@@ -150,14 +150,19 @@ function byDateDesc(a: Post, b: Post): number {
   return a.title.localeCompare(b.title);
 }
 
+/** Return a new, canonically ordered post array without mutating the input. */
+export function sortPostsNewestFirst(posts: readonly Post[]): Post[] {
+  return [...posts].sort(byDateDesc);
+}
+
 /** Every post on disk, drafts included, sorted newest first. */
 export function getAllPosts(directory: string = POSTS_DIRECTORY): Post[] {
   if (!fs.existsSync(directory)) return [];
-  return fs
+  const posts = fs
     .readdirSync(directory)
     .filter(isPostFile)
-    .map((filename) => readPost(directory, filename))
-    .sort(byDateDesc);
+    .map((filename) => readPost(directory, filename));
+  return sortPostsNewestFirst(posts);
 }
 
 /** Posts safe to show anywhere: drafts removed. */
@@ -216,6 +221,14 @@ export function formatPostDate(date: string): string {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+/** e.g. "2026-09-03" -> "September". Timezone-independent. */
+export function formatPostMonth(date: string): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "long",
     timeZone: "UTC",
   });
 }
