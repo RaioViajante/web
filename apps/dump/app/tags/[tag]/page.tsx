@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
-import { PostList } from "@/components/PostList";
+import { TagPostList, tagHref } from "@/components/TagViews";
 import { getAllTags, getPostsByTag } from "@/lib/posts";
 
 export const dynamicParams = false;
@@ -18,24 +18,22 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { tag } = await params;
-  const name = decodeURIComponent(tag);
   return {
-    title: `Posts tagged "${name}"`,
-    description: `Posts tagged "${name}".`,
-    alternates: { canonical: `/tags/${tag}` },
+    title: `Posts tagged "${tag}"`,
+    description: `Posts tagged "${tag}".`,
+    alternates: { canonical: tagHref(tag) },
   };
 }
 
 export default async function TagPage({ params }: PageProps) {
   const { tag } = await params;
-  const name = decodeURIComponent(tag);
-  const posts = getPostsByTag(name);
+  const posts = getPostsByTag(tag);
   if (posts.length === 0) notFound();
 
   return (
-    <>
-      <h1>Posts tagged {name}</h1>
-      <PostList posts={posts} />
-    </>
+    <div className="tag-page">
+      <h1 className="tag-page-heading">tag: {tag}</h1>
+      <TagPostList posts={posts} />
+    </div>
   );
 }
