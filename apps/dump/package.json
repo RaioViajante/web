@@ -1,0 +1,23 @@
+{
+  "name": "dump",
+  "version": "1.0.0",
+  "description": "> a memory dump, hopefully readable.",
+  "homepage": "https://github.com/RaioViajante/dump#readme",
+  "bugs": {
+    "url": "https://github.com/RaioViajante/dump/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RaioViajante/dump.git"
+  },
+  "license": "MIT",
+  "author": "",
+  "scripts": {
+    "dev": "next dev"
+  },
+  "dependencies": {
+    "next": "^13.1.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
