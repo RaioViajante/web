@@ -15,10 +15,11 @@ interface PostArticleProps {
  */
 export function PostArticle({ post, children }: PostArticleProps) {
   return (
-    <article>
+    <article className="post-article">
       <header>
-        <h1>{post.title}</h1>
+        <h1 className="post-title">{post.title}</h1>
         <PostMeta date={post.date} tags={post.tags} />
+        <p className="post-dek">{post.description}</p>
       </header>
 
       <div className="prose">{children}</div>
