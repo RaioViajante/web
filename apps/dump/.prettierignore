@@ -1,7 +1,13 @@
 node_modules
 .next
+.turbo
 out
 build
 coverage
 .vercel
 package-lock.json
+next-env.d.ts
+
+# Content is authored prose — don't let the formatter reflow it.
+content
+tests/fixtures

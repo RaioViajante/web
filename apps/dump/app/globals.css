@@ -1,0 +1,194 @@
+/*
+ * Readable baseline only. Not the visual identity — that comes in a later
+ * milestone. This file provides document defaults, a typographic baseline,
+ * layout width, code-block overflow, focus states, and article readability.
+ */
+
+:root {
+  --font-body: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-ui:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:
+    ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace;
+
+  --color-text: #1a1a1a;
+  --color-muted: #565656;
+  --color-link: #0b5cad;
+  --color-rule: #dcdcdc;
+  --color-code-bg: #f4f4f4;
+
+  --measure: 68ch;
+  --space: 1.6rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 112.5%;
+  line-height: 1.6;
+}
+
+body {
+  margin: 0;
+  padding: 0 var(--space);
+  color: var(--color-text);
+  background: #fff;
+  font-family: var(--font-body);
+  -webkit-text-size-adjust: 100%;
+}
+
+body > * {
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+
+main {
+  padding-block: calc(var(--space) * 2);
+}
+
+/* The skip link moves focus here; no ring needed on a deliberate jump. */
+main:focus {
+  outline: none;
+}
+
+a {
+  color: var(--color-link);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+/* Skip link: off-screen until focused. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-text);
+  color: #fff;
+  font-family: var(--font-ui);
+}
+
+.skip-link:focus {
+  left: var(--space);
+}
+
+/* Header / footer */
+.site-header,
+.site-footer {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: var(--space);
+}
+
+.site-title {
+  font-weight: 700;
+}
+
+.site-header nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer {
+  padding-block: var(--space);
+  color: var(--color-muted);
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-ui);
+  line-height: 1.25;
+  margin: calc(var(--space) * 1.5) 0 var(--space);
+}
+
+h1 {
+  font-size: 1.9rem;
+}
+h2 {
+  font-size: 1.4rem;
+}
+h3 {
+  font-size: 1.15rem;
+}
+
+/* Post byline and listings */
+.post-meta {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.post-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.post-list > li {
+  margin-block: calc(var(--space) * 1.5);
+}
+
+/* Rendered MDX */
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose blockquote {
+  margin-inline: 0;
+  padding-left: var(--space);
+  border-left: 3px solid var(--color-rule);
+  color: var(--color-muted);
+}
+
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--color-code-bg);
+  padding: 0.15em 0.35em;
+}
+
+.prose pre {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  padding: var(--space);
+  background: var(--color-code-bg);
+  overflow-x: auto;
+}
+
+.prose pre code {
+  display: grid; /* one grid row per line — rehype-pretty-code */
+}
+
+figure[data-rehype-pretty-code-figure] {
+  margin-inline: 0;
+}
+
+figcaption[data-rehype-pretty-code-title] {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  margin-bottom: 0.4rem;
+}

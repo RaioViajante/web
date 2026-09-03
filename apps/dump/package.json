@@ -1,7 +1,10 @@
 {
   "name": "dump",
-  "version": "1.0.0",
-  "description": "> a memory dump, hopefully readable.",
+  "version": "0.1.0",
+  "private": true,
+  "description": "a memory dump, hopefully readable.",
+  "license": "MIT",
+  "author": "RaioViajante",
   "homepage": "https://github.com/RaioViajante/dump#readme",
   "bugs": {
     "url": "https://github.com/RaioViajante/dump/issues"
@@ -10,14 +13,49 @@
     "type": "git",
     "url": "git+https://github.com/RaioViajante/dump.git"
   },
-  "license": "MIT",
-  "author": "",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
-    "dev": "next dev"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
-    "next": "^13.1.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "@mdx-js/loader": "^3.1.1",
+    "@next/mdx": "^16.3.4",
+    "gray-matter": "^4.0.3",
+    "next": "^16.3.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "rehype-pretty-code": "^0.14.5",
+    "rehype-slug": "^6.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "shiki": "^4.4.3"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/jest": "^30.0.0",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.4",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^30.5.1",
+    "jest-environment-jsdom": "^30.5.1",
+    "prettier": "^3.9.6",
+    "typescript": "^5.9.3"
   }
 }

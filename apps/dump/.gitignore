@@ -5,6 +5,14 @@
 /.next
 /out
 
+# turbopack
+.turbo
+
+# next dev auto-generates these when an AI agent is detected; keep them out of
+# the tree. Run `git add -f` if you decide to adopt them (see nextjs.org docs).
+/AGENTS.md
+/CLAUDE.md
+
 # production
 /build
 
