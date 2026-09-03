@@ -6,9 +6,7 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <p>
-        {site.tagline}
-        {" — "}
-        <Link href="/rss.xml">RSS</Link>
+        {site.name} — {site.author}, 2026. <Link href="/rss.xml">rss</Link>
       </p>
     </footer>
   );
