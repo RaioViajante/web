@@ -563,6 +563,57 @@ h3 {
   font-weight: 700;
 }
 
+/* Uses */
+.uses-page {
+  overflow-wrap: break-word;
+}
+
+.uses-heading {
+  margin: 0 0 34px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.uses-section {
+  margin-bottom: 34px;
+}
+
+.uses-section-heading {
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-rule);
+  color: var(--color-muted);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.uses-list {
+  margin: 0;
+}
+
+.uses-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-rule-soft);
+}
+
+.uses-item-name {
+  color: var(--fg);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.uses-item-note {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 /* Article */
 .post-article {
   max-width: var(--measure);
