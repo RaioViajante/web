@@ -393,6 +393,74 @@ h3 {
   }
 }
 
+/* Archive chronology */
+.archive-heading {
+  margin: 0 0 28px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.archive-empty {
+  margin: 0;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.archive-year {
+  margin-bottom: 36px;
+}
+
+.archive-year:last-child {
+  margin-bottom: 0;
+}
+
+.archive-year-heading {
+  margin: 0 0 12px;
+  color: var(--fg);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.archive-post-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.archive-post {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--color-rule-soft);
+}
+
+.archive-post-date {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.archive-post-title {
+  color: var(--fg);
+  font-size: 16.5px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.archive-post-title:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 420px) {
+  .archive-post {
+    grid-template-columns: 62px minmax(0, 1fr);
+  }
+}
+
 /* Article */
 .post-article {
   max-width: var(--measure);
