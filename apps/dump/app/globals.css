@@ -370,17 +370,99 @@ h3 {
 }
 
 .prose blockquote {
-  margin-inline: 0;
-  padding-left: var(--space);
-  border-left: 3px solid var(--color-rule);
+  margin: 0 0 24px;
+  padding-left: 18px;
+  border-left: 2px solid var(--color-rule);
   color: var(--color-muted);
+  font-style: italic;
+}
+
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 22px;
+  padding-left: clamp(1.25rem, 5vw, 1.4rem);
+}
+
+.prose li + li {
+  margin-top: 8px;
+}
+
+.prose li::marker {
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.prose li > p {
+  margin-bottom: 8px;
+}
+
+.prose li > ul,
+.prose li > ol {
+  margin: 8px 0 0;
+  padding-left: clamp(1.1rem, 4vw, 1.25rem);
 }
 
 .prose :not(pre) > code {
-  font-family: var(--font-mono);
-  font-size: 0.85em;
+  padding: 2px 5px;
+  color: var(--fg);
   background: var(--color-code-bg);
-  padding: 0.15em 0.35em;
+  font-family: var(--font-mono);
+  font-size: 0.84em;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.table-scroll {
+  max-width: 100%;
+  margin: 0 0 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose table {
+  width: 100%;
+  min-width: max-content;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.prose th {
+  padding: 0 12px 8px;
+  border-bottom: 1px solid var(--color-rule);
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.prose td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-rule-soft);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose :is(th, td):first-child {
+  padding-left: 0;
+}
+
+.prose :is(th, td):last-child {
+  padding-right: 0;
+}
+
+.prose tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .prose pre {
