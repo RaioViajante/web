@@ -45,6 +45,7 @@ html {
 
 body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
   min-height: 100svh;
@@ -206,6 +207,12 @@ a {
 
 .site-footer a:hover {
   color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    padding-bottom: max(88px, calc(env(safe-area-inset-bottom) + 80px));
+  }
 }
 
 /* Theme control */
