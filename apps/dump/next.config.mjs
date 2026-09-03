@@ -4,7 +4,43 @@ import createMDX from "@next/mdx";
  * Syntax highlighting theme for `rehype-pretty-code` (Shiki). Highlighting runs
  * at build time, so no highlighter ships to the browser.
  */
-const shikiTheme = "github-light";
+const shikiTheme = {
+  name: "dump-ink",
+  type: "dark",
+  colors: {
+    "editor.background": "#201c29",
+    "editor.foreground": "#eae6f0",
+  },
+  tokenColors: [
+    {
+      settings: {
+        background: "#201c29",
+        foreground: "#eae6f0",
+      },
+    },
+    {
+      scope: ["comment", "punctuation.definition.comment"],
+      settings: { foreground: "#8f88a3" },
+    },
+    {
+      scope: ["string", "punctuation.definition.string"],
+      settings: { foreground: "#8f88a3" },
+    },
+    {
+      scope: [
+        "keyword",
+        "storage",
+        "constant.numeric",
+        "constant.language",
+        "entity.name.function",
+        "entity.name.label",
+        "support.function",
+        "support.type",
+      ],
+      settings: { foreground: "#b7a4dd" },
+    },
+  ],
+};
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -20,7 +56,10 @@ const withMDX = createMDX({
     remarkPlugins: ["remark-frontmatter", "remark-gfm"],
     rehypePlugins: [
       "rehype-slug",
-      ["rehype-pretty-code", { theme: shikiTheme, keepBackground: false }],
+      [
+        "rehype-pretty-code",
+        { theme: shikiTheme, keepBackground: false, grid: false },
+      ],
     ],
   },
 });

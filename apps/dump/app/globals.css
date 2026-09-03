@@ -384,20 +384,29 @@ h3 {
 }
 
 .prose pre {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  line-height: 1.5;
-  padding: var(--space);
-  background: var(--color-code-bg);
+  max-width: 100%;
+  margin: 0;
+  padding: 14px 18px;
   overflow-x: auto;
+  color: var(--code-fg);
+  background: var(--code-surface);
+  font-family: var(--font-mono);
+  font-size: 14.5px;
+  line-height: 1.6;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
 }
 
 .prose pre code {
-  display: grid; /* one grid row per line — rehype-pretty-code */
+  display: block;
+  min-width: max-content;
+  font: inherit;
+  white-space: inherit;
 }
 
 figure[data-rehype-pretty-code-figure] {
-  margin-inline: 0;
+  max-width: 100%;
+  margin: 0 0 24px;
 }
 
 figcaption[data-rehype-pretty-code-title] {
