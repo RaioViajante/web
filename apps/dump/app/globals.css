@@ -1,21 +1,30 @@
-/*
- * Readable baseline only. Not the visual identity — that comes in a later
- * milestone. This file provides document defaults, a typographic baseline,
- * layout width, code-block overflow, focus states, and article readability.
- */
+:root,
+[data-theme="light"] {
+  --bg: #f4f2ef;
+  --fg: #201e1d;
+  --accent: #4a3d68;
+}
+
+[data-theme="dark"] {
+  --bg: #18161b;
+  --fg: #ece7e0;
+  --accent: #c3b3e0;
+}
 
 :root {
-  --font-body: ui-serif, Georgia, Cambria, "Times New Roman", serif;
-  --font-ui:
-    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono:
-    ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace;
+  --font-body: var(--font-source-serif), Georgia, serif;
+  --font-ui: var(--font-source-serif), Georgia, serif;
+  --font-mono: var(--font-ibm-plex-mono), monospace;
 
-  --color-text: #1a1a1a;
-  --color-muted: #565656;
-  --color-link: #0b5cad;
-  --color-rule: #dcdcdc;
-  --color-code-bg: #f4f4f4;
+  --color-muted: color-mix(in srgb, var(--fg) 55%, transparent);
+  --color-rule: color-mix(in srgb, var(--fg) 15%, transparent);
+  --color-rule-soft: color-mix(in srgb, var(--fg) 9%, transparent);
+  --color-code-bg: color-mix(in srgb, var(--fg) 7%, var(--bg));
+  --selection-bg: color-mix(in srgb, var(--accent) 28%, transparent);
+  --code-surface: #201c29;
+  --code-fg: #eae6f0;
+  --code-muted: #8f88a3;
+  --code-accent: #b7a4dd;
 
   --measure: 68ch;
   --space: 1.6rem;
@@ -35,10 +44,15 @@ html {
 body {
   margin: 0;
   padding: 0 var(--space);
-  color: var(--color-text);
-  background: #fff;
+  color: var(--fg);
+  background: var(--bg);
   font-family: var(--font-body);
   -webkit-text-size-adjust: 100%;
+}
+
+::selection {
+  color: var(--fg);
+  background: var(--selection-bg);
 }
 
 body > * {
@@ -56,11 +70,11 @@ main:focus {
 }
 
 a {
-  color: var(--color-link);
+  color: var(--accent);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-link);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -70,8 +84,8 @@ a {
   left: -9999px;
   top: 0;
   padding: 0.5rem 0.75rem;
-  background: var(--color-text);
-  color: #fff;
+  background: var(--fg);
+  color: var(--bg);
   font-family: var(--font-ui);
 }
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { SiteFooter } from "@/components/SiteFooter";
@@ -6,6 +7,18 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/lib/site";
 
 import "./globals.css";
+
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  variable: "--font-source-serif",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-ibm-plex-mono",
+  weight: ["400", "500"],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -37,7 +50,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang={site.locale}>
-      <body>
+      <body className={`${sourceSerif.variable} ${ibmPlexMono.variable}`}>
         <a href="#content" className="skip-link">
           Skip to content
         </a>
