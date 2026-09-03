@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { site } from "@/lib/site";
 
 import "./globals.css";
@@ -19,6 +20,21 @@ const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
   weight: ["400", "500"],
 });
+
+const themeScript = `
+(function(){
+  var theme = "light";
+  var stored;
+  try {
+    stored = localStorage.getItem("dump-theme");
+  } catch (error) {}
+  if (stored === "light" || stored === "dark") {
+    theme = stored;
+  } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    theme = "dark";
+  }
+  document.documentElement.setAttribute("data-theme", theme);
+})();`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -49,7 +65,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang={site.locale}>
+    <html lang={site.locale} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className={`${sourceSerif.variable} ${ibmPlexMono.variable}`}>
         <a href="#content" className="skip-link">
           Skip to content
@@ -59,6 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {children}
         </main>
         <SiteFooter />
+        <ThemeToggle />
       </body>
     </html>
   );
