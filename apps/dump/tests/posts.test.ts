@@ -105,6 +105,29 @@ describe("post collection", () => {
   });
 });
 
+describe("rendering fixture", () => {
+  it("is valid draft metadata recognized by the content pipeline", () => {
+    expect(getPostBySlug("rendering-test")).toMatchObject({
+      slug: "rendering-test",
+      title: "Rendering Test",
+      draft: true,
+    });
+  });
+
+  it("is excluded from published posts and production static params", () => {
+    expect(getPublishedPosts().map((post) => post.slug)).not.toContain(
+      "rendering-test",
+    );
+
+    const nodeEnv = jest.replaceProperty(process.env, "NODE_ENV", "production");
+    try {
+      expect(getPostSlugs()).not.toContain("rendering-test");
+    } finally {
+      nodeEnv.restore();
+    }
+  });
+});
+
 describe("tags", () => {
   it("counts tags across published posts only, most used first", () => {
     expect(getAllTags(FIXTURES)).toEqual([

@@ -1,0 +1,95 @@
+---
+title: "Rendering Test"
+description: "Development-only fixture for verifying the MDX reading experience."
+date: "2026-09-03"
+tags: []
+draft: true
+---
+
+This paragraph verifies ordinary prose with _emphasized text_, **strong text**, a link to the [MDX documentation](https://mdxjs.com/), and inline code such as `const value = 42`.
+
+A second paragraph makes consecutive text blocks and their vertical spacing easy to inspect.
+
+## Section heading
+
+This section separates the primary heading treatment from the surrounding paragraphs.
+
+### Subsection heading
+
+This subsection verifies the next level in the heading hierarchy.
+
+- First unordered item
+- Second unordered item
+  - Nested unordered item
+  - Another nested item with `inline code`
+- Final unordered item
+
+1. First ordered item
+2. Second ordered item
+   1. Nested ordered item
+   2. Another nested ordered item
+3. Final ordered item
+
+> This neutral quotation exists only to verify blockquote rendering across multiple lines.
+> Its second line makes spacing and indentation problems visible.
+
+| Element | Example | Expected behavior |
+| --- | --- | --- |
+| Emphasis | `_text_` | Italic text |
+| Strong | `**text**` | Heavier text |
+| Link | `[label](url)` | Recognizable link |
+
+## Assembly
+
+```asm
+bits 16
+org 0x7c00
+
+start:
+    mov ah, 0x0e      ; BIOS teletype function
+    mov al, 'H'
+    int 0x10
+
+    mov cx, 3         ; repeat count
+.hang:
+    jmp .hang
+```
+
+## TypeScript
+
+```typescript
+type RenderState = {
+  label: string;
+  count: number;
+};
+
+function formatState(state: RenderState): string {
+  // Preserve indentation, comments, strings, and numbers.
+  const nextCount = state.count + 1;
+
+  return `${state.label}: ${nextCount}`;
+}
+
+const result = formatState({
+  label: "rendering fixture",
+  count: 41,
+});
+
+const intentionallyLongSourceLine = "This deliberately long source line should remain on one line so horizontal overflow behavior is immediately visible during code-block refinement.";
+```
+
+## Shell
+
+```sh
+# Prepare a temporary output directory.
+mkdir -p ./tmp/rendering-test
+
+printf '%s\n' "first line" "second line"
+npm run typecheck
+
+for file in ./content/posts/*.mdx; do
+  printf 'checking %s\n' "$file"
+done
+```
+
+The final paragraph confirms that prose resumes normally after consecutive fenced examples.
