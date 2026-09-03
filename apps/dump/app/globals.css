@@ -551,6 +551,18 @@ h3 {
   }
 }
 
+/* About */
+.about-page.prose {
+  max-width: 520px;
+  margin-top: 0;
+}
+
+.about-heading {
+  margin: 0 0 24px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
 /* Article */
 .post-article {
   max-width: var(--measure);

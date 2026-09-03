@@ -7,13 +7,8 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <>
-      <h1>About</h1>
-      <p>
-        This is a personal publishing site for RaioViajante — notes on computer
-        science, projects, devlogs, tooling, and hardware. A memory dump,
-        hopefully readable.
-      </p>
-    </>
+    <div className="about-page prose">
+      <h1 className="about-heading">About</h1>
+    </div>
   );
 }
