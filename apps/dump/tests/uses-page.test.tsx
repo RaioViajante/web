@@ -17,17 +17,32 @@ describe("<UsesPage />", () => {
     expect(container.querySelector("img")).not.toBeInTheDocument();
   });
 
-  it("opens with the muted running-inventory line", () => {
+  it("opens with the muted intro line and the drier mono aside", () => {
     const { container } = render(<UsesPage />);
 
-    const intro = container.querySelector(".uses-intro");
-    expect(intro).toHaveTextContent(
+    expect(container.querySelector(".uses-intro")).toHaveTextContent(
       "A running, incomplete inventory. Updated whenever I remember to.",
+    );
+    expect(container.querySelector(".uses-aside")).toHaveTextContent(
+      "mostly things I use to convince computers to cooperate.",
     );
   });
 
-  it("groups every entry under one of the four relevant categories", () => {
+  it("lays the four sections out in a single grid in mobile reading order", () => {
     const { container } = render(<UsesPage />);
+
+    const grid = container.querySelector(".uses-grid");
+    expect(grid).toBeInTheDocument();
+
+    // Sections are direct grid children (flat DOM), so document order and the
+    // one-column mobile order are the same; desktop columns come purely from
+    // grid auto-flow, not `order`.
+    const sections = grid
+      ? Array.from(grid.children).filter((node) =>
+          node.classList.contains("uses-section"),
+        )
+      : [];
+    expect(sections).toHaveLength(4);
 
     const headings = Array.from(
       container.querySelectorAll(".uses-section-heading"),

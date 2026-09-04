@@ -62,21 +62,30 @@ export default function UsesPage() {
       <p className="uses-intro">
         A running, incomplete inventory. Updated whenever I remember to.
       </p>
-      {categories.map((category) => (
-        <div className="uses-section" key={category.heading}>
-          <h2 className="uses-section-heading">{category.heading}</h2>
-          <div className="uses-list">
-            {category.items.map((item) => (
-              <div className="uses-item" key={item.name}>
-                <span className="uses-item-name">{item.name}</span>
-                {item.note ? (
-                  <span className="uses-item-note">{item.note}</span>
-                ) : null}
-              </div>
-            ))}
+      <p className="uses-aside">
+        mostly things I use to convince computers to cooperate.
+      </p>
+      {/* Flat DOM order (Machines, Operating Systems, Editors, Terminal) is the
+          mobile reading order. On wide screens the grid auto-flows the same four
+          sections into two columns: left holds Machines + Editors, right holds
+          Operating Systems + Terminal. No `order` tricks. */}
+      <div className="uses-grid">
+        {categories.map((category) => (
+          <div className="uses-section" key={category.heading}>
+            <h2 className="uses-section-heading">{category.heading}</h2>
+            <div className="uses-list">
+              {category.items.map((item) => (
+                <div className="uses-item" key={item.name}>
+                  <span className="uses-item-name">{item.name}</span>
+                  {item.note ? (
+                    <span className="uses-item-note">{item.note}</span>
+                  ) : null}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

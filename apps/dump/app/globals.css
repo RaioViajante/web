@@ -583,10 +583,34 @@ h3 {
 }
 
 .uses-intro {
-  margin: 0 0 40px;
+  margin: 0 0 6px;
   color: var(--color-muted);
   font-size: 15px;
   line-height: 1.5;
+}
+
+/* A dry footnote under the intro, not a subtitle: mono, a notch smaller, quiet. */
+.uses-aside {
+  margin: 0 0 40px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Two-column editorial grid on wider screens. The four sections stay in a flat
+   DOM (= mobile order); row-major auto-flow drops them into columns as
+   left: Machines, Editors / right: Operating Systems, Terminal. */
+.uses-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: clamp(2rem, 6vw, 3rem);
+}
+
+@media (min-width: 640px) {
+  .uses-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
 }
 
 .uses-section {
