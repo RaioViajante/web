@@ -12,32 +12,30 @@ Origin resolution is centralized in `lib/site.ts` (`resolveSiteUrl()`), priority
 
 `metadataBase`, `alternates.canonical`, Open Graph URLs, the RSS feed, and the sitemap all derive from `site.url` / `absoluteUrl()` — there is no second place that builds URLs, so setting the one environment variable is sufficient.
 
-## Vercel configuration (manual — not yet performed)
+## Vercel configuration
 
-The Vercel CLI was not available or authenticated in this environment (no `vercel` binary, no cached package, no `.vercel/project.json` link), and installing/logging in requires an interactive browser or email OTP flow. Per this issue's scope, that step was **not** attempted automatically. To complete it:
+Done:
 
-1. `vercel login` (interactive) and `vercel link` to associate this repo with the existing Vercel project — do **not** guess the project ID; let the CLI or dashboard resolve it.
-2. Add the custom domain to the project: Vercel dashboard → Project → Settings → Domains → Add → `dump.raioviajante.com` (or `vercel domains add dump.raioviajante.com` / `vercel project add-domain` from a linked CLI).
-3. Vercel will display the exact DNS target for this domain at that point (a CNAME to a project-specific `*.vercel-dns.com`-style host is typical, but **use whatever value Vercel's UI/CLI actually shows** — do not assume a value from memory).
-4. Set the environment variable on the **Production** environment only (Settings → Environment Variables), unless a clear reason emerges to also set it for Preview:
-   ```
-   NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com
-   ```
-5. Do not trigger a deploy as part of this — that belongs to #23.
+- Project `dump` (`prj_aLr1Ds2A7hb3oEcwchcU7r3map69`), under the `bryanalvarenga-5889s-projects` scope.
+- Custom domain `dump.raioviajante.com` added and verified (`vercel domains verify` → `configured-correctly`).
+- `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com` set on the **Production** environment only.
+- Deployed and live at the canonical origin (issue #23).
 
-## Cloudflare DNS (manual — exact target pending step 3 above)
+**Known gap:** Vercel's GitHub App failed to auto-connect this repository when the project was created, and re-checking since (`vercel project inspect dump`) still shows no Git Repository link. Deployment is currently **CLI-only** (`vercel deploy --prod` from a local checkout) — pushing to `main` does not trigger a deploy. Fixing the connection is an interactive step (authorizing Vercel's GitHub App for `RaioViajante/dump`) not attempted here; once connected, Preview/Production deploys and PR checks come from Vercel's own Git integration automatically, no config change needed on this side.
 
-`raioviajante.com` is managed in Cloudflare. Once Vercel provides the real target for `dump.raioviajante.com`:
+## Cloudflare DNS
 
-| Field        | Value                                                                                                                                                 |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Type         | CNAME (or whatever record type Vercel's domain instructions specify for this hostname)                                                                |
-| Name         | `dump`                                                                                                                                                |
-| Target       | _the exact host Vercel displays when the domain is added — not invented here_                                                                         |
-| Proxy status | **DNS only** initially (grey cloud), so Vercel can issue/validate the TLS certificate; can be reconsidered afterward if Cloudflare proxying is wanted |
-| TTL          | Auto                                                                                                                                                  |
+Configured and live, in the `raioviajante.com` zone:
 
-Do not touch any other record on the zone — this only adds the one `dump` record. Do not point the apex (`raioviajante.com`) or `www` at this project.
+| Field        | Value                                                                                             |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| Type         | CNAME                                                                                             |
+| Name         | `dump`                                                                                            |
+| Target       | `1d6a74d940b03953.vercel-dns-017.com.` (the project-specific value Vercel's domain-add flow gave) |
+| Proxy status | DNS only                                                                                          |
+| TTL          | Auto                                                                                              |
+
+No other record on the zone was touched. The apex (`raioviajante.com`) and `www` remain unconfigured, as intended.
 
 ## What's already correct in the app (no code changes needed)
 

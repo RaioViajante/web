@@ -8,7 +8,7 @@ Posts live in `content/posts/` as `.mdx` files. One file is one article.
    `content/posts/booting-512-bytes.mdx` → `/posts/booting-512-bytes`.
 2. Add frontmatter (below) and write the article. Start body headings at `##`
    — the `#` (h1) is the post title, rendered from frontmatter.
-3. Commit and push. Vercel builds and deploys it.
+3. Commit and push. See `docs/production-origin.md` for how this ships.
 
 No React files need to change.
 
@@ -54,8 +54,15 @@ Standard Markdown plus GitHub-flavored tables and strikethrough, automatic
 heading IDs, and build-time syntax highlighting for fenced code blocks. React
 components can be imported directly into an `.mdx` file when needed.
 
-## `_keep.mdx`
+## License
 
-`content/posts/_keep.mdx` is a build placeholder, not a post (the leading `_`
-excludes it). The bundler needs at least one `.mdx` file here to compile the
-post route. Delete it once a real article exists.
+Articles here are Copyright RaioViajante, all rights reserved — not covered
+by the repository's MIT license, which applies only to the source code. See
+the root [`LICENSE`](../LICENSE).
+
+## If this directory is ever empty
+
+The bundler needs at least one `.mdx` file here to compile the post route. If
+every post is ever removed, add a placeholder file (filename starting with
+`_` or `.` so `isPostFile()` in `lib/posts.ts` excludes it from listings)
+until a real one exists again.

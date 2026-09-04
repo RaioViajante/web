@@ -5,6 +5,8 @@
 A personal publication for writing about things I build, learn, use, explore,
 and occasionally break. Mostly computers.
 
+Live at [dump.raioviajante.com](https://dump.raioviajante.com).
+
 ## What is this?
 
 The code behind `dump`, RaioViajante's site. A static Next.js site that turns a
@@ -18,6 +20,7 @@ somewhere to write things down while learning and building in public.
 - MDX through `@next/mdx`, with frontmatter parsed by `gray-matter`
 - `rehype-pretty-code` and Shiki for build-time syntax highlighting
 - `remark-gfm`, `rehype-slug`
+- Giscus for comments, backed by GitHub Discussions
 - Jest and Testing Library
 
 ## Writing
@@ -72,3 +75,9 @@ content/     posts, as MDX
 lib/         content pipeline, feed, site config
 tests/       Jest specs
 ```
+
+## License
+
+Source code is [MIT](LICENSE). The written articles in `content/posts/` are
+not — they're Copyright RaioViajante, all rights reserved. See
+[`content/README.md`](content/README.md).
