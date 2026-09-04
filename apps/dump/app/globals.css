@@ -571,6 +571,12 @@ h3 {
   font-weight: 700;
 }
 
+/* The closing line reads better with a little more air above it. Still ordinary
+   prose — same family, size, and weight as the paragraphs before it. */
+.about-coda {
+  margin-top: 34px;
+}
+
 /* Uses */
 .uses-page {
   overflow-wrap: break-word;
