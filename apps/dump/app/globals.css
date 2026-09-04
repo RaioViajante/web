@@ -919,3 +919,14 @@ figcaption[data-rehype-pretty-code-title] {
   color: var(--color-muted);
   margin-bottom: 0.4rem;
 }
+
+/* Comments (Giscus): a single quiet rule continuing the article, not a card. */
+.comments-rule {
+  margin: 56px 0 0;
+  border: none;
+  border-top: 1px solid var(--color-rule);
+}
+
+.comments {
+  margin-top: var(--space);
+}

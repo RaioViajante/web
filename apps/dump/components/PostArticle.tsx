@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { Comments } from "@/components/Comments";
 import { PostMeta } from "@/components/PostMeta";
 import type { Post } from "@/lib/posts";
 
@@ -9,9 +10,9 @@ interface PostArticleProps {
 }
 
 /**
- * Chrome around a rendered MDX post: title, byline, prose body, and a slot for
- * a future comments section (Giscus). The content system does not need to
- * change when comments are added — mount them where the marker is.
+ * Chrome around a rendered MDX post: title, byline, prose body, and the
+ * comments section (Giscus). `Comments` is the only client boundary here —
+ * everything else in this tree stays server-rendered.
  */
 export function PostArticle({ post, children }: PostArticleProps) {
   return (
@@ -24,7 +25,7 @@ export function PostArticle({ post, children }: PostArticleProps) {
 
       <div className="prose">{children}</div>
 
-      {/* Comments slot: render <Comments /> (Giscus) here later. */}
+      <Comments />
     </article>
   );
 }
