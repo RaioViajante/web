@@ -930,3 +930,30 @@ figcaption[data-rehype-pretty-code-title] {
 .comments {
   margin-top: var(--space);
 }
+
+/* 404 */
+.not-found-page {
+  margin-top: 24px;
+}
+
+.not-found-eyebrow {
+  margin: 0 0 14px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.not-found-heading {
+  margin: 0 0 16px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.not-found-copy {
+  margin: 0 0 28px;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+}
