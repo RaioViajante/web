@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 
 import { PostArticle } from "@/components/PostArticle";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
+import { alternatesFor } from "@/lib/site";
+import { blogPostingJsonLd, jsonLdScript } from "@/lib/structured-data";
 
 export const dynamicParams = false;
 
@@ -24,7 +26,7 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
-    alternates: { canonical: `/posts/${post.slug}` },
+    alternates: alternatesFor(`/posts/${post.slug}`),
     openGraph: {
       type: "article",
       title: post.title,
@@ -44,8 +46,16 @@ export default async function PostPage({ params }: PageProps) {
   const { default: Content } = await import(`@/content/posts/${slug}.mdx`);
 
   return (
-    <PostArticle post={post}>
-      <Content />
-    </PostArticle>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript(blogPostingJsonLd(post)),
+        }}
+      />
+      <PostArticle post={post}>
+        <Content />
+      </PostArticle>
+    </>
   );
 }

@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
+
 import { HomePostList } from "@/components/HomePostList";
 import { getPublishedPosts } from "@/lib/posts";
+import { alternatesFor } from "@/lib/site";
+
+export const metadata: Metadata = {
+  alternates: alternatesFor("/"),
+};
 
 export default function HomePage() {
   const posts = getPublishedPosts();

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 
+import { alternatesFor } from "@/lib/site";
+
 export const metadata: Metadata = {
   title: "Uses",
+  alternates: alternatesFor("/uses"),
 };
 
 type UsesItem = {

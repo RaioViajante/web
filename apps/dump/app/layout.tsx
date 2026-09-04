@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { site } from "@/lib/site";
+import { alternatesFor, site } from "@/lib/site";
+import { jsonLdScript, websiteJsonLd } from "@/lib/structured-data";
 
 import "./globals.css";
 
@@ -45,12 +46,10 @@ export const metadata: Metadata = {
   description: site.description,
   authors: [{ name: site.author }],
   // No canonical here: child pages that need one set it themselves, and an
-  // inherited `canonical: "/"` would wrongly point every page at the homepage.
-  alternates: {
-    types: {
-      "application/rss+xml": [{ url: "/rss.xml", title: `${site.name} RSS` }],
-    },
-  },
+  // inherited `canonical: "/"` would wrongly point every page at the
+  // homepage. Every page's `alternates` (this one included) goes through
+  // `alternatesFor` so the RSS link survives that per-page override.
+  alternates: alternatesFor(),
   // Site-level Open Graph defaults. No `url` here — like `canonical`, an
   // inherited one would point every page at the homepage. Post pages set their
   // own `openGraph`.
@@ -73,6 +72,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang={site.locale} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
+        />
       </head>
       <body className={`${sourceSerif.variable} ${ibmPlexMono.variable}`}>
         <a href="#content" className="skip-link">

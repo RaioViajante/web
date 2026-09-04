@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { TagPostList, tagHref } from "@/components/TagViews";
 import { getAllTags, getPostsByTag } from "@/lib/posts";
+import { alternatesFor } from "@/lib/site";
 
 export const dynamicParams = false;
 
@@ -21,7 +22,7 @@ export async function generateMetadata({
   return {
     title: `Posts tagged "${tag}"`,
     description: `Posts tagged "${tag}".`,
-    alternates: { canonical: tagHref(tag) },
+    alternates: alternatesFor(tagHref(tag)),
   };
 }
 

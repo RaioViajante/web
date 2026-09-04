@@ -33,3 +33,23 @@ export const site = {
 export function absoluteUrl(path: string): string {
   return `${site.url}${path.startsWith("/") ? path : `/${path}`}`;
 }
+
+/**
+ * A page's `alternates` metadata: RSS autodiscovery, plus this page's own
+ * canonical URL if it has one.
+ *
+ * Next merges `metadata` fields shallowly — a page that sets its own
+ * `alternates` replaces the root layout's `alternates` entirely rather than
+ * merging into it, silently dropping the RSS `<link>` on every page that
+ * sets a canonical unless it re-declares `types` too. Route every
+ * `alternates` field (root layout included) through this one function so
+ * that can't happen by omission.
+ */
+export function alternatesFor(canonicalPath?: string) {
+  return {
+    ...(canonicalPath ? { canonical: canonicalPath } : {}),
+    types: {
+      "application/rss+xml": [{ url: "/rss.xml", title: `${site.name} RSS` }],
+    },
+  };
+}

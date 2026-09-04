@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 
+import { alternatesFor } from "@/lib/site";
+
 export const metadata: Metadata = {
   title: "About",
   description: "What this site is and who writes it.",
+  alternates: alternatesFor("/about"),
 };
 
 export default function AboutPage() {
