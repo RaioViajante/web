@@ -7,7 +7,26 @@ import {
   TagPostList,
   tagHref,
 } from "@/components/TagViews";
-import type { Post } from "@/lib/posts";
+import { getAllTags, getPostsByTag } from "@/lib/posts";
+import type { Post, TagCount } from "@/lib/posts";
+
+// `app/tags/[tag]/page.tsx` reads real published posts by default (as it
+// must, in production). The "tag routes" tests below stub just the two
+// lookups it calls, so route behavior stays deterministic regardless of
+// whatever posts currently exist in content/posts. Every other export
+// (formatPostDate, sortPostsNewestFirst, ...) stays real, since the
+// presentational tests further down render against it.
+// jest.mock() takes a literal specifier, not one resolved through the "@/"
+// alias (that's rewritten only for static import/require specifiers by
+// Next's SWC transform), so this uses the real relative path.
+jest.mock("../lib/posts", () => ({
+  ...jest.requireActual("../lib/posts"),
+  getAllTags: jest.fn(),
+  getPostsByTag: jest.fn(),
+}));
+
+const mockGetAllTags = jest.mocked(getAllTags);
+const mockGetPostsByTag = jest.mocked(getPostsByTag);
 
 const posts: Post[] = [
   {
@@ -91,11 +110,30 @@ describe("<TagPostList />", () => {
 });
 
 describe("tag routes", () => {
+  afterEach(() => {
+    mockGetAllTags.mockReset();
+    mockGetPostsByTag.mockReset();
+  });
+
   it("does not generate tag routes when there are no published posts", () => {
+    mockGetAllTags.mockReturnValue([]);
+
     expect(generateStaticParams()).toEqual([]);
   });
 
+  it("generates one static param per known tag", () => {
+    const tags: TagCount[] = [
+      { tag: "osdev", count: 2 },
+      { tag: "x86", count: 1 },
+    ];
+    mockGetAllTags.mockReturnValue(tags);
+
+    expect(generateStaticParams()).toEqual([{ tag: "osdev" }, { tag: "x86" }]);
+  });
+
   it("returns a real 404 for a tag with no published posts", async () => {
+    mockGetPostsByTag.mockReturnValue([]);
+
     await expect(
       TagPage({ params: Promise.resolve({ tag: "does-not-exist" }) }),
     ).rejects.toThrow(/404/);
