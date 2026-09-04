@@ -3,12 +3,17 @@
   --bg: #f4f2ef;
   --fg: #201e1d;
   --accent: #4a3d68;
+  /* Paper holds less contrast than charcoal, so the muted mix is heavier here
+     to keep secondary text at the same perceived weight as dark mode and clear
+     the AA threshold on small metadata text. */
+  --color-muted: color-mix(in srgb, var(--fg) 65%, transparent);
 }
 
 [data-theme="dark"] {
   --bg: #18161b;
   --fg: #ece7e0;
   --accent: #c3b3e0;
+  --color-muted: color-mix(in srgb, var(--fg) 55%, transparent);
 }
 
 :root {
@@ -16,7 +21,6 @@
   --font-ui: var(--font-source-serif), Georgia, serif;
   --font-mono: var(--font-ibm-plex-mono), monospace;
 
-  --color-muted: color-mix(in srgb, var(--fg) 55%, transparent);
   --color-rule: color-mix(in srgb, var(--fg) 15%, transparent);
   --color-rule-soft: color-mix(in srgb, var(--fg) 9%, transparent);
   --color-code-bg: color-mix(in srgb, var(--fg) 7%, var(--bg));
