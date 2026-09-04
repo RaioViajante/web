@@ -166,6 +166,37 @@ a {
   line-height: 1.5;
 }
 
+/* Navigation row: the primary links, with the GitHub utility link held to the
+   far right of the row and dropping onto its own line only at very narrow
+   widths. */
+.site-nav-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+}
+
+.site-nav-row .primary-navigation {
+  flex: 1 1 auto;
+}
+
+.site-github-link {
+  display: inline-flex;
+  margin-left: auto;
+  color: var(--fg);
+  transition: color 150ms ease;
+}
+
+.site-github-link:hover {
+  color: var(--accent);
+}
+
+.site-github-link svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
 .primary-navigation {
   font-size: 15px;
   line-height: 1.5;
