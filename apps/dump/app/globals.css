@@ -577,9 +577,16 @@ h3 {
 }
 
 .uses-heading {
-  margin: 0 0 34px;
+  margin: 0 0 12px;
   font-size: 28px;
   font-weight: 700;
+}
+
+.uses-intro {
+  margin: 0 0 40px;
+  color: var(--color-muted);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .uses-section {

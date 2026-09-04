@@ -10,7 +10,6 @@ describe("<UsesPage />", () => {
       screen.getByRole("heading", { level: 1, name: "Uses" }),
     ).toBeInTheDocument();
     expect(container.querySelector(".uses-page")).toBeInTheDocument();
-    expect(container.querySelector("p")).not.toBeInTheDocument();
     expect(container.querySelector("section")).not.toBeInTheDocument();
     expect(container.querySelector("dl")).not.toBeInTheDocument();
     expect(container.querySelector("ul")).not.toBeInTheDocument();
@@ -18,39 +17,43 @@ describe("<UsesPage />", () => {
     expect(container.querySelector("img")).not.toBeInTheDocument();
   });
 
-  it("groups every entry under a category heading", () => {
-    render(<UsesPage />);
+  it("opens with the muted running-inventory line", () => {
+    const { container } = render(<UsesPage />);
 
-    for (const heading of [
-      "Desktop",
-      "Laptop",
-      "Displays",
-      "Keyboards",
-      "Mice & Desk",
-      "Audio",
-      "Camera",
+    const intro = container.querySelector(".uses-intro");
+    expect(intro).toHaveTextContent(
+      "A running, incomplete inventory. Updated whenever I remember to.",
+    );
+  });
+
+  it("groups every entry under one of the four relevant categories", () => {
+    const { container } = render(<UsesPage />);
+
+    const headings = Array.from(
+      container.querySelectorAll(".uses-section-heading"),
+    ).map((node) => node.textContent);
+    expect(headings).toEqual([
+      "Machines",
       "Operating Systems",
       "Editors",
       "Terminal",
-      "Lab",
-      "Consoles",
-    ]) {
-      expect(
-        screen.getByRole("heading", { level: 2, name: heading }),
-      ).toBeInTheDocument();
-    }
+    ]);
   });
 
-  it("renders an item name with an optional quiet secondary detail", () => {
+  it("renders item names with an optional quiet secondary detail", () => {
     const { container } = render(<UsesPage />);
 
-    expect(screen.getByText("AMD Ryzen 7 5700X3D")).toBeInTheDocument();
-    expect(screen.getByText("32 GB · 3600 MT/s")).toBeInTheDocument();
+    expect(screen.getByText("Desktop")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Ryzen 7 5700X3D · 32 GB RAM · Fedora Workstation / Windows 11",
+      ),
+    ).toBeInTheDocument();
     expect(
       screen.getByText("planned VM on Fedora Workstation"),
     ).toBeInTheDocument();
 
-    // Names are always present; notes are optional.
+    // Names are always present; notes are optional (Terminal entries carry none).
     expect(
       container.querySelectorAll(".uses-item-name").length,
     ).toBeGreaterThan(container.querySelectorAll(".uses-item-note").length);
