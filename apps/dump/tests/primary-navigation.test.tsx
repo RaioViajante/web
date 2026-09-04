@@ -20,7 +20,7 @@ describe("<PrimaryNavigation />", () => {
   });
 
   it("keeps posts current while reading an article", () => {
-    pathname = "/posts/rendering-test";
+    pathname = "/posts/booting-512-bytes";
     render(<PrimaryNavigation />);
 
     expect(screen.getByRole("link", { name: "posts" })).toHaveAttribute(

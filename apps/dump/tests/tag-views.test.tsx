@@ -91,7 +91,7 @@ describe("<TagPostList />", () => {
 });
 
 describe("tag routes", () => {
-  it("does not generate tag routes from the draft-only publication", () => {
+  it("does not generate tag routes when there are no published posts", () => {
     expect(generateStaticParams()).toEqual([]);
   });
 

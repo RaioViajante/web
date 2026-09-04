@@ -295,16 +295,6 @@ h3 {
   color: var(--color-muted);
 }
 
-.post-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.post-list > li {
-  margin-block: calc(var(--space) * 1.5);
-}
-
 /* Homepage chronology */
 .home-empty {
   margin: 0;

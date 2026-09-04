@@ -97,34 +97,20 @@ describe("post collection", () => {
     expect(getPostSlugs(FIXTURES)).toContain("hidden-post");
   });
 
+  it("drops drafts from the production prerender set", () => {
+    const nodeEnv = jest.replaceProperty(process.env, "NODE_ENV", "production");
+    try {
+      expect(getPostSlugs(FIXTURES)).toEqual(["second-post", "first-post"]);
+    } finally {
+      nodeEnv.restore();
+    }
+  });
+
   it("treats a missing content directory as no posts", () => {
     expect(getAllPosts(EMPTY)).toEqual([]);
     expect(getPublishedPosts(EMPTY)).toEqual([]);
     expect(getAllTags(EMPTY)).toEqual([]);
     expect(getPostBySlug("anything", EMPTY)).toBeNull();
-  });
-});
-
-describe("rendering fixture", () => {
-  it("is valid draft metadata recognized by the content pipeline", () => {
-    expect(getPostBySlug("rendering-test")).toMatchObject({
-      slug: "rendering-test",
-      title: "Rendering Test",
-      draft: true,
-    });
-  });
-
-  it("is excluded from published posts and production static params", () => {
-    expect(getPublishedPosts().map((post) => post.slug)).not.toContain(
-      "rendering-test",
-    );
-
-    const nodeEnv = jest.replaceProperty(process.env, "NODE_ENV", "production");
-    try {
-      expect(getPostSlugs()).not.toContain("rendering-test");
-    } finally {
-      nodeEnv.restore();
-    }
   });
 });
 
