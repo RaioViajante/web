@@ -577,21 +577,28 @@ h3 {
 }
 
 .uses-heading {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 28px;
   font-weight: 700;
 }
 
+/* Editorial lede: the page serif, roman, muted, a little under body size —
+   clearly quieter and smaller than the heading, but not metadata-small. */
 .uses-intro {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   color: var(--color-muted);
-  font-size: 15px;
-  line-height: 1.5;
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
-/* A dry footnote under the intro, not a subtitle: mono, a notch smaller, quiet. */
+/* A dry footnote under the lede, not a subtitle: mono, notably smaller, held
+   off the margin by a thin rule like the page's blockquotes. */
 .uses-aside {
-  margin: 0 0 40px;
+  margin: 0 0 28px;
+  padding-left: 18px;
+  border-left: 2px solid var(--color-rule);
   color: var(--color-muted);
   font-family: var(--font-mono);
   font-size: 13px;
@@ -604,7 +611,7 @@ h3 {
 .uses-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  column-gap: clamp(2rem, 6vw, 3rem);
+  column-gap: 2.25rem;
 }
 
 @media (min-width: 640px) {
