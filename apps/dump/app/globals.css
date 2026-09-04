@@ -91,6 +91,13 @@ a {
   outline-offset: 2px;
 }
 
+/* Code surfaces stay dark in both themes, so the light-theme accent is too dark
+   to read against them. Focus there uses the lighter code-surface accent. */
+.prose pre:focus-visible,
+.prose pre a:focus-visible {
+  outline-color: var(--code-accent);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

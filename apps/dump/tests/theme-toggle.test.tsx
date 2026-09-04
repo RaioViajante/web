@@ -33,6 +33,29 @@ describe("<ThemeToggle />", () => {
     expect(container.querySelector(".theme-icon--sun")).not.toBeInTheDocument();
   });
 
+  it("hides its icon from assistive technology", async () => {
+    const { container } = render(<ThemeToggle />);
+    await screen.findByRole("button");
+
+    const icon = container.querySelector(".theme-icon");
+    expect(icon).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("keeps keyboard focus on the button after toggling the theme", async () => {
+    render(<ThemeToggle />);
+    const button = await screen.findByRole("button", {
+      name: "Switch to dark theme",
+    });
+
+    button.focus();
+    expect(button).toHaveFocus();
+
+    fireEvent.click(button);
+
+    expect(button).toHaveAccessibleName("Switch to light theme");
+    expect(button).toHaveFocus();
+  });
+
   it("switches the theme, icon, and stored preference", async () => {
     const { container } = render(<ThemeToggle />);
     const button = await screen.findByRole("button", {
