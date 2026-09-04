@@ -61,6 +61,11 @@ export const metadata: Metadata = {
     description: site.description,
     locale: "en_US",
   },
+  // A generated OG image now exists on every page (site default, or a
+  // per-post one) — large-image is the correct card type for that.
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
