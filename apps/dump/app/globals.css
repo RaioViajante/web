@@ -7,6 +7,15 @@
      to keep secondary text at the same perceived weight as dark mode and clear
      the AA threshold on small metadata text. */
   --color-muted: color-mix(in srgb, var(--fg) 65%, transparent);
+  /* Same warm-neutral mix as --color-code-bg (inline code), so fenced blocks
+     match the rest of the light-mode palette instead of a stark white editor
+     surface. Foreground/accent mirror --fg/--accent; muted is that formula's
+     65%-over-bg mix pre-computed for the Shiki theme in next.config.mjs,
+     which can't reference CSS custom properties. */
+  --code-surface: color-mix(in srgb, var(--fg) 7%, var(--bg));
+  --code-fg: var(--fg);
+  --code-muted: #656361;
+  --code-accent: var(--accent);
 }
 
 [data-theme="dark"] {
@@ -14,6 +23,11 @@
   --fg: #ece7e0;
   --accent: #c3b3e0;
   --color-muted: color-mix(in srgb, var(--fg) 55%, transparent);
+  /* Unchanged from the original single dark Shiki theme. */
+  --code-surface: #201c29;
+  --code-fg: #eae6f0;
+  --code-muted: #8f88a3;
+  --code-accent: #b7a4dd;
 }
 
 :root {
@@ -25,10 +39,6 @@
   --color-rule-soft: color-mix(in srgb, var(--fg) 9%, transparent);
   --color-code-bg: color-mix(in srgb, var(--fg) 7%, var(--bg));
   --selection-bg: color-mix(in srgb, var(--accent) 28%, transparent);
-  --code-surface: #201c29;
-  --code-fg: #eae6f0;
-  --code-muted: #8f88a3;
-  --code-accent: #b7a4dd;
 
   --site-width: 680px;
   --page-gutter: clamp(1rem, 4vw, 1.25rem);
@@ -95,8 +105,9 @@ a {
   outline-offset: 2px;
 }
 
-/* Code surfaces stay dark in both themes, so the light-theme accent is too dark
-   to read against them. Focus there uses the lighter code-surface accent. */
+/* Code blocks use their own accent (matches the Shiki keyword colour in each
+   theme) rather than the page --accent, so the ring always matches the
+   syntax-highlighting palette rendered inside. */
 .prose pre:focus-visible,
 .prose pre a:focus-visible {
   outline-color: var(--code-accent);
@@ -906,6 +917,19 @@ h3 {
   min-width: max-content;
   font: inherit;
   white-space: inherit;
+}
+
+/* rehype-pretty-code renders each token with both theme colours as
+   `--shiki-light`/`--shiki-dark` custom properties (keepBackground: false
+   drops the rest of its inline styling); this picks the one matching the
+   active site theme. Tokens with no colour (e.g. plain text) fall back to
+   the inherited --code-fg above. */
+.prose pre code span {
+  color: var(--shiki-light);
+}
+
+[data-theme="dark"] .prose pre code span {
+  color: var(--shiki-dark);
 }
 
 figure[data-rehype-pretty-code-figure] {

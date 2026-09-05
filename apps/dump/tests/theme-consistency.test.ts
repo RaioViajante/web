@@ -29,11 +29,11 @@ describe("theme tokens", () => {
     expect(dark).toMatch(/--color-muted:\s*color-mix\([^)]*var\(--fg\) 55%/);
   });
 
-  it("keeps the code surface dark and theme-independent", () => {
-    // Issue #8: the fenced-code surface stays dark in both themes.
-    expect(css).toMatch(/:root\s*\{[^}]*--code-surface:\s*#201c29/);
-    expect(dark).not.toContain("--code-surface");
-    expect(light).not.toContain("--code-surface");
+  it("follows the active theme for the fenced-code surface", () => {
+    // Issue: the fenced-code surface used to stay dark in both themes. Each
+    // theme now carries its own --code-surface, matching its Shiki theme.
+    expect(dark).toMatch(/--code-surface:\s*#201c29/);
+    expect(light).toMatch(/--code-surface:\s*color-mix\(/);
   });
 
   it("derives selection colour from a token rather than a literal", () => {

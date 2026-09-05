@@ -18,9 +18,9 @@ describe("focus-visible system", () => {
     expect(rule).not.toMatch(/outline:\s*none/);
   });
 
-  it("keeps the ring readable on the always-dark code surface", () => {
-    // The code surface does not change with the theme, so the light-theme
-    // accent would be too dark to see against it.
+  it("rings code blocks with the code-specific accent, not the page accent", () => {
+    // --code-accent tracks each theme's Shiki keyword colour, so the ring
+    // always matches the syntax-highlighting palette rendered inside.
     expect(css).toMatch(
       /\.prose pre:focus-visible[\s\S]{0,80}\{\s*outline-color:\s*var\(--code-accent\)/,
     );
