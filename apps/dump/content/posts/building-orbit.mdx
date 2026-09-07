@@ -1,0 +1,930 @@
+---
+title: "I Got Bored of CRUD, So I'm Building a Scheduler"
+description: "I wanted to get better at Java and Spring, so naturally I started building a self-hosted job scheduler and accidentally found JPA, state machines, and distributed systems waiting for me."
+date: "2026-09-07"
+tags:
+  - java
+  - spring
+  - distributed-systems
+draft: false
+---
+
+I've been wanting to get actually good at Java and Spring for a while.
+
+Not "I can create a controller and connect it to a database" good.
+
+I mean understanding what is happening underneath enough that Spring stops feeling like a collection of annotations I memorized from tutorials.
+
+So, naturally, I decided to build something unnecessarily difficult.
+
+It's called **orbit**.
+
+The idea is to build a self-hosted distributed job scheduler.
+
+Something vaguely living in the same universe as cron, GitHub Actions runners, Rundeck and Temporal.
+
+Except significantly smaller.
+
+And currently incapable of doing almost everything I just compared it to.
+
+We're getting there.
+
+## The rule is no magic infrastructure
+
+One thing I decided very early was that I don't want to build this like a fake production architecture diagram.
+
+No Kafka because Kafka looks cool.
+
+No Kubernetes because apparently every side project needs a Kubernetes cluster now.
+
+No Redis because someone on YouTube said "distributed systems."
+
+No twelve microservices talking to each other while the entire application has three users.
+
+For now, orbit is a Spring Boot application talking directly to PostgreSQL.
+
+```text
+orbit
+├── orbit-server
+├── docs
+├── compose.yaml
+└── README.md
+```
+
+Eventually there will also be:
+
+```text
+orbit-worker
+orbit-web
+```
+
+But they don't exist yet.
+
+And I really like that.
+
+I'm trying to only introduce complexity when the project gives me a reason to.
+
+Which is probably the first time I've ever voluntarily resisted adding more infrastructure to something.
+
+## A Job is not an execution
+
+The first thing I had to model was a `Job`.
+
+A Job is basically the definition of something orbit knows how to run.
+
+Right now it contains things like:
+
+```text
+name
+command
+cronExpression
+maxRetries
+timeoutSeconds
+enabled
+```
+
+So, for example:
+
+```text
+name: database-backup
+command: ./backup.sh
+maxRetries: 3
+timeoutSeconds: 300
+```
+
+The important realization came a little later.
+
+A Job is not the thing actually running.
+
+It's the definition.
+
+If that same backup runs ten times, I don't have ten Jobs.
+
+I have:
+
+```text
+Job
+├── Execution #1
+├── Execution #2
+├── Execution #3
+└── ...
+```
+
+That distinction sounds incredibly obvious now.
+
+It was not obvious when I started.
+
+And it changes a lot about how the system needs to be designed.
+
+But before getting to Executions, I needed to make Jobs exist properly.
+
+## Apparently entities can have opinions
+
+My first instinct with JPA entities has historically been something like:
+
+```java
+private String name;
+
+public void setName(String name) {
+    this.name = name;
+}
+```
+
+Repeat until the file becomes 200 lines long.
+
+But for orbit I wanted to try treating the domain object as something that actually owns its rules.
+
+So instead of giving `Job` setters for everything, the entity validates itself when it is created:
+
+```java
+public Job(
+        String name,
+        String command,
+        String cronExpression,
+        int maxRetries,
+        int timeoutSeconds
+) {
+    validateName(name);
+    validateCommand(command);
+    validateCronExpression(cronExpression);
+    validateMaxRetries(maxRetries);
+    validateTimeoutSeconds(timeoutSeconds);
+
+    this.name = name;
+    this.command = command;
+    this.cronExpression = cronExpression;
+    this.enabled = true;
+    this.maxRetries = maxRetries;
+    this.timeoutSeconds = timeoutSeconds;
+    this.createdAt = Instant.now();
+    this.updatedAt = this.createdAt;
+}
+```
+
+And instead of this:
+
+```java
+job.setEnabled(false);
+```
+
+I have:
+
+```java
+job.disable();
+```
+
+which currently does:
+
+```java
+public void disable() {
+    this.enabled = false;
+    this.updatedAt = Instant.now();
+}
+```
+
+That's obviously not complicated.
+
+But I like the difference in meaning.
+
+One says:
+
+```text
+change this boolean
+```
+
+The other says:
+
+```text
+disable this job
+```
+
+If disabling a Job becomes more complicated later, that behavior still has somewhere to live.
+
+I'm slowly understanding why people keep telling me that domain objects are supposed to do things.
+
+## Then Spring created a repository I never wrote
+
+The repository is currently this:
+
+```java
+public interface JobRepository extends JpaRepository<Job, Long> {
+}
+```
+
+That's the whole thing.
+
+And Spring somehow turns that into something that can:
+
+```text
+save
+findById
+findAll
+delete
+count
+exists
+```
+
+without me implementing the class.
+
+I knew Spring Data did this before.
+
+Knowing something and actually stopping to understand it are very different things.
+
+Spring finds the repository interface, creates an implementation at runtime, and injects that implementation wherever I ask for `JobRepository`.
+
+Which means my service can just do this:
+
+```java
+public JobService(JobRepository jobRepository) {
+    this.jobRepository = jobRepository;
+}
+```
+
+I don't instantiate anything myself.
+
+Spring gives it to me.
+
+Dependency injection finally feels slightly less like wizardry.
+
+Slightly.
+
+## I don't want my database creating itself
+
+Another decision I made was to not let Hibernate manage the schema.
+
+So instead of:
+
+```properties
+spring.jpa.hibernate.ddl-auto=update
+```
+
+orbit uses:
+
+```properties
+spring.jpa.hibernate.ddl-auto=validate
+```
+
+Schema changes belong to Flyway.
+
+The first migration creates `jobs`:
+
+```sql
+CREATE TABLE jobs (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    name VARCHAR(120) NOT NULL,
+    command TEXT NOT NULL,
+    cron_expression VARCHAR(100),
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    max_retries INTEGER NOT NULL DEFAULT 0,
+    timeout_seconds INTEGER NOT NULL DEFAULT 300,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+Flyway changes the database.
+
+Hibernate looks at the result and says whether my entity mapping agrees with it.
+
+I like that separation a lot more than:
+
+```text
+I changed a Java class and I guess the database is different now.
+```
+
+Migrations also leave an actual history of what happened to the schema.
+
+Which feels like version control for the database.
+
+That's probably an oversimplification.
+
+It is also currently how my brain stores the concept.
+
+## My first endpoint
+
+Eventually I had enough pieces to do this:
+
+```text
+POST /jobs
+```
+
+The request looks like:
+
+```json
+{
+  "name": "database-backup",
+  "command": "./backup.sh",
+  "cronExpression": null,
+  "maxRetries": 3,
+  "timeoutSeconds": 300
+}
+```
+
+And Postman gave me:
+
+```text
+201 Created
+```
+
+I was much more excited about this than someone should reasonably be about a POST endpoint.
+
+But the interesting part was the path the request took.
+
+```text
+Postman
+   ↓
+JobController
+   ↓
+CreateJobRequest
+   ↓
+JobService
+   ↓
+Job
+   ↓
+JobRepository
+   ↓
+Hibernate
+   ↓
+PostgreSQL
+```
+
+There are already a lot of layers involved in putting five values into a database.
+
+Software engineering is beautiful.
+
+## Why not just receive the entity?
+
+Initially it would have been very easy to write something like:
+
+```java
+public Job create(@RequestBody Job job)
+```
+
+and call it a day.
+
+Instead I created a request DTO:
+
+```java
+public record CreateJobRequest(
+        @NotBlank
+        @Size(max = 120)
+        String name,
+
+        @NotBlank
+        String command,
+
+        String cronExpression,
+
+        @NotNull
+        @PositiveOrZero
+        Integer maxRetries,
+
+        @NotNull
+        @Positive
+        Integer timeoutSeconds
+) {
+}
+```
+
+This gives the HTTP layer its own contract.
+
+The client is allowed to send:
+
+```text
+name
+command
+cronExpression
+maxRetries
+timeoutSeconds
+```
+
+It is not allowed to decide things like:
+
+```text
+id
+enabled
+createdAt
+updatedAt
+```
+
+Those belong to the application.
+
+The same idea exists on the way out.
+
+Instead of returning the JPA entity directly, I return:
+
+```java
+JobResponse
+```
+
+which explicitly maps the fields the API is allowed to expose.
+
+So now I have:
+
+```text
+HTTP input
+→ CreateJobRequest
+
+domain
+→ Job
+
+HTTP output
+→ JobResponse
+```
+
+This felt a little excessive when there were only five fields.
+
+It already feels much less excessive now.
+
+## I learned why `Integer` sometimes makes more sense than `int`
+
+This was another tiny thing I had never really thought about.
+
+Inside the entity:
+
+```java
+private int maxRetries;
+```
+
+makes sense.
+
+A valid Job should never have:
+
+```text
+maxRetries = null
+```
+
+But inside an HTTP request DTO I use:
+
+```java
+@NotNull
+Integer maxRetries
+```
+
+Why?
+
+Because there is a difference between:
+
+```json
+{
+  "maxRetries": 0
+}
+```
+
+and not sending `maxRetries` at all.
+
+With an `int`, missing data can collapse into the primitive default:
+
+```text
+0
+```
+
+With `Integer`, absence can remain:
+
+```text
+null
+```
+
+and Bean Validation can reject it.
+
+A wrapper type suddenly became part of an API design decision.
+
+Java keeps finding new ways to make `null` relevant.
+
+## Then I stopped calling `save()`
+
+Updating a Job taught me something I had heard about before but never really internalized.
+
+This is currently part of my service:
+
+```java
+@Transactional
+public Optional<Job> updateConfiguration(
+        Long id,
+        String name,
+        String command,
+        String cronExpression,
+        int maxRetries,
+        int timeoutSeconds
+) {
+    return jobRepository.findById(id)
+            .map(job -> {
+                job.updateConfiguration(
+                        name,
+                        command,
+                        cronExpression,
+                        maxRetries,
+                        timeoutSeconds
+                );
+
+                return job;
+            });
+}
+```
+
+Notice what's missing.
+
+There is no:
+
+```java
+jobRepository.save(job);
+```
+
+That originally looked wrong to me.
+
+But the `Job` was loaded inside a transaction.
+
+Hibernate is managing that entity.
+
+I modify it.
+
+The transaction finishes.
+
+Hibernate notices that the object changed and generates an SQL `UPDATE`.
+
+This is called **dirty checking**.
+
+I sent this from Postman:
+
+```text
+PUT /jobs/1
+```
+
+watched the logs and there it was.
+
+An `UPDATE`.
+
+I never called `save()`.
+
+This is exactly the type of framework behavior I want to understand instead of just accepting that Spring does things when I put annotations in the correct places.
+
+## CRUD, but slightly less cursed
+
+Right now the API has:
+
+```text
+POST /jobs
+GET  /jobs
+GET  /jobs/{id}
+PUT  /jobs/{id}
+```
+
+It can create, list, find and update Jobs.
+
+I haven't implemented delete.
+
+That one is intentional.
+
+Once a Job has execution history, I don't know if deleting it should mean:
+
+```text
+delete everything
+```
+
+or:
+
+```text
+keep the historical executions
+```
+
+or:
+
+```text
+you cannot delete this
+```
+
+or maybe:
+
+```text
+archive it instead
+```
+
+I don't have that requirement yet.
+
+So instead of inventing an answer because REST tutorials usually end with a DELETE endpoint, I just didn't make one.
+
+Progress.
+
+## Enable and disable are not just booleans
+
+I also added:
+
+```text
+POST /jobs/{id}/enable
+POST /jobs/{id}/disable
+```
+
+It might look strange compared to simply patching:
+
+```json
+{
+  "enabled": false
+}
+```
+
+But I'm treating these as commands.
+
+The API isn't saying:
+
+```text
+set enabled to false
+```
+
+It's saying:
+
+```text
+disable this job
+```
+
+And the domain performs that behavior.
+
+```java
+job.disable();
+```
+
+Again, right now that behavior is tiny.
+
+But the vocabulary feels right.
+
+I'm starting to care a suspicious amount about method names.
+
+## The database in my tests is actually PostgreSQL
+
+For repository integration tests I'm using Testcontainers.
+
+So instead of pretending H2 is PostgreSQL, the tests actually start a PostgreSQL container.
+
+Something like:
+
+```java
+@Container
+@ServiceConnection
+static PostgreSQLContainer postgres =
+        new PostgreSQLContainer("postgres:17");
+```
+
+Then Spring connects to it.
+
+Flyway runs the migrations.
+
+Hibernate talks to it.
+
+The repository performs real SQL.
+
+And when the test ends, the database disappears.
+
+My repository test even does this:
+
+```java
+entityManager.flush();
+entityManager.clear();
+```
+
+At first I didn't understand why.
+
+`flush()` forces pending changes into the database.
+
+`clear()` removes the entity from Hibernate's persistence context.
+
+That means when I call `findById()` afterward, Hibernate can't quietly hand me the same Java object it already has in memory.
+
+It actually has to load the row again.
+
+So the test verifies:
+
+```text
+Java object
+→ INSERT
+→ PostgreSQL
+→ SELECT
+→ Java object
+```
+
+instead of accidentally testing Hibernate's cache.
+
+That's a much better test.
+
+## Not every test needs Spring
+
+The service tests are different.
+
+There is no PostgreSQL.
+
+There isn't even a Spring application context.
+
+I create a mocked repository:
+
+```java
+@Mock
+private JobRepository jobRepository;
+```
+
+and manually give it to the service:
+
+```java
+jobService = new JobService(jobRepository);
+```
+
+Then I can define behavior like:
+
+```java
+when(jobRepository.findById(1L))
+        .thenReturn(Optional.of(job));
+```
+
+The test isn't asking:
+
+> does PostgreSQL work?
+
+It is asking:
+
+> does `JobService` behave correctly when the repository returns this?
+
+I'm finally starting to separate these mentally:
+
+```text
+JobTest
+→ domain rules
+
+JobServiceTest
+→ application behavior
+
+JobRepositoryTest
+→ persistence integration
+```
+
+Before this project I had a tendency to just think:
+
+```text
+test = test
+```
+
+Apparently there is more lore here too.
+
+## Now it actually starts becoming orbit
+
+All of that still leaves orbit dangerously close to being a CRUD application with a dramatic README.
+
+So now I'm working on `Execution`.
+
+The distinction is:
+
+```text
+Job
+→ what should run
+
+Execution
+→ one concrete run
+```
+
+An Execution starts with one of these states:
+
+```java
+public enum ExecutionStatus {
+    QUEUED,
+    RUNNING,
+    SUCCEEDED,
+    FAILED,
+    CANCELLED
+}
+```
+
+And I don't want to expose:
+
+```java
+setStatus(...)
+```
+
+because then nothing prevents cursed transitions like:
+
+```text
+SUCCEEDED → RUNNING
+FAILED → QUEUED
+CANCELLED → SUCCEEDED
+```
+
+Instead I want the object to behave more like a small state machine.
+
+Something roughly like:
+
+```text
+            QUEUED
+               |
+               v
+            RUNNING
+            /     \
+           v       v
+    SUCCEEDED     FAILED
+
+QUEUED / RUNNING
+       |
+       v
+   CANCELLED
+```
+
+I haven't implemented those transitions yet.
+
+That's the next thing I'm going to work on.
+
+## Executions need to remember the past
+
+The database migration for Executions already exists.
+
+One decision I particularly like is that an Execution stores a snapshot of some Job configuration.
+
+For example:
+
+```text
+command
+maxRetries
+timeoutSeconds
+```
+
+Why duplicate those if the Execution already has a `job_id`?
+
+Because Jobs can change.
+
+Imagine this:
+
+```text
+10:00
+command = ./backup-v1.sh
+
+10:01
+Execution #42 is created
+
+10:10
+command = ./backup-v2.sh
+```
+
+If Execution #42 only looked at the current Job configuration, historical data would lie.
+
+It should remember:
+
+```text
+I ran ./backup-v1.sh
+```
+
+even if the Job now says something completely different.
+
+So the Execution stores the configuration it received when it was created.
+
+That was my first tiny encounter with a problem that feels much more like distributed systems than CRUD.
+
+Historical truth matters.
+
+## And we still haven't distributed anything
+
+Despite the name, orbit currently has no workers.
+
+Nothing is running across multiple machines.
+
+There are no heartbeats.
+
+No leader election.
+
+No retry engine.
+
+No failure recovery.
+
+No WebSocket status updates.
+
+No scheduler loop.
+
+No machine disappearing in the middle of a task and forcing me to question the meaning of reality.
+
+Yet.
+
+Eventually I want something like:
+
+```text
+orbit-server
+     |
+     ├── worker: desktop
+     ├── worker: macbook
+     └── worker: homelab
+```
+
+The server should be able to queue work.
+
+Workers should claim it.
+
+Executions should transition through states.
+
+Machines should disappear.
+
+Tasks should fail.
+
+Retries should happen.
+
+And somewhere in that process I'm probably going to learn why distributed systems engineers always look tired.
+
+That's the point.
+
+I don't think the world particularly needs another job scheduler.
+
+I'm building orbit because I wanted a project that would eventually force me past controllers, repositories and CRUD.
+
+So far I've learned more from a single `Job` than I expected.
+
+And the interesting part hasn't even started yet.
