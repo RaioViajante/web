@@ -3,7 +3,7 @@ import { projects } from "../../lib/projects";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "projects · raioviajante.com",
+  title: "projects",
 };
 
 export default function Projects() {

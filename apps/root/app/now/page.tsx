@@ -3,7 +3,7 @@ import { lastUpdated, now, tagline } from "../../lib/now";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "now · raioviajante.com",
+  title: "now",
 };
 
 export default function Now() {

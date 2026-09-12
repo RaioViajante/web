@@ -5,7 +5,7 @@ internet. It is not intended to be a portfolio, résumé, or sales landing page.
 
 ## Scope
 
-Planned internal routes:
+Internal routes:
 
 - `/` — home
 - `/projects` — projects
@@ -21,10 +21,11 @@ These external websites must not become local routes.
 
 ## Status and stack
 
-The application foundation is initialized with a placeholder `/` page. The approved
-interface and the `/projects` and `/now` routes are not implemented yet.
-The stack is Next.js (App Router), React, TypeScript, pnpm, ESLint, and Prettier,
-with Vercel planned for deployment.
+The approved interface is implemented across `/`, `/projects`, and `/now`,
+sharing a common layout, header, and footer. The stack is Next.js (App
+Router), React, TypeScript, pnpm, ESLint, and Prettier, ready to deploy to
+Vercel at https://raioviajante.com. See [deployment](docs/deployment.md) for
+details.
 
 ## Local development
 

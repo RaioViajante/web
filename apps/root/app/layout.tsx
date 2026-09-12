@@ -23,8 +23,24 @@ const serif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "raioviajante.com",
-  description: "The personal internet home of RaioViajante.",
+  metadataBase: new URL("https://raioviajante.com"),
+  title: {
+    default: "RaioViajante",
+    template: "%s · raioviajante.com",
+  },
+  description: "curious enough to build it myself.",
+  openGraph: {
+    title: "RaioViajante",
+    description: "curious enough to build it myself.",
+    url: "https://raioviajante.com",
+    siteName: "RaioViajante",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "RaioViajante",
+    description: "curious enough to build it myself.",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
