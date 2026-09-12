@@ -1,0 +1,35 @@
+.heading {
+  margin: 36px 0 22px;
+  color: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.project {
+  display: block;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(236, 231, 224, 0.09);
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.description {
+  margin: 5px 0 0;
+  color: rgba(236, 231, 224, 0.7);
+  font-size: 15px;
+  font-style: italic;
+}
+
+.metadata {
+  margin: 8px 0 0;
+  color: rgba(236, 231, 224, 0.45);
+  font-family: var(--font-mono), monospace;
+  font-size: 12.5px;
+}
