@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function Projects() {
   return (
     <>
-      <h1 className={styles.heading}>projects/</h1>
+      <h1 className={`section-label ${styles.heading}`}>projects/</h1>
       {projects.map((project) => (
         <a
           key={project.name}

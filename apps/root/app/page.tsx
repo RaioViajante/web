@@ -12,7 +12,10 @@ export default function Home() {
       </p>
 
       <section className={styles.places} aria-labelledby="places-heading">
-        <h2 id="places-heading" className={styles.sectionHeading}>
+        <h2
+          id="places-heading"
+          className={`section-label ${styles.sectionHeading}`}
+        >
           places/
         </h2>
         <div className={styles.placesList}>
@@ -45,7 +48,7 @@ export default function Home() {
       <section aria-labelledby="recent-heading">
         <h2
           id="recent-heading"
-          className={`${styles.sectionHeading} ${styles.recentHeading}`}
+          className={`section-label ${styles.sectionHeading} ${styles.recentHeading}`}
         >
           recent/
         </h2>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function Now() {
   return (
     <>
-      <h1 className={styles.heading}>now/</h1>
+      <h1 className={`section-label ${styles.heading}`}>now/</h1>
       <p className={styles.meta}>last updated {lastUpdated}</p>
       <p className={styles.description}>{tagline}</p>
 
@@ -25,7 +25,7 @@ export default function Now() {
             </h2>
             <div className={styles.items}>
               {group.items.map((item) => (
-                <div key={item.title} className={styles.item}>
+                <div key={item.title}>
                   <div className={styles.itemTitle}>{item.title}</div>
                   {item.description ? (
                     <p className={styles.itemDescription}>{item.description}</p>

@@ -79,6 +79,14 @@ a:focus-visible {
   padding-block: 0 100px;
 }
 
+.section-label {
+  color: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
 .page-heading {
   max-width: 26ch;
   margin: 36px 0 14px;

@@ -8,11 +8,6 @@
 
 .sectionHeading {
   margin: 0 0 18px;
-  color: var(--muted);
-  font-family: var(--font-mono), monospace;
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.02em;
 }
 
 .placesList {
