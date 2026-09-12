@@ -1,0 +1,384 @@
+---
+title: "Apparently Moving a File Has Edge Cases"
+description: "I started reorganizing my entire workflow, got tired of moving files by hand, and somehow ended up learning Python, pytest, and why even moving a file has edge cases."
+date: "2026-09-12"
+tags:
+  - python
+  - pytest
+  - automation
+draft: false
+---
+
+I've been reorganizing basically my entire workflow lately.
+
+My development environment, projects, passwords, folders, backups, random files scattered around my machines.
+
+Basically trying to make my computer feel less like a place where I've been throwing things for years and more like something that actually works with me.
+
+At some point I reached the extremely exciting part of this process:
+
+my files.
+
+Downloads is the obvious disaster zone.
+
+Screenshots.
+
+PDFs.
+
+Images.
+
+Archives.
+
+Installers.
+
+Files I downloaded three months ago for reasons that have been completely lost to history.
+
+I could organize all of it manually.
+
+Create some folders.
+
+Move everything around.
+
+Delete what I don't need.
+
+Then do exactly the same thing again a few weeks later.
+
+I really didn't want to do that.
+
+Lately, whenever I notice myself doing something repetitive on a computer, my first thought has been:
+
+> why am I doing something the computer could be doing for me?
+
+So I started `sweep`.
+
+The first target is Downloads.
+
+But that's not really the idea of the project.
+
+Eventually I want `sweep` to help organize much more than that.
+
+Documents.
+
+Screenshots.
+
+Random files sitting around my home directory.
+
+Old archives.
+
+Maybe even project folders and other parts of my filesystem where things slowly accumulate until I pretend I don't see them anymore.
+
+Basically, I want to build something that understands how I like my files organized and does the boring part for me.
+
+Which also happened to be a pretty good excuse to finally learn Python properly.
+
+Not "I know what a list and a `for` loop are" properly.
+
+Actually building something with it.
+
+I had touched Python before, but never had a project that forced me to stop and ask:
+
+> okay, but how would I actually build this properly?
+
+Apparently moving a file was enough to start asking that question.
+
+## Pathlib is much nicer than I expected
+
+One of the first things I started using was `Path`.
+
+```python
+from pathlib import Path
+```
+
+Until now, I mostly thought about file paths as strings.
+
+Something like:
+
+```python
+"/home/bryan/Downloads/photo.png"
+```
+
+Which works.
+
+Until you actually need to do things with it.
+
+With `Path`, the path starts behaving more like an actual object instead of some string I'm desperately cutting apart.
+
+```python
+source = Path("photo.png")
+```
+
+Then I can do things like:
+
+```python
+source.exists()
+source.suffix
+source.name
+```
+
+Without manually concatenating strings like an animal.
+
+I liked this immediately.
+
+File paths are one of those things that feel ridiculously simple until you need to do literally anything non-trivial with them.
+
+## First, just move the file
+
+The first interesting thing `sweep` needed to do was very sophisticated.
+
+Move a file.
+
+The mental model was basically:
+
+```text
+photo.png
+```
+
+becomes:
+
+```text
+Images/photo.png
+```
+
+That's it.
+
+So I started working on a `move_file` function.
+
+Eventually I had something with a responsibility roughly like this:
+
+```python
+result = move_file(source, destination)
+```
+
+If everything goes well, the file disappears from the source and appears at the destination.
+
+And honestly, that was already satisfying.
+
+There is something strangely nice about writing a tiny function, running the tests and seeing that a real file actually moved somewhere else.
+
+Maybe my dopamine receptors are completely destroyed.
+
+## Then I remembered the file that is already there
+
+At some point I thought:
+
+> what if `Images/photo.png` already exists?
+
+My first reaction was basically:
+
+"well... move it anyway?"
+
+Which is a fantastic design decision if the purpose of `sweep` is to destroy my own files.
+
+So, no.
+
+I want `sweep` to be conservative.
+
+If something already exists at the destination, the safest first behavior is to simply leave everything alone.
+
+That gave me this test:
+
+```python
+def test_move_file_skips_existing_destination(tmp_path):
+    source = tmp_path / "photo.png"
+    destination = tmp_path / "Images" / "photo.png"
+
+    source.touch()
+    destination.touch()
+
+    result = move_file(source, destination)
+
+    assert result is False
+    assert source.exists()
+    assert destination.exists()
+```
+
+This was probably the first moment where the project started feeling slightly more real to me.
+
+Not because this is complicated code.
+
+It's literally a test involving two empty files.
+
+But I stopped thinking only about:
+
+> does the function work?
+
+and started thinking about:
+
+> what happens when everything isn't perfect?
+
+The original file needs to stay there.
+
+The destination file needs to stay there.
+
+And the function should tell me it decided not to do anything:
+
+```python
+assert result is False
+```
+
+Tiny detail.
+
+But exactly the kind of tiny detail I would normally discover after accidentally breaking something.
+
+## `tmp_path` looks like magic
+
+This was also my first time using `tmp_path` from `pytest`.
+
+When I first saw something like:
+
+```python
+def test_move_file_moves_file(tmp_path):
+```
+
+my immediate thought was:
+
+> where the hell did `tmp_path` come from?
+
+I didn't create it.
+
+I didn't manually pass it.
+
+I didn't import it.
+
+It's just there.
+
+`pytest` sees the argument and provides a temporary directory for the test.
+
+So I can do this:
+
+```python
+source = tmp_path / "photo.png"
+source.touch()
+```
+
+and create a real file on the filesystem without filling the repository with garbage.
+
+The test can interact with actual files and directories, and afterward that environment can simply disappear.
+
+Which is much better than what I probably would have done on my own:
+
+```text
+test-files-final-final-2/
+```
+
+sitting permanently inside the repository.
+
+## Apparently moving files has rules
+
+The funny thing is that I didn't start `sweep` because I was looking for a Python project.
+
+I started it because I was reorganizing my computer and got tired of the idea of doing the same boring work manually forever.
+
+Python came second.
+
+And now the most interesting part isn't even the syntax.
+
+The syntax is fine.
+
+`Path` is nice.
+
+The tests are small.
+
+The thing that keeps making me stop and think is everything around the code.
+
+What happens if the source doesn't exist?
+
+Should `sweep` create the destination directory automatically?
+
+What happens when two files have the same name?
+
+Do I skip the second one?
+
+Rename it?
+
+Compare both files?
+
+What if they are identical?
+
+What exactly counts as an image?
+
+Where should screenshots go?
+
+Should rules be based on extensions?
+
+Names?
+
+Dates?
+
+Directories?
+
+Metadata?
+
+Suddenly "organize my files" isn't one operation.
+
+It's a pile of decisions.
+
+And I kind of love that.
+
+Because this was exactly what I wanted from the project.
+
+I didn't want to learn Python by watching someone write:
+
+```python
+print("Hello, World!")
+```
+
+for the tenth time.
+
+I wanted a problem small enough that I could actually build it, but real enough that it would keep creating questions I didn't know I had.
+
+## Downloads is just the beginning
+
+Right now, `sweep` is tiny.
+
+Very tiny.
+
+It is absolutely not roaming around my computer autonomously cleaning everything.
+
+Probably a good thing.
+
+For now I'm building the smallest parts first.
+
+Move one file.
+
+Test it.
+
+Find a case I didn't think about.
+
+Handle it.
+
+Write another test.
+
+Repeat.
+
+Downloads is just the easiest place to start because it's where the chaos is most obvious.
+
+But eventually I want this thing to be much more general.
+
+I want to be able to point `sweep` at different parts of my filesystem and define how those places should be organized.
+
+Maybe one directory gets organized by file type.
+
+Another one by date.
+
+Maybe screenshots follow completely different rules.
+
+Maybe old archives get moved somewhere else.
+
+Maybe some files should never be touched at all.
+
+I don't know exactly what that system looks like yet.
+
+Which is probably the reason I'm enjoying building it.
+
+A few days ago I just wanted to stop dragging files around manually.
+
+Now I'm thinking about conflict policies, filesystem rules and how much authority I should give a Python script over everything I own.
+
+Normal progression, I guess.
+
+For now, `sweep` can move a file without destroying another one that was already there.
+
+Not exactly revolutionary automation.
+
+But if this eventually means I never have to manually clean the same folders over and over again, that's already enough reason for me to keep building it.
