@@ -1,10 +1,7 @@
 reference/
-
 node_modules/
 .next/
 out/
 .vercel/
 next-env.d.ts
-*.tsbuildinfo
-.env*
-.DS_Store
+pnpm-lock.yaml

@@ -21,9 +21,22 @@ These external websites must not become local routes.
 
 ## Status and stack
 
-Documentation foundation only. The application has not been initialized.
-The intended stack is Next.js, React, TypeScript, pnpm, ESLint, Prettier, and Vercel.
-Development commands will be documented after initialization.
+The application foundation is initialized with a placeholder `/` page. The approved
+interface and the `/projects` and `/now` routes are not implemented yet.
+The stack is Next.js (App Router), React, TypeScript, pnpm, ESLint, and Prettier,
+with Vercel planned for deployment.
+
+## Local development
+
+Use Node.js 24 or newer and pnpm 12.4.1.
+
+```sh
+pnpm install
+pnpm dev
+```
+
+Open http://localhost:3000. See [development](docs/development.md) for validation
+and production commands.
 
 ## Visual reference
 
