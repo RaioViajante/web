@@ -1,8 +1,8 @@
 export default function Home() {
   return (
-    <main>
-      <h1>raioviajante.com</h1>
-      <p>Under construction.</p>
-    </main>
+    <>
+      <h1 className="page-heading">raioviajante.com</h1>
+      <p className="page-description">Under construction.</p>
+    </>
   );
 }

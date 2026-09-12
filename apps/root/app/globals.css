@@ -1,0 +1,115 @@
+:root {
+  color-scheme: dark;
+  --background: #18161b;
+  --foreground: #ece7e0;
+  --accent: #c3b3e0;
+  --muted: rgba(236, 231, 224, 0.55);
+  --subtle: rgba(236, 231, 224, 0.4);
+  --separator: rgba(236, 231, 224, 0.15);
+  --content-width: 680px;
+  --gutter: clamp(1rem, 4vw, 1.25rem);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+::selection {
+  background: rgba(195, 179, 224, 0.28);
+}
+
+a {
+  color: var(--foreground);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* The export's 680px content width excludes its horizontal gutters. */
+.page-container {
+  box-sizing: content-box;
+  width: calc(100% - 2 * var(--gutter));
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 44px 8px;
+  font-family: var(--font-mono), monospace;
+}
+
+.site-brand {
+  font-size: 15px;
+}
+
+.site-brand span {
+  color: var(--subtle);
+}
+
+.github-link {
+  display: inline-flex;
+}
+
+.github-link svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.site-main {
+  padding-block: 0 100px;
+}
+
+.page-heading {
+  max-width: 26ch;
+  margin: 36px 0 14px;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.page-description {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.site-footer {
+  padding-block: 32px 56px;
+  border-top: 1px solid var(--separator);
+  color: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 13.5px;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a {
+    transition: none;
+  }
+}
