@@ -89,6 +89,25 @@ a:hover {
   padding-inline: var(--gutter);
 }
 
+/* Shared across the homepage list and the experiment page metadata
+   sections: a small, letter-spaced mono label introducing a block of
+   content ("experiments/", "what", "experiment", "notes"). */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* Shared editorial prose voice — "mono identifies, serif speaks". */
+.prose {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--fg);
+  margin: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   body {
     transition: none;
