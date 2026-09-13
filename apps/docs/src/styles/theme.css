@@ -210,3 +210,24 @@ starlight-toc a[aria-current='true'] {
 	background: none;
 	box-shadow: none;
 }
+
+/**
+ * Search
+ *
+ * Pagefind's UI already inherits our --sl-color-* tokens through Starlight's own
+ * --pagefind-ui-* mapping (see Search.astro); these are the few spots that need a
+ * more literal reference match: descriptions read in serif like any other prose,
+ * and the highlighted result gets a restrained accent border instead of an outline.
+ */
+#starlight__search .pagefind-ui__result-excerpt {
+	font-family: 'Source Serif 4', ui-serif, Georgia, serif;
+}
+
+#starlight__search .pagefind-ui__result-title:not(:where(.pagefind-ui__result-nested *)):hover,
+#starlight__search
+	.pagefind-ui__result-title:not(:where(.pagefind-ui__result-nested *)):focus-within,
+#starlight__search .pagefind-ui__result-nested:hover,
+#starlight__search .pagefind-ui__result-nested:focus-within {
+	outline: none;
+	border-inline-start: 2px solid var(--rv-accent);
+}
