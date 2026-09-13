@@ -1,4 +1,5 @@
 ---
+import BootSector from "../../components/surfaces/BootSector.astro";
 import ExecutionStates from "../../components/surfaces/ExecutionStates.astro";
 import FilenameClassifier from "../../components/surfaces/FilenameClassifier.astro";
 import type { InferGetStaticPropsType } from "astro";
@@ -24,4 +25,5 @@ const { experiment } = Astro.props as Props;
   {experiment.surface === "execution-states" && (
     <ExecutionStates slot="surface" />
   )}
+  {experiment.surface === "boot-sector" && <BootSector slot="surface" />}
 </ExperimentLayout>

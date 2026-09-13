@@ -36,6 +36,7 @@ export const experiments: Experiment[] = [
   {
     id: "003",
     slug: "boot-sector",
+    surface: "boot-sector",
     title: "boot sector",
     description: "the assembly behind a BIOS hello world",
     status: "done",
