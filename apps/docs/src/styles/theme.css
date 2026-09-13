@@ -123,10 +123,27 @@
 	font-family: 'Source Serif 4', ui-serif, Georgia, serif;
 }
 
+/* Font-size lives on the wrapper, not the heading itself: Starlight's own
+   anchor-link positioning (anchor-links.css) reserves space with an
+   em-based padding-inline-end on the heading and pulls the anchor link back
+   over it with an equal-and-opposite em-based negative margin — but that
+   margin is set on `.sl-anchor-link`, a SIBLING of the heading that inherits
+   its font-size from `.sl-heading-wrapper`, not from the heading element.
+   Overriding font-size on the heading alone (its previous location here)
+   left the wrapper at Starlight's native (much larger) per-level heading
+   size, so the two ends of that em-relative padding/margin balance resolved
+   against different font-sizes — the anchor link's pull-back overshot the
+   heading's actual reserved space and the "#" landed on top of the heading's
+   trailing letters. Setting it on the wrapper instead keeps the heading and
+   its anchor link at the same inherited font-size, so Starlight's own
+   spacing math is internally consistent again. */
+.sl-markdown-content .sl-heading-wrapper:is(.level-h2, .level-h3, .level-h4, .level-h5, .level-h6) {
+	font-size: var(--sl-text-sm);
+}
+
 .sl-markdown-content :is(h2, h3, h4, h5, h6) {
 	font-family: 'IBM Plex Mono', var(--sl-font-system-mono);
 	font-weight: 500;
-	font-size: var(--sl-text-sm);
 	letter-spacing: 0.3px;
 }
 
