@@ -6,17 +6,17 @@ Node.js 24 or newer, pnpm (recorded in `package.json`).
 
 ## Commands
 
-| Command              | Purpose                                            |
-| -------------------- | --------------------------------------------------- |
-| `pnpm install`        | Install dependencies from the manifest and lockfile. |
-| `pnpm dev`            | Start the local development server.                  |
-| `pnpm build`          | Type-check (`astro check`) then build for production into `dist/`. |
-| `pnpm preview`        | Serve the production build locally.                  |
-| `pnpm check`          | Run Astro/TypeScript diagnostics (`astro check`).     |
-| `pnpm typecheck`      | Alias for `pnpm check`, kept for cross-repo consistency. |
-| `pnpm lint`           | Run ESLint.                                          |
-| `pnpm format`         | Apply Prettier formatting.                           |
-| `pnpm format:check`   | Check formatting with Prettier without writing.       |
+| Command             | Purpose                                                            |
+| ------------------- | ------------------------------------------------------------------ |
+| `pnpm install`      | Install dependencies from the manifest and lockfile.               |
+| `pnpm dev`          | Start the local development server.                                |
+| `pnpm build`        | Type-check (`astro check`) then build for production into `dist/`. |
+| `pnpm preview`      | Serve the production build locally.                                |
+| `pnpm check`        | Run Astro/TypeScript diagnostics (`astro check`).                  |
+| `pnpm typecheck`    | Alias for `pnpm check`, kept for cross-repo consistency.           |
+| `pnpm lint`         | Run ESLint.                                                        |
+| `pnpm format`       | Apply Prettier formatting.                                         |
+| `pnpm format:check` | Check formatting with Prettier without writing.                    |
 
 ## Conventions
 
