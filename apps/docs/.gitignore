@@ -6,8 +6,7 @@ dist/
 node_modules/
 
 # Environment
-.env
-.env.production
+.env*
 
 # Logs
 npm-debug.log*
@@ -20,3 +19,6 @@ yarn-error.log*
 
 # Local-only design reference material
 reference/
+
+# Vercel
+.vercel
