@@ -217,15 +217,30 @@ header.header {
 	padding-top: 0;
 }
 
+/* Two groups, not three spread evenly: brand on the left, then a single
+   "utilities" cluster (search + GitHub) flush right. Header.astro renders
+   these as three separate flex children (title, search, right-group) with no
+   shared wrapper — `space-between` across all three left search stranded
+   between brand and GitHub instead of grouped with it. The auto margin on
+   the search wrapper is the standard flex "divider" trick: it consumes all
+   the leftover space *before* it, pulling search and the following
+   right-group together at the end with only the header's own small `gap`
+   between them, while brand stays flush left — without needing to touch
+   Header.astro's own markup. */
 header.header > .header {
 	display: flex;
 	grid-template-columns: none;
-	justify-content: space-between;
+	justify-content: flex-start;
 	align-items: center;
+	gap: 1.5rem;
 	width: var(--rv-container-width);
 	max-width: none;
 	margin-inline: auto;
 	padding-inline: var(--rv-page-inline);
+}
+
+header.header > .header > div:has(button[data-open-modal]) {
+	margin-inline-start: auto;
 }
 
 .social-icons::after {
