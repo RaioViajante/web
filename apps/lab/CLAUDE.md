@@ -6,5 +6,5 @@ Read [`AGENTS.md`](AGENTS.md) first — it is the primary instruction file for t
 - Keep implementations simple. Avoid unnecessary abstractions, and do not introduce a UI framework beyond Astro + TypeScript unless an experiment genuinely requires it.
 - Preserve the established RaioViajante visual identity (`docs/design.md`) instead of defaulting to generic dashboard or documentation-SaaS patterns.
 - `reference/claude-export/` is read-only and git-ignored — never edit, move, format, or commit anything inside it.
-- The demonstration experiments (parser playground, boot sector, etc.) are fixtures for the page system, not real projects — don't expand their fictional technical detail beyond what's already approved.
+- Experiments are real, provenance-backed content. Follow `docs/content.md` for immutable numbering, Lab publication dates, optional public source links, and faithful browser reproductions. Never present planned project functionality as implemented.
 - Don't duplicate content already covered in `AGENTS.md` — extend it there if a new agent-wide rule is needed, rather than restating it here.

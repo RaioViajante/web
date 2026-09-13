@@ -22,7 +22,7 @@ Astro (static-first, no server runtime needed), TypeScript, pnpm. No React, Vue,
 ```text
 src/
   components/    shared shell pieces (Header, Footer, ThemeToggle)
-                 and per-experiment surfaces (ParserPlayground, BootSector)
+                 and per-experiment surfaces (FilenameClassifier, ExecutionStates, BootSector)
   data/          experiments.ts — centralized experiment content model
   layouts/       BaseLayout.astro (site shell), ExperimentLayout.astro
   pages/
@@ -34,7 +34,9 @@ src/
 
 ## Routing
 
-Experiment routes are generated statically from `src/data/experiments.ts` through a single dynamic route (`src/pages/experiments/[slug].astro`), producing clean paths like `/experiments/parser-playground/`. There is no per-experiment route file — adding an experiment means adding a data record and, if it needs a bespoke visual surface, a small Astro component referenced from that record.
+Experiment routes are generated statically from `src/data/experiments.ts` through a single dynamic route (`src/pages/experiments/[slug].astro`), producing clean paths like `/experiments/filename-classifier/`. There is no per-experiment route file — adding an experiment means adding a data record and, if it needs a bespoke visual surface, a small Astro component referenced from that record.
+
+The classifier and execution surfaces share small pure TypeScript functions with their browser scripts under `src/lib/`. They reproduce referenced project behavior locally, without a server or sibling-repository build dependency. Boot source inspection uses native `details` / `summary` elements and works without JavaScript. Source metadata is optional; the layout omits its row when absent.
 
 ## Canonical vs. wide experiment layout
 

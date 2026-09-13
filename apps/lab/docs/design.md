@@ -36,7 +36,7 @@ Back link (`← lab/`), `<number> / <title>` heading, a metadata block (status, 
 
 ### Canonical vs. wide
 
-The experiment surface defaults to the same 680px canonical column as everything else. A future experiment may opt into a `wide` layout only when it genuinely needs more horizontal space (a waveform editor, a timeline, a node graph, a large canvas, a code editor with a live preview). Neither current demo (parser playground, boot sector) uses `wide` — `experiment` is not a synonym for full-width.
+The experiment surface defaults to the same 680px canonical column as everything else. A future experiment may opt into a `wide` layout only when it genuinely needs more horizontal space (a waveform editor, a timeline, a node graph, a large canvas, a code editor with a live preview). Neither original design demo (parser playground, boot sector) used `wide` — `experiment` is not a synonym for full-width.
 
 ## Theme selector
 
