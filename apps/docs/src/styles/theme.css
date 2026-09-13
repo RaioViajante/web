@@ -58,6 +58,7 @@
 	/* Core container: the same reading column width used across the RaioViajante ecosystem */
 	--sl-content-width: 42.5rem; /* 680px */
 	--sl-sidebar-width: 11.875rem; /* 190px */
+	--rv-rail-gap: 3rem; /* 48px gap between the reading column and the sidebar/TOC rails */
 }
 
 :root[data-theme='light'] {
@@ -84,6 +85,7 @@
 .sl-markdown-content :is(h2, h3, h4, h5, h6) {
 	font-family: 'IBM Plex Mono', var(--sl-font-system-mono);
 	font-weight: 500;
+	font-size: var(--sl-text-sm);
 	letter-spacing: 0.3px;
 }
 
@@ -94,4 +96,117 @@
 /* The page title is the article's editorial voice, not a label — it stays serif. */
 [id='_top'] {
 	font-family: 'Source Serif 4', ui-serif, Georgia, serif;
+}
+
+/**
+ * Docs shell
+ *
+ * The header, and the article's reading column, are centered at the same
+ * --sl-content-width independent of the sidebar/TOC rails, instead of Starlight's
+ * default "content flush against a viewport-edge sidebar" layout. The rails become
+ * fixed columns positioned outward from the centered column's edges at wide
+ * viewports; below that they fall back to Starlight's own responsive behavior
+ * (popover sidebar, collapsed mobile TOC) untouched.
+ */
+
+/* Header: a simple bar centered at the content width, not a sidebar-aware grid. */
+header.header {
+	padding-inline: 0;
+}
+
+header.header > .header {
+	display: flex;
+	grid-template-columns: none;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	max-width: var(--sl-content-width);
+	margin-inline: auto;
+	padding-inline: var(--sl-content-pad-x);
+}
+
+.social-icons::after {
+	border-inline-end: none;
+}
+
+/* No boxed panels between page title and body. */
+.content-panel + .content-panel {
+	border-top: none;
+}
+
+@media (min-width: 72rem) {
+	.main-frame {
+		padding-inline-start: 0;
+	}
+
+	.sidebar-pane {
+		inset-inline-start: calc(
+			50% - (var(--sl-content-width) / 2) - var(--rv-rail-gap) - var(--sl-sidebar-width)
+		);
+		background-color: transparent;
+		border-inline-end: none;
+	}
+
+	.right-sidebar-container {
+		width: 0;
+	}
+
+	.right-sidebar {
+		inset-inline-start: calc(50% + (var(--sl-content-width) / 2) + var(--rv-rail-gap));
+		width: var(--sl-sidebar-width);
+		border-inline-start: none;
+		background: transparent;
+	}
+
+	.main-pane {
+		width: 100%;
+		--sl-content-margin-inline: auto;
+	}
+}
+
+/* Table of contents: a quiet label, restrained active-section treatment. */
+#starlight__on-this-page {
+	font-family: 'IBM Plex Mono', var(--sl-font-system-mono);
+	font-weight: 400;
+	font-size: var(--sl-text-xs);
+	color: color-mix(in srgb, var(--rv-fg) 45%, transparent);
+	text-transform: none;
+}
+
+starlight-toc a[aria-current='true'] {
+	font-weight: 500;
+}
+
+/* Pagination: flat text links, not bordered cards. */
+.pagination-links a {
+	border: none;
+	border-radius: 0;
+	padding: 0;
+	box-shadow: none;
+	color: color-mix(in srgb, var(--rv-fg) 68%, transparent);
+}
+
+.pagination-links a:hover {
+	border-color: transparent;
+	color: var(--sl-color-white);
+}
+
+.pagination-links .link-title {
+	font-size: var(--sl-text-lg);
+}
+
+/* Mobile menu toggle: a plain icon aligned with the content edge, not a floating pill. */
+.sl-menu-button {
+	position: fixed;
+	inset-inline-end: var(--sl-content-pad-x);
+	background: none;
+	color: var(--rv-fg);
+	box-shadow: none;
+	border-radius: 0;
+}
+
+:root[data-theme='light'] .sl-menu-button,
+.sl-menu-button:has(~ :popover-open) {
+	background: none;
+	box-shadow: none;
 }

@@ -11,6 +11,19 @@ export default defineConfig({
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RaioViajante/docs' },
 			],
 			customCss: ['./src/styles/theme.css'],
+			components: {
+				Sidebar: './src/components/overrides/Sidebar.astro',
+				Footer: './src/components/overrides/Footer.astro',
+			},
+			sidebar: [
+				{
+					label: 'raioviajante',
+					items: [
+						{ label: 'design language', link: '/raioviajante/design-language/' },
+						{ label: 'repository conventions', link: '/raioviajante/repository-conventions/' },
+					],
+				},
+			],
 			head: [
 				{
 					tag: 'link',

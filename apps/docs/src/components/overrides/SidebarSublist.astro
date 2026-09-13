@@ -1,0 +1,100 @@
+---
+// Flat sidebar: group headers are plain labels, never a collapsible <details>/<summary>.
+// Based on @astrojs/starlight/components/SidebarSublist.astro, minus the disclosure widget.
+interface Props {
+	sublist: any[];
+	nested?: boolean;
+}
+
+const { sublist, nested } = Astro.props;
+---
+
+<ul class:list={{ 'top-level': !nested }}>
+	{
+		sublist.map((entry) => (
+			<li>
+				{entry.type === 'link' ? (
+					<a
+						href={entry.href}
+						aria-current={entry.isCurrent ? 'page' : undefined}
+						class:list={[{ large: !nested }, entry.attrs.class]}
+						{...entry.attrs}
+					>
+						<span>{entry.label}</span>
+					</a>
+				) : (
+					<div class="group">
+						<span class="group-label large">{entry.label}</span>
+						<Astro.self sublist={entry.entries} nested />
+					</div>
+				)}
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	@layer starlight.core {
+		ul {
+			--sl-sidebar-item-padding-inline: 0.5rem;
+			list-style: none;
+			padding: 0;
+		}
+
+		li {
+			overflow-wrap: anywhere;
+		}
+
+		ul ul li {
+			margin-inline-start: 0;
+			border: none;
+			padding-inline-start: 0;
+		}
+
+		.group-label {
+			display: block;
+			color: color-mix(in srgb, var(--rv-fg) 45%, transparent);
+			font-size: var(--sl-text-xs);
+			margin-bottom: 0.75rem;
+		}
+
+		.large {
+			font-weight: 400;
+			color: var(--sl-color-white);
+		}
+
+		.top-level > li + li {
+			margin-top: 1.75rem;
+		}
+
+		a {
+			display: block;
+			text-decoration: none;
+			color: color-mix(in srgb, var(--rv-fg) 68%, transparent);
+			padding: 0.3em 0;
+			line-height: 1.6;
+		}
+
+		a:hover,
+		a:focus {
+			color: var(--sl-color-white);
+		}
+
+		[aria-current='page'],
+		[aria-current='page']:hover,
+		[aria-current='page']:focus {
+			font-weight: 500;
+			color: var(--rv-accent);
+			background: none;
+		}
+
+		@media (min-width: 50rem) {
+			.large {
+				font-size: var(--sl-text-sm);
+			}
+			a {
+				font-size: var(--sl-text-sm);
+			}
+		}
+	}
+</style>

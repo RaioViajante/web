@@ -1,0 +1,14 @@
+---
+// Based on @astrojs/starlight/components/Sidebar.astro, using the flat SidebarSublist
+// override below instead of the default collapsible-group one.
+import MobileMenuFooter from 'virtual:starlight/components/MobileMenuFooter';
+import SidebarSublist from './SidebarSublist.astro';
+
+const { sidebar } = Astro.locals.starlightRoute;
+---
+
+<SidebarSublist sublist={sidebar} />
+
+<div class="md:sl-hidden">
+	<MobileMenuFooter />
+</div>
