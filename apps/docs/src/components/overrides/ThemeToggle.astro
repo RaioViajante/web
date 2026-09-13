@@ -83,6 +83,20 @@ const { fixed = true } = Astro.props;
 		left: 1.5rem;
 	}
 
+	/*
+	 * Below the breakpoint where the sidebar collapses into the hamburger/popover
+	 * mobile nav, the fixed toggle can sit over scrolling body text. On pages that
+	 * have that mobile nav (i.e. a sidebar exists), hide the fixed instance there and
+	 * rely on the inline one MobileMenuFooter already renders inside it. The homepage
+	 * has no sidebar/mobile nav to house an inline instance, so its fixed toggle stays
+	 * visible at every width — the only way to switch themes there.
+	 */
+	@media (max-width: 49.9375rem) {
+		:global([data-has-sidebar]) theme-toggle.fixed {
+			display: none;
+		}
+	}
+
 	.theme-toggle-button {
 		display: flex;
 		align-items: center;

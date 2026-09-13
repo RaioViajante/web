@@ -139,21 +139,55 @@ header.header > .header {
 		padding-inline-start: 0;
 	}
 
-	.sidebar-pane {
+	/*
+	 * `.page` is the positioned ancestor both rails stretch against below, so their
+	 * height matches the real document (article + footer), not the viewport.
+	 */
+	.page {
+		position: relative;
+	}
+
+	/* Left rail: nav has no native cross-axis sibling to stretch against (it's a
+	   column-flex sibling of .main-frame, not a row-flex one like the TOC container),
+	   so it's repositioned to span the full document height directly. */
+	nav.sidebar {
+		position: absolute;
+		inset-block: 0 0;
 		inset-inline-start: calc(
 			50% - (var(--sl-content-width) / 2) - var(--rv-rail-gap) - var(--sl-sidebar-width)
 		);
+		width: var(--sl-sidebar-width);
+	}
+
+	.sidebar-pane {
+		position: sticky;
+		inset-inline-start: auto;
+		top: var(--sl-nav-height);
+		width: 100%;
+		height: auto;
+		max-height: calc(100vh - var(--sl-nav-height));
 		background-color: transparent;
 		border-inline-end: none;
 	}
 
+	/* Right rail: same idea, but .right-sidebar-container already stretches to match
+	   .main-pane's height as an ordinary flex sibling — it just needs repositioning
+	   out to the rail, same as the left one. */
 	.right-sidebar-container {
-		width: 0;
+		position: absolute;
+		inset-block: 0 0;
+		inset-inline-start: calc(50% + (var(--sl-content-width) / 2) + var(--rv-rail-gap));
+		width: var(--sl-sidebar-width);
 	}
 
 	.right-sidebar {
-		inset-inline-start: calc(50% + (var(--sl-content-width) / 2) + var(--rv-rail-gap));
-		width: var(--sl-sidebar-width);
+		position: sticky;
+		inset-inline-start: auto;
+		top: var(--sl-nav-height);
+		width: 100%;
+		height: auto;
+		max-height: calc(100vh - var(--sl-nav-height));
+		padding-top: 0;
 		border-inline-start: none;
 		background: transparent;
 	}
