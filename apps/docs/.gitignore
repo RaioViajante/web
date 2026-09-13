@@ -17,3 +17,6 @@ yarn-error.log*
 
 # Editor/OS
 .DS_Store
+
+# Local-only design reference material
+reference/
