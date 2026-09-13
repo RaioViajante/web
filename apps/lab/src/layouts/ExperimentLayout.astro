@@ -15,10 +15,7 @@ const layout = experiment.layout ?? "canonical";
 const hasSurface = experiment.surface != null;
 ---
 
-<BaseLayout
-  title={`${experiment.title} · lab`}
-  description={experiment.description}
->
+<BaseLayout pageTitle={experiment.title} description={experiment.description}>
   <main class="experiment-main">
     <div class="container">
       <a href="/" class="back-link">

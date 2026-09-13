@@ -4,14 +4,17 @@ import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
 import { THEME_STORAGE_KEY } from "../lib/theme";
+import { formatTitle } from "../lib/site";
 
 interface Props {
-  title: string;
+  pageTitle?: string;
   description?: string;
 }
 
-const { title, description = "lab.raioviajante.com — things may break." } =
+const { pageTitle, description = "lab.raioviajante.com — things may break." } =
   Astro.props;
+
+const title = formatTitle(pageTitle);
 ---
 
 <!doctype html>
