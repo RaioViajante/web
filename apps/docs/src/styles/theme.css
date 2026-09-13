@@ -9,6 +9,10 @@
  * Base identity (`--rv-bg`/`--rv-fg`/`--rv-accent`) is defined once and re-defined only
  * under `[data-theme='light']`; every `--sl-color-*` below is derived from those three
  * values, so light mode falls out of the same formulas instead of a separate palette.
+ *
+ * Horizontal layout is governed by our own `--rv-content-width`/`--rv-page-inline`/
+ * `--rv-rail-width`/`--rv-rail-gap` tokens (defined below), not `--sl-content-width`
+ * directly — see the "Docs shell" section for why.
  */
 
 :root {
@@ -55,10 +59,29 @@
 	--sl-font: 'IBM Plex Mono', var(--sl-font-system-mono);
 	--sl-font-mono: 'IBM Plex Mono', var(--sl-font-system-mono);
 
-	/* Core container: the same reading column width used across the RaioViajante ecosystem */
-	--sl-content-width: 42.5rem; /* 680px */
-	--sl-sidebar-width: 11.875rem; /* 190px */
-	--rv-rail-gap: 3rem; /* 48px gap between the reading column and the sidebar/TOC rails */
+	/*
+	 * Canonical RaioViajante layout tokens — the single source of truth for every
+	 * primary surface's horizontal alignment (header, homepage, article, footer).
+	 *
+	 * Deliberately independent of --sl-content-width: Starlight itself silently
+	 * redefines that token to 67.5rem on any page without a sidebar — see
+	 * `html:not([data-has-sidebar]) { --sl-content-width: 67.5rem; }` in
+	 * Page.astro — via a selector with higher specificity (0,1,1) than a plain
+	 * `:root` override (0,1,0), so it cannot be fixed by reassigning
+	 * --sl-content-width at :root. Every rule below that governs the canonical
+	 * column reads --rv-content-width directly instead, so it can never be
+	 * silently overridden by Starlight's own sidebar-presence logic again.
+	 */
+	--rv-content-width: 42.5rem; /* 680px reading column */
+	--rv-page-inline: var(--sl-content-pad-x); /* shared responsive gutter */
+	--rv-rail-width: 11.875rem; /* 190px sidebar/TOC rail */
+	--rv-rail-gap: 3rem; /* 48px gap between the reading column and the rails */
+
+	/* Starlight's own tokens still mirror ours, for native code we haven't
+	   directly overridden (e.g. the sidebar's flush layout between 50rem and
+	   72rem uses --sl-sidebar-width to reserve its own space). */
+	--sl-content-width: var(--rv-content-width);
+	--sl-sidebar-width: var(--rv-rail-width);
 }
 
 :root[data-theme='light'] {
@@ -99,17 +122,34 @@
 }
 
 /**
- * Docs shell
+ * Docs shell — the canonical RaioViajante layout system
  *
- * The header, and the article's reading column, are centered at the same
- * --sl-content-width independent of the sidebar/TOC rails, instead of Starlight's
- * default "content flush against a viewport-edge sidebar" layout. The rails become
- * fixed columns positioned outward from the centered column's edges at wide
- * viewports; below that they fall back to Starlight's own responsive behavior
- * (popover sidebar, collapsed mobile TOC) untouched.
+ * Every primary surface (header, homepage, article reading column, footer,
+ * pagination) is centered at the same --rv-content-width with the same
+ * --rv-page-inline gutter, at every viewport width — this is the core page
+ * margin, and it never changes shape based on route or sidebar presence.
+ *
+ * The documentation rails (sidebar/TOC) are the only thing allowed to extend
+ * outward around that column, and only where there is room for them (>=72rem):
+ * there, they become fixed-position columns positioned outward from the
+ * canonical column's own edges via calc(), clamped with min()/max() so they
+ * can never push past the viewport edge. Below that width they collapse to
+ * Starlight's own responsive behavior (popover sidebar, collapsed mobile TOC),
+ * untouched — but the canonical column itself stays centered regardless.
  */
 
-/* Header: a simple bar centered at the content width, not a sidebar-aware grid. */
+/* The canonical container: ContentPanel's own .sl-container (used for both the
+   page-title panel and the body panel), scoped so it never touches
+   PageSidebar's unrelated same-named TOC-width wrapper. Unlayered, so it wins
+   over Starlight's own (layered, --sl-content-width-driven, only centered
+   >=72rem) rule regardless of that token's value on any given route. */
+.content-panel > .sl-container {
+	max-width: var(--rv-content-width);
+	margin-inline: auto;
+}
+
+/* Header: a simple bar centered at the canonical content width, not a
+   sidebar-aware grid — identical on every route, sidebar or not. */
 header.header {
 	padding-inline: 0;
 }
@@ -120,9 +160,9 @@ header.header > .header {
 	justify-content: space-between;
 	align-items: center;
 	width: 100%;
-	max-width: var(--sl-content-width);
+	max-width: var(--rv-content-width);
 	margin-inline: auto;
-	padding-inline: var(--sl-content-pad-x);
+	padding-inline: var(--rv-page-inline);
 }
 
 .social-icons::after {
@@ -149,14 +189,16 @@ header.header > .header {
 
 	/* Left rail: nav has no native cross-axis sibling to stretch against (it's a
 	   column-flex sibling of .main-frame, not a row-flex one like the TOC container),
-	   so it's repositioned to span the full document height directly. */
+	   so it's repositioned to span the full document height directly. Clamped with
+	   max() so it can never be pushed left of the viewport edge. */
 	nav.sidebar {
 		position: absolute;
 		inset-block: 0 0;
-		inset-inline-start: calc(
-			50% - (var(--sl-content-width) / 2) - var(--rv-rail-gap) - var(--sl-sidebar-width)
+		inset-inline-start: max(
+			0px,
+			calc(50% - (var(--rv-content-width) / 2) - var(--rv-rail-gap) - var(--rv-rail-width))
 		);
-		width: var(--sl-sidebar-width);
+		width: var(--rv-rail-width);
 	}
 
 	.sidebar-pane {
@@ -172,12 +214,16 @@ header.header > .header {
 
 	/* Right rail: same idea, but .right-sidebar-container already stretches to match
 	   .main-pane's height as an ordinary flex sibling — it just needs repositioning
-	   out to the rail, same as the left one. */
+	   out to the rail, same as the left one. Clamped with min() so it can never be
+	   pushed past the viewport's right edge. */
 	.right-sidebar-container {
 		position: absolute;
 		inset-block: 0 0;
-		inset-inline-start: calc(50% + (var(--sl-content-width) / 2) + var(--rv-rail-gap));
-		width: var(--sl-sidebar-width);
+		inset-inline-start: min(
+			calc(50% + (var(--rv-content-width) / 2) + var(--rv-rail-gap)),
+			calc(100% - var(--rv-rail-width))
+		);
+		width: var(--rv-rail-width);
 	}
 
 	.right-sidebar {
@@ -232,7 +278,7 @@ starlight-toc a[aria-current='true'] {
 /* Mobile menu toggle: a plain icon aligned with the content edge, not a floating pill. */
 .sl-menu-button {
 	position: fixed;
-	inset-inline-end: var(--sl-content-pad-x);
+	inset-inline-end: var(--rv-page-inline);
 	background: none;
 	color: var(--rv-fg);
 	box-shadow: none;
