@@ -7,6 +7,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'RaioViajante Docs',
+			favicon: '/icon.png',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RaioViajante/docs' },
 			],
