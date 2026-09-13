@@ -14,7 +14,12 @@
   --bg: #f4f1ec;
   --fg: #211f24;
   --accent: #6d4fa6;
-  --muted: color-mix(in srgb, var(--fg) 58%, transparent);
+  /* The design export's own 58% reads as ~3.9:1 against this background,
+     short of WCAG AA (4.5:1) at the small sizes muted text is used at here.
+     raioviajante.com and dump hit the exact same shortfall in their own
+     light themes and settled on 65% to clear it (paper holds less contrast
+     than charcoal) — reused here rather than picking a new number. */
+  --muted: color-mix(in srgb, var(--fg) 65%, transparent);
   --border: color-mix(in srgb, var(--fg) 14%, transparent);
   --cell: color-mix(in srgb, var(--fg) 5%, transparent);
 }
