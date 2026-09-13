@@ -4,7 +4,7 @@ export const projects = [
     description: "terminal music player",
     stack: "rust",
     year: "2026",
-    status: "active",
+    status: "exploring",
     href: "https://github.com/RaioViajante/hum",
   },
   {
@@ -17,11 +17,21 @@ export const projects = [
   },
   {
     name: "orbit",
-    description: "job scheduler built to go deeper into Java and Spring",
+    description:
+      "job execution backend built to go deeper into Java and Spring",
     stack: "java / spring",
     year: "2026",
     status: "active",
     href: "https://github.com/RaioViajante/orbit",
+  },
+  {
+    name: "yanawa",
+    description:
+      "an application-oriented programming language in the design phase",
+    stack: "language design",
+    year: "2026",
+    status: "exploring",
+    href: "https://github.com/yanawa/yanawa",
   },
   {
     name: "dump",
