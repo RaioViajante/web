@@ -25,8 +25,8 @@ const serif = Source_Serif_4({
 export const metadata: Metadata = {
   metadataBase: new URL("https://raioviajante.com"),
   title: {
-    default: "RaioViajante",
-    template: "%s · raioviajante.com",
+    default: "raioviajante",
+    template: "%s · raioviajante",
   },
   description: "curious enough to build it myself.",
   openGraph: {
