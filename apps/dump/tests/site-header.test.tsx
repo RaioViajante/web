@@ -28,7 +28,7 @@ describe("<SiteHeader />", () => {
       container.querySelector(".primary-navigation .site-github-link"),
     ).toBeNull();
 
-    // It sits after the nav in document order, so keyboard order stays logical.
+    // It follows the title before the nav, matching the visual reading order.
     const focusable = Array.from(
       container.querySelectorAll("a, nav"),
     ) as Element[];
@@ -39,6 +39,7 @@ describe("<SiteHeader />", () => {
       el.classList.contains("site-github-link"),
     );
     expect(navIndex).toBeGreaterThanOrEqual(0);
-    expect(linkIndex).toBeGreaterThan(navIndex);
+    expect(linkIndex).toBe(1);
+    expect(linkIndex).toBeLessThan(navIndex);
   });
 });
