@@ -8,7 +8,7 @@ type NowGroup = {
   items: NowItem[];
 };
 
-export const lastUpdated = "2026-09-12";
+export const lastUpdated = "2026-09-13";
 
 export const tagline = "a snapshot of what currently has my attention.";
 
@@ -18,15 +18,17 @@ export const now: NowGroup[] = [
     items: [
       {
         title: "sweep",
-        description: "making my filesystem organize itself",
+        description:
+          "making file organization predictable before making it ambitious",
       },
       {
         title: "orbit",
-        description: "going deeper into Java and Spring",
+        description:
+          "building the execution model before the scheduler starts scheduling",
       },
       {
-        title: "hum",
-        description: "slowly building a terminal music player",
+        title: "yanawa",
+        description: "defining the language before starting the compiler",
       },
     ],
   },
@@ -36,10 +38,6 @@ export const now: NowGroup[] = [
       {
         title: "java / spring",
         description: "going deeper into the Java ecosystem",
-      },
-      {
-        title: "angular",
-        description: "getting comfortable on the other side of the stack",
       },
       {
         title: "python",
@@ -58,6 +56,7 @@ export const now: NowGroup[] = [
       { title: "developer tooling" },
       { title: "automation" },
       { title: "systems programming" },
+      { title: "language design" },
     ],
   },
 ];
