@@ -123,20 +123,23 @@
 	font-family: 'Source Serif 4', ui-serif, Georgia, serif;
 }
 
-/* Font-size lives on the wrapper, not the heading itself: Starlight's own
-   anchor-link positioning (anchor-links.css) reserves space with an
-   em-based padding-inline-end on the heading and pulls the anchor link back
-   over it with an equal-and-opposite em-based negative margin — but that
-   margin is set on `.sl-anchor-link`, a SIBLING of the heading that inherits
-   its font-size from `.sl-heading-wrapper`, not from the heading element.
-   Overriding font-size on the heading alone (its previous location here)
-   left the wrapper at Starlight's native (much larger) per-level heading
-   size, so the two ends of that em-relative padding/margin balance resolved
-   against different font-sizes — the anchor link's pull-back overshot the
-   heading's actual reserved space and the "#" landed on top of the heading's
-   trailing letters. Setting it on the wrapper instead keeps the heading and
-   its anchor link at the same inherited font-size, so Starlight's own
-   spacing math is internally consistent again. */
+/* Font-size must match on BOTH the wrapper and the heading, not just one:
+   Starlight's own anchor-link positioning (anchor-links.css) reserves space
+   with an em-based padding-inline-end on the HEADING element, then pulls
+   the anchor link back over it with an equal-and-opposite em-based negative
+   margin set on `.sl-anchor-link` — a SIBLING of the heading that inherits
+   its font-size from `.sl-heading-wrapper`, not from the heading. Those two
+   em values only cancel out correctly when the heading and the wrapper
+   resolve to the same font-size. Starlight's own markdown CSS sets an
+   explicit font-size directly on h2–h6 (not just inheritance), so
+   overriding only the wrapper (as a previous version of this rule did)
+   left the heading at Starlight's native, much larger per-level size while
+   the wrapper (and so the anchor link) shrank — the padding/margin balance
+   was still mismatched, just in the other direction, and heading text
+   silently reverted to the native large size in the process. Both
+   declarations below carry the identical value so the heading, its
+   wrapper, and the sibling anchor link all resolve `em`s against the same
+   font-size. */
 .sl-markdown-content .sl-heading-wrapper:is(.level-h2, .level-h3, .level-h4, .level-h5, .level-h6) {
 	font-size: var(--sl-text-sm);
 }
@@ -144,6 +147,7 @@
 .sl-markdown-content :is(h2, h3, h4, h5, h6) {
 	font-family: 'IBM Plex Mono', var(--sl-font-system-mono);
 	font-weight: 500;
+	font-size: var(--sl-text-sm);
 	letter-spacing: 0.3px;
 }
 
@@ -232,6 +236,28 @@ header.header {
 
 .main-frame {
 	padding-top: 0;
+}
+
+/* Anchor-scroll offset: Starlight's own `scroll-padding-top` (Page.astro,
+   `calc(1.5rem + var(--sl-nav-height))`) reserves nav-height of extra space
+   above every scroll/hash target, on the assumption that a `position: fixed`
+   header would otherwise overlay it. Our header is `position: static` (see
+   above) and already occupies real space in document flow, so that
+   reservation is now dead weight: it doesn't prevent any overlap (there is
+   none to prevent), it just pushes every TOC/permalink jump target an extra
+   `--sl-nav-height` further down than necessary. Left alone, `--sl-nav-height`
+   itself still has to stay real (the sticky rails below key off it), so the
+   offset is corrected here directly rather than by zeroing that variable.
+
+   `html:root` (not plain `html`): Page.astro's own rule is unlayered too
+   (it's a plain inline `<style>` block, not inside `@layer`), so this isn't
+   the usual "unlayered beats layered" case used elsewhere in this file —
+   with equal specificity here, whichever rule is LATER in the final
+   concatenated stylesheet wins, and Starlight's own CSS is bundled after
+   customCss. `:root` adds exactly one pseudo-class's worth of specificity
+   (0,1,1 vs 0,0,1) to win outright, rather than relying on source order. */
+html:root {
+	scroll-padding-top: 1.5rem;
 }
 
 /* Two groups, not three spread evenly: brand on the left, then a single
@@ -373,9 +399,30 @@ button[data-open-modal] > kbd {
 		background: transparent;
 	}
 
+	/* `.main-pane` spans the FULL row width (see above) so the reading column
+	   can stay centered on the canonical formula independent of the rail —
+	   but that means its own box geometrically covers the same screen area
+	   as `.right-sidebar-container` (the TOC rail), which sits inside this
+	   same flex row. `.main-pane` has native `isolation: isolate` (from
+	   TwoColumnContent.astro), which makes the whole element paint as one
+	   unit alongside other positioned/stacking-context elements in DOM
+	   order — and since it comes AFTER the right-sidebar-container `<aside>`
+	   in the markup, it paints on top of it, silently swallowing every
+	   click over the TOC despite having no visible content there. Turning
+	   off pointer-events on the full-width wrapper and back on only for the
+	   actual bounded content column (`.content-panel > .sl-container`, the
+	   same canonical selector everything real content already renders
+	   inside) lets clicks pass through the empty overlap straight to the
+	   TOC/sidebar rail beneath, without touching any width, position, or
+	   z-index. */
 	.main-pane {
 		width: 100%;
 		--sl-content-margin-inline: auto;
+		pointer-events: none;
+	}
+
+	.content-panel > .sl-container {
+		pointer-events: auto;
 	}
 }
 
