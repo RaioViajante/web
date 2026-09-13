@@ -1,0 +1,445 @@
+---
+title: "An Execution Is More Than a Row in a Database"
+description: "Orbit started with Jobs and endpoints, but modeling the first real execution forced me to decide which state transitions are legal and which ones should fail loudly."
+date: "2026-09-13"
+tags:
+  - java
+  - spring
+  - distributed-systems
+draft: false
+---
+
+In the last Orbit post, I was mostly thinking about Jobs.
+
+Creating them.
+
+Validating them.
+
+Putting them in PostgreSQL through a suspicious amount of Spring code.
+
+The next obvious thing was an Execution.
+
+At first this sounded easy.
+
+Give it an id.
+
+Connect it to a Job.
+
+Add a status.
+
+Store a few timestamps.
+
+Maybe keep an exit code around for later.
+
+Another entity.
+
+Another migration.
+
+Another place for me to discover that five fields somehow require twenty decisions.
+
+Then I started asking what values were actually allowed to follow each other.
+
+That was when the row stopped looking like a row.
+
+It started looking like a lifecycle.
+
+## A Job is not an Execution
+
+A Job describes something Orbit may eventually run.
+
+It contains configuration and intention:
+
+```text
+name
+command
+cronExpression
+maxRetries
+timeoutSeconds
+enabled
+```
+
+An Execution is one concrete run of that Job.
+
+If the same backup command runs ten times, I don't want ten Jobs with ten slightly different versions of the configuration.
+
+I want one Job and ten Executions that tell me what happened each time.
+
+That distinction was already present in Orbit's architecture notes.
+
+It became more interesting when I started constructing the object.
+
+The current `Execution` keeps the Job reference, but also copies the command, maximum retries and timeout seconds into its own fields.
+
+That means a new Execution remembers the configuration it was created with.
+
+If I change the Job later, the existing Execution does not suddenly acquire a different command just because somebody edited the definition.
+
+I am not calling this event sourcing.
+
+I have read enough words about distributed systems to know that naming something too early is dangerous.
+
+It is simply a snapshot of the values the current model decided were relevant when the Execution was created.
+
+That already feels more useful than a row containing a foreign key and a vague status.
+
+## `QUEUED` is already a decision
+
+The first state is `QUEUED`.
+
+That makes sense for something that may eventually be picked up by a scheduler or a worker.
+
+It also creates the first rule.
+
+An Execution should not become `RUNNING` from absolutely anywhere.
+
+It should become `RUNNING` when the `start()` action is allowed from `QUEUED`.
+
+The code currently looks like this:
+
+```java
+public void start() {
+    if (status != ExecutionStatus.QUEUED) throw new IllegalStateException("Only queued executions can be started");
+    this.status = ExecutionStatus.RUNNING;
+    this.startedAt = Instant.now();
+}
+```
+
+The important part is not the assignment.
+
+It is the condition before the assignment.
+
+I could expose a setter and let something else write:
+
+```java
+execution.setStatus(RUNNING);
+```
+
+That would answer the question:
+
+> what value do you want in this field?
+
+`start()` answers a different question:
+
+> is starting this Execution legal from where it is now?
+
+That difference is small enough to fit in one method and large enough to change how I think about the object.
+
+The domain object is not just carrying data around while the service layer makes every decision.
+
+At least for this part, it knows what it is allowed to become.
+
+## State transitions stopped being setters
+
+The current states are:
+
+```text
+QUEUED
+RUNNING
+SUCCEEDED
+FAILED
+CANCELLED
+```
+
+And the intended transitions currently look like:
+
+```text
+QUEUED
+  ├─ start() ─────→ RUNNING
+  │                  ├─ succeed() ─→ SUCCEEDED
+  │                  ├─ fail() ────→ FAILED
+  │                  └─ cancel() ──→ CANCELLED
+  └─ cancel() ────→ CANCELLED
+```
+
+There is no path from `SUCCEEDED` back to `RUNNING`.
+
+There is no path from `FAILED` to `RUNNING` in the current model.
+
+There is no path from `CANCELLED` to anything else.
+
+That sounds obvious when drawn like this.
+
+It becomes less obvious when the object is a JPA entity with a status column and several application layers around it.
+
+The methods are deliberately named after actions:
+
+```java
+execution.start();
+execution.succeed(0);
+execution.fail(1, "Backup command failed");
+execution.cancel();
+```
+
+Those calls describe a history.
+
+They don't just describe four unrelated writes to a database field.
+
+The history matters because the same method can be valid or invalid depending on what happened before it.
+
+Calling `succeed(0)` on a newly created Execution is rejected because it has never been running.
+
+Calling `start()` twice is rejected because it is no longer queued.
+
+Calling `cancel()` after success is rejected because a finished Execution cannot be cancelled through the current domain operation.
+
+The object is starting to have a memory of its own past.
+
+## Success and failure carry different information
+
+The status is only the most visible part of the lifecycle.
+
+When an Execution starts, it records `startedAt`.
+
+When it succeeds, it records the exit code and `finishedAt`.
+
+When it fails, it records the exit code, an error message and `finishedAt`.
+
+When it is cancelled, it records `finishedAt`.
+
+That means cancellation from `QUEUED` leaves `startedAt` unset.
+
+It never started.
+
+That tiny detail feels important because timestamps are also part of the story the object is keeping.
+
+The failure method has another rule:
+
+```java
+public void fail(int exitCode, String errorMessage) {
+    if (status != ExecutionStatus.RUNNING) throw new IllegalStateException("Only running executions can fail");
+    if (errorMessage == null || errorMessage.isBlank())
+        throw new IllegalArgumentException("Error message must not be blank");
+
+    this.status = ExecutionStatus.FAILED;
+    this.exitCode = exitCode;
+    this.errorMessage = errorMessage;
+    this.finishedAt = Instant.now();
+}
+```
+
+The message cannot be blank.
+
+That feels reasonable.
+
+The exit code rules are less opinionated right now.
+
+`succeed()` does not require the exit code to be zero.
+
+`fail()` does not require the exit code to be nonzero.
+
+I could invent a reason for both rules immediately.
+
+Maybe success should always mean zero.
+
+Maybe failure should always mean something went wrong at the operating-system level.
+
+But those rules are not in the current model.
+
+The code allows an integer and lets the caller decide what that integer means for now.
+
+That is one of the places where the implementation is showing me that a design can be incomplete without being accidental.
+
+I may change those rules later.
+
+For now, I need to describe what Orbit actually says, not what seems tidy in a diagram.
+
+## The tests became examples of forbidden history
+
+The Execution tests were where the lifecycle became difficult to ignore.
+
+They do test the ordinary paths:
+
+create an Execution and check that it starts as `QUEUED`;
+
+start it and check `RUNNING` plus `startedAt`;
+
+succeed it and check `SUCCEEDED`, the exit code and `finishedAt`;
+
+fail it and check the error message and timestamps;
+
+cancel it from both `QUEUED` and `RUNNING`.
+
+But the more interesting tests are the rejected paths.
+
+The tests also ask questions like:
+
+What happens if I start an Execution twice?
+
+What happens if I succeed before starting it?
+
+What happens if I fail without an error message?
+
+What happens if I cancel an Execution that already succeeded?
+
+These are not just tests for return values.
+
+They are tests for histories that should not be possible through the domain API.
+
+For example, this is expected to fail:
+
+```java
+Execution execution = new Execution(job);
+
+execution.succeed(0);
+```
+
+The exception is an `IllegalStateException` with:
+
+```text
+Only running executions can succeed
+```
+
+And this sequence is also rejected:
+
+```java
+execution.start();
+execution.start();
+```
+
+The second call fails with:
+
+```text
+Only queued executions can be started
+```
+
+I started thinking less about whether every method worked in isolation and more about whether the object could enter a state that should never exist.
+
+That is a much more interesting question to ask of a test.
+
+It is also a much more annoying question when the answer is yes.
+
+## The database is not the domain model
+
+Orbit does have an `executions` table.
+
+It stores the Job relationship, the status, the copied configuration and the lifecycle fields.
+
+The migration also constrains the status column to the five known values.
+
+That is useful.
+
+It does not mean the database knows the complete lifecycle.
+
+The database can know that `RUNNING` is a valid value.
+
+It does not, by itself, know whether this particular row was previously `QUEUED`.
+
+It does not know that `SUCCEEDED` should only follow `RUNNING`.
+
+It does not know that cancelling a queued Execution should leave `startedAt` empty.
+
+The current Java object is where Orbit encodes those application rules.
+
+That is a different kind of protection from a database constraint.
+
+I don't want to pretend this solves every consistency problem.
+
+Two workers trying to claim the same Execution would eventually make this conversation much more difficult.
+
+Concurrency, locking and idempotency are still somewhere in Orbit's future.
+
+The current model gives later work a set of rules to deal with.
+
+It does not magically make concurrent state changes safe.
+
+## The scheduler still does not schedule anything
+
+At this point Orbit has a Job, an Execution and a lifecycle for an Execution.
+
+It has migrations.
+
+It has tests.
+
+It has a carefully named set of states for work that nobody is currently running.
+
+Orbit still does not parse cron schedules.
+
+It does not run shell commands.
+
+There are no workers.
+
+There is no distributed execution.
+
+Retry and timeout values are stored configuration, but they are not being enforced by a runtime yet.
+
+I have now modeled the lifecycle of jobs that are not actually being executed.
+
+This is either excellent groundwork or a very organized way to avoid writing the scheduler.
+
+Probably both.
+
+The important boundary is that the domain model is real even though the runtime behavior is not.
+
+`start()` changes an object in memory.
+
+It does not start a process.
+
+`succeed()` records a result supplied by the caller.
+
+It does not observe a command finishing.
+
+`cancel()` changes the Execution state.
+
+It does not stop an operating-system process because Orbit has no process to stop yet.
+
+That distinction feels obvious when written down.
+
+It is exactly the kind of thing that gets blurred when a project has a compelling name and a README that says “distributed job scheduler.”
+
+## Doing this first still makes sense
+
+Before a scheduler loop can create, start, retry or cancel Executions, Orbit needs some answer to a simpler question:
+
+What is an Execution allowed to become?
+
+If that answer is left entirely to the runtime, the runtime will invent semantics while it is busy doing other things.
+
+One code path will set `RUNNING` directly.
+
+Another will update timestamps afterward.
+
+Some future worker will decide that a failed Execution can be restarted.
+
+Some other future worker will disagree.
+
+Now the system has a distributed argument about a boolean-shaped field.
+
+Keeping the first rules on the domain object gives later code something to push against.
+
+The scheduler still might need different transitions.
+
+Retries might deserve a separate attempt model.
+
+Cancellation might need coordination with a worker.
+
+Concurrent claims might need database support that the current entity does not have.
+
+None of that is solved here.
+
+But at least the project has stopped treating every status change as an equally harmless assignment.
+
+## There is still a lot of empty space
+
+The next work is not a triumphant launch of the scheduler.
+
+Orbit still needs to decide how Executions are created and queried through the application layers, and how the persistence pieces fit around the domain object.
+
+After that, the project eventually has to deal with scheduling, command execution, retries, timeouts and workers.
+
+Each one will put pressure on this first lifecycle.
+
+That is probably the point.
+
+I don't want to build a loop that quietly invents what `FAILED` or `CANCELLED` means while I am debugging it at three in the morning.
+
+For now, an Execution is a JPA entity with five possible states, a few guarded actions and a collection of tests describing both its normal life and the histories it rejects.
+
+It is not a scheduler.
+
+It is not distributed.
+
+It is not even running anything.
+
+But it is finally more than another row waiting for somebody to update a status column.
+
+The next question is what happens when two things try to change that row at the same time.
