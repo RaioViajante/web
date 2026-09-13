@@ -1,8 +1,6 @@
 ---
 import type { InferGetStaticPropsType } from "astro";
 import ExperimentLayout from "../../layouts/ExperimentLayout.astro";
-import BootSector from "../../components/surfaces/BootSector.astro";
-import ParserPlayground from "../../components/surfaces/ParserPlayground.astro";
 import { experiments } from "../../data/experiments";
 
 export function getStaticPaths() {
@@ -15,15 +13,6 @@ export function getStaticPaths() {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { experiment } = Astro.props as Props;
-
-const Surface =
-  experiment.surface === "parser-playground"
-    ? ParserPlayground
-    : experiment.surface === "boot-sector"
-      ? BootSector
-      : null;
 ---
 
-<ExperimentLayout experiment={experiment}>
-  {Surface && <Surface slot="surface" />}
-</ExperimentLayout>
+<ExperimentLayout experiment={experiment} />

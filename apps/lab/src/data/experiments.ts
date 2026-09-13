@@ -1,11 +1,10 @@
-export type ExperimentStatus = "active" | "archived";
+export type ExperimentStatus = "active" | "done" | "archived";
 
 /**
  * "canonical" (default) keeps the experiment surface inside the same 680px
  * column as the rest of the site. "wide" is an opt-in breakout for an
  * experiment that genuinely needs more horizontal space (a waveform editor,
- * a node graph, a large canvas) — see docs/design.md. Neither current
- * demonstration experiment uses it.
+ * a node graph, a large canvas) — see docs/design.md.
  */
 export type ExperimentLayout = "canonical" | "wide";
 
@@ -15,7 +14,8 @@ export type ExperimentLayout = "canonical" | "wide";
  * dedicated interactive surface still gets the full metadata/prose page,
  * just without this section.
  */
-export type ExperimentSurface = "parser-playground" | "boot-sector";
+export type ExperimentSurface =
+  "filename-classifier" | "execution-states" | "boot-sector";
 
 export interface Experiment {
   id: string;
@@ -31,58 +31,45 @@ export interface Experiment {
   surface?: ExperimentSurface;
 }
 
-/**
- * Temporary demonstration entries carried over from the approved design
- * reference (reference/claude-export/Lab.dc.html) — see docs/content.md.
- * They exist to establish the homepage list and experiment page system, not
- * as real projects, and will be replaced with real RaioViajante experiments.
- */
+/** Real experiments, ordered by descending publication number. */
 export const experiments: Experiment[] = [
   {
-    id: "017",
-    slug: "parser-playground",
-    title: "parser playground",
-    description: "syntax experiments before they become language decisions",
-    status: "active",
-    created: "2026-09-01",
-    source: "https://github.com/raioviajante/parser-playground",
-    what: "Before a language decides what it is, someone has to guess how it should read. This is that guessing, made visible.",
-    surface: "parser-playground",
-  },
-  {
-    id: "016",
-    slug: "cron-visualizer",
-    title: "cron visualizer",
-    description: "making schedules less unpleasant to look at",
-    status: "active",
-    created: "2026-08-20",
-    source: "https://github.com/raioviajante/cron-visualizer",
-    what: "Cron expressions are precise and unreadable at the same time. I wanted to see them as time, not syntax.",
-  },
-  {
-    id: "014",
-    slug: "filesystem-classifier",
-    title: "filesystem classifier",
-    description: "experimenting with how files decide where they belong",
-    status: "active",
-    created: "2026-09-13",
-    source: "https://github.com/raioviajante/filesystem-classifier",
-    what: "I wanted to see how reliably a file could be classified without turning the whole thing into something much larger than it needed to be.",
-    notes:
-      "Extension matching gets it right more often than it should. The interesting failures are the ambiguous ones.",
-  },
-  {
-    id: "006",
+    id: "003",
     slug: "boot-sector",
     title: "boot sector",
-    description: "512 bytes and bad decisions",
-    status: "archived",
-    created: "2024-02-02",
-    source: "https://github.com/raioviajante/boot-sector",
-    what: "512 bytes, no operating system, no safety net. Just enough instructions to prove the machine is listening.",
+    description: "the assembly behind a BIOS hello world",
+    status: "done",
+    created: "2026-09-13",
+    layout: "canonical",
+    source: "https://github.com/RaioViajante/x86-os-experiment",
+    what: "The actual assembly from an x86 learning experiment, alongside the behavior recorded in its learning notes. The Lab presents the source; it does not boot or emulate it.",
     notes:
-      "The signature at the end (0x55AA) is the only thing standing between this and garbage.",
-    surface: "boot-sector",
+      "Based on x86-os-experiment revision e966889. The Hello, World! result is documented in the project notes, not independently reproduced here.",
+  },
+  {
+    id: "002",
+    slug: "execution-states",
+    title: "execution states",
+    description: "trying the transitions Orbit allows—and the ones it rejects",
+    status: "active",
+    created: "2026-09-13",
+    layout: "canonical",
+    what: "An interactive representation of Orbit’s current Execution domain rules. State changes happen in this browser example: no commands run, and there is no scheduler behind the page.",
+    notes:
+      "Based on Orbit revision cd97666. Timestamps are browser-generated sample values, with no persistence. Retry and timeout settings are configuration only.",
+  },
+  {
+    id: "001",
+    slug: "filename-classifier",
+    title: "filename classifier",
+    description: "seeing where Sweep puts a filename",
+    status: "active",
+    created: "2026-09-13",
+    layout: "canonical",
+    source: "https://github.com/RaioViajante/sweep",
+    what: "Sweep classifies files by their final extension before deciding where they belong. This reproduces that small part of its current behavior in the browser; Sweep itself is not running here.",
+    notes:
+      "Based on Sweep revision 3544d36. Only filename extensions are considered. No files are uploaded, inspected, or moved.",
   },
 ];
 
