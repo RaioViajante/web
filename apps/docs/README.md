@@ -27,7 +27,7 @@ Only documentation that is genuinely worth organizing and making navigable for t
 These are two different concepts:
 
 - **Repository documentation** (`docs/` in this repo) — internal documentation about developing and maintaining this repository itself.
-- **Public documentation** (`src/content/docs/`, once Starlight is initialized) — the actual content rendered on docs.raioviajante.com.
+- **Public documentation** (`src/content/docs/`) — the actual content rendered on docs.raioviajante.com.
 
 See [`docs/architecture.md`](docs/architecture.md) and [`AGENTS.md`](AGENTS.md) for more detail on this distinction.
 
@@ -41,19 +41,17 @@ See [`docs/architecture.md`](docs/architecture.md) and [`AGENTS.md`](AGENTS.md) 
 - Pagefind (via Starlight)
 - Vercel
 
-## Initial content areas
+## Current and future content areas
 
-Public documentation is expected to eventually cover, at minimum:
+The current public documentation contains:
 
 - `projects/`
-  - `hum`
   - `sweep`
-  - `orbit`
 - `raioviajante/`
   - design language
   - repository conventions
 
-These are planned areas, not existing pages. Content will be added as it becomes real and worth publishing.
+Other projects may receive documentation only when their implemented behavior is stable and useful enough to publish. Project specifications and future plans are not published as current behavior.
 
 ## Development
 
@@ -69,4 +67,4 @@ See [`docs/development.md`](docs/development.md) for more detail.
 
 ## Current status
 
-The Astro/Starlight application has been initialized: the site builds, runs, and renders a single public index page under `src/content/docs/`. The RaioViajante visual identity has not been applied yet, and the planned project documentation (hum, sweep, orbit, design language, repository conventions) has not been written yet.
+The Astro/Starlight application is initialized and includes the approved RaioViajante visual system, a bespoke homepage, article navigation, table-of-contents support, heading permalinks, and dark/light themes. Published content includes the Sweep project page and the two RaioViajante pages under `src/content/docs/`.

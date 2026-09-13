@@ -41,4 +41,4 @@ The layout should give these elements the space they need while keeping the same
 
 ## Status
 
-No visual implementation exists yet — this document describes the identity to carry forward once the Astro/Starlight application and its theme are built.
+The approved visual system is implemented in the Astro/Starlight application. The current site includes the shared colors and typography, custom header and footer treatment, theme toggle, flat sidebar, canonical 680px reading column, and responsive article rails described above.

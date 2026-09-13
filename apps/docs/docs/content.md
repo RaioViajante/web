@@ -14,20 +14,22 @@ Public documentation on docs.raioviajante.com should be:
 
 This site does not automatically mirror every `/docs` file from every project repository. A project having internal documentation does not mean that documentation should be republished here. Content is promoted to `docs.raioviajante.com` deliberately, when it's genuinely useful to a public reader.
 
-## Planned information architecture
+## Current public information architecture
 
 ```
 projects/
-  hum/
   sweep/
-  orbit/
 
 raioviajante/
   design-language/
   repository-conventions/
 ```
 
-This is the planned structure, not existing content. Sections and pages should be created only when there is real content to justify them — do not create placeholder pages ahead of actual documentation.
+Sweep currently has one public page. The RaioViajante section contains the design language and repository conventions pages.
+
+## Potential future information architecture
+
+Other projects may be added when they meet the publication threshold. Possible future project sections include Orbit, Hum, yanawa, or x86-related material, but none of those projects currently has a public documentation section here. Sections and pages should be created only when there is real, stable content to justify them — never as placeholders.
 
 ## Growing this structure
 

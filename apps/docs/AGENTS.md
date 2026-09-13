@@ -19,7 +19,7 @@ Astro, Starlight, TypeScript, pnpm, Markdown/MDX, Pagefind (via Starlight), depl
 This is important and easy to get wrong:
 
 - **`docs/`** — internal documentation about developing and maintaining *this repository*. Read by contributors and agents, not published.
-- **`src/content/docs/`** — public documentation content rendered on docs.raioviajante.com. This directory does not exist yet; it will be created when Starlight is initialized.
+- **`src/content/docs/`** — public documentation content rendered on docs.raioviajante.com. Starlight is initialized and published pages live here.
 
 Never conflate the two. Never place public content under `docs/`, and never place repository-maintenance documentation under `src/content/docs/`.
 
