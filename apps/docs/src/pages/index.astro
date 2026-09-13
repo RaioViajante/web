@@ -10,11 +10,29 @@ import { Icon } from '@astrojs/starlight/components';
 
 <StarlightPage
 	frontmatter={{
-		title: 'RaioViajante Docs',
+		// dump's homepage title is its framework's "default" title — the site
+		// name plus its tagline, e.g. "dump — a memory dump, hopefully
+		// readable." (app/layout.tsx) — rather than the per-page
+		// "page title — site name" template every other page uses. Starlight
+		// has no equivalent "default vs template" split: every route's
+		// `<title>` goes through the same `${data.title} ${titleDelimiter}
+		// ${siteTitle}` formula (astro.config.mjs sets siteTitle to "docs").
+		// Setting this page's own title to the complete string up front, and
+		// overriding the generated `<title>` tag below (native `head`
+		// frontmatter, not a component override) to that same string,
+		// reproduces dump's exact homepage title/og:title without a second
+		// "— docs" getting appended on top.
+		title: 'docs — technical documentation for things built under raioviajante.',
 		description: 'Public technical documentation for projects and systems built under RaioViajante.',
 		template: 'splash',
 		hero: {},
 		pagefind: false,
+		head: [
+			{
+				tag: 'title',
+				content: 'docs — technical documentation for things built under raioviajante.',
+			},
+		],
 	}}
 >
 	<h1 class="sr-only">RaioViajante Docs</h1>

@@ -6,7 +6,18 @@ export default defineConfig({
 	site: 'https://docs.raioviajante.com',
 	integrations: [
 		starlight({
-			title: 'RaioViajante Docs',
+			// Matches dump.raioviajante.com's own document-title convention: a
+			// short lowercase site identity joined to the page title with an
+			// em dash (`app/layout.tsx`'s `title.template: "%s — ${site.name}"`,
+			// site.name: "dump"). Starlight's own `<title>` formula is
+			// `${data.title} ${titleDelimiter} ${siteTitle}`, so this alone
+			// turns every page's own frontmatter title (already short, e.g.
+			// "Design language") into "Design language — docs" — no per-page
+			// title changes needed. The homepage is the one exception (see
+			// src/pages/index.astro) since Starlight has no "default title"
+			// concept distinct from the per-page template.
+			title: 'docs',
+			titleDelimiter: '—',
 			favicon: '/icon.png',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RaioViajante/docs' },
