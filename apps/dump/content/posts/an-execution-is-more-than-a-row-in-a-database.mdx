@@ -58,9 +58,9 @@ timeoutSeconds
 enabled
 ```
 
-An Execution is one concrete run of that Job.
+An Execution is meant to represent one concrete run of that Job.
 
-If the same backup command runs ten times, I don't want ten Jobs with ten slightly different versions of the configuration.
+If the same backup command eventually runs ten times, I don't want ten Jobs with ten slightly different versions of the configuration.
 
 I want one Job and ten Executions that tell me what happened each time.
 
