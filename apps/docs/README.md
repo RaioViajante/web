@@ -55,6 +55,18 @@ Public documentation is expected to eventually cover, at minimum:
 
 These are planned areas, not existing pages. Content will be added as it becomes real and worth publishing.
 
+## Development
+
+```
+pnpm install   # install dependencies
+pnpm dev       # start the local development server
+pnpm build     # production build (also builds the Pagefind search index)
+pnpm preview   # serve the production build locally
+pnpm check     # run Astro/TypeScript diagnostics
+```
+
+See [`docs/development.md`](docs/development.md) for more detail.
+
 ## Current status
 
-This repository currently contains only its documentation foundation (this README, `AGENTS.md`, `CLAUDE.md`, and `docs/`). The Astro/Starlight application has not been initialized yet, and no dependencies have been installed.
+The Astro/Starlight application has been initialized: the site builds, runs, and renders a single public index page under `src/content/docs/`. The RaioViajante visual identity has not been applied yet, and the planned project documentation (hum, sweep, orbit, design language, repository conventions) has not been written yet.
