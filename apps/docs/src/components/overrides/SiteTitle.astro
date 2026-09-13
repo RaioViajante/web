@@ -1,0 +1,39 @@
+---
+// The RaioViajante brand mark: "raioviajante" links back to the ecosystem root,
+// "~ / docs" stays plain text identifying this particular site.
+---
+
+<div class="site-title sl-flex">
+	<a href="https://raioviajante.com">raioviajante</a><span class="tilde">&nbsp;~</span><span
+		class="sep"
+	>&nbsp;/&nbsp;</span><span class="current">docs</span>
+</div>
+
+<style>
+	@layer starlight.core {
+		.site-title {
+			align-items: center;
+			gap: 0;
+			font-size: var(--sl-text-base);
+			font-weight: 400;
+			white-space: nowrap;
+			min-width: 0;
+		}
+		.site-title a {
+			color: var(--sl-color-white);
+			text-decoration: none;
+		}
+		.site-title a:hover {
+			color: var(--rv-accent);
+		}
+		.tilde {
+			color: var(--rv-accent);
+		}
+		.sep {
+			color: color-mix(in srgb, var(--rv-fg) 45%, transparent);
+		}
+		.current {
+			color: var(--sl-color-white);
+		}
+	}
+</style>
