@@ -5,7 +5,7 @@
 .project {
   display: block;
   padding: 16px 0;
-  border-bottom: 1px solid rgba(236, 231, 224, 0.09);
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 9%, transparent);
 }
 
 .name {
@@ -17,14 +17,14 @@
 
 .description {
   margin: 5px 0 0;
-  color: rgba(236, 231, 224, 0.7);
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
   font-size: 15px;
   font-style: italic;
 }
 
 .metadata {
   margin: 8px 0 0;
-  color: rgba(236, 231, 224, 0.45);
+  color: color-mix(in srgb, var(--foreground) 45%, transparent);
   font-family: var(--font-mono), monospace;
   font-size: 12.5px;
 }

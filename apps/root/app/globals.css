@@ -1,11 +1,23 @@
-:root {
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --background: #f4f2ef;
+  --foreground: #201e1d;
+  --accent: #4a3d68;
+  --muted: color-mix(in srgb, var(--foreground) 65%, transparent);
+}
+
+[data-theme="dark"] {
   color-scheme: dark;
   --background: #18161b;
   --foreground: #ece7e0;
   --accent: #c3b3e0;
-  --muted: rgba(236, 231, 224, 0.55);
-  --subtle: rgba(236, 231, 224, 0.4);
-  --separator: rgba(236, 231, 224, 0.15);
+  --muted: color-mix(in srgb, var(--foreground) 55%, transparent);
+}
+
+:root {
+  --subtle: color-mix(in srgb, var(--foreground) 40%, transparent);
+  --separator: color-mix(in srgb, var(--foreground) 15%, transparent);
   --content-width: 680px;
   --gutter: clamp(1rem, 4vw, 1.25rem);
 }
@@ -19,10 +31,13 @@ body {
   font-size: 16px;
   font-weight: 400;
   line-height: normal;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
 }
 
 ::selection {
-  background: rgba(195, 179, 224, 0.28);
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
 a {
@@ -116,8 +131,50 @@ a:focus-visible {
   margin: 0;
 }
 
+/* Theme control */
+.theme-toggle {
+  position: fixed;
+  z-index: 40;
+  bottom: max(24px, calc(env(safe-area-inset-bottom) + 16px));
+  left: max(24px, calc(env(safe-area-inset-left) + 16px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--separator);
+  border-radius: 50%;
+  color: var(--accent);
+  background: var(--background);
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--foreground) 14%, transparent);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.theme-toggle:hover {
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--foreground) 18%, transparent);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.theme-icon {
+  display: block;
+}
+
+.theme-icon--sun {
+  color: #a9822a;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  a {
+  a,
+  body,
+  .theme-toggle {
     transition: none;
   }
 }
