@@ -8,7 +8,11 @@ interface Props {
 
 const { experiment } = Astro.props;
 const layout = experiment.layout ?? "canonical";
-const hasSurface = Astro.slots.has("surface");
+// Derived from the data record rather than Astro.slots.has("surface"): that
+// check reflects whether the parent's template contains a slot="surface"
+// node at all, not whether the conditional inside it actually rendered
+// anything — so it stayed true even for experiments with no surface.
+const hasSurface = experiment.surface != null;
 ---
 
 <BaseLayout

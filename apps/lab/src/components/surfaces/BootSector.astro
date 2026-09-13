@@ -1,0 +1,147 @@
+---
+const BYTE_COUNT = 512;
+const DEFAULT_IDX = 511;
+
+const bytes = Array.from({ length: BYTE_COUNT }, (_, idx) => {
+  const val = idx === 510 ? 0x55 : idx === 511 ? 0xaa : (idx * 167 + 53) % 256;
+  const hex = val.toString(16).padStart(2, "0").toUpperCase();
+  const bin = val.toString(2).padStart(8, "0");
+  const isSignature = idx >= 510;
+  return { idx, val, hex, bin, isSignature };
+});
+
+const initial = bytes[DEFAULT_IDX];
+---
+
+<div class="boot-sector" data-boot-sector>
+  <div class="byte-grid" aria-hidden="true">
+    {bytes.map((b) => (
+      <div
+        class:list={[
+          "byte",
+          {
+            "byte--signature": b.isSignature,
+            "byte--active": b.idx === DEFAULT_IDX,
+          },
+        ]}
+        data-idx={b.idx}
+        data-hex={b.hex}
+        data-dec={b.val}
+        data-bin={b.bin}
+        data-note={b.isSignature ? "— boot signature" : ""}
+      >
+        {b.hex}
+      </div>
+    ))}
+  </div>
+  <div class="inspector">
+    <span>
+      offset{" "}
+      <span class="value" data-field="idx">
+        {initial.idx}
+      </span>
+    </span>
+    <span>
+      hex{" "}
+      <span class="value" data-field="hex">
+        0x{initial.hex}
+      </span>
+    </span>
+    <span>
+      dec{" "}
+      <span class="value" data-field="dec">
+        {initial.val}
+      </span>
+    </span>
+    <span>
+      bin{" "}
+      <span class="value" data-field="bin">
+        {initial.bin}
+      </span>
+    </span>
+    <span class="value" data-field="note">
+      — boot signature
+    </span>
+  </div>
+</div>
+
+<style>
+  .boot-sector {
+    border: 1px solid var(--border);
+    padding: 1.25rem;
+  }
+
+  .byte-grid {
+    display: grid;
+    grid-template-columns: repeat(16, minmax(0, 1fr));
+    gap: 2px;
+    font-family: var(--font-mono);
+    overflow-x: auto;
+  }
+
+  .byte {
+    font-size: 9px;
+    text-align: center;
+    padding: 2px 0;
+    box-sizing: border-box;
+    background: var(--cell);
+    color: var(--muted);
+  }
+
+  .byte--signature {
+    background: color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+
+  .byte--active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .inspector {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .value {
+    color: var(--fg);
+  }
+</style>
+
+<script>
+  function setupBootSector(container: HTMLElement) {
+    const grid = container.querySelector<HTMLElement>(".byte-grid");
+    if (!grid) return;
+
+    function setField(name: string, value: string) {
+      const field = container.querySelector<HTMLElement>(
+        `[data-field="${name}"]`,
+      );
+      if (field) field.textContent = value;
+    }
+
+    grid.addEventListener("mouseover", (event) => {
+      const cell = (event.target as HTMLElement).closest<HTMLElement>(".byte");
+      if (!cell || !grid.contains(cell)) return;
+
+      grid.querySelector(".byte--active")?.classList.remove("byte--active");
+      cell.classList.add("byte--active");
+
+      setField("idx", cell.dataset.idx ?? "");
+      setField("hex", `0x${cell.dataset.hex}`);
+      setField("dec", cell.dataset.dec ?? "");
+      setField("bin", cell.dataset.bin ?? "");
+      setField("note", cell.dataset.note ?? "");
+    });
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-boot-sector]")
+    .forEach(setupBootSector);
+</script>

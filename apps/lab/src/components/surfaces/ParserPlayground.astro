@@ -1,0 +1,116 @@
+---
+const INPUT = `function add(a, b) {
+  return a + b;
+}`;
+
+type AstRow =
+  | { indent: number; heading: string; spaceBefore?: boolean }
+  | { indent: number; key: string; val: string };
+
+const AST_ROWS: AstRow[] = [
+  { indent: 0, heading: "FunctionDeclaration" },
+  { indent: 1, key: "name", val: "add" },
+  { indent: 1, key: "parameters", val: "[a, b]" },
+  { indent: 1, heading: "ReturnStatement", spaceBefore: true },
+  { indent: 2, heading: "BinaryExpression" },
+  { indent: 3, key: "left", val: "a" },
+  { indent: 3, key: "operator", val: "+" },
+  { indent: 3, key: "right", val: "b" },
+];
+---
+
+<div class="parser-playground">
+  <div class="pane">
+    <div class="section-label pane-label">input/</div>
+    <pre class="code">{INPUT}</pre>
+  </div>
+  <div class="pane pane--parsed">
+    <div class="section-label pane-label">parsed/</div>
+    <div class="ast">
+      {AST_ROWS.map((row) => (
+        <div
+          class="ast-row"
+          style={{
+            paddingLeft: `${row.indent * 14}px`,
+            marginTop:
+              "spaceBefore" in row && row.spaceBefore ? "0.6rem" : "0.15rem",
+          }}
+        >
+          {"heading" in row ? (
+            <span class="ast-heading">{row.heading}</span>
+          ) : (
+            <>
+              <span class="ast-key">{row.key}</span>
+              <span class="ast-val">{row.val}</span>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .parser-playground {
+    border: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (min-width: 640px) {
+    .parser-playground {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .pane--parsed {
+      border-left: 1px solid var(--border);
+      border-top: none;
+    }
+  }
+
+  .pane {
+    padding: 1.25rem;
+    min-width: 0;
+  }
+
+  .pane--parsed {
+    border-top: 1px solid var(--border);
+  }
+
+  .pane-label {
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .code {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--fg);
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    overflow-x: auto;
+  }
+
+  .ast-row {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .ast-heading {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .ast-key {
+    color: var(--muted);
+    display: inline-block;
+    width: 110px;
+  }
+
+  .ast-val {
+    color: var(--fg);
+  }
+</style>
