@@ -81,11 +81,25 @@
 	--rv-rail-width: 11.875rem; /* 190px — sidebar/TOC rail, extends OUTSIDE the column */
 	--rv-rail-gap: 3rem; /* 48px gap between the reading column and the rails */
 
+	/* The one canonical container formula (content width + gutter on both
+	   sides, never wider than the viewport). Anything that needs a single
+	   element to both size and pad itself — currently only the header, since
+	   ContentPanel.astro/.sl-container split that same shape across a padded
+	   parent and a width-capped child instead — uses this directly, so both
+	   approaches are the exact same shape, not two similar formulas. */
+	--rv-container-width: min(100%, calc(var(--rv-content-width) + 2 * var(--rv-page-inline)));
+
 	/* Starlight's own tokens still mirror ours, for native code we haven't
 	   directly overridden (e.g. the sidebar's flush layout between 50rem and
-	   72rem uses --sl-sidebar-width to reserve its own space). */
+	   72rem uses --sl-sidebar-width to reserve its own space). Content-panel's
+	   own padding (ContentPanel.astro, native, unmodified) reads
+	   --sl-content-pad-x directly — mirroring it here means the article/
+	   homepage gutter and the header's gutter are the exact same value, not
+	   two similar-but-different formulas (Starlight's own stepped 1rem/1.5rem
+	   scale vs a separately chosen one). */
 	--sl-content-width: var(--rv-content-width);
 	--sl-sidebar-width: var(--rv-rail-width);
+	--sl-content-pad-x: var(--rv-page-inline);
 }
 
 :root[data-theme='light'] {
@@ -186,9 +200,21 @@
    homepage, article, and footer — exactly like raioviajante.com and dump,
    where the header/main/footer all share one container. It does NOT span the
    sidebar/TOC's outer boundary: those rails are supporting tools that extend
-   outward around this column: they never redefine it. */
+   outward around this column: they never redefine it.
+
+   It is also NOT sticky or fixed: Starlight's own PageFrame makes it
+   `position: fixed` by default (the reason `.main-frame` normally reserves
+   `--sl-nav-height` of top padding, and why the sticky sidebar/TOC below use
+   that same value as their offset). Only the article's own sidebar/TOC are
+   meant to stay put while scrolling — the header belongs to normal document
+   flow and scrolls away like the rest of raioviajante.com/dump's headers. */
 header.header {
+	position: static;
 	padding-inline: 0;
+}
+
+.main-frame {
+	padding-top: 0;
 }
 
 header.header > .header {
@@ -196,8 +222,8 @@ header.header > .header {
 	grid-template-columns: none;
 	justify-content: space-between;
 	align-items: center;
-	width: 100%;
-	max-width: var(--rv-content-width);
+	width: var(--rv-container-width);
+	max-width: none;
 	margin-inline: auto;
 	padding-inline: var(--rv-page-inline);
 }
@@ -261,11 +287,13 @@ button[data-open-modal] > kbd {
 
 	/* Left rail: nav has no native cross-axis sibling to stretch against (it's a
 	   column-flex sibling of .main-frame, not a row-flex one like the TOC container),
-	   so it's repositioned to span the full document height directly. Clamped with
-	   max() so it can never be pushed left of the viewport edge. */
+	   so it's repositioned to span the document height directly — starting right
+	   where the (normal-flow, non-sticky) header ends, since the rail has no reason
+	   to extend behind it. Clamped with max() so it can never be pushed left of the
+	   viewport edge. */
 	nav.sidebar {
 		position: absolute;
-		inset-block: 0 0;
+		inset-block: var(--sl-nav-height) 0;
 		inset-inline-start: max(
 			0px,
 			calc(50% - (var(--rv-content-width) / 2) - var(--rv-rail-gap) - var(--rv-rail-width))
@@ -273,13 +301,16 @@ button[data-open-modal] > kbd {
 		width: var(--rv-rail-width);
 	}
 
+	/* `top: 0`, not the header's height: the header scrolls away with the rest of
+	   the page, so once scrolled past it there is nothing left reserving that
+	   space — the rail should stick flush against the viewport's own top edge. */
 	.sidebar-pane {
 		position: sticky;
 		inset-inline-start: auto;
-		top: var(--sl-nav-height);
+		top: 0;
 		width: 100%;
 		height: auto;
-		max-height: calc(100vh - var(--sl-nav-height));
+		max-height: 100vh;
 		background-color: transparent;
 		border-inline-end: none;
 	}
@@ -290,7 +321,7 @@ button[data-open-modal] > kbd {
 	   pushed past the viewport's right edge. */
 	.right-sidebar-container {
 		position: absolute;
-		inset-block: 0 0;
+		inset-block: var(--sl-nav-height) 0;
 		inset-inline-start: min(
 			calc(50% + (var(--rv-content-width) / 2) + var(--rv-rail-gap)),
 			calc(100% - var(--rv-rail-width))
@@ -301,10 +332,10 @@ button[data-open-modal] > kbd {
 	.right-sidebar {
 		position: sticky;
 		inset-inline-start: auto;
-		top: var(--sl-nav-height);
+		top: 0;
 		width: 100%;
 		height: auto;
-		max-height: calc(100vh - var(--sl-nav-height));
+		max-height: 100vh;
 		padding-top: 0;
 		border-inline-start: none;
 		background: transparent;
@@ -313,6 +344,55 @@ button[data-open-modal] > kbd {
 	.main-pane {
 		width: 100%;
 		--sl-content-margin-inline: auto;
+	}
+}
+
+/*
+ * Unify the rail breakpoint at 72rem.
+ *
+ * Starlight's own sidebar has two different behaviors: a popover below 50rem,
+ * and a persistent flush-left column from 50rem up (`.sidebar-pane {
+ * display: block; ... }` in PageFrame.astro, native, layered). Our own
+ * outward-rail positioning above only takes over at 72rem — there isn't room
+ * for a centered 680px column plus two 190px rails with a 48px gap below
+ * that (it needs ~1156px). That left a real gap: between 50rem and 72rem,
+ * the sidebar was neither in the popover NOR in our outward rail — it was
+ * Starlight's own flush-left column, reserving real space via
+ * `--sl-content-inline-start` and shifting the article's reading column off
+ * the canonical center the header/homepage/footer use at that same width.
+ *
+ * Rather than moving the outward rail down to a width where it would collide
+ * with the content column, the popover stays active up to 72rem instead: the
+ * canonical column now holds its position continuously from the narrowest
+ * width up to 72rem, with no desktop rails at all until there is genuinely
+ * room for them.
+ */
+@media (min-width: 50rem) and (max-width: 71.9975rem) {
+	/* Undo Starlight's own forced `display: block`, restoring the native
+	   popover show/hide behavior this element already has by default. */
+	.sidebar-pane {
+		display: revert;
+	}
+
+	/* Undo the flush-column space Starlight's own Page.astro inline style
+	   reserves at this width (`html[data-has-sidebar]` matches that rule's
+	   own `[data-has-sidebar]` selector with one extra type-selector's worth
+	   of specificity, so it wins without relying on source order). */
+	html[data-has-sidebar] {
+		--sl-content-inline-start: 0px;
+	}
+
+	/* Keep the hamburger reachable: Starlight hides it from 50rem up,
+	   assuming its own flush sidebar has taken over by then. */
+	.sl-menu-button {
+		display: flex;
+	}
+
+	/* Defer the header's GitHub icon (and any other --right-group content) to
+	   the same 72rem point the persistent sidebar appears at, rather than
+	   showing it alongside a still-popover-based nav. */
+	.right-group {
+		display: none;
 	}
 }
 
@@ -327,6 +407,23 @@ button[data-open-modal] > kbd {
 
 starlight-toc a[aria-current='true'] {
 	font-weight: 500;
+}
+
+/* Mobile/tablet "on this page" bar: Starlight makes this `position: fixed`
+   pinned just below where its own fixed header sits. Since the header is no
+   longer fixed (see "Header" above), that assumption no longer holds — this
+   becomes a normal in-flow element instead, sitting right after the header
+   and scrolling away with the rest of the page. It is not sticky: unlike the
+   desktop sidebar/TOC, its own container (`.right-sidebar-container`, a
+   normal-flow block at this width, not stretched to the document's height)
+   is only as tall as the bar itself, so there's no room for it to stick
+   within — only the desktop rails, which are deliberately stretched to the
+   full article height, meet the bar for "remain inside document height,
+   stop before footer, don't overlap content". */
+mobile-starlight-toc nav {
+	position: static;
+	inset-inline: auto;
+	width: 100%;
 }
 
 /* Pagination: flat text links, not bordered cards. */
@@ -347,7 +444,10 @@ starlight-toc a[aria-current='true'] {
 	font-size: var(--sl-text-lg);
 }
 
-/* Mobile menu toggle: a plain icon aligned with the content edge, not a floating pill. */
+/* Mobile menu toggle: a plain icon aligned with the content edge, not a
+   floating pill. Being unlayered, this alone already beats every one of
+   Starlight's own layered background-color variants (default, light theme,
+   popover-open) — no need to restate "none" for each of them separately. */
 .sl-menu-button {
 	position: fixed;
 	inset-inline-end: var(--rv-page-inline);
@@ -355,12 +455,6 @@ starlight-toc a[aria-current='true'] {
 	color: var(--rv-fg);
 	box-shadow: none;
 	border-radius: 0;
-}
-
-:root[data-theme='light'] .sl-menu-button,
-.sl-menu-button:has(~ :popover-open) {
-	background: none;
-	box-shadow: none;
 }
 
 /**
