@@ -1,0 +1,300 @@
+---
+title: "I Split My Internet Into Four Different Kinds of Place"
+description: "I kept building places for different kinds of work until it became obvious that my personal website was trying to be a home page, notebook, documentation site, and experiment lab at the same time."
+date: "2026-09-13"
+tags:
+  - meta
+  - dump
+  - personal
+draft: false
+---
+
+I started with the obvious idea.
+
+Make a personal website.
+
+Put some projects on it.
+
+Add a few links.
+
+Write down what I'm doing.
+
+Maybe make it look like I know where all of this is going.
+
+That last part was probably too ambitious.
+
+The first version of [raioviajante.com](https://raioviajante.com) was meant to be a place for my identity, my projects and whatever currently had my attention.
+
+That worked for a while.
+
+Then the different kinds of things I was making started getting in each other's way.
+
+A project card is useful for saying that something exists.
+
+It is a terrible place to explain how I accidentally gave a Python script permission to rearrange my files.
+
+A post is a good place to tell that story.
+
+It is a less good place to keep the final instructions for using a system six months later.
+
+And an interactive experiment has a completely different job from both of them.
+
+At some point I realized that I wasn't trying to add more pages to one website.
+
+I was trying to give different kinds of work somewhere appropriate to exist.
+
+## dump came first
+
+The first answer was dump.
+
+I wanted somewhere to write about the things I build, learn, use, explore and occasionally break.
+
+That was the original idea behind “Maybe This Can Be Something Someday.”
+
+Write things down before they disappear.
+
+Keep the mistakes in the story.
+
+Admit when I don't understand what I'm doing yet.
+
+It turned out that dump was becoming more specific than a blog.
+
+I don't really want it to be a stream of polished announcements about completed projects.
+
+The useful part is usually earlier than that.
+
+It is the moment when moving one file becomes a discussion about conflict policies.
+
+It is the moment when a CRUD application starts needing an execution state machine.
+
+It is the moment when I decide to design a programming language before I have written a compiler.
+
+Those things are stories because they have a before and an after, even when the after is mostly another question.
+
+Dump can contain unfinished thinking.
+
+That is one of the reasons it exists.
+
+## Documentation started feeling different
+
+The problem is that not everything should stay in story form.
+
+There is a difference between:
+
+> I discovered this while building the thing.
+
+and:
+
+> This is how the thing works.
+
+The first one needs the confusion.
+
+The second one needs the confusion removed.
+
+If I write about discovering that a system needs a particular boundary, the sequence of events matters.
+
+If I later document that boundary, the sequence is mostly noise.
+
+I want to be able to explain the stable result without making somebody read through my entire emotional relationship with it.
+
+That led to [docs.raioviajante.com](https://docs.raioviajante.com).
+
+The distinction applies inside the repository too.
+
+Internal repository documentation explains how a site is developed, maintained or organized.
+
+Curated public documentation explains a technical subject that is worth making useful and navigable for somebody else.
+
+Those are related, but they are not the same thing.
+
+Docs should survive the story that caused the documentation to exist.
+
+Dump is allowed to remember the story.
+
+## Then the Lab happened
+
+The next problem was the stuff that wanted to be touched.
+
+Small interfaces.
+
+Tiny demonstrations.
+
+Things that were too interactive to be a paragraph and too incomplete to deserve a project repository of their own.
+
+That became [lab.raioviajante.com](https://lab.raioviajante.com).
+
+The first Lab design used convincing fictional fixtures.
+
+A parser playground.
+
+A cron visualizer.
+
+They were useful while I was working out what the site should feel like.
+
+They also quietly suggested that there were real parser and scheduler implementations behind them.
+
+There weren't.
+
+That started bothering me.
+
+There is nothing wrong with a design fixture during design work.
+
+But once the Lab became a public collection, an interactive page needed to be honest about where its behavior came from.
+
+A convincing interface should not quietly imply that code exists somewhere when it does not.
+
+So the fictional fixtures were removed and the collection was rebuilt around real work:
+
+`001` is a filename classifier grounded in Sweep.
+
+`002` is an execution-state experiment grounded in Orbit.
+
+`003` is a boot-sector experiment grounded in x86-os-experiment.
+
+The experiments are deliberately bounded.
+
+The filename classifier does not inspect or move files.
+
+The execution-state page does not run commands and has no scheduler behind it.
+
+The boot-sector page presents real assembly and documented behavior, but it does not boot or emulate anything in the browser.
+
+This is a little less impressive than pretending the pages are miniature versions of the projects.
+
+It is also much more interesting to me.
+
+## Four places, one identity
+
+So now there are four sites:
+
+[raioviajante.com](https://raioviajante.com) tells you what exists and what currently has my attention.
+
+[dump.raioviajante.com](https://dump.raioviajante.com) tells the story.
+
+[docs.raioviajante.com](https://docs.raioviajante.com) explains the stable technical knowledge.
+
+[lab.raioviajante.com](https://lab.raioviajante.com) lets you touch the idea.
+
+They are separate repositories and separate deployments.
+
+They are also meant to feel like parts of the same place.
+
+The sites share a visual language, including the dark and light themes, the restrained palette, the typography and the general refusal to put every piece of information inside a rounded card.
+
+IBM Plex Mono handles the things that identify and locate: navigation, labels, paths and metadata.
+
+Source Serif 4 handles the things that explain: the writing, the arguments and the descriptions.
+
+Mono identifies. Serif speaks.
+
+That principle ended up being more useful than I expected.
+
+The sites have different jobs, but they don't need different personalities.
+
+They should feel like rooms in the same house.
+
+The house may contain an x86 boot sector, a Java scheduler, a language design document and a file organizer.
+
+I never claimed the rooms would match.
+
+## Why not keep everything in one site?
+
+Technically, I could have made one site with:
+
+`/projects`
+
+`/blog`
+
+`/docs`
+
+`/lab`
+
+That wasn't really the issue.
+
+The issue was what each place would make me expect when I opened it.
+
+When I write in dump, I can tell the messy version.
+
+I can say that I started with the wrong mental model, show the tiny test that changed it and admit that I still don't know what happens next.
+
+When I write docs, I should care more about whether the explanation remains useful than about recreating the order in which I learned it.
+
+When I publish something in Lab, it should be small enough to touch and honest about what it is reproducing.
+
+When I update root, the answer should be concise.
+
+The same project can appear in several places, but it should not have to speak in the same register everywhere.
+
+Sweep can be a short entry on the root, a story about file conflicts in dump, a future useful reference in docs and a classifier you can try in Lab.
+
+Those are four different ways of saying something about the same work.
+
+## Infrastructure for curiosity
+
+I keep building things that do not naturally belong to the same portfolio category.
+
+Python automation.
+
+Java and Spring.
+
+Language design.
+
+Operating systems.
+
+Rust and system ideas that currently exist somewhere between a specification and an empty `main` function.
+
+I could force all of that into a conventional project grid.
+
+It would probably look tidy.
+
+It would also hide the reason I am making any of it.
+
+The projects are connected less by their output than by the habit behind them: I notice something I don't understand, follow it further than was strictly necessary and eventually create a repository.
+
+The ecosystem is infrastructure for that habit.
+
+That sounds grander than it is.
+
+Mostly it means I now have somewhere to put the explanation when a side project starts generating more questions than code.
+
+## This is objectively too much for a personal website
+
+I wanted somewhere to put my projects.
+
+I ended up with four domains, four repositories, four builds and a shared theme selector.
+
+There are documents explaining what each document site is for.
+
+There are provenance notes explaining why a browser demo is allowed to call itself real.
+
+At some point I had to admit that I may have built infrastructure around the act of writing about infrastructure.
+
+This is probably what happens when I am left alone with a computer and an unresolved distinction.
+
+The funny part is that the separation has made the work feel simpler.
+
+I don't have to decide whether a new idea is important enough for the one website.
+
+I can ask a smaller question instead.
+
+Is this an identity update, a story, stable knowledge or something I can make people touch?
+
+## The boxes are allowed to leak
+
+The four sites have only recently taken this shape, so I don't expect the boundaries to stay perfectly clean.
+
+Some experiments will become projects.
+
+Some project decisions will become posts.
+
+Some posts may eventually become documentation once the uncertain parts settle down.
+
+The root will keep changing because what currently has my attention keeps changing.
+
+That movement is not a failure of the structure.
+
+It is the reason the structure needs to be flexible.
+
+The point was never to give every idea a perfect box.
+
+It was to make the next strange idea a little easier to place.
