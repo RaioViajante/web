@@ -18,7 +18,7 @@ export default defineConfig({
 			// concept distinct from the per-page template.
 			title: 'docs',
 			titleDelimiter: '—',
-			favicon: '/icon.png',
+			favicon: '/icon.png?v=2',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RaioViajante/docs' },
 			],
