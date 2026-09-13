@@ -34,6 +34,10 @@ export default defineConfig({
 			},
 			sidebar: [
 				{
+					label: 'projects',
+					items: [{ label: 'sweep', link: '/projects/sweep/' }],
+				},
+				{
 					label: 'raioviajante',
 					items: [
 						{ label: 'design language', link: '/raioviajante/design-language/' },
