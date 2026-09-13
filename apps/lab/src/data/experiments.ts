@@ -61,6 +61,7 @@ export const experiments: Experiment[] = [
   {
     id: "001",
     slug: "filename-classifier",
+    surface: "filename-classifier",
     title: "filename classifier",
     description: "seeing where Sweep puts a filename",
     status: "active",
