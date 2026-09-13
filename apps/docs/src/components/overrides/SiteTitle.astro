@@ -1,13 +1,15 @@
 ---
-// The RaioViajante brand mark: "raioviajante" links back to the ecosystem root,
-// "~ / docs" stays plain text identifying this particular site.
+// The RaioViajante brand mark. The whole "raioviajante ~ / docs" identity is a
+// single link back to this site's own homepage (not the ecosystem root at
+// raioviajante.com) — inside docs.raioviajante.com, "docs" is the current
+// application, so its home link stays internal.
 ---
 
-<div class="site-title sl-flex">
-	<a href="https://raioviajante.com">raioviajante</a><span class="tilde">&nbsp;~</span><span
+<a class="site-title sl-flex" href="/">
+	<span class="brand">raioviajante</span><span class="tilde">&nbsp;~</span><span
 		class="sep"
 	>&nbsp;/&nbsp;</span><span class="current">docs</span>
-</div>
+</a>
 
 <style>
 	@layer starlight.core {
@@ -18,12 +20,10 @@
 			font-weight: 400;
 			white-space: nowrap;
 			min-width: 0;
-		}
-		.site-title a {
 			color: var(--sl-color-white);
 			text-decoration: none;
 		}
-		.site-title a:hover {
+		.site-title:hover .brand {
 			color: var(--rv-accent);
 		}
 		.tilde {

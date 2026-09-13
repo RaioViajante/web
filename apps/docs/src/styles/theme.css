@@ -148,8 +148,14 @@
 	margin-inline: auto;
 }
 
-/* Header: a simple bar centered at the canonical content width, not a
-   sidebar-aware grid — identical on every route, sidebar or not. */
+/* Header: a simple bar centered at the same *shell* width as the documentation
+   layout below it — the reading column plus the sidebar/TOC rail and gap on
+   each side (identical to where the sidebar's left edge and the TOC's right
+   edge sit at >=72rem) — not a sidebar-aware grid, and not just the narrower
+   680px reading column. Identical on every route, sidebar or not: pages
+   without rails (the homepage) simply have nothing to extend into that space,
+   same as the reading column does at every width once the shell itself no
+   longer fits (see the max-width/shrink-to-fit behavior below). */
 header.header {
 	padding-inline: 0;
 }
@@ -160,7 +166,7 @@ header.header > .header {
 	justify-content: space-between;
 	align-items: center;
 	width: 100%;
-	max-width: var(--rv-content-width);
+	max-width: calc(var(--rv-content-width) + 2 * (var(--rv-rail-gap) + var(--rv-rail-width)));
 	margin-inline: auto;
 	padding-inline: var(--rv-page-inline);
 }
