@@ -49,6 +49,7 @@ export const experiments: Experiment[] = [
   {
     id: "002",
     slug: "execution-states",
+    surface: "execution-states",
     title: "execution states",
     description: "trying the transitions Orbit allows—and the ones it rejects",
     status: "active",

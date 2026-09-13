@@ -1,4 +1,5 @@
 ---
+import ExecutionStates from "../../components/surfaces/ExecutionStates.astro";
 import FilenameClassifier from "../../components/surfaces/FilenameClassifier.astro";
 import type { InferGetStaticPropsType } from "astro";
 import ExperimentLayout from "../../layouts/ExperimentLayout.astro";
@@ -19,5 +20,8 @@ const { experiment } = Astro.props as Props;
 <ExperimentLayout experiment={experiment}>
   {experiment.surface === "filename-classifier" && (
     <FilenameClassifier slot="surface" />
+  )}
+  {experiment.surface === "execution-states" && (
+    <ExecutionStates slot="surface" />
   )}
 </ExperimentLayout>
