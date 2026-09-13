@@ -28,18 +28,18 @@ export const places = [
 
 export const recentActivity = [
   {
-    date: "2026-09-12",
-    source: "sweep",
-    message: "teaching my files to organize themselves",
+    date: "2026-09-13",
+    source: "yanawa",
+    message: "closed the language identity milestone",
   },
   {
     date: "2026-09-12",
     source: "dump",
-    message: "why I'm building sweep",
+    message: "Apparently Moving a File Has Edge Cases",
   },
   {
     date: "2026-09-07",
     source: "dump",
-    message: "I got bored of CRUD…",
+    message: "I Got Bored of CRUD, So I'm Building a Scheduler",
   },
 ];
