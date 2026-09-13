@@ -61,7 +61,11 @@
 
 	/*
 	 * Canonical RaioViajante layout tokens — the single source of truth for every
-	 * primary surface's horizontal alignment (header, homepage, article, footer).
+	 * primary surface's horizontal alignment (header, homepage, article reading
+	 * column, footer). Values are the actual ones used by raioviajante.com and
+	 * dump.raioviajante.com (both: `max-width:680px; margin-inline:auto;
+	 * padding-inline: clamp(1rem, 4vw, 1.25rem)`, applied identically to their
+	 * header/main/footer) — not a docs-specific approximation.
 	 *
 	 * Deliberately independent of --sl-content-width: Starlight itself silently
 	 * redefines that token to 67.5rem on any page without a sidebar — see
@@ -73,8 +77,8 @@
 	 * silently overridden by Starlight's own sidebar-presence logic again.
 	 */
 	--rv-content-width: 42.5rem; /* 680px reading column */
-	--rv-page-inline: var(--sl-content-pad-x); /* shared responsive gutter */
-	--rv-rail-width: 11.875rem; /* 190px sidebar/TOC rail */
+	--rv-page-inline: clamp(1rem, 4vw, 1.25rem); /* the ecosystem's actual gutter */
+	--rv-rail-width: 11.875rem; /* 190px — sidebar/TOC rail, extends OUTSIDE the column */
 	--rv-rail-gap: 3rem; /* 48px gap between the reading column and the rails */
 
 	/* Starlight's own tokens still mirror ours, for native code we haven't
@@ -121,21 +125,51 @@
 	font-family: 'Source Serif 4', ui-serif, Georgia, serif;
 }
 
+/* Heading permalinks: Starlight's default is a large chain-link SVG. Its
+   hover-only reveal, href, and accessible label all stay native — only the
+   icon itself is replaced with a small muted "#", so it reads as a quiet
+   affordance rather than a decoration. Reserved layout space (and so heading
+   flow/width) is untouched: it's the same --sl-anchor-icon-size box, just
+   showing different content. Never applies to the page title (h1/_top),
+   since Starlight only wraps markdown-body headings (h2+ in practice here)
+   in this treatment, not PageTitle. */
+.sl-anchor-icon svg {
+	display: none;
+}
+
+.sl-anchor-icon::before {
+	content: '#';
+	display: inline-block;
+	width: var(--sl-anchor-icon-size);
+	font-family: 'IBM Plex Mono', var(--sl-font-system-mono);
+	font-size: 0.85em;
+	line-height: 1;
+	text-align: center;
+	color: color-mix(in srgb, var(--rv-accent) 70%, transparent);
+}
+
+.sl-anchor-link:hover .sl-anchor-icon::before,
+.sl-anchor-link:focus .sl-anchor-icon::before {
+	color: var(--rv-accent);
+}
+
 /**
  * Docs shell — the canonical RaioViajante layout system
  *
- * Every primary surface (header, homepage, article reading column, footer,
- * pagination) is centered at the same --rv-content-width with the same
- * --rv-page-inline gutter, at every viewport width — this is the core page
- * margin, and it never changes shape based on route or sidebar presence.
+ * Every primary surface — header, homepage content, article reading column,
+ * footer, pagination — is centered at the same --rv-content-width (680px)
+ * with the same --rv-page-inline gutter, at every viewport width. This is the
+ * core page margin, and it never changes shape based on route or sidebar
+ * presence — the header does NOT widen to span the sidebar/TOC.
  *
- * The documentation rails (sidebar/TOC) are the only thing allowed to extend
- * outward around that column, and only where there is room for them (>=72rem):
- * there, they become fixed-position columns positioned outward from the
- * canonical column's own edges via calc(), clamped with min()/max() so they
- * can never push past the viewport edge. Below that width they collapse to
- * Starlight's own responsive behavior (popover sidebar, collapsed mobile TOC),
- * untouched — but the canonical column itself stays centered regardless.
+ * The documentation rails (sidebar/TOC) are supporting tools, not part of the
+ * identity grid: they extend OUTWARD around the canonical column, and only
+ * where there is room for them (>=72rem), as fixed-position columns
+ * positioned via calc() from the column's own edges, clamped with min()/max()
+ * so they can never push past the viewport edge. Below that width they
+ * collapse to Starlight's own responsive behavior (popover sidebar, collapsed
+ * mobile TOC), untouched — but the canonical column itself stays centered
+ * regardless, and the rails never redefine it.
  */
 
 /* The canonical container: ContentPanel's own .sl-container (used for both the
@@ -148,14 +182,11 @@
 	margin-inline: auto;
 }
 
-/* Header: a simple bar centered at the same *shell* width as the documentation
-   layout below it — the reading column plus the sidebar/TOC rail and gap on
-   each side (identical to where the sidebar's left edge and the TOC's right
-   edge sit at >=72rem) — not a sidebar-aware grid, and not just the narrower
-   680px reading column. Identical on every route, sidebar or not: pages
-   without rails (the homepage) simply have nothing to extend into that space,
-   same as the reading column does at every width once the shell itself no
-   longer fits (see the max-width/shrink-to-fit behavior below). */
+/* Header: a simple bar centered at the SAME canonical content width as the
+   homepage, article, and footer — exactly like raioviajante.com and dump,
+   where the header/main/footer all share one container. It does NOT span the
+   sidebar/TOC's outer boundary: those rails are supporting tools that extend
+   outward around this column: they never redefine it. */
 header.header {
 	padding-inline: 0;
 }
@@ -166,13 +197,48 @@ header.header > .header {
 	justify-content: space-between;
 	align-items: center;
 	width: 100%;
-	max-width: calc(var(--rv-content-width) + 2 * (var(--rv-rail-gap) + var(--rv-rail-width)));
+	max-width: var(--rv-content-width);
 	margin-inline: auto;
 	padding-inline: var(--rv-page-inline);
 }
 
 .social-icons::after {
 	border-inline-end: none;
+}
+
+/* GitHub icon: fg by default, accent on hover — matches raioviajante.com and
+   dump's own github-link treatment exactly (Starlight's own SocialIcons
+   default is inverted: accent by default, white on hover). */
+.social-icons a {
+	color: var(--rv-fg);
+}
+
+.social-icons a:hover {
+	color: var(--rv-accent);
+}
+
+/* Search trigger: quiet navigation metadata, not a bordered button/pill — the
+   search OVERLAY is the approved surface, this is just the header's entry
+   point into it. */
+button[data-open-modal] {
+	border: none;
+	border-radius: 0;
+	background: none;
+	padding-inline: 0;
+	width: auto;
+	max-width: none;
+	color: color-mix(in srgb, var(--rv-fg) 55%, transparent);
+}
+
+button[data-open-modal]:hover {
+	border-color: transparent;
+	background: none;
+	color: var(--rv-fg);
+}
+
+button[data-open-modal] > kbd {
+	background: none;
+	border: 1px solid var(--sl-color-hairline);
 }
 
 /* No boxed panels between page title and body. */
