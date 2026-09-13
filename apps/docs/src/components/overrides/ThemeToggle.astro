@@ -1,0 +1,119 @@
+---
+// Replaces Starlight's header <select> (auto/dark/light) with the circular toggle
+// shared with dump.raioviajante.com. It reuses the same 'starlight-theme'
+// localStorage key and `document.documentElement.dataset.theme` that
+// ThemeProvider.astro's inline (FOUC-preventing) script already sets on load — this
+// component only needs to reflect and update that same state, restricted to the two
+// states this toggle actually offers (no "auto").
+//
+// `fixed` (default true) pins it bottom-left, independent of the header — used once,
+// by the PageFrame override. The mobile menu footer renders a second, non-fixed
+// instance (`fixed={false}`) so the toggle stays reachable while the mobile nav
+// popover — which renders in the browser's top layer, above any fixed element — is open.
+interface Props {
+	fixed?: boolean;
+}
+
+const { fixed = true } = Astro.props;
+---
+
+<theme-toggle class:list={{ fixed }}>
+	<button type="button" class="theme-toggle-button" aria-pressed="true">
+		<svg width="17" height="17" viewBox="0 0 16 16" aria-hidden="true" class="icon-moon">
+			<circle cx="8" cy="8" r="6" fill="var(--rv-accent)"></circle>
+			<circle cx="10.6" cy="5.6" r="5.2" fill="var(--rv-bg)"></circle>
+		</svg>
+		<svg width="17" height="17" viewBox="0 0 16 16" aria-hidden="true" class="icon-sun">
+			<circle cx="8" cy="8" r="3.4" fill="currentColor"></circle>
+			<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.15">
+				<path
+					d="M13 8h1.9M11.54 11.54l1.34 1.34M8 13v1.9M4.46 11.54l-1.34 1.34M3 8H1.1M4.46 4.46L3.12 3.12M8 3V1.1M11.54 4.46l1.34-1.34"
+				></path>
+			</g>
+		</svg>
+	</button>
+</theme-toggle>
+
+<script>
+	type Theme = 'dark' | 'light';
+	const storageKey = 'starlight-theme';
+
+	const getPreferredTheme = (): Theme =>
+		matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+
+	class ThemeToggle extends HTMLElement {
+		constructor() {
+			super();
+			const button = this.querySelector('button')!;
+			this.reflect(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark', button);
+
+			button.addEventListener('click', () => {
+				const next: Theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+				localStorage.setItem(storageKey, next);
+				document.documentElement.dataset.theme = next;
+				this.reflect(next, button);
+			});
+
+			// Follow the system preference for as long as the visitor hasn't picked a theme here.
+			matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+				if (localStorage.getItem(storageKey)) return;
+				const theme = getPreferredTheme();
+				document.documentElement.dataset.theme = theme;
+				this.reflect(theme, button);
+			});
+		}
+
+		reflect(theme: Theme, button: HTMLButtonElement) {
+			button.setAttribute('aria-pressed', String(theme === 'dark'));
+			button.setAttribute(
+				'aria-label',
+				theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'
+			);
+		}
+	}
+
+	customElements.define('theme-toggle', ThemeToggle);
+</script>
+
+<style>
+	theme-toggle.fixed {
+		position: fixed;
+		z-index: var(--sl-z-index-navbar);
+		bottom: 1.5rem;
+		left: 1.5rem;
+	}
+
+	.theme-toggle-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		padding: 0;
+		border: 1px solid color-mix(in srgb, var(--rv-fg) 15%, transparent);
+		border-radius: 50%;
+		background: var(--rv-bg);
+		color: #a9822a;
+		box-shadow: 0 1px 3px color-mix(in srgb, var(--rv-fg) 14%, transparent);
+		cursor: pointer;
+	}
+
+	.theme-toggle-button:hover {
+		box-shadow: 0 2px 6px color-mix(in srgb, var(--rv-fg) 18%, transparent);
+	}
+
+	.icon-moon,
+	.icon-sun {
+		grid-area: 1 / 1;
+	}
+
+	.theme-toggle-button {
+		display: grid;
+		place-items: center;
+	}
+
+	[aria-pressed='true'] .icon-sun,
+	[aria-pressed='false'] .icon-moon {
+		display: none;
+	}
+</style>

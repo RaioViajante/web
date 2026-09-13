@@ -1,0 +1,13 @@
+---
+// Composes Starlight's own PageFrame unchanged, only adding the fixed theme toggle
+// outside of it — every other slot (header/sidebar/main-frame) is Starlight's default.
+import Default from '@astrojs/starlight/components/PageFrame.astro';
+import ThemeToggle from './ThemeToggle.astro';
+---
+
+<Default>
+	<slot name="header" slot="header" />
+	<slot name="sidebar" slot="sidebar" />
+	<slot />
+</Default>
+<ThemeToggle />

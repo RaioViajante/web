@@ -1,0 +1,39 @@
+---
+// Based on @astrojs/starlight/components/MobileMenuFooter.astro, swapping the
+// (emptied) ThemeSelect for a second, non-fixed ThemeToggle instance: the mobile nav
+// popover renders in the browser's top layer, above any fixed element, so the
+// always-visible toggle from PageFrame would otherwise be unreachable while it's open.
+import LanguageSelect from 'virtual:starlight/components/LanguageSelect';
+import SocialIcons from 'virtual:starlight/components/SocialIcons';
+import ThemeToggle from './ThemeToggle.astro';
+---
+
+<div class="mobile-preferences sl-flex">
+	<div class="social-icons">
+		<SocialIcons />
+	</div>
+	<ThemeToggle fixed={false} />
+	<LanguageSelect />
+</div>
+
+<style>
+	@layer starlight.core {
+		.social-icons {
+			display: flex;
+			margin-inline-end: auto;
+			gap: 1rem;
+			align-items: center;
+			padding-block: 1rem;
+		}
+		.social-icons:empty {
+			display: none;
+		}
+		.mobile-preferences {
+			justify-content: space-between;
+			flex-wrap: wrap;
+			border-top: 1px solid var(--sl-color-gray-6);
+			column-gap: 1rem;
+			padding: 0.5rem 0;
+		}
+	}
+</style>
