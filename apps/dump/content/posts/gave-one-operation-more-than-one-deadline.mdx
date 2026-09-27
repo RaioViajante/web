@@ -1,0 +1,221 @@
+---
+title: "I Gave One Operation More Than One Deadline"
+description: "I thought jobs-mcp had one caller deadline, but pagination, retries, pacing, and transport had each acquired their own interpretation of the time left."
+date: "2026-09-27"
+tags:
+  - typescript
+  - reliability
+  - time
+  - mcp
+draft: false
+---
+
+I thought I had implemented a deadline.
+
+The caller could say that an operation had to finish by a particular time, and `jobs-mcp` would stop when that time arrived.
+
+Reasonable.
+
+Except a single operation was not necessarily a single request.
+
+Listing jobs could involve several pages. A request might wait in a queue, be delayed by pacing, fail and be retried, receive a `Retry-After`, and finally spend some time inside the active transport attempt.
+
+Getting one job could travel through many of the same steps.
+
+Somewhere along the way, I had built several places that could look at the caller's wall-clock deadline and decide how much time remained.
+
+I had meant to give the operation one limit.
+
+I had actually given different pieces of it their own interpretation of that limit.
+
+## The request was the wrong boundary
+
+The first mental model was too close to the network request.
+
+Something was about to make a request, so it would calculate the remaining time and arrange for that request to stop when the duration expired.
+
+Then another page needed to be fetched.
+
+That code could calculate the remaining time too.
+
+Then a retry happened.
+
+It could do the same thing again.
+
+The individual calculations were all trying to respect the same deadline. That was what made the model look correct for longer than it should have.
+
+But the thing the caller asked for was not:
+
+```text
+make one HTTP request
+```
+
+It was closer to:
+
+```text
+complete this jobs.list operation before the deadline
+```
+
+The pages were part of that operation.
+
+So were the retries.
+
+So was every moment spent waiting for permission to make the next attempt.
+
+The time limit belonged around the whole operation, not around whichever request happened to be active when somebody checked the clock.
+
+## Wall clocks answer a different question
+
+The deadline arrived as a wall-clock timestamp.
+
+That made sense at the boundary. The caller needed a recognizable way to say:
+
+```text
+do not continue after this timestamp
+```
+
+My mistake was continuing to use that timestamp as the source of the budget inside the operation.
+
+Once the work had started, I did not need to keep asking what time it was. I needed to measure how much of the original duration had already been spent.
+
+The wall clock can move because the system clock can be adjusted. Most of the time I would never notice. Code measuring an elapsed budget cannot make that assumption.
+
+If I repeatedly do something conceptually like this:
+
+```text
+remaining = wall-clock deadline - wall-clock now
+```
+
+then every calculation asks the wall clock to interpret the budget again.
+
+What I actually needed was one monotonic endpoint. Monotonic time is useful here because it moves forward for the purpose of measuring elapsed time, even if the system clock is corrected while the operation is running.
+
+The corrected model converts the caller's wall-clock deadline once, when the logical operation begins. That produces one remaining duration and one monotonic endpoint.
+
+After that, the operation stops translating the timestamp into new little budgets. Every part of it moves toward the same end.
+
+## Retrying does not create more time
+
+Retries made the ownership problem much easier to see.
+
+Suppose an operation begins with ten seconds available.
+
+The first attempt waits for pacing, spends time on the network and fails.
+
+The next attempt does not have ten seconds.
+
+It has whatever remains after all of that.
+
+This sounds painfully obvious when written as two sentences.
+
+It becomes easier to violate when retry code accepts a duration and each attempt creates its own timeout machinery. A fresh attempt can start looking like a fresh budget even though it is only another attempt to finish the same work.
+
+The same applies to `Retry-After`.
+
+If a response says to wait longer than the operation can afford, the wait does not become exempt because the server requested it. The operation cannot borrow time from somewhere outside its own deadline.
+
+It either waits within the remaining budget or reaches the endpoint first.
+
+The deadline is not only a limit on productive network activity.
+
+It is a limit on how long the caller is willing to let the entire operation exist.
+
+## Waiting is still part of the operation
+
+The queue and pacing layers were another useful way to misunderstand this.
+
+It is tempting to think of a timeout as something that begins when bytes start travelling.
+
+But an operation can spend most of its life not travelling anywhere.
+
+It can wait behind other work.
+
+It can wait for a pacing interval.
+
+It can wait before retrying.
+
+It can wait because the remote side asked it to slow down.
+
+From the caller's perspective, that is all time spent.
+
+If an operation has one second left and waits in a queue for two seconds, the correct result is not to begin a new transport attempt with a fresh timeout. The work is already late.
+
+This changed the question each layer needed to ask.
+
+Not:
+
+```text
+how long may my part take?
+```
+
+But:
+
+```text
+is there still budget for my part to begin or continue?
+```
+
+That is a much less generous question.
+
+It is also the one the caller actually asked.
+
+## One channel, one budget
+
+The correction was to create an operation-scoped channel once for the logical `jobs.list` or `jobs.get` operation.
+
+The channel owns the shared budget and cancellation path for that operation.
+
+Conceptually, the structure is now:
+
+```text
+caller wall-clock deadline
+            |
+            | convert once
+            v
+one monotonic operation endpoint
+            |
+            +-- queueing
+            +-- pacing
+            +-- page 1
+            +-- retry wait
+            +-- page 1 retry
+            +-- page 2
+            +-- active transport attempts
+```
+
+Everything below the endpoint consumes the same budget.
+
+Requests travelling through the channel no longer carry independent deadline or signal state that can quietly recreate the old model. They participate in the operation that already exists.
+
+This matters for pagination in particular.
+
+Page two is not a new operation just because it is a new HTTP request. It exists only because the caller's original listing operation is still in progress.
+
+Giving the page its own deadline machinery would put the accidental boundary back in exactly the place I had just removed it from.
+
+## The bug was mostly a noun
+
+The correction around issue `#56` was completed and reviewed successfully.
+
+The code changed, but the more useful change was in how I named the thing being limited.
+
+I had been thinking about request deadlines.
+
+The system needed an operation budget.
+
+Once that distinction became explicit, several decisions stopped being independent:
+
+- a retry consumes the original budget;
+- a page consumes the original budget;
+- waiting for pacing consumes the original budget;
+- waiting in a queue consumes the original budget;
+- an active attempt stops when the original budget is gone.
+
+This is not a new theory of time.
+
+It is one modeling mistake in a private side project that made me learn why systems code is so particular about clocks and ownership.
+
+I started with one wall-clock deadline and assumed that meant I had one deadline.
+
+It turned out I only had one timestamp.
+
+The operation did not truly have one budget until every part of it was forced to share the same clock and the same end.
