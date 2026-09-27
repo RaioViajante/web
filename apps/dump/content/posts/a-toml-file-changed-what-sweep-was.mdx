@@ -1,0 +1,181 @@
+---
+title: "A TOML File Changed What Sweep Was"
+description: "Sweep started with my file-organizing preferences inside the code, but loading TOML configuration turned those preferences into an interface the program has to respect."
+date: "2026-09-27"
+tags:
+  - python
+  - toml
+  - cli
+  - sweep
+draft: false
+---
+
+Sweep started with a very convenient assumption.
+
+I was the user.
+
+If I thought images belonged in one directory and archives belonged in another, the program could simply know that because I had written it into the code.
+
+There was no disagreement between the author's preferences and the user's preferences.
+
+They were the same person, sitting at the same desk, looking at the same terrible Downloads directory.
+
+This worked surprisingly well right up until I added configuration.
+
+## The rules had been hiding in the code
+
+The first version of Sweep needed rules in order to classify files and decide where they should go.
+
+Hard-coding those rules did not initially feel like a design problem.
+
+It felt like programming.
+
+The project was small, the behavior was changing and I was still learning what I wanted it to do. Editing Python whenever I changed my mind was not much of a burden because I already had the repository open.
+
+But hard-coded preferences have a quiet consequence.
+
+The program cannot distinguish between:
+
+```text
+this is how Sweep works
+```
+
+and:
+
+```text
+this is how I happen to organize my files today
+```
+
+Those are not the same kind of rule.
+
+One belongs to the tool.
+
+The other belongs to whoever is using it.
+
+As long as I was the only person involved, the distinction was very easy to ignore.
+
+## Then there was a TOML file
+
+Recent work added configuration loading using Python's `tomllib`.
+
+At the most mechanical level, this means Sweep can read TOML instead of requiring every preference to live inside Python source code.
+
+That part is pleasantly ordinary.
+
+The file is parsed.
+
+Python gives the program data.
+
+Sweep can use that data while deciding how it should behave.
+
+But the moment the values came from outside the code, they stopped being private implementation details.
+
+They became input.
+
+And input has opinions.
+
+It can be absent.
+
+It can be malformed.
+
+It can be valid TOML and still make no sense to Sweep.
+
+It can name a category the rest of the program does not understand.
+
+It can omit something that used to exist as an unquestioned constant in the code.
+
+Parsing the file answers one fairly small question:
+
+```text
+is this TOML?
+```
+
+It does not answer:
+
+```text
+is this a configuration Sweep knows how to use?
+```
+
+That second question belongs to Sweep now.
+
+## Configuration is an interface
+
+I used to think of configuration as moving values out of the source code.
+
+Take a constant from here.
+
+Put it in a file over there.
+
+Congratulations, the program is configurable.
+
+That model misses the awkward part.
+
+Once a configuration file exists, the shape and meaning of that file become a small interface between the user and the program.
+
+The program has to decide what a missing value means.
+
+Maybe there is a default.
+
+Maybe the value is required.
+
+Maybe the relevant feature should be disabled.
+
+Those are three different behaviors, and the TOML parser cannot choose between them for me.
+
+Invalid values create the same problem.
+
+Rejecting them is easy to say. Producing an error that explains which part is invalid and what Sweep expected is a different piece of work.
+
+Then there are unknown rules and categories.
+
+Ignoring one might make a configuration appear to work while Sweep quietly does something else. Rejecting every unknown value is safer, but it also means the configuration format has to be defined carefully enough that the rejection is useful.
+
+Compatibility appears eventually too.
+
+If I change how a rule is represented later, an old configuration file does not stop existing just because the new design looks nicer.
+
+Sweep does not have final answers to all of these questions yet.
+
+Adding TOML did not solve configuration.
+
+It made the configuration problem visible.
+
+## Some decisions should stay in the program
+
+External configuration creates another temptation: make everything configurable.
+
+Every directory.
+
+Every name.
+
+Every conflict.
+
+Every tiny branch that might someday bother somebody.
+
+That would certainly remove hard-coded preferences.
+
+It might also replace a small file organizer with a language for describing file organizers.
+
+I am already designing one programming language. I do not need the Sweep configuration file to become another one by accident.
+
+Some behavior still belongs in code.
+
+Safety rules are the clearest example. A preference may describe where a category should go. That does not mean configuration should casually bypass the conservative behavior that keeps Sweep from overwriting an existing file.
+
+The configuration can express choices within the tool.
+
+It should not make the tool stop being the tool.
+
+I do not know exactly where that boundary will settle yet.
+
+Right now, Sweep can load TOML. That is the part that exists.
+
+I still need to decide which values are required, which missing values should use defaults and which configurations should be rejected. Sweep also needs to say something useful when it cannot use the file it was given.
+
+And I still need to decide where configuration stops and ordinary program behavior begins.
+
+`tomllib` cannot answer any of that for me.
+
+It can parse the file.
+
+The rest is still open.

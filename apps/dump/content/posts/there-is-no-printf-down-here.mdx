@@ -1,0 +1,430 @@
+---
+title: "There Is No printf Down Here"
+description: "My first steps into x86 assembly, BIOS interrupts, boot sectors, and the strange realization that there is no operating system underneath me anymore."
+date: "2026-09-05"
+tags:
+  - osdev
+  - assembly
+  - x86
+draft: false
+---
+
+I've spent most of my time programming with a lot of things that I don't really know how they work underneath.
+
+Operating systems, runtimes, libraries, frameworks.
+
+They're just there.
+
+Recently, I decided to try building a tiny operating system in x86 assembly. I'm using Nanobyte's *Building an OS* series as a reference while trying to understand what I'm actually typing.
+
+It doesn't have a name yet.
+
+And, sincerely, I still don't understand most of this.
+
+But I'm ridiculously excited about it.
+
+So, these are basically the first lines I wrote:
+
+```asm
+org 0x7C00
+bits 16
+```
+
+`org 0x7C00` tells NASM to calculate labels and memory addresses assuming that our code will be loaded at address `0x7C00`.
+
+Why `0x7C00`?
+
+Because that's where a traditional BIOS loads the boot sector before giving it control.
+
+Then we have:
+
+```asm
+bits 16
+```
+
+which tells NASM to generate 16-bit x86 instructions.
+
+At this point the processor is running in real mode.
+
+I used to write code assuming there was an entire operating system underneath me.
+
+Now I'm writing the thing that runs before the operating system even exists.
+
+That's weird.
+
+And extremely cool.
+
+## Apparently a newline needs two numbers
+
+Next, I wrote this:
+
+```asm
+%define ENDL 0x0D, 0x0A
+```
+
+At first I had absolutely no idea why it was called `ENDL`.
+
+Nanobyte called it that, so I did too.
+
+I assume it means something like "end line."
+
+It isn't a special NASM keyword or anything. It's just a constant we defined ourselves.
+
+`0x0D` is a carriage return and `0x0A` is a line feed.
+
+Together, they give us a new line.
+
+Apparently even pressing Enter has lore.
+
+## Where everything starts
+
+Then:
+
+```asm
+start:
+    jmp main
+```
+
+`start` is just a label.
+
+The first thing the bootloader does is jump to `main`.
+
+And `jmp` literally means jump.
+
+Finally, something here is exactly as stupidly simple as it sounds.
+
+## My first routine
+
+Then I needed a way to print a string.
+
+I'm going to call this a routine because apparently I'm low-level enough now that calling everything a "function" feels suspicious.
+
+```asm
+puts:
+    push si
+    push ax
+```
+
+This routine is going to modify `SI` and `AX`, so we save their current values on the stack first.
+
+Later we'll restore them.
+
+Already missing local variables.
+
+Then we get to the part that confused me the most:
+
+```asm
+.loop:
+    lodsb
+
+    or al, al
+    jz .done
+
+    mov ah, 0x0E
+    mov bh, 0x00
+    int 0x10
+
+    jmp .loop
+```
+
+Let's try to understand this mess.
+
+`lodsb` loads one byte from the address pointed to by `DS:SI` into the `AL` register.
+
+Then it moves `SI` to the next byte.
+
+So basically we're walking through our string one character at a time.
+
+There is one small detail, though.
+
+Whether `lodsb` moves forward or backward depends on something called the Direction Flag.
+
+So before using it, I explicitly clear that flag later with:
+
+```asm
+cld
+```
+
+That guarantees that `SI` moves forward.
+
+This is already one of the things I'm starting to like about low-level programming.
+
+Your code can work while depending on some CPU state you didn't even know existed.
+
+Then we have this:
+
+```asm
+or al, al
+jz .done
+```
+
+This one looked completely pointless to me.
+
+We're doing an OR operation between `AL` and itself.
+
+The value doesn't change.
+
+So... why?
+
+Because the CPU flags do.
+
+If `AL` contains `0`, the Zero Flag gets set.
+
+Then `jz`, which means "jump if zero," sends us to `.done`.
+
+And why do we care about a zero?
+
+Because the string ends with a null byte.
+
+So this:
+
+```asm
+or al, al
+jz .done
+```
+
+is basically our cursed assembly version of:
+
+```text
+if character == 0:
+    stop
+```
+
+Apparently `if` statements have been taken away from me.
+
+Now comes the part that actually prints something:
+
+```asm
+mov ah, 0x0E
+mov bh, 0x00
+int 0x10
+```
+
+BIOS interrupt `0x10`, function `0x0E`, provides a teletype output service.
+
+The character we want to print is already inside `AL`.
+
+We put `0x0E` in `AH` to select the BIOS function and then call:
+
+```asm
+int 0x10
+```
+
+And the BIOS prints the character for us.
+
+No standard library.
+
+No terminal emulator.
+
+No `printf`.
+
+I'm literally asking the BIOS to put a character on the screen.
+
+I don't know why, but this is one of the coolest things I've programmed in a while.
+
+Then:
+
+```asm
+jmp .loop
+```
+
+and we do everything again.
+
+One character at a time until we find the null byte.
+
+## So that's what `ret` does
+
+When we're finished:
+
+```asm
+.done:
+    pop ax
+    pop si
+    ret
+```
+
+The `pop`s restore the registers we saved before entering the routine.
+
+But `ret` was another instruction I originally typed without really knowing what the hell it was doing.
+
+It started making sense when I looked at this:
+
+```asm
+call puts
+```
+
+`call` doesn't simply jump to `puts`.
+
+Before jumping, it saves the address of the next instruction on the stack.
+
+Then, when `puts` reaches:
+
+```asm
+ret
+```
+
+`ret` takes that address back from the stack and execution continues from where the routine was called.
+
+So `call` and `ret` together give us something that starts looking a little more like the function calls I'm used to.
+
+The stack is already doing much more work than I expected.
+
+## Finally, `main`
+
+Now we get here:
+
+```asm
+main:
+    mov ax, 0
+    mov ds, ax
+    mov es, ax
+```
+
+We're initializing our segment registers.
+
+With `DS` set to zero, addresses become much easier for me to reason about for now.
+
+Then we initialize the stack:
+
+```asm
+mov ss, ax
+mov sp, 0x7C00
+```
+
+The stack pointer starts at `0x7C00`.
+
+And x86 stacks grow downward.
+
+Which is funny because our bootloader itself was just loaded at `0x7C00`.
+
+So our code lives above that address while the stack starts growing into the memory below it.
+
+Then I added:
+
+```asm
+cld
+```
+
+to make sure string instructions like `lodsb` move forward through memory.
+
+Finally:
+
+```asm
+mov si, msg_hello
+call puts
+```
+
+`SI` now points to our message:
+
+```asm
+msg_hello: db 'Hello, World!', ENDL, 0
+```
+
+And that final `0` is important.
+
+That's the null byte our loop is searching for.
+
+`puts` walks through the message one byte at a time, asks the BIOS to print each character, and stops when it reaches that zero.
+
+Then:
+
+```asm
+hlt
+```
+
+`hlt` tells the processor to stop executing instructions until an interrupt wakes it up.
+
+And immediately after that I have:
+
+```asm
+.halt:
+    jmp .halt
+```
+
+So if execution continues, we just jump to the same place forever instead of accidentally letting the CPU start executing whatever bytes happen to come after our code.
+
+I've never found an infinite loop this comforting before.
+
+## 512 bytes
+
+And then there's probably my favorite part:
+
+```asm
+times 510 - ($ - $$) db 0
+dw 0xAA55
+```
+
+A traditional BIOS boot sector occupies exactly 512 bytes.
+
+This:
+
+```asm
+times 510 - ($ - $$) db 0
+```
+
+fills the remaining space with zeros until byte 510.
+
+Then we write:
+
+```asm
+dw 0xAA55
+```
+
+Because x86 is little-endian, those bytes appear in the final binary as:
+
+```text
+55 AA
+```
+
+Those are the final two bytes of the sector.
+
+The BIOS checks for this signature to recognize the sector as bootable.
+
+So, from my current understanding, the conversation is basically:
+
+```text
+me:   here's 512 bytes
+BIOS: are the last two 55 AA?
+me:   yes
+BIOS: good enough for me
+```
+
+Which seems like an unreasonable amount of trust to put in someone who learned what `ret` does five minutes ago.
+
+## And somehow it booted
+
+I'm writing all of this in Vim and running it inside QEMU.
+
+I assembled the boot sector, started the virtual machine and eventually saw:
+
+```text
+Hello, World!
+```
+
+That's it.
+
+Thirteen characters.
+
+Probably the least impressive output I've ever been this excited about.
+
+But this time there was no Node underneath it.
+
+No JVM.
+
+No libc.
+
+No operating system.
+
+No `printf`.
+
+Just a CPU waking up in 16-bit real mode, some code I wrote, and a BIOS that was apparently willing to trust me.
+
+I still don't understand a huge part of what's happening here.
+
+And that's probably the best part.
+
+There's so much underneath the abstractions I've been using every day that I never really thought about.
+
+For now, I have 512 bytes.
+
+And somehow they boot.

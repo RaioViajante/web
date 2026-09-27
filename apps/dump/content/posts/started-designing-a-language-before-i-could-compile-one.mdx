@@ -1,0 +1,298 @@
+---
+title: "I Started Designing a Language Before I Could Compile One"
+description: "I started designing yanawa while still learning how programming languages and compilers are built, and discovered that deciding what a language should be is its own kind of technical work."
+date: "2026-09-13"
+tags:
+  - programming-languages
+  - language-design
+  - compilers
+draft: false
+---
+
+I've been building a few things lately that have made me think more carefully about what I actually like in software.
+
+Sweep is making me think about boring work and how much authority I want to give a script over my files.
+
+Orbit is making me think about state, boundaries and all the ways a simple application can start asking difficult questions.
+
+And somewhere in the middle of all that, I started designing a programming language.
+
+Which is a completely reasonable thing to do when you're still learning how programming languages are built.
+
+The language is called [yanawa](https://github.com/yanawa/yanawa).
+
+It does not run.
+
+There is no compiler.
+
+There is no lexer, parser, type checker, interpreter, runtime, CLI or REPL.
+
+There isn't even an executable yanawa program waiting somewhere for me to discover the correct command.
+
+Right now, yanawa is a repository full of design documents.
+
+And somehow, that has already started feeling like building something.
+
+## I did not start with syntax
+
+My first instinct was to think about the fun parts.
+
+Should functions use `fn`?
+
+Should blocks use braces or indentation?
+
+Should the language have a special way to declare immutable values?
+
+These are the kinds of questions that make a language feel real very quickly.
+
+You can write a few examples, argue about punctuation and suddenly you have opinions about semicolons.
+
+This is how civilization ends.
+
+But the more I wrote down, the more obvious it became that syntax wasn't the real problem.
+
+The harder questions were things like:
+
+What kind of programs is yanawa for?
+
+What should be explicit?
+
+What should the compiler be able to infer safely?
+
+When does a type annotation communicate something useful, and when is it just repeating information?
+
+What kinds of mistakes should be difficult to express?
+
+What should application code feel like when it has to talk to a database, an HTTP service or an unreliable external system?
+
+Those questions come before deciding whether a block ends with `}` or with a change in indentation.
+
+So the first real milestone was not a compiler milestone.
+
+It was defining what yanawa is trying to become.
+
+## Familiar syntax, fewer things to repeat
+
+The current direction is fairly simple to describe, at least before the details start fighting each other.
+
+yanawa is meant to be an application-oriented language with strong static typing and less ceremony.
+
+The goal isn't to make every program as short as possible.
+
+That usually turns into a competition to see who can hide the most information in the fewest characters.
+
+I want code to be concise when the compiler already knows something, while keeping meaningful behavior visible.
+
+For example, the current syntax direction allows the type to be inferred when the value makes it obvious:
+
+```yanawa
+let name = "Morgan"
+let age = 29
+let active = true
+```
+
+The equivalent explicit version would still be available:
+
+```yanawa
+let name: str = "Morgan"
+let age: int = 29
+let active: bool = true
+```
+
+This is not a revolutionary idea.
+
+It is also exactly the kind of thing I keep coming back to.
+
+Strong typing should give me useful guarantees without making me write down the same fact twice just because the language insists on it.
+
+At the same time, inference should not become an excuse for the compiler to make surprising decisions on my behalf.
+
+There is a difference between deriving a type and silently introducing a database transaction.
+
+One is information the compiler can already see.
+
+The other is behavior with consequences.
+
+That distinction is becoming one of the more important design constraints in yanawa.
+
+## The syntax is still a proposal
+
+The current direction uses indentation-based blocks with a colon:
+
+```yanawa
+fn greet(name: str) -> str:
+    return "Hello, {name}"
+```
+
+It feels readable to me.
+
+It also looks close enough to things I already understand that I don't need to spend my first day learning a new punctuation system before I can think about the program itself.
+
+But this is a proposal.
+
+No compiler accepts it.
+
+The same is true for nullable values. The design currently leans toward ordinary types being non-nullable by default, with absence made explicit:
+
+```yanawa
+let nickname: str? = none
+```
+
+I like the idea that `str` and `str?` should mean different things.
+
+I like that a value which may be absent should make that possibility visible to whoever reads the code.
+
+Those ideas feel more durable than the exact spelling.
+
+Maybe the syntax stays as `T?` and `none`.
+
+Maybe some part of it changes after the compiler exists and starts finding holes in my reasoning.
+
+That is the distinction I am trying to keep clear:
+
+absence should be explicit is a design principle.
+
+`str?` is a current syntax proposal.
+
+Strong typing with useful inference is a direction.
+
+The exact rules for inference are still something I need to work out.
+
+I am learning that it is possible to be confident about a problem while remaining undecided about its implementation.
+
+This is very inconvenient for someone who would like to finish a language by next Tuesday.
+
+## Structs, errors and the application-shaped part
+
+yanawa is currently leaning toward familiar building blocks such as structs, enums and traits, with composition preferred over a traditional class-heavy design.
+
+The current design has examples like:
+
+```yanawa
+struct User:
+    id: int
+    name: str
+```
+
+Again, this is an example of a direction, not a feature I can use.
+
+The reason I keep returning to these ordinary-looking pieces is that I want the language to spend its novelty carefully.
+
+It doesn't need a new way to declare every familiar concept just to prove that it is a new language.
+
+The more interesting questions are around application boundaries.
+
+Applications have to deal with HTTP, JSON, configuration, databases and external services. They also have to deal with invalid input, missing values, timeouts and failures that don't care how elegant the code looked in the editor.
+
+The repository explores whether an application-oriented language and its first-party tooling should understand more about these boundaries than a general-purpose language usually does.
+
+That does not mean yanawa has built-in HTTP.
+
+It does not have JSON support, a database layer or typed routes.
+
+I am interested in the question itself.
+
+If a language is designed around application development, should the language, standard library and tooling share more information about the places where application code meets the outside world?
+
+Could that remove some of the mechanical mapping between types, routes, validation, serialization and framework configuration without hiding what the program is doing?
+
+I don't know yet.
+
+But it feels like a better question than adding another annotation because every other ecosystem has one.
+
+## Then I reached the compiler problem
+
+At some point, design documents stop being enough.
+
+The next milestone is Compiler Foundation, which is where yanawa starts having to become software instead of only a set of carefully worded intentions.
+
+That means a workspace, source files, source spans, diagnostics and tests.
+
+Eventually it means a lexer turning source text into tokens, a parser building a syntax tree, name resolution, type checking, semantic analysis and some kind of execution path.
+
+The current compiler architecture describes a possible pipeline:
+
+```text
+source code
+    ↓
+lexer
+    ↓
+tokens
+    ↓
+parser
+    ↓
+syntax tree
+    ↓
+type checking
+    ↓
+semantic representation
+    ↓
+target output
+```
+
+There are more stages in the actual design direction, including lowering, an intermediate representation and code generation.
+
+None of those stages are implemented.
+
+The implementation language is not even settled yet.
+
+I can currently draw a compiler pipeline more confidently than I can write one.
+
+That feels like a problem.
+
+It also feels like the next useful problem.
+
+## I have opinions about a language that cannot run
+
+The uncomfortable part is that yanawa cannot execute this:
+
+```yanawa
+fn main():
+    print("Hello, World!")
+```
+
+It cannot reject it either.
+
+There is no lexer yet, so the language is not currently capable of having a bad token.
+
+I have opinions about error handling in a language that cannot produce an error.
+
+I have thoughts about compiler diagnostics even though there is no compiler to point at a source span.
+
+I have been writing about non-nullability while owning absolutely no mechanism that can stop a nullable value from being used incorrectly.
+
+This is either premature or exactly the kind of constraint-setting work that makes implementation less directionless later.
+
+Probably both.
+
+The important thing is not to pretend that a design document is evidence that a feature works.
+
+The language identity milestone does not mean version one of yanawa is designed and waiting to be downloaded.
+
+It means the project has a clearer idea of which questions it is trying to answer.
+
+That is a smaller achievement than having a compiler.
+
+It is still an achievement.
+
+## So this is building too
+
+I started yanawa because I wanted to understand programming languages better.
+
+That is still true.
+
+But I also wanted to see whether the things that bother me in application development could be described precisely enough to design around them.
+
+That part has been more difficult than choosing syntax.
+
+It is easy to say “less ceremony.”
+
+It is harder to decide which ceremony is accidental, which ceremony communicates something important and which clever shortcut will become somebody else's debugging session later.
+
+For now, yanawa is a language made of constraints, examples, open questions and a suspicious amount of Markdown.
+
+The next step is Compiler Foundation.
+
+Soon I will have to make the first one of those examples mean something to a machine.
+
+And then the language can finally start disagreeing with me.

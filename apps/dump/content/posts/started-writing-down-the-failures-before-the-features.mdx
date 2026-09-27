@@ -1,0 +1,153 @@
+---
+title: "I Started Writing Down the Failures Before the Features"
+description: "jobs-mcp began as a tool for job workflows, then accumulated decisions about provenance, secrets, recovery, and automation before the visible product had much to show."
+date: "2026-09-27"
+tags:
+  - architecture
+  - reliability
+  - security
+  - mcp
+draft: false
+---
+
+`jobs-mcp` started with a fairly understandable purpose.
+
+Help with job discovery and application workflows.
+
+There are visible features hiding inside that sentence. Find things. Store things. Compare things. Eventually help with actions that would otherwise be repetitive.
+
+I expected to spend most of my time thinking about those.
+
+Instead, the project kept asking what should happen when the information was incomplete, duplicated, sensitive, stale, interrupted or wrong.
+
+The visible product still had very little to show.
+
+The failure modes were already forming a committee.
+
+## Facts needed a past
+
+A job listing looks like data.
+
+A title, a company, a location, a description and some links.
+
+But a tool that may eventually help make decisions about that listing needs to know more than the current values.
+
+I needed to know where a fact came from, whether it was observed directly or derived, and whether two similar representations were actually the same thing.
+
+I also needed some answer for what should remain true about an existing copy after its source changes.
+
+Those questions led to design work around explicit facts, provenance and canonical identity.
+
+Most of that was design work.
+
+Writing down how identity should work is not the same as proving that every path in the program already follows it. Deciding to use canonical representation and hashing does not make duplicate or conflicting information disappear.
+
+It gives later code a definition to implement and tests something precise to disagree with.
+
+Without that definition, the first convenient string comparison would quietly become the identity model.
+
+I did not want that decision to happen just because one comparison was the easiest thing to write first.
+
+## Secrets made “local” less comforting
+
+`jobs-mcp` is private and intended to run locally.
+
+That initially sounds like a large part of the security story.
+
+It is not.
+
+A local tool can still handle credentials, write files, call networks and process information that should not end up in a log or a Git repository.
+
+So the design started accumulating boundaries.
+
+Persistent secrets belong in platform facilities such as macOS Keychain or Secret Service rather than in source control or ordinary configuration files.
+
+Filesystem access needs an explicit shape.
+
+Network access needs an explicit shape.
+
+Logs need structure, but “structured” cannot become a sophisticated way to preserve sensitive values forever.
+
+Some of this is still recorded design rather than finished behavior. An ADR saying where secrets belong does not mean every secret lifecycle already works.
+
+But making the decision early prevents a temporary plaintext solution from becoming the architecture because it happened to work first.
+
+## Recovery arrived before confidence
+
+Persistence created another collection of uncomfortable questions.
+
+The project uses SQLite with strict tables and migrations as part of its foundation.
+
+That gives the data a place to live and the schema a history.
+
+It does not answer what happens when that history is interrupted.
+
+A migration can fail. A backup can exist while the restore is broken. Recovery itself can stop halfway through.
+
+The project also needs to decide what evidence should remain after an operation changes something important.
+
+That led to work around append-only audit concepts, backup and restore design, and a recovery ledger.
+
+Some of this is still design and planned work.
+
+A recovery document is not a recovered database.
+
+An append-only audit concept is not a complete audit system.
+
+A backup plan is not trustworthy merely because the word “backup” appears in several issue titles.
+
+Those distinctions matter to me because this project is unusually easy to describe in the future tense. The design is detailed enough that planned behavior can start sounding implemented if I stop paying attention to the verbs.
+
+I had written down what I wanted recovery to guarantee. I still had to build and test most of it.
+
+## Automation needed limits before abilities
+
+The same thing happened with automation.
+
+It is easy to imagine a job tool becoming increasingly autonomous. That is the appealing direction if the only metric is how many manual steps disappear.
+
+It is also how a useful assistant can become a machine that performs consequential external actions with too much confidence.
+
+Before much of that automation existed, I needed to decide how much authority it should have, what would require review and what should never happen silently. Preserving where facts came from was part of making those decisions understandable later.
+
+Cancellation and retries belong to this conversation too.
+
+A retry is not automatically harmless because the first attempt failed. An operation might have effects the caller cannot safely repeat. Cancellation is not merely an error result if work is already waiting, pacing or travelling through the transport.
+
+Deadline handling is one place where a documented constraint has already reached implementation and review.
+
+Other automation and recovery questions remain documented constraints or future work.
+
+## I had more decisions than product
+
+At some point the repository had accumulated ADRs, issues, milestones and security notes faster than visible features.
+
+This looked slightly ridiculous.
+
+I was building a private side project, not preparing a spacecraft for launch.
+
+There were documents about audit integrity and recovery behavior while many ordinary product interactions still did not exist.
+
+I did wonder whether I was using architecture as a particularly organized form of procrastination.
+
+That possibility has not been completely eliminated.
+
+But the questions in those documents were not invented to make the repository look serious.
+
+They came from decisions the code would otherwise make accidentally. The first retry loop could decide what was safe to repeat. The first convenient log statement could decide which sensitive values were recorded. A quick recovery script could become the recovery policy without anybody choosing it deliberately.
+
+Writing those decisions down did not solve them.
+
+It made them difficult to ignore.
+
+## Some of this is probably wrong
+
+An ADR can preserve the reason a choice was made.
+
+It cannot guarantee the choice survives contact with the implementation.
+
+Some decisions have already reached code. Others are still waiting for the part of the project that will put pressure on them.
+
+I expect a few of the ADRs to become embarrassing once more of the system has to work.
+
+I just do not know which ones yet.
