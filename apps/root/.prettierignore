@@ -1,0 +1,7 @@
+reference/
+node_modules/
+.next/
+out/
+.vercel/
+next-env.d.ts
+pnpm-lock.yaml

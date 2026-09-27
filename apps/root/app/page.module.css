@@ -1,0 +1,108 @@
+.description {
+  margin-bottom: 64px;
+}
+
+.places {
+  margin-bottom: 56px;
+}
+
+.sectionHeading {
+  margin: 0 0 18px;
+}
+
+.placesList {
+  display: flex;
+  flex-direction: column;
+}
+
+.place {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 9%, transparent);
+}
+
+.place:last-child {
+  border-bottom: 0;
+}
+
+.placeName {
+  display: block;
+  font-family: var(--font-mono), monospace;
+  font-size: 15px;
+}
+
+.placeDescription {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.arrow {
+  color: var(--subtle);
+  /* Use the reference fallback for symbols outside the loaded font subset. */
+  font-family: "IBM Plex Mono", monospace;
+  transition: color 150ms ease;
+}
+
+.place:hover .arrow {
+  color: var(--accent);
+}
+
+.recentHeading {
+  margin-bottom: 16px;
+}
+
+.recentList {
+  display: grid;
+  grid-template-columns: auto minmax(5rem, auto) 1fr;
+  gap: 8px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: color-mix(in srgb, var(--foreground) 70%, transparent);
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+}
+
+.recentRow {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+.recentRow time {
+  color: color-mix(in srgb, var(--foreground) 45%, transparent);
+}
+
+.source {
+  color: var(--accent);
+}
+
+.message {
+  min-width: 0;
+}
+
+/* Keep messages readable when the three reference columns become too narrow. */
+@media (max-width: 480px) {
+  .recentList {
+    grid-template-columns: auto 1fr;
+  }
+
+  .recentRow {
+    row-gap: 4px;
+  }
+
+  .message {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow {
+    transition: none;
+  }
+}
