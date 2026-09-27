@@ -1,0 +1,29 @@
+---
+import BootSector from "../../components/surfaces/BootSector.astro";
+import ExecutionStates from "../../components/surfaces/ExecutionStates.astro";
+import FilenameClassifier from "../../components/surfaces/FilenameClassifier.astro";
+import type { InferGetStaticPropsType } from "astro";
+import ExperimentLayout from "../../layouts/ExperimentLayout.astro";
+import { experiments } from "../../data/experiments";
+
+export function getStaticPaths() {
+  return experiments.map((experiment) => ({
+    params: { slug: experiment.slug },
+    props: { experiment },
+  }));
+}
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { experiment } = Astro.props as Props;
+---
+
+<ExperimentLayout experiment={experiment}>
+  {experiment.surface === "filename-classifier" && (
+    <FilenameClassifier slot="surface" />
+  )}
+  {experiment.surface === "execution-states" && (
+    <ExecutionStates slot="surface" />
+  )}
+  {experiment.surface === "boot-sector" && <BootSector slot="surface" />}
+</ExperimentLayout>

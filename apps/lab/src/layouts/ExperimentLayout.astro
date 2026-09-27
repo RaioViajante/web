@@ -1,0 +1,154 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import type { Experiment } from "../data/experiments";
+
+interface Props {
+  experiment: Experiment;
+}
+
+const { experiment } = Astro.props;
+const layout = experiment.layout ?? "canonical";
+// Derived from the data record rather than Astro.slots.has("surface"): that
+// check reflects whether the parent's template contains a slot="surface"
+// node at all, not whether the conditional inside it actually rendered
+// anything — so it stayed true even for experiments with no surface.
+const hasSurface = experiment.surface != null;
+---
+
+<BaseLayout pageTitle={experiment.title} description={experiment.description}>
+  <main class="experiment-main">
+    <div class="container">
+      <a href="/" class="back-link">
+        ← lab/
+      </a>
+
+      <h1 class="exp-title">
+        {experiment.id} / {experiment.title}
+      </h1>
+
+      <dl class="metadata">
+        <dt>status</dt>
+        <dd
+          class:list={[
+            "status",
+            { "status--active": experiment.status === "active" },
+          ]}
+        >
+          {experiment.status}
+        </dd>
+        <dt>created</dt>
+        <dd>{experiment.created}</dd>
+        {experiment.source && (
+          <>
+            <dt>source</dt>
+            <dd>
+              <a
+                href={experiment.source}
+                target="_blank"
+                rel="noreferrer noopener"
+                class="source-link"
+              >
+                github ↗
+              </a>
+            </dd>
+          </>
+        )}
+      </dl>
+
+      <div class="section-label what-label">what</div>
+      <p class="prose what">{experiment.what}</p>
+
+      {hasSurface && <div class="section-label surface-label">experiment</div>}
+    </div>
+
+    {hasSurface && (
+      <div
+        class={
+          layout === "wide" ? "surface surface--wide" : "container surface"
+        }
+      >
+        <slot name="surface" />
+      </div>
+    )}
+
+    {experiment.notes && (
+      <div class="container">
+        <div class="section-label notes-label">notes</div>
+        <p class="prose notes">{experiment.notes}</p>
+      </div>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .experiment-main {
+    padding-block: 0.5rem 4rem;
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .exp-title {
+    font-family: var(--font-mono);
+    font-size: 1.35rem;
+    font-weight: 400;
+    margin: 1.25rem 0 1.5rem;
+  }
+
+  .metadata {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.4rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    margin: 0 0 2.25rem;
+  }
+
+  .metadata dt {
+    color: var(--muted);
+  }
+
+  .metadata dd {
+    margin: 0;
+    color: var(--fg);
+  }
+
+  .status--active {
+    color: var(--accent);
+  }
+
+  .source-link {
+    color: var(--accent);
+  }
+
+  .what-label {
+    margin-bottom: 0.6rem;
+  }
+
+  .what {
+    margin: 0 0 2.25rem;
+  }
+
+  .surface-label {
+    margin-bottom: 0.9rem;
+  }
+
+  .surface {
+    margin-bottom: 2.25rem;
+  }
+
+  .surface--wide {
+    width: 100%;
+  }
+
+  .notes-label {
+    margin: 0.5rem 0 0.6rem;
+  }
+
+  .notes {
+    font-size: 1rem;
+  }
+</style>

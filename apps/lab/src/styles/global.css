@@ -1,0 +1,120 @@
+/*
+ * RaioViajante shared visual identity, adapted for lab.raioviajante.com.
+ *
+ * Palette values match the approved Claude Design export
+ * (reference/claude-export/Lab.dc.html) exactly. Light is the default so the
+ * page renders correctly before the anti-flash script below runs (e.g. with
+ * JS disabled); [data-theme="dark"] overrides it, matching the pattern used
+ * by raioviajante.com and dump.
+ */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f1ec;
+  --fg: #211f24;
+  --accent: #6d4fa6;
+  /* The design export's own 58% reads as ~3.9:1 against this background,
+     short of WCAG AA (4.5:1) at the small sizes muted text is used at here.
+     raioviajante.com and dump hit the exact same shortfall in their own
+     light themes and settled on 65% to clear it (paper holds less contrast
+     than charcoal) — reused here rather than picking a new number. */
+  --muted: color-mix(in srgb, var(--fg) 65%, transparent);
+  --border: color-mix(in srgb, var(--fg) 14%, transparent);
+  --cell: color-mix(in srgb, var(--fg) 5%, transparent);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #18161b;
+  --fg: #ece7e0;
+  --accent: #c3b3e0;
+  --muted: color-mix(in srgb, var(--fg) 55%, transparent);
+  --border: color-mix(in srgb, var(--fg) 12%, transparent);
+  --cell: color-mix(in srgb, var(--fg) 6%, transparent);
+}
+
+:root {
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-serif: "Source Serif 4", ui-serif, Georgia, serif;
+
+  /* Canonical RaioViajante shell: the same 680px column and fluid gutter
+	   used by raioviajante.com, dump, and docs. Every primary surface
+	   (header, homepage, experiment metadata/prose, footer) shares this. */
+  --content-width: 680px;
+  --gutter: clamp(1rem, 4vw, 1.25rem);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  line-height: 1.6;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-serif);
+  font-size: 16px;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The canonical container: every header/main/footer surface centers its
+   content at --content-width with the same fluid gutter on both sides. */
+.container {
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Shared across the homepage list and the experiment page metadata
+   sections: a small, letter-spaced mono label introducing a block of
+   content ("experiments/", "what", "experiment", "notes"). */
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* Shared editorial prose voice — "mono identifies, serif speaks". */
+.prose {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--fg);
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+}

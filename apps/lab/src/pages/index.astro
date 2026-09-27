@@ -1,0 +1,132 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { experiments } from "../data/experiments";
+---
+
+<BaseLayout>
+  <main class="container home-main">
+    <div class="intro">
+      <div class="heading">lab/</div>
+      <p class="lede">things may break.</p>
+      <p class="description">
+        experiments, prototypes and ideas that haven't decided what they are
+        yet.
+      </p>
+    </div>
+
+    <div class="section-label">experiments/</div>
+
+    <ul class="experiment-list">
+      {experiments.map((experiment) => (
+        <li>
+          <a href={`/experiments/${experiment.slug}/`} class="experiment-row">
+            <span class="number">{experiment.id}</span>
+            <span class="titling">
+              <span class="title">{experiment.title}</span>
+              <span class="description">{experiment.description}</span>
+            </span>
+            <span
+              class:list={[
+                "status",
+                { "status--active": experiment.status === "active" },
+              ]}
+            >
+              {experiment.status}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </main>
+</BaseLayout>
+
+<style>
+  .home-main {
+    padding-block: 0.5rem 4rem;
+  }
+
+  .intro {
+    margin-bottom: 2.75rem;
+  }
+
+  .heading {
+    font-family: var(--font-mono);
+    font-size: 1.6rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .lede {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    margin: 0 0 0.75rem;
+  }
+
+  .intro .description {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    margin: 0;
+    max-width: 52ch;
+    color: var(--muted);
+  }
+
+  .section-label {
+    margin-bottom: 0.5rem;
+  }
+
+  .experiment-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .experiment-row {
+    display: grid;
+    grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: baseline;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--fg);
+  }
+
+  .experiment-row:hover .title {
+    color: var(--accent);
+  }
+
+  .number {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .titling {
+    min-width: 0;
+  }
+
+  .title {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--fg);
+  }
+
+  .titling .description {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+    line-height: 1.4;
+  }
+
+  .status {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    justify-self: end;
+    white-space: nowrap;
+  }
+
+  .status--active {
+    color: var(--accent);
+  }
+</style>

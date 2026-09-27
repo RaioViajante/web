@@ -1,0 +1,25 @@
+# Build output
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env*
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor/OS
+.DS_Store
+*.tsbuildinfo
+
+# Local-only design reference material
+reference/
+
+# Vercel
+.vercel
