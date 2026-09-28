@@ -1,0 +1,50 @@
+name: CI
+
+# Validates every app in the workspace on pull requests and pushes to main.
+# Vercel remains solely responsible for deploying; this workflow never does.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Public, not a secret: dump's canonical origin, so CI validates the site as
+  # it actually ships instead of falling back to the localhost dev origin.
+  NEXT_PUBLIC_SITE_URL: https://dump.raioviajante.com
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Reject npm and yarn lockfiles
+        run: |
+          stray=$(find . -path '*/node_modules' -prune -o \( -name package-lock.json -o -name yarn.lock \) -print)
+          if [ -n "$stray" ]; then
+            echo "Only pnpm-lock.yaml is allowed. Remove:"
+            echo "$stray"
+            exit 1
+          fi
+
+      # Reads the pnpm version from package.json#packageManager.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # format:check, lint, typecheck, test and build across every app.
+      - run: pnpm validate
