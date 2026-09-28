@@ -55,7 +55,7 @@ pnpm install
 pnpm run dev
 ```
 
-Node 24 (`.nvmrc`). Checks:
+Node 24 (pinned in the repository root `.nvmrc`). Checks:
 
 ```
 pnpm run lint

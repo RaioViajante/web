@@ -2,7 +2,7 @@
 
 ## Source of truth
 
-The approved Claude Design export lives at [`../reference/claude-export/`](../reference/claude-export/) (`Lab.dc.html`). It is read-only visual reference material: never modify, move, format, or commit it. Implement the intended design it represents, not any implementation bug introduced by the design environment itself. Bugs already identified and rejected during design iteration, which must not be reintroduced:
+The approved Claude Design export was kept locally at `reference/claude-export/` (`Lab.dc.html`), untracked and not part of the monorepo checkout. Where available, it is read-only visual reference material: never modify, move, format, or commit it. Implement the intended design it represents, not any implementation bug introduced by the design environment itself. Bugs already identified and rejected during design iteration, which must not be reintroduced:
 
 - Experiment surfaces growing to viewport width instead of staying inside the canonical column.
 - Parser playground tokens exploding vertically instead of a compact two-column layout.

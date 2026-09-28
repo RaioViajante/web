@@ -6,20 +6,21 @@
 raioviajante.com -> Vercel
 ```
 
-The production domain is raioviajante.com. The application deploys to Vercel
-from its GitHub repository (`RaioViajante/raioviajante.com`): pushes to `main`
-are expected to produce production deployments, with preview deployments for
-other branches and pull requests.
+The production domain is raioviajante.com; `www.raioviajante.com` redirects to
+it. The app deploys from the `RaioViajante/web` monorepo with `apps/root` as
+the Vercel project's Root Directory. The shared production topology, build
+settings, and rollout requirements are documented in the repository-level
+[deployment guide](../../../docs/deployment.md).
 
-Vercel detects the Next.js App Router project automatically and runs
-`pnpm install` and `pnpm build`. No `vercel.json` or other Vercel-specific
-configuration is required; keep it that way unless a real need appears.
+Vercel detects the Next.js App Router project automatically. No `vercel.json`
+or other Vercel-specific configuration is required; keep it that way unless a
+real need appears.
 
 ## Related deployments
 
 dump.raioviajante.com, lab.raioviajante.com, and docs.raioviajante.com are
-independently deployed applications outside this repository. Never implement
-them as local routes here; see [architecture](architecture.md).
+separate apps in the same monorepo, each deployed by its own Vercel project.
+Never implement them as local routes here; see [architecture](architecture.md).
 
 ## Future redirect
 

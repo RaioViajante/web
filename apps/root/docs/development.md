@@ -3,7 +3,9 @@
 ## Requirements and commands
 
 Use Node.js 24 or newer and pnpm 12.4.1 (recorded in `package.json`).
-Run commands from the repository root.
+Run these commands from `apps/root`, or from the monorepo root as
+`pnpm --filter @raioviajante/root <script>`; see the repository-level
+[development guide](../../../docs/development.md).
 
 | Command             | Purpose                                                |
 | ------------------- | ------------------------------------------------------ |
@@ -29,9 +31,10 @@ Run commands from the repository root.
 - Inspect existing work before editing. Keep `reference/` read-only and excluded
   from Git, ESLint, Prettier, and TypeScript.
 - `next.config.ts` disables generated agent rules to preserve `AGENTS.md`.
-  `pnpm-workspace.yaml` enables the native resolver build script used by ESLint.
-- Commit `pnpm-lock.yaml` with dependency changes. Generated Next.js files,
-  dependencies, and local environment files are ignored.
+  The monorepo's root `pnpm-workspace.yaml` allows the native resolver build
+  script used by ESLint.
+- Commit the root `pnpm-lock.yaml` with dependency changes. Generated Next.js
+  files, dependencies, and local environment files are ignored.
 - Make meaningful, coherent commits using the Git rules in [AGENTS.md](../AGENTS.md).
 
 ## Validation

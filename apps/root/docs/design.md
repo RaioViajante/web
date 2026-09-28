@@ -3,8 +3,8 @@
 ## Source of truth
 
 `/refence/claude-export/` is the approved visual source of truth named in the
-project brief. Its actual location in this checkout is
-[`../reference/claude-export/`](../reference/claude-export/). Keep it read-only:
+project brief. It was kept locally at `reference/claude-export/`, untracked,
+and is not part of the monorepo checkout. Where available, keep it read-only:
 do not modify, move, rename, delete, or build the application inside it.
 
 Use the approved Home, Projects, Now, Nav, and Footer exports. Their page styles

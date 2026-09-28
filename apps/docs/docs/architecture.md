@@ -6,10 +6,10 @@ RaioViajante's internet presence is split across separate subdomains, each with 
 
 - **`raioviajante.com`** — root / personal internet home
 - **`dump.raioviajante.com`** — writing
-- **`docs.raioviajante.com`** — public technical documentation (this repository)
+- **`docs.raioviajante.com`** — public technical documentation (this app)
 - **`lab.raioviajante.com`** — experiments
 
-Each subdomain is expected to be its own repository and its own deployment. This repository covers only `docs.raioviajante.com`.
+Each subdomain is its own app in the `RaioViajante/web` monorepo and its own deployment. This app, `apps/docs`, covers only `docs.raioviajante.com`.
 
 ## Role of this site
 
@@ -17,9 +17,9 @@ Each subdomain is expected to be its own repository and its own deployment. This
 
 ## Repository documentation vs. public documentation
 
-This repository maintains a strict separation between two kinds of documentation:
+This app maintains a strict separation between two kinds of documentation:
 
-- **Repository documentation** — lives in `docs/` (this directory). It documents how to develop, maintain, and reason about this repository itself: architecture, content philosophy, design system, development workflow, deployment. It is read by contributors and agents, not published to the site.
+- **Repository documentation** — lives in `docs/` (this directory, `apps/docs/docs/`). It documents how to develop, maintain, and reason about this app itself: architecture, content philosophy, design system, development workflow, deployment. It is read by contributors and agents, not published to the site. Monorepo-wide documentation lives in the repository root's `docs/`.
 - **Public documentation** — lives in `src/content/docs/`, rendered by Starlight as the actual pages of docs.raioviajante.com.
 
 Do not place public-facing content in `docs/`, and do not place repository-maintenance notes in `src/content/docs/`.

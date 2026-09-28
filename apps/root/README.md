@@ -42,9 +42,10 @@ and production commands.
 ## Visual reference
 
 The approved Claude Design reference is identified in the project brief as
-`/refence/claude-export/`. In this checkout, it is located at
-[`reference/claude-export/`](reference/claude-export/). It is read-only visual
-reference material: do not modify, move, rename, delete, or build inside it.
+`/refence/claude-export/` and was kept locally at `reference/claude-export/`.
+It is not tracked in Git and is not part of the monorepo checkout. Where it is
+available, it is read-only visual reference material: do not modify, move,
+rename, delete, or build inside it.
 
 ## Documentation
 

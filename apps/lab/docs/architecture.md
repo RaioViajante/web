@@ -2,12 +2,12 @@
 
 ## The RaioViajante ecosystem
 
-RaioViajante's internet presence is split across separate subdomains, each its own repository and its own deployment:
+RaioViajante's internet presence is split across separate subdomains, each its own app in the `RaioViajante/web` monorepo and its own deployment:
 
 - **`raioviajante.com`** — identity / personal index
 - **`dump.raioviajante.com`** — writing and thoughts
 - **`docs.raioviajante.com`** — stable public technical documentation
-- **`lab.raioviajante.com`** — experiments (this repository)
+- **`lab.raioviajante.com`** — experiments (this app)
 
 ## Role of this site
 

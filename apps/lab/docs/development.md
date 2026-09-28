@@ -13,7 +13,7 @@ Node.js 24 or newer, pnpm (recorded in `package.json`).
 | `pnpm build`        | Type-check (`astro check`) then build for production into `dist/`. |
 | `pnpm preview`      | Serve the production build locally.                                |
 | `pnpm check`        | Run Astro/TypeScript diagnostics (`astro check`).                  |
-| `pnpm typecheck`    | Alias for `pnpm check`, kept for cross-repo consistency.           |
+| `pnpm typecheck`    | Alias for `pnpm check`, used by the monorepo's `pnpm typecheck`.   |
 | `pnpm lint`         | Run ESLint.                                                        |
 | `pnpm format`       | Apply Prettier formatting.                                         |
 | `pnpm format:check` | Check formatting with Prettier without writing.                    |

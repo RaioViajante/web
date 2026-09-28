@@ -2,7 +2,7 @@
 
 **Canonical `dump` origin: `https://dump.raioviajante.com`**
 
-The apex `raioviajante.com` and `www.raioviajante.com` are intentionally **not** configured for this project — the apex stays free for a future root RaioViajante site. This project owns only the `dump` subdomain.
+The apex `raioviajante.com` and `www.raioviajante.com` belong to the root app's Vercel project, not to this one. This project owns only the `dump` subdomain.
 
 Origin resolution is centralized in `lib/site.ts` (`resolveSiteUrl()`), priority order:
 
@@ -14,14 +14,10 @@ Origin resolution is centralized in `lib/site.ts` (`resolveSiteUrl()`), priority
 
 ## Vercel configuration
 
-Done:
-
-- Project `dump` (`prj_aLr1Ds2A7hb3oEcwchcU7r3map69`), under the `bryanalvarenga-5889s-projects` scope.
-- Custom domain `dump.raioviajante.com` added and verified (`vercel domains verify` → `configured-correctly`).
+- Vercel project `dump`, deployed from the `RaioViajante/web` monorepo with `apps/dump` as the Root Directory. Deployments come from Vercel's Git integration on `main`; see the repository-level [deployment guide](../../../docs/deployment.md).
+- Custom domain `dump.raioviajante.com` added and verified.
 - `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com` set on the **Production** environment only.
-- Deployed and live at the canonical origin (issue #23).
-
-**Known gap:** Vercel's GitHub App failed to auto-connect this repository when the project was created, and re-checking since (`vercel project inspect dump`) still shows no Git Repository link. Deployment is currently **CLI-only** (`vercel deploy --prod` from a local checkout) — pushing to `main` does not trigger a deploy. Fixing the connection is an interactive step (authorizing Vercel's GitHub App for `RaioViajante/dump`) not attempted here; once connected, Preview/Production deploys and PR checks come from Vercel's own Git integration automatically, no config change needed on this side.
+- Live at the canonical origin since `RaioViajante/dump#23`, before the monorepo migration.
 
 ## Cloudflare DNS
 
@@ -35,7 +31,7 @@ Configured and live, in the `raioviajante.com` zone:
 | Proxy status | DNS only                                                                                          |
 | TTL          | Auto                                                                                              |
 
-No other record on the zone was touched. The apex (`raioviajante.com`) and `www` remain unconfigured, as intended.
+This record belongs to dump. The apex (`raioviajante.com`) and `www` records serve the root app and are not part of this project.
 
 ## What's already correct in the app (no code changes needed)
 

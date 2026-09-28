@@ -8,7 +8,7 @@ RaioViajante's internet presence is split across a few properties, each with a d
 
 - `raioviajante.com` — root / personal internet home
 - `dump.raioviajante.com` — writing
-- `docs.raioviajante.com` — public technical documentation (this repository)
+- `docs.raioviajante.com` — public technical documentation (this app)
 - `lab.raioviajante.com` — experiments
 
 This site is the public technical documentation layer. It is not a portfolio, not a blog, not a marketing site, and not a mirror of every repository's internal `docs/` directory.
@@ -26,7 +26,7 @@ Only documentation that is genuinely worth organizing and making navigable for t
 
 These are two different concepts:
 
-- **Repository documentation** (`docs/` in this repo) — internal documentation about developing and maintaining this repository itself.
+- **Repository documentation** (`docs/` in this app, i.e. `apps/docs/docs/`) — internal documentation about developing and maintaining this app itself.
 - **Public documentation** (`src/content/docs/`) — the actual content rendered on docs.raioviajante.com.
 
 See [`docs/architecture.md`](docs/architecture.md) and [`AGENTS.md`](AGENTS.md) for more detail on this distinction.
