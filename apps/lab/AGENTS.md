@@ -1,58 +1,50 @@
-# AGENTS.md
+# AGENTS.md — apps/lab
 
-Primary instruction file for coding agents working in this repository. Read this before making any changes.
+App-specific instructions for `@raioviajante/lab`. Repository-wide rules are in
+the root `AGENTS.md`.
 
-## Project purpose
+## Purpose
 
-`lab.raioviajante.com` is the experimental part of the RaioViajante internet identity, alongside `raioviajante.com` (identity / personal index), `dump.raioviajante.com` (writing and thoughts), and `docs.raioviajante.com` (stable public technical documentation). It hosts experiments, prototypes, and technical curiosities that haven't decided what they are yet. It is not a portfolio, blog, or stable documentation.
+This app serves lab.raioviajante.com: experiments, prototypes, and technical
+curiosities that have not decided what they are yet. It is not a portfolio,
+blog, or stable documentation.
 
-Core rule: **the shell is consistent, the experiments are allowed to misbehave.** The global shell (header, footer, theme, canonical content width) stays disciplined and unmistakably RaioViajante. An individual experiment surface may introduce specialized interaction, but experiments do not get permission to redesign the site around themselves.
-
-## Repository language
-
-Everything in this repository is written in English: filenames, documentation, code, comments (when necessary), commit messages, metadata, and configuration descriptions. No exceptions.
+Core rule: **the shell is consistent, the experiments are allowed to
+misbehave.** The global shell (header, footer, theme selector, canonical content
+width) stays disciplined and unmistakably RaioViajante. An experiment may
+introduce a specialized interactive surface inside its own content area, but it
+must not redesign or destabilize the shell.
 
 ## Stack
 
-Astro, TypeScript, pnpm. Static-first architecture — no React, Vue, Svelte, or another UI framework unless a specific future experiment genuinely requires client-side interactivity beyond what a small inline script can provide. Do not add dependencies that aren't clearly needed.
+Astro and TypeScript, static-first. No React, Vue, Svelte, or other UI framework
+unless a specific experiment needs more client-side interactivity than a small
+inline script can provide.
 
-## Visual identity
+## Experiments
 
-Preserve the shared RaioViajante identity described in [`docs/design.md`](docs/design.md):
+- Experiment data is centralized in `src/data/experiments.ts`, not hardcoded in
+  page markup. Do not add a database or CMS.
+- Experiment pages default to the canonical 680px column. Opt into the `wide`
+  layout only when an experiment genuinely needs more horizontal space.
+- Keep each experiment's code isolated to its own surface component and helpers.
+- Experiments are real, provenance-backed content. Follow
+  [docs/content.md](docs/content.md) for immutable numbering, publication dates,
+  and public source links. Never present planned project functionality as
+  implemented, and do not invent fictional technical content.
 
-- Canonical content width: 680px, with a `clamp(1rem, 4vw, 1.25rem)` responsive gutter.
-- Dark theme: background `#18161b`, foreground `#ece7e0`, accent `#c3b3e0`.
-- Typography: IBM Plex Mono for identity, navigation, paths, labels, metadata, and code-adjacent UI; Source Serif 4 for prose and editorial voice. **Mono identifies. Serif speaks.**
-- The same theme selector (fixed bottom-left, small, circular, understated) used across the ecosystem, ported from the real sibling implementations, not reinvented.
+## Design
 
-Do not redesign the approved Claude Design direction. If the exported prototype contains implementation bugs from the design environment (e.g. experiment surfaces growing to viewport width), reproduce the intended design, not the bug — see `docs/design.md` for the specific list.
+- Follow [docs/design.md](docs/design.md) for the shared shell: the 680px column
+  with a `clamp(1rem, 4vw, 1.25rem)` gutter, the color tokens, and the rule that
+  mono identifies and serif speaks.
+- The original design export was kept locally at `reference/claude-export/`. It
+  is untracked and not part of the monorepo; where a local copy exists, treat it
+  as read-only and never format, build in, or commit it. Implement the intended
+  design, not bugs from the design environment listed in `docs/design.md`.
+- No dashboards, fake browser or terminal chrome, or unnecessary animation.
 
-## Reference material
+## UI validation
 
-The approved Claude Design export lives at [`reference/claude-export/`](reference/claude-export/). Treat it as **read-only**: never modify, move, rename, delete, format, or build inside it, and never commit it — it is excluded via `.gitignore`. Inspect it for visual truth; implement cleanly in the real application instead of copying its markup.
-
-## Experiment content model
-
-Experiment data is centralized (`src/data/experiments.ts` or equivalent) rather than hardcoded into page markup, so adding, removing, or reordering experiments is trivial. Do not build a database or a CMS.
-
-Experiment pages default to the canonical 680px column. An experiment may opt into a wider `wide` layout only when it genuinely needs more horizontal space; `canonical` is the default and `experiment` must never be treated as a synonym for full-width.
-
-## Git workflow
-
-- Every meaningful unit of work results in its own commit.
-- Use Conventional Commits, in English (e.g. `feat: implement lab experiment index`).
-- One coherent change per commit. Never mix unrelated work.
-- Always inspect `git status` and `git diff` before staging and committing.
-- Never write vague commit messages.
-- Do not push unless explicitly asked to.
-- Do not rewrite history (no `--amend` on existing work, no rebase) unless explicitly asked.
-- Never force push.
-
-## Working principles
-
-- Prefer simple architecture over clever architecture. No premature abstractions, no speculative flexibility.
-- Keep dependencies minimal.
-- Inspect existing code and docs before modifying anything.
-- Validate work before committing: run the project's format, lint, typecheck, and build scripts (see `docs/development.md`).
-- Do not invent substantial fictional technical content for the demonstration experiments — they exist to establish the reusable page system, not to document real projects.
-- Do not turn this site into a generic dashboard or documentation-SaaS look-alike: no cards, no bento grids, no glassmorphism, no glowing gradients, no decorative blobs, no fake browser/terminal chrome, no unnecessary animation.
+For UI changes, also follow the manual verification checklist in
+[docs/development.md](docs/development.md).
