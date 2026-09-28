@@ -1,5 +1,5 @@
 {
-  "name": "dump",
+  "name": "@raioviajante/dump",
   "version": "0.1.0",
   "private": true,
   "description": "a memory dump, hopefully readable.",
