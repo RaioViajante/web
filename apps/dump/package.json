@@ -5,13 +5,14 @@
   "description": "a memory dump, hopefully readable.",
   "license": "MIT",
   "author": "RaioViajante",
-  "homepage": "https://github.com/RaioViajante/dump#readme",
+  "homepage": "https://github.com/RaioViajante/web/tree/main/apps/dump#readme",
   "bugs": {
     "url": "https://github.com/RaioViajante/dump/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RaioViajante/dump.git"
+    "url": "git+https://github.com/RaioViajante/web.git",
+    "directory": "apps/dump"
   },
   "packageManager": "pnpm@12.4.1",
   "engines": {

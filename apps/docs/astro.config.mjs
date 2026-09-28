@@ -20,7 +20,7 @@ export default defineConfig({
 			titleDelimiter: '—',
 			favicon: '/icon.png?v=2',
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RaioViajante/docs' },
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RaioViajante/web' },
 			],
 			customCss: ['./src/styles/theme.css'],
 			components: {
