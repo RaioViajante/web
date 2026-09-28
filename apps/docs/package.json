@@ -3,11 +3,13 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "packageManager": "pnpm@12.4.1",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "typecheck": "astro check",
     "astro": "astro"
   },
   "dependencies": {

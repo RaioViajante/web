@@ -1,0 +1,16 @@
+{
+  "name": "@raioviajante/web",
+  "private": true,
+  "packageManager": "pnpm@12.4.1",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "format:check": "pnpm -r --if-present format:check",
+    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  }
+}
