@@ -49,14 +49,23 @@ const { fixed = true } = Astro.props;
 
 			button.addEventListener('click', () => {
 				const next: Theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-				localStorage.setItem(storageKey, next);
 				document.documentElement.dataset.theme = next;
 				this.reflect(next, button);
+				try {
+					localStorage.setItem(storageKey, next);
+				} catch {
+					// The theme still changes when storage is unavailable; it just isn't persisted.
+				}
 			});
 
 			// Follow the system preference for as long as the visitor hasn't picked a theme here.
 			matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
-				if (localStorage.getItem(storageKey)) return;
+				try {
+					if (localStorage.getItem(storageKey)) return;
+				} catch {
+					// Storage is unavailable, so an in-page choice can't be told apart from none.
+					return;
+				}
 				const theme = getPreferredTheme();
 				document.documentElement.dataset.theme = theme;
 				this.reflect(theme, button);
