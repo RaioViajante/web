@@ -51,20 +51,20 @@ See `content/README.md` for the rest.
 ## Development
 
 ```
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 Node 24 (`.nvmrc`). Checks:
 
 ```
-npm run lint
-npm run typecheck
-npm run test
-npm run build
+pnpm run lint
+pnpm run typecheck
+pnpm run test
+pnpm run build
 ```
 
-`npm run format` applies Prettier.
+`pnpm run format` applies Prettier.
 
 ## Structure
 

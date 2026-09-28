@@ -5,7 +5,7 @@ out
 build
 coverage
 .vercel
-package-lock.json
+pnpm-lock.yaml
 next-env.d.ts
 
 # Content is authored prose — don't let the formatter reflow it.
