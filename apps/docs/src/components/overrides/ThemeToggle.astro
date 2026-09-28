@@ -50,7 +50,10 @@ const { fixed = true } = Astro.props;
 			button.addEventListener('click', () => {
 				const next: Theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
 				document.documentElement.dataset.theme = next;
-				this.reflect(next, button);
+				// Keep every mounted instance (fixed and mobile-menu) in step, not just this one.
+				document.querySelectorAll<ThemeToggle>('theme-toggle').forEach((toggle) => {
+					toggle.reflect(next, toggle.querySelector('button')!);
+				});
 				try {
 					localStorage.setItem(storageKey, next);
 				} catch {
