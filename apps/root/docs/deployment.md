@@ -9,7 +9,7 @@ raioviajante.com -> Vercel
 The production domain is raioviajante.com; `www.raioviajante.com` redirects to
 it. The app deploys from the `RaioViajante/web` monorepo with `apps/root` as
 the Vercel project's Root Directory. The shared production topology, build
-settings, and rollout requirements are documented in the repository-level
+settings, and Ignored Build Step are documented in the repository-level
 [deployment guide](../../../docs/deployment.md).
 
 Vercel detects the Next.js App Router project automatically. No `vercel.json`

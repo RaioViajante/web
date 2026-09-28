@@ -4,6 +4,6 @@ docs.raioviajante.com is deployed by its own Vercel project, `docs`, from the
 `RaioViajante/web` monorepo with `apps/docs` as the Root Directory. Astro's
 static output (`dist/`) is what gets served.
 
-The shared production topology, build settings, and rollout requirements are
+The shared production topology, build settings, and Ignored Build Step are
 documented in the repository-level
 [deployment guide](../../../docs/deployment.md).

@@ -19,37 +19,32 @@
   `vercel.json`.
 - DNS for `raioviajante.com` is managed in Cloudflare.
 
+## Build and install
+
+All four projects build from the pnpm workspace. Vercel detects pnpm 12.4.1
+from `packageManager` and installs from the root `pnpm-lock.yaml`, using the
+install-script policy in the root `pnpm-workspace.yaml`. Each install covers
+the whole workspace; the build then runs in the project's Root Directory.
+
 ## Ignored Build Step
 
-Every project skips builds for commits that do not affect it. The command runs
-from the project's Root Directory, so `.` is the app directory. Exit code `1`
-builds; `0` skips.
-
-**Currently configured on all four projects:**
-
-```sh
-git diff HEAD^ HEAD --quiet -- .
-```
-
-**Required before the pnpm workspace reaches production.** The workspace moves
-install configuration to the repository root, so root-level changes must also
-trigger builds:
+Every project skips builds for commits that do not affect it. All four projects
+use:
 
 ```sh
 git diff HEAD^ HEAD --quiet -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml
 ```
 
-At the time of writing, production still runs the layout from before the
-workspace, where each app had its own lockfile. Rolling out the workspace also
-changes each project's package manager, which should be confirmed with preview
-deployments before `main` moves:
+The command runs from the project's Root Directory. Exit code `1` builds; `0`
+skips. The paths cover:
 
-| Project            | Before the workspace | With the workspace |
-| ------------------ | -------------------- | ------------------ |
-| `raioviajante.com` | pnpm 12.4.1          | pnpm 12.4.1        |
-| `dump`             | npm                  | pnpm 12.4.1        |
-| `docs`             | pnpm 10              | pnpm 12.4.1        |
-| `lab`              | pnpm 10              | pnpm 12.4.1        |
+- `.` — changes inside the app's own directory.
+- `../../package.json` — root workspace scripts and package-manager metadata.
+- `../../pnpm-lock.yaml` — dependency changes, which may affect any app.
+- `../../pnpm-workspace.yaml` — workspace membership and install-script policy.
+
+The command compares only the latest commit with its parent, so a push of
+several commits is judged by its last commit.
 
 ## Environment
 
@@ -59,6 +54,7 @@ The other apps do not use custom environment variables.
 
 ## Shared packages
 
-No shared packages exist yet. When an app starts consuming code from a future
-`packages/` directory, that app's Ignored Build Step must also list the shared
-paths it depends on, so a shared change rebuilds every consumer.
+No shared packages exist yet; there is no `packages/` directory. When an app
+starts consuming code from a future shared package, that app's Ignored Build
+Step must also list the shared paths it depends on, so a shared change rebuilds
+every consumer.

@@ -25,6 +25,15 @@ Every historical commit was rewritten only to move its files under
 
 Commit SHAs are different from the originals, because the tree paths changed.
 
+## Package management after the import
+
+Before the monorepo, each app had its own lockfile and package manager: dump
+used npm, root used pnpm 12.4.1, and docs and lab were built with pnpm 10 on
+Vercel. The pnpm workspace replaced them with one root lockfile; all four apps
+now build with pnpm 12.4.1. Merging the per-app lockfiles reconciled a few
+transitive dependency versions, recorded in the `chore: establish pnpm
+workspace` commit.
+
 ## Historical references
 
 Issue references such as `#20` in imported dump commit messages refer to the
