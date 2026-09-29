@@ -11,9 +11,9 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f4f1ec;
-  --fg: #211f24;
-  --accent: #6d4fa6;
+  --bg: #f4f2ef;
+  --fg: #201e1d;
+  --accent: #4a3d68;
   /* The design export's own 58% reads as ~3.9:1 against this background,
      short of WCAG AA (4.5:1) at the small sizes muted text is used at here.
      raioviajante.com and dump hit the exact same shortfall in their own
