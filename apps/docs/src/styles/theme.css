@@ -106,6 +106,8 @@
 	--rv-bg: #f4f2ef;
 	--rv-fg: #201e1d;
 	--rv-accent: #4a3d68;
+	/* Paper holds less contrast than charcoal: muted text needs a heavier mix to clear AA. */
+	--sl-color-gray-3: color-mix(in srgb, var(--rv-fg) 65%, transparent);
 }
 
 ::selection {
