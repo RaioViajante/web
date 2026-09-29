@@ -313,7 +313,7 @@ button[data-open-modal] {
 	padding-inline: 0;
 	width: auto;
 	max-width: none;
-	color: color-mix(in srgb, var(--rv-fg) 55%, transparent);
+	color: var(--sl-color-gray-3);
 }
 
 button[data-open-modal]:hover {
