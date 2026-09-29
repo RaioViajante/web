@@ -1,8 +1,8 @@
 /*
  * RaioViajante shared visual identity, adapted for lab.raioviajante.com.
  *
- * Palette values match the approved Claude Design export
- * (reference/claude-export/Lab.dc.html) exactly. Light is the default so the
+ * Base bg/fg/accent values are the shared RaioViajante palette; derived
+ * treatments (muted, border, cell) are lab's own. Light is the default so the
  * page renders correctly before the anti-flash script below runs (e.g. with
  * JS disabled); [data-theme="dark"] overrides it, matching the pattern used
  * by raioviajante.com and dump.
