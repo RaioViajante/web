@@ -103,9 +103,9 @@
 }
 
 :root[data-theme='light'] {
-	--rv-bg: #f4f1ec;
-	--rv-fg: #201e23;
-	--rv-accent: #6d4fa8;
+	--rv-bg: #f4f2ef;
+	--rv-fg: #201e1d;
+	--rv-accent: #4a3d68;
 }
 
 ::selection {
