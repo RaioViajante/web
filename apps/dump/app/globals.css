@@ -82,7 +82,7 @@ body {
 main,
 .site-footer {
   width: 100%;
-  max-width: var(--site-width);
+  max-width: calc(var(--site-width) + 2 * var(--page-gutter));
   margin-inline: auto;
   padding-inline: var(--page-gutter);
 }
