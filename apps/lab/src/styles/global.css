@@ -21,6 +21,8 @@
      than charcoal) — reused here rather than picking a new number. */
   --muted: color-mix(in srgb, var(--fg) 65%, transparent);
   --border: color-mix(in srgb, var(--fg) 15%, transparent);
+  /* Editable fields share the page fill, so their border alone marks them: 3:1 minimum. */
+  --field-border: color-mix(in srgb, var(--fg) 49%, transparent);
   --cell: color-mix(in srgb, var(--fg) 5%, transparent);
 }
 
@@ -31,6 +33,7 @@
   --accent: #c3b3e0;
   --muted: color-mix(in srgb, var(--fg) 55%, transparent);
   --border: color-mix(in srgb, var(--fg) 15%, transparent);
+  --field-border: color-mix(in srgb, var(--fg) 49%, transparent);
   --cell: color-mix(in srgb, var(--fg) 6%, transparent);
 }
 
