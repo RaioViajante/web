@@ -40,7 +40,7 @@ The classifier and execution surfaces share small pure TypeScript functions with
 
 ## Canonical vs. wide experiment layout
 
-Every primary surface (header, homepage, experiment metadata, prose, and by default the experiment surface itself) shares one canonical column: `max-width: 680px` with a `clamp(1rem, 4vw, 1.25rem)` gutter. An experiment's data record carries an explicit `layout` field (`"canonical"` by default, `"wide"` opt-in) so a future experiment that genuinely needs more horizontal space (a waveform editor, a node graph, a large canvas) can request a breakout without making width-expansion the default behavior for every experiment. See [`design.md`](design.md) for the visual rationale.
+Every primary surface (header, homepage, experiment metadata, prose, and by default the experiment surface itself) shares one canonical column: 680px of actual content (`--content-width`), with the `clamp(1rem, 4vw, 1.25rem)` gutter (`--gutter`) outside it, so a container is at most the content width plus two gutters wide. An experiment's data record carries an explicit `layout` field (`"canonical"` by default, `"wide"` opt-in) so a future experiment that genuinely needs more horizontal space (a waveform editor, a node graph, a large canvas) can request a breakout without making width-expansion the default behavior for every experiment. See [`design.md`](design.md) for the visual rationale.
 
 ## Theme system
 

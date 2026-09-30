@@ -41,8 +41,8 @@
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --font-serif: "Source Serif 4", ui-serif, Georgia, serif;
 
-  /* Canonical RaioViajante shell: the same 680px column and fluid gutter
-	   used by raioviajante.com, dump, and docs. Every primary surface
+  /* Canonical RaioViajante shell: 680px of actual content with the fluid
+	   gutter outside it, as on raioviajante.com and docs. Every primary surface
 	   (header, homepage, experiment metadata/prose, footer) shares this. */
   --content-width: 680px;
   --gutter: clamp(1rem, 4vw, 1.25rem);
