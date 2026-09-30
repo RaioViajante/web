@@ -20,7 +20,7 @@
      light themes and settled on 65% to clear it (paper holds less contrast
      than charcoal) — reused here rather than picking a new number. */
   --muted: color-mix(in srgb, var(--fg) 65%, transparent);
-  --border: color-mix(in srgb, var(--fg) 14%, transparent);
+  --border: color-mix(in srgb, var(--fg) 15%, transparent);
   --cell: color-mix(in srgb, var(--fg) 5%, transparent);
 }
 
@@ -30,7 +30,7 @@
   --fg: #ece7e0;
   --accent: #c3b3e0;
   --muted: color-mix(in srgb, var(--fg) 55%, transparent);
-  --border: color-mix(in srgb, var(--fg) 12%, transparent);
+  --border: color-mix(in srgb, var(--fg) 15%, transparent);
   --cell: color-mix(in srgb, var(--fg) 6%, transparent);
 }
 
