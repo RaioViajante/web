@@ -17,7 +17,7 @@ docs.raioviajante.com is part of the RaioViajante ecosystem and should clearly b
 
 ## Adapting the identity for documentation
 
-docs.raioviajante.com does not need to copy the ~680px centered layout used on raioviajante.com. Documentation has functional needs raioviajante.com doesn't:
+docs.raioviajante.com uses the shared 680px content measure for its reading column, while its Starlight rails and surrounding layout serve documentation-specific needs:
 
 - a navigation sidebar
 - code blocks
