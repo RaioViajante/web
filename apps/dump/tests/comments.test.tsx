@@ -56,15 +56,15 @@ describe("<Comments />", () => {
     expect(document.querySelector(SCRIPT_SELECTOR)).toBeInTheDocument();
   });
 
-  it("configures the RaioViajante/dump repository and Comments category", () => {
+  it("configures the RaioViajante/web repository and Comments category", () => {
     render(<Comments />);
     intersectFirst();
 
     const script = document.querySelector(SCRIPT_SELECTOR);
-    expect(script).toHaveAttribute("data-repo", "RaioViajante/dump");
-    expect(script).toHaveAttribute("data-repo-id", "R_kgDOUNBnpg");
+    expect(script).toHaveAttribute("data-repo", "RaioViajante/web");
+    expect(script).toHaveAttribute("data-repo-id", "R_kgDOUu8oYA");
     expect(script).toHaveAttribute("data-category", "Comments");
-    expect(script).toHaveAttribute("data-category-id", "DIC_kwDOUNBnps4DE4Sz");
+    expect(script).toHaveAttribute("data-category-id", "DIC_kwDOUu8oYM4DGx0J");
   });
 
   it("maps discussions to the article pathname, strictly", () => {

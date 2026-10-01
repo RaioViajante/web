@@ -3,12 +3,12 @@
 import { useEffect, useRef } from "react";
 
 // Repository configuration for the giscus GitHub Discussions backend. These
-// are the real, retrieved repo/category identifiers for RaioViajante/dump —
+// are the real, retrieved repo/category identifiers for RaioViajante/web —
 // see docs/comments.md for how they were obtained and how to re-derive them.
-const REPO = "RaioViajante/dump";
-const REPO_ID = "R_kgDOUNBnpg";
+const REPO = "RaioViajante/web";
+const REPO_ID = "R_kgDOUu8oYA";
 const CATEGORY = "Comments";
-const CATEGORY_ID = "DIC_kwDOUNBnps4DE4Sz";
+const CATEGORY_ID = "DIC_kwDOUu8oYM4DGx0J";
 
 // Borderless variants read closest to the editorial palette: no boxed card,
 // just text and rules matching the surrounding article.

@@ -41,5 +41,7 @@ original `RaioViajante/dump` issue tracker, not to issues in this repository.
 
 ## Original repositories
 
-The original repositories remain available and are not archived. dump's
-comments are backed by GitHub Discussions on `RaioViajante/dump`.
+The original repositories remain available. root, docs, and lab are archived;
+dump remains active while the new comments flow is verified in production.
+The current dump source configuration targets GitHub Discussions on
+`RaioViajante/web`.

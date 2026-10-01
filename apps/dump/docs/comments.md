@@ -4,9 +4,9 @@ Comments on `/posts/[slug]` are powered by [giscus](https://giscus.app), backed 
 
 ## Repository configuration
 
-- **Discussions**: enabled on `RaioViajante/dump`.
-- **giscus GitHub App**: installed and authorized for `RaioViajante/dump` (https://github.com/apps/giscus).
-- **Category**: `Comments` — an Announcement-format category (only maintainers can start new discussion threads; anyone can comment on existing ones), so visitors can't open unrelated discussion threads from the widget.
+- **Discussions**: enabled on `RaioViajante/web`.
+- **giscus GitHub App**: installed and authorized for `RaioViajante/web` (https://github.com/apps/giscus).
+- **Category**: `Comments` — an open-ended discussion category.
 - **Mapping**: `pathname`, strict (`data-strict="1"`) — one discussion per article URL, keyed on the URL path rather than the title/description/date, which can change without breaking the thread.
 
 ### Identifiers
@@ -15,15 +15,15 @@ Retrieved from GitHub's GraphQL API, not invented:
 
 | Field         | Value                  |
 | ------------- | ---------------------- |
-| Repository ID | `R_kgDOUNBnpg`         |
+| Repository ID | `R_kgDOUu8oYA`         |
 | Category name | `Comments`             |
-| Category ID   | `DIC_kwDOUNBnps4DE4Sz` |
+| Category ID   | `DIC_kwDOUu8oYM4DGx0J` |
 
 To re-derive these (e.g. after recreating the repo or category), query:
 
 ```graphql
 query {
-  repository(owner: "RaioViajante", name: "dump") {
+  repository(owner: "RaioViajante", name: "web") {
     id
     discussionCategories(first: 20) {
       nodes {
