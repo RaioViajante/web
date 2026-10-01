@@ -48,3 +48,24 @@ describe("theme tokens", () => {
     expect(css).not.toMatch(/prefers-color-scheme/);
   });
 });
+
+describe("font tokens", () => {
+  const layout = fs.readFileSync(
+    path.join(process.cwd(), "app", "layout.tsx"),
+    "utf8",
+  );
+
+  it("exposes the next/font variables where the :root aliases resolve", () => {
+    // --font-body/--font-ui/--font-mono are declared on :root, and a custom
+    // property only sees variables on its own element or ancestors. With the
+    // next/font classes on <body>, every alias computed to nothing and the
+    // whole site fell back to the browser default serif.
+    expect(css).toMatch(
+      /:root\s*\{[^}]*--font-body:\s*var\(--font-source-serif\)/,
+    );
+    const html = layout.match(/<html\b[^>]*>/)?.[0] ?? "";
+    expect(html).toContain("sourceSerif.variable");
+    expect(html).toContain("ibmPlexMono.variable");
+    expect(layout).toMatch(/<body>/);
+  });
+});

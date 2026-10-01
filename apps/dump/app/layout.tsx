@@ -69,7 +69,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang={site.locale} suppressHydrationWarning>
+    <html
+      lang={site.locale}
+      className={`${sourceSerif.variable} ${ibmPlexMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
@@ -77,7 +81,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
         />
       </head>
-      <body className={`${sourceSerif.variable} ${ibmPlexMono.variable}`}>
+      <body>
         <a href="#content" className="skip-link">
           Skip to content
         </a>
