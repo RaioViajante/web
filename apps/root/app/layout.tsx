@@ -5,6 +5,7 @@ import { PageContainer } from "../components/PageContainer";
 import { SiteHeader } from "../components/SiteHeader";
 import { SiteFooter } from "../components/SiteFooter";
 import { ThemeToggle } from "../components/ThemeToggle";
+import "@raioviajante/design/tokens.css";
 import "./globals.css";
 
 const mono = IBM_Plex_Mono({
