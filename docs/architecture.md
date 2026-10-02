@@ -88,12 +88,14 @@ typography, layout, width, and gutter stay in each app.
 
 | App  | Consumes `@raioviajante/design` |
 | ---- | ------------------------------- |
+| root | yes                             |
 | lab  | yes                             |
-| root | no                              |
 | dump | no                              |
 | docs | no                              |
 
-lab's mapping is described in its own [design notes](../apps/lab/docs/design.md).
+Each consumer documents its own mapping: see root's
+[design notes](../apps/root/docs/design.md) and lab's
+[design notes](../apps/lab/docs/design.md).
 
 Play is intentionally allowed its own visual identity. When it joins the
 repository, it must not automatically inherit the shared RaioViajante design

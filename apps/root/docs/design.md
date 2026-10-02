@@ -27,6 +27,25 @@ Implement the reference rather than reinterpreting it.
   part of raioviajante.com.
 - Preserve spacing, separators, hover states, and responsive padding accurately.
 
+## Color tokens
+
+root consumes `@raioviajante/design` (`"@raioviajante/design": "workspace:*"`).
+`app/layout.tsx` imports `@raioviajante/design/tokens.css` before
+`app/globals.css`, and `globals.css` keeps root's own variable names as aliases
+of the shared primitives:
+
+- `--background` → `--rv-color-bg`
+- `--foreground` → `--rv-color-fg`
+- `--accent` → `--rv-color-accent`
+- `--muted` → `--rv-color-muted`
+- `--separator` → `--rv-color-hairline`
+
+Pages and components use the root names, never `--rv-color-*` directly. Values
+specific to root stay in `globals.css`: `--subtle`, `color-scheme`, the content
+width and gutter, and the theme toggle's sun color and shadows. The selection
+and focus rules and the theme bootstrap also stay in root. The switch to shared
+tokens was made without any rendered change.
+
 ## Prohibited additions
 
 Do not add glassmorphism, bento grids, glowing gradients, decorative blobs, fake

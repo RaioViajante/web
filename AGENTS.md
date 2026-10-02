@@ -62,7 +62,7 @@ to enforce it.
   not required to be pixel-identical; each app implements it for its framework.
 - Shared design code should come from proven reuse. `@raioviajante/design`
   provides only the five shared color primitives (`--rv-color-*` in
-  `tokens.css`). lab is its only consumer; root, dump, and docs are not.
+  `tokens.css`). root and lab consume it; dump and docs do not.
 - A consuming app keeps its own semantic aliases (for example
   `--bg: var(--rv-color-bg)`) and its app-specific tokens. Selectors, focus and
   selection rules, theme bootstrap, typography, layout, width, and gutter stay
@@ -124,7 +124,7 @@ Report checks exactly as run; do not claim checks that did not run.
   user explicitly asks.
 - Before an app starts consuming a package from `packages/`, its Ignored Build
   Step must already list that package's path (for example
-  `../../packages/design`). Today only lab's does.
+  `../../packages/design`). Today root's and lab's do; dump's and docs' do not.
 - `NEXT_PUBLIC_SITE_URL` (dump) is public configuration, not a secret.
 - Do not describe a rollout as live until production actually runs it.
 
