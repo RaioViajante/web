@@ -22,6 +22,18 @@ The approved Claude Design export was kept locally at `reference/claude-export/`
 
 Principle: **mono identifies, serif speaks.** Do not substitute fonts, and do not use mono for prose or serif for interface chrome.
 
+### Color tokens
+
+lab is the first consumer of `@raioviajante/design` (`"@raioviajante/design": "workspace:*"`). `src/layouts/BaseLayout.astro` imports `@raioviajante/design/tokens.css` before `src/styles/global.css`, and `global.css` keeps lab's own variable names as aliases of the shared primitives:
+
+- `--bg` → `--rv-color-bg`
+- `--fg` → `--rv-color-fg`
+- `--accent` → `--rv-color-accent`
+- `--muted` → `--rv-color-muted`
+- `--border` → `--rv-color-hairline`
+
+Components and pages use the lab names, never `--rv-color-*` directly. Tokens that are specific to lab stay defined in `global.css`: `--field-border` (the stronger 49% boundary on editable fields) and `--cell` (5% light, 6% dark), along with `color-scheme`. The switch to shared tokens was made without any rendered change.
+
 ## Header
 
 `raioviajante ~ / lab`, GitHub icon on the right, sharing the canonical 680px container with the rest of the page. Normal document flow — not sticky, not fixed. No additional navigation links.

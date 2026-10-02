@@ -43,29 +43,66 @@ another site as a local route.
 The split follows what each site needs. There is no goal of converging on one
 framework.
 
-## Dependency direction
+## Shared packages
 
-A top-level `packages/` directory does **not** exist yet. It is the intended
-place for future shared code, with one allowed direction:
+Shared code lives in `packages/`, with one allowed direction:
 
 ```text
 apps/* ──depends on──▶ packages/*
 packages/* never depend on apps/*
 ```
 
+```text
+packages/
+└── design/    @raioviajante/design — shared color tokens
+```
+
+An app depends on a package through `workspace:*` and imports it through the
+package's `exports`, never by a relative path into `packages/`.
+
 ## Shared design policy
 
-root, dump, docs, and lab share the broader RaioViajante visual identity. Today
-each app implements that identity itself. Shared implementation is extracted
-only where there is genuine reuse; no shared design package exists yet.
+root, dump, docs, and lab share the broader RaioViajante visual identity. Each
+app implements that identity itself; shared implementation is extracted only
+where there is genuine reuse.
+
+`@raioviajante/design` is a private, framework-neutral package of static CSS
+with no build step. It exports `./tokens.css`, which defines five color
+primitives for the light and dark themes:
+
+- `--rv-color-bg`
+- `--rv-color-fg`
+- `--rv-color-accent`
+- `--rv-color-muted`
+- `--rv-color-hairline`
+
+The package contains no components, typography, layout, or theme behavior. A
+consuming app keeps its own variable names and points them at the primitives:
+
+```text
+app CSS ──▶ app semantic aliases (e.g. --bg) ──▶ --rv-color-* primitives
+```
+
+App-specific tokens, selectors, focus and selection rules, theme bootstrap,
+typography, layout, width, and gutter stay in each app.
+
+| App  | Consumes `@raioviajante/design` |
+| ---- | ------------------------------- |
+| lab  | yes                             |
+| root | no                              |
+| dump | no                              |
+| docs | no                              |
+
+lab's mapping is described in its own [design notes](../apps/lab/docs/design.md).
 
 Play is intentionally allowed its own visual identity. When it joins the
-repository, it must not automatically inherit a future shared RaioViajante
-design package.
+repository, it must not automatically inherit the shared RaioViajante design
+package.
 
 ## Workspace
 
-- One pnpm workspace (`pnpm-workspace.yaml`) covering `apps/*`.
+- One pnpm workspace (`pnpm-workspace.yaml`) covering `apps/*` and
+  `packages/*`.
 - One root `pnpm-lock.yaml` for every app.
 - Each app remains a separate package (`@raioviajante/<app>`) with its own
   dependency declarations. Versions of the same dependency may intentionally

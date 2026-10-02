@@ -28,23 +28,36 @@ the whole workspace; the build then runs in the project's Root Directory.
 
 ## Ignored Build Step
 
-Every project skips builds for commits that do not affect it. All four projects
-use:
+Every project skips builds for commits that do not affect it. The command runs
+from the project's Root Directory and compares `VERCEL_GIT_PREVIOUS_SHA` (the
+commit of the project's last successful deployment) with `HEAD`, so every
+commit in a push is taken into account. Exit code `0` skips the build; any
+other exit code builds.
+
+The check fails open: a missing, malformed, or unresolvable previous SHA, or a
+`git diff` error, exits non-zero and builds rather than skipping.
+
+root, dump, and docs use:
 
 ```sh
-git diff HEAD^ HEAD --quiet -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml
+p=${VERCEL_GIT_PREVIOUS_SHA:-}; [ "${#p}" -eq 40 ] || exit 1; case "$p" in *[!0-9A-Fa-f]*) exit 1;; esac; git cat-file -e "$p^{commit}" || exit 1; git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml
 ```
 
-The command runs from the project's Root Directory. Exit code `1` builds; `0`
-skips. The paths cover:
+lab consumes `@raioviajante/design`, so its command also watches
+`../../packages/design`. It uses a shorter, equivalent form so that it stays
+within Vercel's 256-character limit for this setting:
+
+```sh
+p=$VERCEL_GIT_PREVIOUS_SHA; printf %s "$p" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e "$p^{commit}" && git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design
+```
+
+The paths cover:
 
 - `.` — changes inside the app's own directory.
 - `../../package.json` — root workspace scripts and package-manager metadata.
 - `../../pnpm-lock.yaml` — dependency changes, which may affect any app.
 - `../../pnpm-workspace.yaml` — workspace membership and install-script policy.
-
-The command compares only the latest commit with its parent, so a push of
-several commits is judged by its last commit.
+- `../../packages/design` (lab only) — the shared package lab consumes.
 
 ## Environment
 
@@ -54,7 +67,10 @@ The other apps do not use custom environment variables.
 
 ## Shared packages
 
-No shared packages exist yet; there is no `packages/` directory. When an app
-starts consuming code from a future shared package, that app's Ignored Build
-Step must also list the shared paths it depends on, so a shared change rebuilds
-every consumer.
+`packages/design` (`@raioviajante/design`) is consumed by lab only. A commit that
+changes only `packages/design` rebuilds lab and skips root, dump, and docs.
+
+Before another app starts consuming a shared package, add that package's path
+to the app's Ignored Build Step first, so a shared change can never skip one of
+its consumers. root and dump do not list `../../packages/design` yet; docs is
+not a consumer.

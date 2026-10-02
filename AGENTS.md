@@ -10,16 +10,18 @@ Precedence:
 
 ## Repository
 
-| Path        | Package              | Role                            |
-| ----------- | -------------------- | ------------------------------- |
-| `apps/root` | `@raioviajante/root` | personal home, ecosystem index  |
-| `apps/dump` | `@raioviajante/dump` | personal technical writing      |
-| `apps/docs` | `@raioviajante/docs` | curated technical documentation |
-| `apps/lab`  | `@raioviajante/lab`  | interactive experiments         |
+| Path              | Package                | Role                            |
+| ----------------- | ---------------------- | ------------------------------- |
+| `apps/root`       | `@raioviajante/root`   | personal home, ecosystem index  |
+| `apps/dump`       | `@raioviajante/dump`   | personal technical writing      |
+| `apps/docs`       | `@raioviajante/docs`   | curated technical documentation |
+| `apps/lab`        | `@raioviajante/lab`    | interactive experiments         |
+| `packages/design` | `@raioviajante/design` | shared color tokens (CSS)       |
 
 - The apps are deployed independently. Apps must not import from one another.
-- A top-level `packages/` directory does not exist yet. Move code there only
-  when it has a real shared responsibility.
+- Shared code lives in `packages/`. Move code there only when it has a real
+  shared responsibility. Apps may depend on packages; packages never depend on
+  apps.
 - Repository-level documentation lives in `docs/`; each app has its own `docs/`.
 - `apps/root`, `apps/docs`, and `apps/lab` have their own `AGENTS.md`.
   `apps/dump` has none committed: the `AGENTS.md` and `CLAUDE.md` that Next.js
@@ -58,9 +60,14 @@ to enforce it.
 
 - root, dump, docs, and lab share the broader RaioViajante identity. They are
   not required to be pixel-identical; each app implements it for its framework.
-- Shared design code should come from proven reuse. No shared design package
-  exists yet.
-- Play is planned separately and must not automatically inherit a future
+- Shared design code should come from proven reuse. `@raioviajante/design`
+  provides only the five shared color primitives (`--rv-color-*` in
+  `tokens.css`). lab is its only consumer; root, dump, and docs are not.
+- A consuming app keeps its own semantic aliases (for example
+  `--bg: var(--rv-color-bg)`) and its app-specific tokens. Selectors, focus and
+  selection rules, theme bootstrap, typography, layout, width, and gutter stay
+  in each app.
+- Play is planned separately and must not automatically inherit the
   RaioViajante shared design package.
 - Do not default to generic SaaS layouts, card-heavy dashboards, bento grids,
   gratuitous gradients, decorative blobs, or glassmorphism.
@@ -115,6 +122,9 @@ Report checks exactly as run; do not claim checks that did not run.
 - Vercel project settings, domains, environment variables, and Ignored Build
   Step commands are production infrastructure. Do not change them unless the
   user explicitly asks.
+- Before an app starts consuming a package from `packages/`, its Ignored Build
+  Step must already list that package's path (for example
+  `../../packages/design`). Today only lab's does.
 - `NEXT_PUBLIC_SITE_URL` (dump) is public configuration, not a secret.
 - Do not describe a rollout as live until production actually runs it.
 

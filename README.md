@@ -2,7 +2,8 @@
 
 This repository contains the web applications that make up the RaioViajante
 internet ecosystem. Each application is developed, validated, and deployed
-independently; they share only repository infrastructure.
+independently; they share repository infrastructure and, where reuse is proven,
+small packages under `packages/`.
 
 ## Applications
 
@@ -24,6 +25,8 @@ Each app keeps its own README and `docs/` directory for app-specific details.
 │   ├── dump/
 │   ├── docs/
 │   └── lab/
+├── packages/
+│   └── design/           @raioviajante/design, shared color tokens
 ├── docs/                 repository-level documentation
 ├── .github/workflows/    CI
 ├── package.json          workspace scripts

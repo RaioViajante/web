@@ -29,7 +29,8 @@ src/
     index.astro                     the lab index ("/")
     experiments/[slug].astro        experiment page shell, one route per
                                      experiment via getStaticPaths
-  styles/        global.css — design tokens, typography, base elements
+  styles/        global.css — lab's token aliases and own tokens, typography,
+                 base elements (shared colors come from @raioviajante/design)
 ```
 
 ## Routing
@@ -44,4 +45,4 @@ Every primary surface (header, homepage, experiment metadata, prose, and by defa
 
 ## Theme system
 
-The theme selector, color tokens, and persistence strategy are ported from the real implementations in the sibling `raioviajante.com` and `dump` repositories (not reinvented) — see [`design.md`](design.md) for specifics.
+The theme selector and persistence strategy are ported from the real implementations in the sibling `raioviajante.com` and `dump` repositories (not reinvented). The shared color primitives come from `@raioviajante/design`, aliased to lab's own variable names — see [`design.md`](design.md) for specifics.
