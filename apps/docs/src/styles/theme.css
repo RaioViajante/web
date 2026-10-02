@@ -119,6 +119,14 @@
 	outline-offset: 2px;
 }
 
+/* The mobile "On this page" summary spans the full viewport width, so an
+   outward ring falls off-screen. Starlight insets its outline with
+   --sl-outline-offset-inside, but that layered rule loses to the unlayered
+   global one above, so restore it here for this control only. */
+#starlight__on-this-page--mobile:focus-visible {
+	outline-offset: var(--sl-outline-offset-inside);
+}
+
 /* Prose speaks in serif; the interface (handled above) stays in mono. */
 .sl-markdown-content {
 	font-family: 'Source Serif 4', ui-serif, Georgia, serif;
