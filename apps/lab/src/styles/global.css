@@ -71,6 +71,7 @@ body {
 }
 
 ::selection {
+  color: var(--fg);
   background: color-mix(in srgb, var(--accent) 28%, transparent);
 }
 
