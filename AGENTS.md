@@ -34,7 +34,7 @@ to enforce it.
 
 ## Package management
 
-- pnpm only, version 12.4.1 (`packageManager`). Node 24, pinned in `.nvmrc`.
+- pnpm only, version 12.8.1 (`packageManager`). Node 24, pinned in `.nvmrc`.
 - One root `pnpm-workspace.yaml` and one root `pnpm-lock.yaml`. Do not add
   per-app lockfiles, `package-lock.json`, or `yarn.lock`.
 - Change `pnpm-lock.yaml` only through pnpm commands, never by hand.

@@ -2,7 +2,7 @@
 
 ## Requirements and commands
 
-Use Node.js 24 or newer and pnpm 12.4.1 (recorded in `package.json`).
+Use Node.js 24 or newer and pnpm 12.8.1 (recorded in `package.json`).
 Run these commands from `apps/root`, or from the monorepo root as
 `pnpm --filter @raioviajante/root <script>`; see the repository-level
 [development guide](../../../docs/development.md).

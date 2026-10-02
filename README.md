@@ -37,7 +37,7 @@ implementation begins. It is not part of this repository today.
 ## Requirements
 
 - Node.js 24 (the exact version is pinned in [`.nvmrc`](.nvmrc))
-- pnpm 12.4.1 (pinned through `packageManager` in [`package.json`](package.json))
+- pnpm 12.8.1 (pinned through `packageManager` in [`package.json`](package.json))
 
 ## Getting started
 

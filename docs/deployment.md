@@ -21,7 +21,7 @@
 
 ## Build and install
 
-All four projects build from the pnpm workspace. Vercel detects pnpm 12.4.1
+All four projects build from the pnpm workspace. Vercel detects pnpm 12.8.1
 from `packageManager` and installs from the root `pnpm-lock.yaml`, using the
 install-script policy in the root `pnpm-workspace.yaml`. Each install covers
 the whole workspace; the build then runs in the project's Root Directory.

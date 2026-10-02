@@ -4,7 +4,7 @@
 
 - Node.js 24.20.0, pinned in [`.nvmrc`](../.nvmrc). The workspace requires
   Node 24 (`engines`).
-- pnpm 12.4.1, pinned through `packageManager` in the root
+- pnpm 12.8.1, pinned through `packageManager` in the root
   [`package.json`](../package.json) and in each app's `package.json`.
 
 ## Install

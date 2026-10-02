@@ -29,7 +29,7 @@ details.
 
 ## Local development
 
-Use Node.js 24 or newer and pnpm 12.4.1.
+Use Node.js 24 or newer and pnpm 12.8.1.
 
 ```sh
 pnpm install
