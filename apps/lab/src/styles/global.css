@@ -1,26 +1,28 @@
 /*
  * RaioViajante shared visual identity, adapted for lab.raioviajante.com.
  *
- * Base bg/fg/accent values are the shared RaioViajante palette; derived
- * treatments (muted, border, cell) are lab's own. Light is the default so the
- * page renders correctly before the anti-flash script below runs (e.g. with
- * JS disabled); [data-theme="dark"] overrides it, matching the pattern used
- * by raioviajante.com and dump.
+ * The shared palette (background, foreground, accent, muted, hairline) comes
+ * from @raioviajante/design, imported before this file; lab keeps its own
+ * variable names as aliases. The remaining treatments (field border, cell) are
+ * lab's own. Light is the default so the page renders correctly before the
+ * anti-flash script runs (e.g. with JS disabled); [data-theme="dark"]
+ * overrides it, matching the pattern used by raioviajante.com and dump.
  */
+
+/* Recomputed wherever a theme applies, so each alias follows the shared
+   token for the active theme. */
+:root,
+[data-theme] {
+  --bg: var(--rv-color-bg);
+  --fg: var(--rv-color-fg);
+  --accent: var(--rv-color-accent);
+  --muted: var(--rv-color-muted);
+  --border: var(--rv-color-hairline);
+}
 
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f4f2ef;
-  --fg: #201e1d;
-  --accent: #4a3d68;
-  /* The design export's own 58% reads as ~3.9:1 against this background,
-     short of WCAG AA (4.5:1) at the small sizes muted text is used at here.
-     raioviajante.com and dump hit the exact same shortfall in their own
-     light themes and settled on 65% to clear it (paper holds less contrast
-     than charcoal) — reused here rather than picking a new number. */
-  --muted: color-mix(in srgb, var(--fg) 65%, transparent);
-  --border: color-mix(in srgb, var(--fg) 15%, transparent);
   /* Editable fields share the page fill, so their border alone marks them: 3:1 minimum. */
   --field-border: color-mix(in srgb, var(--fg) 49%, transparent);
   --cell: color-mix(in srgb, var(--fg) 5%, transparent);
@@ -28,11 +30,6 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #18161b;
-  --fg: #ece7e0;
-  --accent: #c3b3e0;
-  --muted: color-mix(in srgb, var(--fg) 55%, transparent);
-  --border: color-mix(in srgb, var(--fg) 15%, transparent);
   --field-border: color-mix(in srgb, var(--fg) 49%, transparent);
   --cell: color-mix(in srgb, var(--fg) 6%, transparent);
 }
