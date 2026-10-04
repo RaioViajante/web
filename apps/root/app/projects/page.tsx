@@ -18,8 +18,8 @@ export default function Projects() {
       <section className="rv-section" aria-labelledby="all-projects-heading">
         <SectionHeading
           id="all-projects-heading"
-          number="01."
-          title="The list"
+          number="02."
+          title="Projects"
         />
         {projects.map((project) => (
           <article className="project-entry" key={project.name}>

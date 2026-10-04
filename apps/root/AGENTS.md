@@ -9,7 +9,8 @@ This app serves raioviajante.com: the personal internet home and index of the
 RaioViajante ecosystem. It is not a portfolio, résumé, developer sales page, or
 SaaS landing page.
 
-Its routes are `/`, `/setup`, `/projects`, and `/now`. dump, docs, and lab are separate
+Its routes are `/`, `/about`, `/projects`, `/now`, `/contact`, `/gallery`,
+`/setup`, and `/privacy`. dump, docs, and lab are separate
 apps with their own domains; link to their full URLs and never implement them as
 routes here.
 

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const sites = [
   { label: "raioviajante.com", href: "https://raioviajante.com" },
   { label: "dump", href: "https://dump.raioviajante.com" },
@@ -20,6 +22,8 @@ export function SiteFooter() {
         <a className="rv-footer-email" href="mailto:mail@raioviajante.com">
           mail@raioviajante.com
         </a>
+        <p className="rv-footer-cnpj">CNPJ: 53.021.377/0001-93</p>
+        <Link href="/privacy">Privacy Policy</Link>
       </div>
     </footer>
   );

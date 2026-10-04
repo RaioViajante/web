@@ -9,8 +9,12 @@ Internal routes:
 
 - `/` — home
 - `/setup` — personal gear
+- `/about` — brief introduction
 - `/projects` — projects
 - `/now` — current activities
+- `/contact` — contact email
+- `/gallery` — original character art, with room for future work
+- `/privacy` — privacy information for the root site
 
 Related independent websites:
 
@@ -22,7 +26,7 @@ These external websites must not become local routes.
 
 ## Status and stack
 
-The editorial interface is implemented across `/`, `/setup`, `/projects`, and `/now`,
+The editorial interface is implemented across all root routes,
 sharing a common layout, navigation, and footer. The stack is Next.js (App
 Router), React, TypeScript, pnpm, ESLint, and Prettier, ready to deploy to
 Vercel at https://raioviajante.com. See [deployment](docs/deployment.md) for

@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ProjectPreviewRow } from "../components/ProjectPreviewRow";
 import { LeaderRow } from "../components/LeaderRow";
 import { SectionHeading } from "../components/SectionHeading";
-import { introduction } from "../lib/home";
 import { primaryLinks } from "../lib/links";
 import { projects } from "../lib/projects";
 import { getRecentPosts } from "../lib/writing";
@@ -15,18 +15,18 @@ export default async function Home() {
   return (
     <>
       <div className="rv-hero">
-        <Image
-          src="/avatar.png"
-          alt="Illustrated RaioViajante character"
-          width={108}
-          height={108}
-          className="home-avatar"
-          priority
-        />
-        <p className="rv-eyebrow">index</p>
+        <span className="avatar-coin" data-sound="flip">
+          <Image
+            src="/avatar.png"
+            alt="Illustrated RaioViajante character"
+            width={108}
+            height={108}
+            className="home-avatar"
+            priority
+          />
+        </span>
         <h1>RaioViajante</h1>
         <p className="rv-dek">curious enough to build it myself.</p>
-        <p className="home-intro">{introduction}</p>
       </div>
 
       <section className="rv-section" aria-labelledby="links-heading">
@@ -34,7 +34,11 @@ export default async function Home() {
         {primaryLinks.map((link) => (
           <LeaderRow
             key={link.href}
-            name={<a href={link.href}>{link.label}</a>}
+            name={
+              <a href={link.href} data-sound="nav">
+                {link.label}
+              </a>
+            }
             note={link.category}
           />
         ))}
@@ -43,13 +47,9 @@ export default async function Home() {
       <section className="rv-section" aria-labelledby="projects-heading">
         <SectionHeading id="projects-heading" number="00.1" title="Projects" />
         {projects
-          .filter((project) => project.name !== "dump")
+          .filter((project) => project.name !== "Dump")
           .map((project) => (
-            <LeaderRow
-              key={project.name}
-              name={<a href={project.href}>{project.name}</a>}
-              note={project.status}
-            />
+            <ProjectPreviewRow key={project.name} project={project} />
           ))}
       </section>
 
@@ -62,7 +62,11 @@ export default async function Home() {
         {posts.map((post) => (
           <LeaderRow
             key={post.url}
-            name={<a href={post.url}>{post.title}</a>}
+            name={
+              <a href={post.url} data-sound="nav">
+                {post.title}
+              </a>
+            }
             note={post.date}
           />
         ))}
@@ -75,7 +79,14 @@ export default async function Home() {
           number="00.3"
           title="Other links"
         />
-        <LeaderRow name={<Link href="/setup">Setup</Link>} note="gear" />
+        <LeaderRow
+          name={
+            <Link href="/setup" data-sound="nav">
+              Setup
+            </Link>
+          }
+          note="gear"
+        />
       </section>
     </>
   );

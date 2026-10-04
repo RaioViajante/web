@@ -109,11 +109,60 @@ footer.rv-frame {
   border-left: 1px solid transparent;
   color: var(--rv-page-muted) !important;
   font-size: 0.9rem;
+  transition:
+    color 180ms ease,
+    transform 180ms ease,
+    border-color 180ms ease;
 }
 
 .rv-nav-link:hover,
 .rv-nav-link[aria-current="page"] {
   color: var(--rv-page-fg) !important;
+}
+
+.rv-nav-link:hover,
+.rv-nav-link:focus-visible {
+  transform: translateX(0.25rem);
+}
+
+.rv-nav-toggle,
+.rv-subnav a {
+  display: block;
+  border: 0;
+  background: none;
+  color: var(--rv-page-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.rv-nav-toggle {
+  margin-left: 1.75rem;
+  padding: 0.1rem 0;
+}
+
+.rv-subnav {
+  margin: 0 0 0 1.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.rv-subnav[hidden] {
+  display: none;
+}
+
+.rv-subnav a {
+  padding: 0.1rem 0.6rem;
+}
+
+.rv-nav-toggle:hover,
+.rv-subnav a:hover {
+  color: var(--rv-page-fg);
+  transform: translateX(0.25rem);
 }
 
 .rv-nav-link[aria-current="page"] {
@@ -239,6 +288,37 @@ footer.rv-frame {
 .rv-footer-email:hover {
   text-decoration: underline;
   text-underline-offset: 0.2rem;
+}
+
+.rv-footer-cnpj {
+  margin: 0;
+}
+
+.rv-sound-toggle {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--rv-page-fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+.rv-sound-toggle span {
+  color: var(--rv-page-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rv-nav-link,
+  .rv-nav-toggle,
+  .rv-subnav a {
+    transition: none;
+  }
+  .rv-nav-link:hover,
+  .rv-nav-link:focus-visible,
+  .rv-nav-toggle:hover,
+  .rv-subnav a:hover {
+    transform: none;
+  }
 }
 
 @media (max-width: 760px) {

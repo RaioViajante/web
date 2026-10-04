@@ -23,7 +23,7 @@ export default function Now() {
           >
             <SectionHeading
               id={id}
-              number={`02.${index}`}
+              number={`03.${index}`}
               title={group.category}
             />
             {group.items.map((item) => (
