@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const pages = [
   { number: "00.", label: "index", href: "/" },
+  { number: "00.1", label: "setup", href: "/setup" },
   { number: "01.", label: "projects", href: "/projects" },
   { number: "02.", label: "now", href: "/now" },
 ];
@@ -20,7 +21,7 @@ export function SiteNavigation() {
           <li key={page.href}>
             <Link
               href={page.href}
-              className="rv-nav-link"
+              className={`rv-nav-link${page.href === "/setup" ? " rv-nav-subitem" : ""}`}
               aria-current={pathname === page.href ? "page" : undefined}
             >
               {page.number} {page.label}

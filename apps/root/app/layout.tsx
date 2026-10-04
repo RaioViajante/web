@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { IBM_Plex_Mono } from "next/font/google";
+import { Noto_Sans_Mono } from "next/font/google";
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteHeader } from "../components/SiteHeader";
 import { SiteNavigation } from "../components/SiteNavigation";
 import "@raioviajante/design/editorial.css";
 import "./globals.css";
 
-const mono = IBM_Plex_Mono({
+const mono = Noto_Sans_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-mono",
 });

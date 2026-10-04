@@ -2,6 +2,7 @@ import Image from "next/image";
 import { LeaderRow } from "../components/LeaderRow";
 import { SectionHeading } from "../components/SectionHeading";
 import { introduction } from "../lib/home";
+import { primaryLinks } from "../lib/links";
 import { projects } from "../lib/projects";
 import { getRecentPosts } from "../lib/writing";
 
@@ -27,8 +28,19 @@ export default async function Home() {
         <p className="home-intro">{introduction}</p>
       </div>
 
+      <section className="rv-section" aria-labelledby="links-heading">
+        <SectionHeading id="links-heading" number="00." title="Primary links" />
+        {primaryLinks.map((link) => (
+          <LeaderRow
+            key={link.href}
+            name={<a href={link.href}>{link.label}</a>}
+            note={link.category}
+          />
+        ))}
+      </section>
+
       <section className="rv-section" aria-labelledby="projects-heading">
-        <SectionHeading id="projects-heading" number="00." title="Projects" />
+        <SectionHeading id="projects-heading" number="00.1" title="Projects" />
         {projects
           .filter((project) => project.name !== "dump")
           .map((project) => (
@@ -43,7 +55,7 @@ export default async function Home() {
       <section className="rv-section" aria-labelledby="writing-heading">
         <SectionHeading
           id="writing-heading"
-          number="00.1"
+          number="00.2"
           title="Latest writing"
         />
         {posts.map((post) => (

@@ -17,6 +17,9 @@ export function SiteFooter() {
             </span>
           ))}
         </nav>
+        <a className="rv-footer-email" href="mailto:mail@raioviajante.com">
+          mail@raioviajante.com
+        </a>
       </div>
     </footer>
   );

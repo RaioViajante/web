@@ -8,6 +8,7 @@ internet. It is not intended to be a portfolio, résumé, or sales landing page.
 Internal routes:
 
 - `/` — home
+- `/setup` — personal gear
 - `/projects` — projects
 - `/now` — current activities
 
@@ -21,7 +22,7 @@ These external websites must not become local routes.
 
 ## Status and stack
 
-The editorial interface is implemented across `/`, `/projects`, and `/now`,
+The editorial interface is implemented across `/`, `/setup`, `/projects`, and `/now`,
 sharing a common layout, navigation, and footer. The stack is Next.js (App
 Router), React, TypeScript, pnpm, ESLint, and Prettier, ready to deploy to
 Vercel at https://raioviajante.com. See [deployment](docs/deployment.md) for
