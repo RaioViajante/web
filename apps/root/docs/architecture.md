@@ -1,28 +1,16 @@
 # Architecture
 
-This application owns the root domain and three planned routes:
+Root is a Next.js application deployed independently at `raioviajante.com`.
+It owns `/`, `/projects`, and `/now`. Dump, docs, and lab are separate apps at
+their respective subdomains; root links to them by URL and does not import
+their source code.
 
-```text
-raioviajante.com
-├── /
-├── /projects
-└── /now
-```
+The app layout imports the framework-neutral editorial shell from
+`@raioviajante/design/editorial.css`. Root-specific styles and content remain
+inside this app. Reusable local pieces such as navigation, section headings,
+leader rows, and the footer live in `components/`.
 
-Related independent websites:
-
-- dump.raioviajante.com
-- lab.raioviajante.com
-- docs.raioviajante.com
-
-These websites share the RaioViajante visual identity but are independently
-deployed applications. Link to their full external URLs; do not implement them
-as routes in this application.
-
-The intended application stack is Next.js, React, and TypeScript. All internal
-pages will use the same global content container, header, and footer. Keep
-changing content separate from presentation where useful, with components
-extracted for actual reuse.
-
-The application has not been initialized. Detailed source layout and content
-storage choices remain undecided.
+Home obtains recent writing from dump's public RSS feed in `lib/writing.ts`.
+The homepage and feed request each revalidate after 900 seconds. A small
+known-post list keeps the page populated if the feed is temporarily unavailable.
+This is a read-only integration; publishing still happens in dump.

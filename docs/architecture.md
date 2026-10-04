@@ -54,7 +54,7 @@ packages/* never depend on apps/*
 
 ```text
 packages/
-└── design/    @raioviajante/design — shared color tokens
+└── design/    @raioviajante/design — color tokens and editorial shell
 ```
 
 An app depends on a package through `workspace:*` and imports it through the
@@ -76,15 +76,21 @@ primitives for the light and dark themes:
 - `--rv-color-muted`
 - `--rv-color-hairline`
 
-The package contains no components, typography, layout, or theme behavior. A
-consuming app keeps its own variable names and points them at the primitives:
+It also exports `./editorial.css`, an editorial shell introduced for the
+cross-site redesign. Root currently consumes this shell; dump, docs, and lab
+have not migrated to it yet. The shell provides structural selectors for the
+top line, navigation, content grid, sections, rows, and footer. Apps supply
+their own routes and page content.
+
+An app using the color primitives keeps its own variable names and points them
+at the primitives:
 
 ```text
 app CSS ──▶ app semantic aliases (e.g. --bg) ──▶ --rv-color-* primitives
 ```
 
-App-specific tokens, selectors, focus and selection rules, theme bootstrap,
-typography, layout, width, and gutter stay in each app.
+Apps that have not adopted the editorial shell retain their own selectors,
+typography, layout, and theme behavior.
 
 | App  | Consumes `@raioviajante/design` |
 | ---- | ------------------------------- |

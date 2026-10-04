@@ -1,12 +1,23 @@
-import { PageContainer } from "./PageContainer";
+const sites = [
+  { label: "raioviajante.com", href: "https://raioviajante.com" },
+  { label: "dump", href: "https://dump.raioviajante.com" },
+  { label: "docs", href: "https://docs.raioviajante.com" },
+  { label: "lab", href: "https://lab.raioviajante.com" },
+];
 
 export function SiteFooter() {
   return (
-    <PageContainer as="footer" className="site-footer">
-      <p>
-        raioviajante.com — built because apparently having a normal website
-        wasn&apos;t interesting enough.
-      </p>
-    </PageContainer>
+    <footer className="rv-frame">
+      <div className="rv-footer">
+        <nav className="rv-footer-links" aria-label="RaioViajante sites">
+          {sites.map((site, index) => (
+            <span key={site.href}>
+              {index > 0 ? <span aria-hidden="true"> · </span> : null}
+              <a href={site.href}>{site.label}</a>
+            </span>
+          ))}
+        </nav>
+      </div>
+    </footer>
   );
 }

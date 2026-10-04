@@ -1,56 +1,24 @@
 # Design
 
-## Source of truth
+The root site is the first implementation of the editorial RaioViajante design.
+Its visual reference is bero.land: a charcoal canvas, restrained monospaced
+typography, numbered navigation and sections, dotted leader rows, generous
+whitespace, and a small centered footer. The character illustration and content
+are original to RaioViajante.
 
-`/refence/claude-export/` is the approved visual source of truth named in the
-project brief. It was kept locally at `reference/claude-export/`, untracked,
-and is not part of the monorepo checkout. Where available, keep it read-only:
-do not modify, move, rename, delete, or build the application inside it.
+The shared shell rules live in `@raioviajante/design/editorial.css`. Root imports
+them in `app/layout.tsx`, then defines page-specific styling in
+`app/globals.css`. The shell covers the top line, navigation, page grid, hero,
+section headings, leader rows, footer, focus states, and responsive behavior.
+Other apps will consume the shell as they are migrated. Each app keeps its own
+routes and content.
 
-Use the approved Home, Projects, Now, Nav, and Footer exports. Their page styles
-establish the design; the bundled generic Broadsheet theme does not replace them.
-Implement the reference rather than reinterpreting it.
+Root has three routes: `/`, `/projects`, and `/now`. The primary navigation
+contains these local routes only. The footer links to the four independently
+deployed sites. The home page shows recent dump posts from its public RSS feed;
+the feed is revalidated every 15 minutes, with a known-post fallback if the
+feed is unavailable. The footer does not yet contain business details because
+the public CNPJ and contact text have not been supplied.
 
-## Visual principles
-
-- A personal internet home, not a portfolio.
-- An editorial / Unix-inspired aesthetic with typography-driven hierarchy.
-- Dark background (`#18161b`), warm foreground (`#ece7e0`), and restrained purple
-  accent (`#c3b3e0`).
-- Source Serif 4 and IBM Plex Mono, following the reference's sizes and line heights.
-- Generous whitespace and a consistent horizontal content container across pages,
-  header, and footer. Preserve the exported 680px maximum and fluid gutter styling,
-  checking its box model and responsive behavior during implementation.
-- GitHub icon-only header treatment linking to https://github.com/RaioViajante,
-  with an accessible name.
-- External domains shown as external destinations; internal routes presented as
-  part of raioviajante.com.
-- Preserve spacing, separators, hover states, and responsive padding accurately.
-
-## Color tokens
-
-root consumes `@raioviajante/design` (`"@raioviajante/design": "workspace:*"`).
-`app/layout.tsx` imports `@raioviajante/design/tokens.css` before
-`app/globals.css`, and `globals.css` keeps root's own variable names as aliases
-of the shared primitives:
-
-- `--background` → `--rv-color-bg`
-- `--foreground` → `--rv-color-fg`
-- `--accent` → `--rv-color-accent`
-- `--muted` → `--rv-color-muted`
-- `--separator` → `--rv-color-hairline`
-
-Pages and components use the root names, never `--rv-color-*` directly. Values
-specific to root stay in `globals.css`: `--subtle`, `color-scheme`, the content
-width and gutter, and the theme toggle's sun color and shadows. The selection
-and focus rules and the theme bootstrap also stay in root. The switch to shared
-tokens was made without any rendered change.
-
-## Prohibited additions
-
-Do not add glassmorphism, bento grids, glowing gradients, decorative blobs, fake
-terminal chrome, skill bars, huge animations, generic SaaS UI, generic developer
-portfolio sections, or unnecessary cards. Do not add background grids, language
-logos, CTA sections, or other decoration absent from the reference.
-
-Whitespace is intentional; do not fill empty areas merely because they are empty.
+The earlier Claude export in the local `reference/` directory remains an
+untracked historical reference. It is not the source of truth for this redesign.

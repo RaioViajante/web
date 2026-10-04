@@ -1,69 +1,59 @@
-import Link from "next/link";
-import { places, recentActivity } from "../lib/home";
-import styles from "./page.module.css";
+import Image from "next/image";
+import { LeaderRow } from "../components/LeaderRow";
+import { SectionHeading } from "../components/SectionHeading";
+import { introduction } from "../lib/home";
+import { projects } from "../lib/projects";
+import { getRecentPosts } from "../lib/writing";
 
-export default function Home() {
+export const revalidate = 900;
+
+export default async function Home() {
+  const posts = await getRecentPosts();
+
   return (
     <>
-      <h1 className="page-heading">curious enough to build it myself.</h1>
-      <p className={`page-description ${styles.description}`}>
-        I write things, build things and occasionally go too far trying to
-        understand how they work.
-      </p>
+      <div className="rv-hero">
+        <Image
+          src="/avatar.png"
+          alt="Illustrated RaioViajante character"
+          width={108}
+          height={108}
+          className="home-avatar"
+          priority
+        />
+        <p className="rv-eyebrow">index</p>
+        <h1>RaioViajante</h1>
+        <p className="rv-dek">curious enough to build it myself.</p>
+        <p className="home-intro">{introduction}</p>
+      </div>
 
-      <section className={styles.places} aria-labelledby="places-heading">
-        <h2
-          id="places-heading"
-          className={`section-label ${styles.sectionHeading}`}
-        >
-          places/
-        </h2>
-        <div className={styles.placesList}>
-          {places.map((place) => {
-            const external = place.href.startsWith("https://");
-            return (
-              <Link
-                key={place.href}
-                href={place.href}
-                className={styles.place}
-                target={external ? "_blank" : undefined}
-                rel={external ? "noreferrer noopener" : undefined}
-                prefetch={false}
-              >
-                <div>
-                  <span className={styles.placeName}>{place.name}</span>
-                  <div className={styles.placeDescription}>
-                    {place.description}
-                  </div>
-                </div>
-                <span className={styles.arrow} aria-hidden="true">
-                  {external ? "↗" : "→"}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+      <section className="rv-section" aria-labelledby="projects-heading">
+        <SectionHeading id="projects-heading" number="00." title="Projects" />
+        {projects
+          .filter((project) => project.name !== "dump")
+          .map((project) => (
+            <LeaderRow
+              key={project.name}
+              name={<a href={project.href}>{project.name}</a>}
+              note={project.status}
+            />
+          ))}
       </section>
 
-      <section aria-labelledby="recent-heading">
-        <h2
-          id="recent-heading"
-          className={`section-label ${styles.sectionHeading} ${styles.recentHeading}`}
-        >
-          recent/
-        </h2>
-        <ul className={styles.recentList}>
-          {recentActivity.map((entry) => (
-            <li
-              key={`${entry.date}-${entry.source}`}
-              className={styles.recentRow}
-            >
-              <time dateTime={entry.date}>{entry.date}</time>
-              <span className={styles.source}>{entry.source}</span>
-              <span className={styles.message}>{entry.message}</span>
-            </li>
-          ))}
-        </ul>
+      <section className="rv-section" aria-labelledby="writing-heading">
+        <SectionHeading
+          id="writing-heading"
+          number="00.1"
+          title="Latest writing"
+        />
+        {posts.map((post) => (
+          <LeaderRow
+            key={post.url}
+            name={<a href={post.url}>{post.title}</a>}
+            note={post.date}
+          />
+        ))}
+        <p className="home-feed-note">from dump.raioviajante.com</p>
       </section>
     </>
   );

@@ -1,41 +1,40 @@
 import type { Metadata } from "next";
+import { SectionHeading } from "../../components/SectionHeading";
 import { lastUpdated, now, tagline } from "../../lib/now";
-import styles from "./page.module.css";
 
-export const metadata: Metadata = {
-  title: "now",
-};
+export const metadata: Metadata = { title: "now" };
 
 export default function Now() {
   return (
     <>
-      <h1 className={`section-label ${styles.heading}`}>now/</h1>
-      <p className={styles.meta}>last updated {lastUpdated}</p>
-      <p className={styles.description}>{tagline}</p>
-
-      <div className={styles.groups}>
-        {now.map((group) => (
+      <div className="rv-hero">
+        <p className="rv-eyebrow">now</p>
+        <h1>Now</h1>
+        <p className="rv-dek">{tagline}</p>
+        <p className="now-updated">last updated {lastUpdated}</p>
+      </div>
+      {now.map((group, index) => {
+        const id = `${group.category}-heading`;
+        return (
           <section
             key={group.category}
-            className={styles.row}
-            aria-labelledby={`${group.category}-heading`}
+            className="rv-section"
+            aria-labelledby={id}
           >
-            <h2 id={`${group.category}-heading`} className={styles.label}>
-              {group.category}
-            </h2>
-            <div className={styles.items}>
-              {group.items.map((item) => (
-                <div key={item.title}>
-                  <div className={styles.itemTitle}>{item.title}</div>
-                  {item.description ? (
-                    <p className={styles.itemDescription}>{item.description}</p>
-                  ) : null}
-                </div>
-              ))}
-            </div>
+            <SectionHeading
+              id={id}
+              number={`02.${index}`}
+              title={group.category}
+            />
+            {group.items.map((item) => (
+              <div className="now-entry" key={item.title}>
+                <h3>{item.title}</h3>
+                {item.description ? <p>{item.description}</p> : null}
+              </div>
+            ))}
           </section>
-        ))}
-      </div>
+        );
+      })}
     </>
   );
 }

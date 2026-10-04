@@ -1,179 +1,91 @@
-/* The shared palette comes from @raioviajante/design, imported before this
-   file in app/layout.tsx. These aliases keep root's own variable names and are
-   recomputed wherever a theme applies. */
-:root,
-[data-theme] {
-  --background: var(--rv-color-bg);
-  --foreground: var(--rv-color-fg);
-  --accent: var(--rv-color-accent);
-  --muted: var(--rv-color-muted);
-  --separator: var(--rv-color-hairline);
-}
-
-:root,
-[data-theme="light"] {
-  color-scheme: light;
-}
-
-[data-theme="dark"] {
+html {
   color-scheme: dark;
 }
 
-:root {
-  --subtle: color-mix(in srgb, var(--foreground) 40%, transparent);
-  --content-width: 680px;
-  --gutter: clamp(1rem, 4vw, 1.25rem);
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-serif), Georgia, serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: normal;
-  transition:
-    color 150ms ease,
-    background-color 150ms ease;
-}
-
-::selection {
-  color: var(--foreground);
-  background: color-mix(in srgb, var(--accent) 28%, transparent);
-}
-
-a {
-  color: var(--foreground);
-  text-decoration: none;
-  transition: color 150ms ease;
-}
-
-a:hover {
-  color: var(--accent);
-}
-
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* The export's 680px content width excludes its horizontal gutters. */
-.page-container {
-  box-sizing: content-box;
-  width: calc(100% - 2 * var(--gutter));
-  max-width: var(--content-width);
-  margin-inline: auto;
-  padding-inline: var(--gutter);
-}
-
-.site-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-block: 44px 8px;
-  font-family: var(--font-mono), monospace;
-}
-
-.site-brand {
-  font-size: 15px;
-}
-
-.site-brand span {
-  color: var(--subtle);
-}
-
-.github-link {
-  display: inline-flex;
-}
-
-.github-link svg {
-  display: block;
-  width: 18px;
-  height: 18px;
-}
-
-.site-main {
-  padding-block: 0 100px;
-}
-
-.section-label {
-  color: var(--muted);
-  font-family: var(--font-mono), monospace;
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-}
-
-.page-heading {
-  max-width: 26ch;
-  margin: 36px 0 14px;
-  font-size: 1.5rem;
-  font-weight: 400;
-  line-height: 1.5;
-}
-
-.page-description {
-  max-width: 44ch;
-  margin: 0;
-  color: var(--muted);
-  font-size: 16px;
-  font-style: italic;
-  line-height: 1.6;
-}
-
-.site-footer {
-  padding-block: 32px 56px;
-  border-top: 1px solid var(--separator);
-  color: var(--muted);
-  font-family: var(--font-mono), monospace;
-  font-size: 13.5px;
-}
-
-.site-footer p {
-  margin: 0;
-}
-
-/* Theme control */
-.theme-toggle {
+.skip-link {
   position: fixed;
-  z-index: 40;
-  bottom: max(24px, calc(env(safe-area-inset-bottom) + 16px));
-  left: max(24px, calc(env(safe-area-inset-left) + 16px));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 1px solid var(--separator);
-  border-radius: 50%;
-  color: var(--accent);
-  background: var(--background);
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--foreground) 14%, transparent);
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    box-shadow 150ms ease;
+  z-index: 10;
+  top: 0.75rem;
+  left: 0.75rem;
+  transform: translateY(-150%);
+  padding: 0.5rem 0.75rem;
+  background: var(--rv-page-fg);
+  color: var(--rv-page-bg) !important;
 }
 
-.theme-toggle:hover {
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--foreground) 18%, transparent);
+.skip-link:focus {
+  transform: translateY(0);
 }
 
-.theme-icon {
+.home-avatar {
   display: block;
+  width: 108px;
+  height: 108px;
+  margin: 0 auto 1.35rem;
+  border-radius: 50%;
 }
 
-.theme-icon--sun {
-  color: #a9822a;
+.home-intro {
+  max-width: 48ch;
+  margin: 0.8rem auto 0;
+  color: var(--rv-page-muted);
+  font-size: 13px;
+  line-height: 1.75;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  a,
-  body,
-  .theme-toggle {
-    transition: none;
+.home-feed-note {
+  margin: 1.25rem 0 0 3.95rem;
+  color: var(--rv-page-muted);
+  font-size: 11px;
+}
+
+.project-entry {
+  margin-bottom: 1.75rem;
+}
+
+.project-entry .rv-leader {
+  margin-bottom: 0.25rem;
+}
+
+.project-description {
+  margin: 0 0 0 3.95rem;
+  color: var(--rv-page-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.now-updated {
+  margin: 1rem 0 0;
+  color: var(--rv-page-muted);
+  font-size: 11px;
+}
+
+.now-entry {
+  margin: 0 0 1.55rem 3.95rem;
+}
+
+.now-entry h3 {
+  margin: 0 0 0.2rem;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.now-entry p {
+  margin: 0;
+  color: var(--rv-page-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+@media (max-width: 480px) {
+  .home-avatar {
+    width: 92px;
+    height: 92px;
+  }
+
+  .home-feed-note,
+  .project-description,
+  .now-entry {
+    margin-left: 0;
   }
 }

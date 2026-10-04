@@ -15,24 +15,22 @@ routes here.
 
 ## Implementation
 
-- Next.js App Router, React, TypeScript, with native CSS (global styles and CSS
-  modules). Keep it small; prefer simple solutions.
+- Next.js App Router, React, TypeScript, with native CSS. Keep it small;
+  prefer simple solutions.
 - Do not add Tailwind, MDX, Shiki, UI libraries, or testing frameworks unless a
   task explicitly needs them.
-- All pages share the same content container, header, and footer. Page content
-  lives in `lib/` (`home.ts`, `projects.ts`, `now.ts`), separate from
-  presentation.
+- All pages share the editorial shell, navigation, and footer. Changing content
+  lives in `lib/` where practical, separate from presentation.
 - Extract components only where reuse exists within this app.
 - `next.config.ts` sets `agentRules: false` so Next.js does not overwrite this
   hand-written file. Keep it.
 
 ## Design
 
-- Follow [docs/design.md](docs/design.md). Preserve the approved interface —
-  container width, margins, typography, colors, spacing, separators, header,
-  footer, and hover states — without redesigning it.
-- The original design export was kept locally at `reference/claude-export/`. It
-  is untracked and not part of the monorepo; where a local copy exists, treat it
+- Follow [docs/design.md](docs/design.md). Preserve the editorial design across
+  the root routes and coordinate shared shell changes with the other apps.
+- The previous design export was kept locally at `reference/claude-export/`.
+  It is an untracked historical reference; where a local copy exists, treat it
   as read-only and never build inside it.
 - Beyond the repository-wide design restraint, avoid skill bars, call-to-action
   sections, language logos, fake terminal chrome, and large animations.
