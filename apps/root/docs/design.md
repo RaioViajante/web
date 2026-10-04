@@ -25,6 +25,7 @@ body text, 1.82 line height, and a 42rem reading column. Primary links currently
 contains the user's GitHub and public email. Setup has a real route and a typed
 gear list based on the user's supplied model names; no product links have been
 provided yet.
+The home page links to Setup under "Other links" after "Latest writing".
 
 The earlier Claude export in the local `reference/` directory remains an
 untracked historical reference. It is not the source of truth for this redesign.

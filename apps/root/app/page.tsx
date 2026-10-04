@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { LeaderRow } from "../components/LeaderRow";
 import { SectionHeading } from "../components/SectionHeading";
 import { introduction } from "../lib/home";
@@ -66,6 +67,15 @@ export default async function Home() {
           />
         ))}
         <p className="home-feed-note">from dump.raioviajante.com</p>
+      </section>
+
+      <section className="rv-section" aria-labelledby="other-links-heading">
+        <SectionHeading
+          id="other-links-heading"
+          number="00.3"
+          title="Other links"
+        />
+        <LeaderRow name={<Link href="/setup">Setup</Link>} note="gear" />
       </section>
     </>
   );
