@@ -15,8 +15,7 @@ routes and content.
 
 Root has routes for home, about, projects, contact, gallery, setup, privacy,
 and terms of use. The primary navigation contains the local content routes except Setup,
-which is linked from the home page. An index disclosure shows dump, lab, and
-docs with short purpose labels; the footer also links to the four independently
+which is linked from the home page. The footer links to the four independently
 deployed sites. The home page shows recent dump posts from its public RSS feed;
 the feed is revalidated every 15 minutes, with a known-post fallback if the
 feed is unavailable. The footer contains the supplied public email. Its CNPJ
@@ -30,11 +29,14 @@ gear list based on the user's supplied model names; no product links have been
 provided yet.
 The home page links to Setup under "Other links" after "Latest writing".
 Sidebar links only brighten on hover. In content rows, the left label brightens
-without changing size, while the right note brightens and scales slightly.
+without changing size, while the right note brightens and scales by 1.8%.
 Either side activates the same row response and optional short menu click sound.
 The avatar flips on hover with a separate two-part flip sound, and project names
 show larger description previews when any part of their row is hovered or focused.
 Sound is off until enabled by the visitor and its preference is stored in the browser.
+Its text toggle sits alone at the top of the reading column. The Projects page
+uses an editorial list with name, status, description, type, and destination for
+each entry.
 The gallery currently contains the original avatar artwork; additional art
 awaits user-supplied assets. The About page contains only verified project context
 until the user provides biographical details.

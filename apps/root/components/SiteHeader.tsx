@@ -5,7 +5,6 @@ export function SiteHeader() {
     <header className="rv-frame" aria-label="Site header">
       <div className="rv-topline">
         <SoundToggle />
-        <span>raioviajante.com</span>
       </div>
     </header>
   );
