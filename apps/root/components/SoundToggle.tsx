@@ -57,6 +57,7 @@ export function SoundToggle() {
       const element = target.closest<HTMLElement>("[data-sound]");
       if (
         !element ||
+        element.dataset.soundOn === "click" ||
         (event.relatedTarget instanceof Node &&
           element.contains(event.relatedTarget))
       )
@@ -64,8 +65,19 @@ export function SoundToggle() {
       play(element.dataset.sound ?? "nav");
     }
 
+    function onClick(event: MouseEvent) {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const element = target.closest<HTMLElement>("[data-sound-on='click']");
+      if (element) play(element.dataset.sound ?? "nav");
+    }
+
     document.addEventListener("pointerover", onHover);
-    return () => document.removeEventListener("pointerover", onHover);
+    document.addEventListener("click", onClick);
+    return () => {
+      document.removeEventListener("pointerover", onHover);
+      document.removeEventListener("click", onClick);
+    };
   }, [enabled]);
 
   useEffect(

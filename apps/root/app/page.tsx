@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { AvatarCoin } from "../components/AvatarCoin";
 import { ProjectPreviewRow } from "../components/ProjectPreviewRow";
 import { LeaderRow } from "../components/LeaderRow";
 import { SectionHeading } from "../components/SectionHeading";
@@ -15,16 +15,7 @@ export default async function Home() {
   return (
     <>
       <div className="rv-hero">
-        <span className="avatar-coin" data-sound="flip">
-          <Image
-            src="/avatar.png"
-            alt="Illustrated RaioViajante character"
-            width={108}
-            height={108}
-            className="home-avatar"
-            priority
-          />
-        </span>
+        <AvatarCoin />
         <h1>RaioViajante</h1>
         <p className="rv-dek">curious enough to build it myself.</p>
       </div>

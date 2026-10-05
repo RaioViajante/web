@@ -32,11 +32,14 @@ html {
 
 .avatar-coin {
   display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
   perspective: 500px;
   cursor: pointer;
 }
 
-.avatar-coin:hover .home-avatar {
+.avatar-coin.is-flipping .home-avatar {
   animation: avatar-flip 650ms ease-in-out;
 }
 
@@ -185,7 +188,7 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .avatar-coin:hover .home-avatar {
+  .avatar-coin.is-flipping .home-avatar {
     animation: none;
   }
   .project-preview {
