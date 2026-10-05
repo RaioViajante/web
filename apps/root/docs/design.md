@@ -38,6 +38,8 @@ Linked rows give a subtle inset press response and a distinct click sound when s
 is enabled. Primary links and project rows reveal their descriptions after 400 ms
 of pointer hover, or immediately on keyboard focus. The avatar flips on click
 with a separate two-part flip sound.
+Its eight-frame illustration loops every three seconds after the frames have
+loaded. Reduced motion keeps the centered portrait still and disables the flip.
 Sound is off until enabled by the visitor and its preference is stored in the browser.
 Its text toggle sits alone at the top of the reading column. The Projects page
 uses an editorial list with name, status, description, type, and destination for
@@ -47,9 +49,10 @@ on hover or keyboard focus; clicking or tapping it reveals two overlapping group
 of artwork, including the hospital scene, with a short paper-like sound when
 SOUND is enabled. Each artwork rises gently on hover or keyboard focus and opens
 the full image when selected. Reduced motion keeps the click-to-reveal interaction
-without the movement. The homepage portrait and favicon also come from the user's
-art collection. Gallery and portrait assets live under `public/art/` as lossless
-WebP files. The supplied favicon PNG is
+without the movement. The homepage avatar and favicon also come from the user's
+art collection. Gallery and avatar assets live under `public/art/` as lossless
+WebP files. Avatar frames are resized to 432 pixels to fit the small display size.
+The supplied favicon PNG is
 the source for the multi-size `app/favicon.ico`, `app/icon.png`,
 `app/apple-icon.png`, and the 192-pixel icon referenced by `app/manifest.ts`.
 The About page uses Bryan's supplied personal introduction and interests without

@@ -39,6 +39,10 @@ html {
   cursor: pointer;
 }
 
+.avatar-coin:disabled {
+  cursor: default;
+}
+
 .avatar-coin.is-flipping .home-avatar {
   animation: avatar-flip 650ms ease-in-out;
 }
