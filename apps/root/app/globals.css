@@ -148,13 +148,14 @@ html {
   font-weight: 700;
 }
 
-.project-detail a {
+.project-entry .project-detail a {
+  color: #d9dee5;
   text-decoration: underline;
   text-underline-offset: 0.2rem;
   transition: color 420ms ease;
 }
 
-.project-detail a:hover {
+.project-entry .project-detail a:hover {
   color: #fff;
 }
 
@@ -191,7 +192,7 @@ html {
     transition: none;
     transform: none;
   }
-  .project-detail a {
+  .project-entry .project-detail a {
     transition: none;
   }
 }
