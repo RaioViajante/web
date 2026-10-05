@@ -16,7 +16,7 @@ export function AvatarCoin() {
       onClick={() => setFlipping(true)}
     >
       <Image
-        src="/art/portrait.webp"
+        src="/art/portrait-index.webp"
         alt="Illustrated RaioViajante character"
         width={108}
         height={108}

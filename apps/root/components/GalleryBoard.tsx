@@ -60,6 +60,13 @@ const artworks = [
     width: 1672,
     height: 941,
   },
+  {
+    id: "hospital",
+    src: "/art/gallery/hospital-monitor.webp",
+    alt: "RaioViajante resting in a hospital bed beside a binary monitor",
+    width: 1672,
+    height: 941,
+  },
 ] as const;
 
 function Artwork({

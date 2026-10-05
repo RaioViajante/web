@@ -43,11 +43,12 @@ uses an editorial list with name, status, description, type, and destination for
 each entry.
 The gallery opens with the user's "Work of Art" illustration. It floats subtly
 on hover or keyboard focus; clicking or tapping it reveals two overlapping groups
-of artwork with a short paper-like sound when SOUND is enabled. Each artwork rises
-gently on hover or keyboard focus and opens the full image when selected. Reduced
-motion keeps the click-to-reveal interaction without the movement. The homepage
-portrait and favicon also come from the user's art collection. Gallery and portrait
-assets live under `public/art/` as lossless WebP files. The supplied favicon PNG is
+of artwork, including the hospital scene, with a short paper-like sound when
+SOUND is enabled. Each artwork rises gently on hover or keyboard focus and opens
+the full image when selected. Reduced motion keeps the click-to-reveal interaction
+without the movement. The homepage portrait and favicon also come from the user's
+art collection. Gallery and portrait assets live under `public/art/` as lossless
+WebP files. The supplied favicon PNG is
 the source for the multi-size `app/favicon.ico`, `app/icon.png`,
 `app/apple-icon.png`, and the 192-pixel icon referenced by `app/manifest.ts`.
 The About page contains only verified project context until the user provides

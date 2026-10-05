@@ -184,7 +184,7 @@ html {
 }
 
 .gallery-board[data-revealed="true"] {
-  min-height: 71rem;
+  min-height: 86rem;
 }
 
 .gallery-opening {
@@ -260,7 +260,7 @@ html {
 }
 
 .gallery-cluster--second {
-  height: 32rem;
+  height: 47rem;
 }
 
 .gallery-tile {
@@ -372,6 +372,14 @@ html {
   left: 17%;
 }
 
+.gallery-tile--hospital {
+  --tile-width: 52%;
+  --tile-rotate: 4deg;
+  z-index: 4;
+  top: 32rem;
+  right: 8%;
+}
+
 @keyframes gallery-place {
   from {
     opacity: 0;
@@ -421,13 +429,13 @@ html {
 
 @media (max-width: 760px) {
   .gallery-board[data-revealed="true"] {
-    min-height: 57rem;
+    min-height: 61rem;
   }
   .gallery-cluster--first {
     height: 30rem;
   }
   .gallery-cluster--second {
-    height: 26rem;
+    height: 30rem;
   }
   .gallery-tile--castle {
     top: 3rem;
@@ -449,6 +457,10 @@ html {
   }
   .gallery-tile--lab {
     top: 13rem;
+  }
+  .gallery-tile--hospital {
+    --tile-width: 58%;
+    top: 19rem;
   }
 }
 
