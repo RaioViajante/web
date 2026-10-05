@@ -47,9 +47,11 @@ of artwork with a short paper-like sound when SOUND is enabled. Each artwork ris
 gently on hover or keyboard focus and opens the full image when selected. Reduced
 motion keeps the click-to-reveal interaction without the movement. The homepage
 portrait and favicon also come from the user's art collection. Gallery and portrait
-assets live under `public/art/` as lossless WebP files; the supplied favicon lives
-in `app/favicon.ico`. The About page contains only verified project context until
-the user provides biographical details.
+assets live under `public/art/` as lossless WebP files. The supplied favicon PNG is
+the source for the multi-size `app/favicon.ico`, `app/icon.png`,
+`app/apple-icon.png`, and the 192-pixel icon referenced by `app/manifest.ts`.
+The About page contains only verified project context until the user provides
+biographical details.
 
 The earlier Claude export in the local `reference/` directory remains an
 untracked historical reference. It is not the source of truth for this redesign.
