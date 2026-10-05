@@ -61,14 +61,14 @@ to enforce it.
 - root, dump, docs, and lab share the broader RaioViajante identity. They are
   not required to be pixel-identical; each app implements it for its framework.
 - Shared design code should come from proven reuse or a clear architectural
-  reason. `@raioviajante/design` exposes the existing five light/dark color
+  reason. `@raioviajante/design` exposes the existing five dark color
   primitives in `tokens.css`, the editorial design values in
   `editorial-tokens.css`, and the root's editorial shell in `editorial.css`.
-  Root consumes the editorial shell; lab consumes the color primitives. Dump
-  and docs do not consume this package yet.
+  Root and Dump consume the editorial shell; lab consumes the color primitives.
+  Docs does not consume this package yet.
 - The editorial token file is a framework-neutral specification. Each app
   loads its own font assets and retains its routes, content, framework-specific
-  components, theme bootstrap, and app-specific interactions. Apps can use
+  components and app-specific interactions. Apps can use
   shared CSS selectors when the shell fits their structure.
 - Play is planned separately and must not automatically inherit the
   RaioViajante shared design package.

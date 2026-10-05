@@ -67,4 +67,4 @@ See [`docs/development.md`](docs/development.md) for more detail.
 
 ## Current status
 
-The Astro/Starlight application is initialized and includes the approved RaioViajante visual system, a bespoke homepage, article navigation, table-of-contents support, heading permalinks, and dark/light themes. Published content includes the Sweep project page and the two RaioViajante pages under `src/content/docs/`.
+The Astro/Starlight application is initialized and includes the approved RaioViajante visual system, a bespoke homepage, article navigation, table-of-contents support, heading permalinks, and a fixed dark palette. Published content includes the Sweep project page and the two RaioViajante pages under `src/content/docs/`.

@@ -2,7 +2,7 @@
 
 `@raioviajante/design` exposes two visual systems during the site migration:
 
-- `tokens.css` contains the existing light and dark color primitives used by Lab.
+- `tokens.css` contains the dark color primitives used by Lab.
 - `editorial-tokens.css` contains the root site's current editorial colors,
   Noto Sans Mono font specification, type scale, layout measures, and interaction
   timing. It defines custom properties only, so Astro and Next.js can both use it.

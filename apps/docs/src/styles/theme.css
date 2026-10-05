@@ -4,11 +4,10 @@
  * Starlight themes almost entirely through CSS custom properties (`--sl-color-*`,
  * `--sl-font*`, `--sl-content-width`, `--sl-sidebar-width`, ...). This file overrides
  * those tokens instead of reimplementing Starlight's components, so all native
- * behavior (search, sidebar, TOC, theming, responsive layout) keeps working.
+ * behavior (search, sidebar, TOC, responsive layout) keeps working.
  *
- * Base identity (`--rv-bg`/`--rv-fg`/`--rv-accent`) is defined once and re-defined only
- * under `[data-theme='light']`; every `--sl-color-*` below is derived from those three
- * values, so light mode falls out of the same formulas instead of a separate palette.
+ * Base identity (`--rv-bg`/`--rv-fg`/`--rv-accent`) is defined once. Every
+ * `--sl-color-*` below is derived from those three values.
  *
  * Horizontal layout is governed by our own `--rv-content-width`/`--rv-page-inline`/
  * `--rv-rail-width`/`--rv-rail-gap` tokens (defined below), not `--sl-content-width`
@@ -99,14 +98,6 @@
 	--sl-content-width: var(--rv-content-width);
 	--sl-sidebar-width: var(--rv-rail-width);
 	--sl-content-pad-x: var(--rv-page-inline);
-}
-
-:root[data-theme='light'] {
-	--rv-bg: #f4f2ef;
-	--rv-fg: #201e1d;
-	--rv-accent: #4a3d68;
-	/* Paper holds less contrast than charcoal: muted text needs a heavier mix to clear AA. */
-	--sl-color-gray-3: color-mix(in srgb, var(--rv-fg) 65%, transparent);
 }
 
 ::selection {
@@ -534,8 +525,7 @@ mobile-starlight-toc nav {
 
 /* Mobile menu toggle: a plain icon aligned with the content edge, not a
    floating pill. Being unlayered, this alone already beats every one of
-   Starlight's own layered background-color variants (default, light theme,
-   popover-open) — no need to restate "none" for each of them separately. */
+   Starlight's own layered background-color variants, including popover-open. */
 .sl-menu-button {
 	position: fixed;
 	inset-inline-end: var(--rv-page-inline);

@@ -66,9 +66,9 @@ root, dump, docs, and lab share the broader RaioViajante visual identity. Each
 app implements that identity itself; shared implementation is extracted only
 where there is genuine reuse.
 
-`@raioviajante/design` is a private, framework-neutral package of static CSS
-with no build step. It exports `./tokens.css`, which defines five color
-primitives for the light and dark themes:
+`@raioviajante/design` is a private package of shared CSS and browser audio
+with no build step. It exports `./tokens.css`, which defines five dark color
+primitives:
 
 - `--rv-color-bg`
 - `--rv-color-fg`
@@ -80,9 +80,10 @@ It also exports `./editorial-tokens.css`, the framework-neutral specification
 for the root site's current editorial colors, Noto Sans Mono typography,
 layout measures, and interaction timing. `./editorial.css` imports those tokens
 and provides structural selectors for the top line, navigation, content grid,
-sections, rows, and footer. Root currently consumes the shell; dump, docs, and
-lab have not migrated to the editorial tokens or shell yet. Apps supply their
-own font loading, routes, and page content.
+sections, rows, and footer. Root and Dump consume the editorial shell and
+shared sound behavior. Lab consumes the color primitives. Docs has not
+adopted the package yet. Apps supply their own font loading, routes, and page
+content.
 
 An app using the color primitives keeps its own variable names and points them
 at the primitives:
@@ -92,13 +93,13 @@ app CSS ──▶ app semantic aliases (e.g. --bg) ──▶ --rv-color-* primit
 ```
 
 Apps that have not adopted the editorial shell retain their own selectors,
-typography, layout, and theme behavior.
+typography, and layout behavior.
 
 | App  | Consumes `@raioviajante/design` |
 | ---- | ------------------------------- |
 | root | yes                             |
 | lab  | yes                             |
-| dump | no                              |
+| dump | yes                             |
 | docs | no                              |
 
 Each consumer documents its own mapping: see root's

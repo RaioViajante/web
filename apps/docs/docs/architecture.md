@@ -26,4 +26,4 @@ Do not place public-facing content in `docs/`, and do not place repository-maint
 
 ## Status
 
-The Astro/Starlight application is initialized. The content collection is rendered from `src/content/docs/`, with the current public routes grouped under `projects/` and `raioviajante/`. The approved visual system, article navigation, table of contents, heading permalinks, and theme controls are implemented in the application.
+The Astro/Starlight application is initialized. The content collection is rendered from `src/content/docs/`, with the current public routes grouped under `projects/` and `raioviajante/`. The approved visual system, article navigation, table of contents, and heading permalinks are implemented in the application.

@@ -43,8 +43,8 @@ repository. Publish project behavior only once it is implemented and stable.
   look.
 - Customize through Starlight's component overrides in
   `src/components/overrides/` and the theme tokens in `src/styles/theme.css`,
-  keeping native Starlight behavior (search, sidebar, table of contents,
-  theming) working.
+  keeping native Starlight behavior (search, sidebar, table of contents)
+  working. Keep the fixed dark palette and omit theme controls.
 
 ## Formatting and validation
 

@@ -11,7 +11,7 @@ RaioViajante's internet presence is split across separate subdomains, each its o
 
 ## Role of this site
 
-`lab.raioviajante.com` hosts experiments, prototypes, and technical curiosities that haven't decided what they are yet. Core rule: **the shell is consistent, the experiments are allowed to misbehave.** The global shell — header, footer, theme selector, canonical content width — stays disciplined and unmistakably RaioViajante across every route. An individual experiment page may introduce a specialized interactive surface inside its own content area, but experiments do not get permission to redesign the site around themselves.
+`lab.raioviajante.com` hosts experiments, prototypes, and technical curiosities that haven't decided what they are yet. Core rule: **the shell is consistent, the experiments are allowed to misbehave.** The global shell — header, footer, canonical content width — stays disciplined and unmistakably RaioViajante across every route. An individual experiment page may introduce a specialized interactive surface inside its own content area, but experiments do not get permission to redesign the site around themselves.
 
 ## Stack
 
@@ -21,7 +21,7 @@ Astro (static-first, no server runtime needed), TypeScript, pnpm. No React, Vue,
 
 ```text
 src/
-  components/    shared shell pieces (Header, Footer, ThemeToggle)
+  components/    shared shell pieces (Header, Footer)
                  and per-experiment surfaces (FilenameClassifier, ExecutionStates, BootSector)
   data/          experiments.ts — centralized experiment content model
   layouts/       BaseLayout.astro (site shell), ExperimentLayout.astro
@@ -43,6 +43,6 @@ The classifier and execution surfaces share small pure TypeScript functions with
 
 Every primary surface (header, homepage, experiment metadata, prose, and by default the experiment surface itself) shares one canonical column: 680px of actual content (`--content-width`), with the `clamp(1rem, 4vw, 1.25rem)` gutter (`--gutter`) outside it, so a container is at most the content width plus two gutters wide. An experiment's data record carries an explicit `layout` field (`"canonical"` by default, `"wide"` opt-in) so a future experiment that genuinely needs more horizontal space (a waveform editor, a node graph, a large canvas) can request a breakout without making width-expansion the default behavior for every experiment. See [`design.md`](design.md) for the visual rationale.
 
-## Theme system
+## Color system
 
-The theme selector and persistence strategy are ported from the real implementations in the sibling `raioviajante.com` and `dump` repositories (not reinvented). The shared color primitives come from `@raioviajante/design`, aliased to lab's own variable names — see [`design.md`](design.md) for specifics.
+The fixed dark color primitives come from `@raioviajante/design`, aliased to lab's own variable names — see [`design.md`](design.md) for specifics.

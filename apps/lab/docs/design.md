@@ -7,7 +7,6 @@ The approved Claude Design export was kept locally at `reference/claude-export/`
 - Experiment surfaces growing to viewport width instead of staying inside the canonical column.
 - Parser playground tokens exploding vertically instead of a compact two-column layout.
 - Code escaping its bounding box instead of scrolling internally.
-- A half-black/half-white theme icon instead of the clean crescent-moon / sun treatment.
 - GitHub duplicated in the footer — GitHub only ever appears in the header.
 
 ## Shared RaioViajante visual identity
@@ -32,7 +31,7 @@ lab is the first consumer of `@raioviajante/design` (`"@raioviajante/design": "w
 - `--muted` → `--rv-color-muted`
 - `--border` → `--rv-color-hairline`
 
-Components and pages use the lab names, never `--rv-color-*` directly. Tokens that are specific to lab stay defined in `global.css`: `--field-border` (the stronger 49% boundary on editable fields) and `--cell` (5% light, 6% dark), along with `color-scheme`. The switch to shared tokens was made without any rendered change.
+Components and pages use the lab names, never `--rv-color-*` directly. Tokens that are specific to lab stay defined in `global.css`: `--field-border` (the stronger 49% boundary on editable fields) and `--cell` (6% foreground), along with `color-scheme`. The site uses the shared dark palette on every route.
 
 ## Header
 
@@ -49,15 +48,6 @@ Back link (`← lab/`), `<number> / <title>` heading, a metadata block (status, 
 ### Canonical vs. wide
 
 The experiment surface defaults to the same 680px canonical column as everything else. A future experiment may opt into a `wide` layout only when it genuinely needs more horizontal space (a waveform editor, a timeline, a node graph, a large canvas, a code editor with a live preview). Neither original design demo (parser playground, boot sector) used `wide` — `experiment` is not a synonym for full-width.
-
-## Theme selector
-
-Ported from the real sibling implementations (`raioviajante.com` and `dump`'s `ThemeToggle` component and theme-toggle CSS), not reinvented and not approximated from the design export's screenshot-level detail:
-
-- Fixed bottom-left, 40×40px, circular, 1px hairline border, understated.
-- Dark mode shows a crescent moon (two overlapping filled circles); light mode shows a sun (filled circle + radiating strokes) in the warm `#a9822a` tone.
-- Theme is stored in `localStorage` and applied via a `data-theme` attribute on `<html>`, set by an inline head script that runs before first paint — no visible flash, no layout shift.
-- Persists across reloads and direct navigation; falls back to the visitor's `prefers-color-scheme` when nothing is stored yet.
 
 ## Footer
 

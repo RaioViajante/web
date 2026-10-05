@@ -3,8 +3,6 @@ import "@raioviajante/design/tokens.css";
 import "../styles/global.css";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
-import ThemeToggle from "../components/ThemeToggle.astro";
-import { THEME_STORAGE_KEY } from "../lib/theme";
 import { formatTitle } from "../lib/site";
 
 interface Props {
@@ -41,33 +39,10 @@ const title = formatTitle(pageTitle);
     />
 
     <title>{title}</title>
-
-    <script is:inline define:vars={{ THEME_STORAGE_KEY }}>
-      (function () {
-        let stored = null;
-        try {
-          stored = localStorage.getItem(THEME_STORAGE_KEY);
-        } catch {
-          // Storage can be unavailable (private browsing, disabled cookies);
-          // the theme still falls back to prefers-color-scheme below.
-        }
-        const prefersDark =
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const theme =
-          stored === "light" || stored === "dark"
-            ? stored
-            : prefersDark
-              ? "dark"
-              : "light";
-        document.documentElement.setAttribute("data-theme", theme);
-      })();
-    </script>
   </head>
   <body>
     <Header />
     <slot />
     <Footer />
-    <ThemeToggle />
   </body>
 </html>

@@ -2,7 +2,7 @@
 
 ## Status
 
-The Astro/Starlight application is initialized. The approved RaioViajante visual system, bespoke homepage, article navigation, table of contents, heading permalinks, dark/light themes, and current public documentation are implemented.
+The Astro/Starlight application is initialized. The approved RaioViajante visual system, bespoke homepage, article navigation, table of contents, heading permalinks, fixed dark palette, and current public documentation are implemented.
 
 ## Stack
 

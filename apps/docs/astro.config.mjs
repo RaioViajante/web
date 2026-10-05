@@ -28,9 +28,8 @@ export default defineConfig({
 				Footer: './src/components/overrides/Footer.astro',
 				Hero: './src/components/overrides/Hero.astro',
 				SiteTitle: './src/components/overrides/SiteTitle.astro',
-				PageFrame: './src/components/overrides/PageFrame.astro',
+				ThemeProvider: './src/components/overrides/ThemeProvider.astro',
 				ThemeSelect: './src/components/overrides/ThemeSelect.astro',
-				MobileMenuFooter: './src/components/overrides/MobileMenuFooter.astro',
 			},
 			sidebar: [
 				{
