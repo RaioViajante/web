@@ -4,6 +4,7 @@ import {
   createElement,
   type ComponentType,
   type ComponentPropsWithoutRef,
+  type ReactNode,
 } from "react";
 import { render, screen } from "@testing-library/react";
 
@@ -52,5 +53,25 @@ describe("MDX prose elements", () => {
     expect(components.ol).toBeUndefined();
     expect(components.li).toBeUndefined();
     expect(components.blockquote).toBeUndefined();
+  });
+
+  it("provides semantic note and warning blocks to MDX posts", () => {
+    const components = useMDXComponents();
+    const Note = components.Note as ComponentType<{ children: ReactNode }>;
+    const Warning = components.Warning as ComponentType<{
+      children: ReactNode;
+    }>;
+    render(
+      <>
+        <Note>Useful context.</Note>
+        <Warning>Check the output.</Warning>
+      </>,
+    );
+    expect(
+      screen.getByRole("complementary", { name: "note" }),
+    ).toHaveTextContent("Useful context.");
+    expect(
+      screen.getByRole("complementary", { name: "warning" }),
+    ).toHaveTextContent("Check the output.");
   });
 });

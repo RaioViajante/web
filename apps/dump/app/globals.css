@@ -379,6 +379,35 @@ body {
   border-left: 1px solid #555;
   color: var(--dump-secondary);
 }
+.prose-callout {
+  margin: 1.8rem 0;
+  padding: 0.1rem 0 0.1rem 1rem;
+  border-left: 1px solid #555;
+  color: var(--dump-secondary);
+}
+.prose-callout > strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--rv-page-fg);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.prose-callout > div > :last-child {
+  margin-bottom: 0;
+}
+.prose-callout--important {
+  border-color: var(--dump-secondary);
+}
+.prose-callout--warning {
+  border: 0;
+  border-left: 2px solid var(--rv-page-fg);
+}
+.prose-callout--deprecated {
+  border: 0;
+  border-left: 1px dotted var(--dump-secondary);
+}
 .prose ul,
 .prose ol {
   padding-left: 1.5rem;
@@ -432,6 +461,25 @@ figcaption[data-rehype-pretty-code-title] {
   background: var(--dump-code-bg);
   font-size: 0.76rem;
   line-height: 1.75;
+}
+.prose pre[data-language]:not([data-language="text"]) {
+  padding-top: 2rem;
+}
+.prose pre[data-language]:not([data-language="text"])::before {
+  position: absolute;
+  top: 0.35rem;
+  left: 1rem;
+  color: var(--rv-page-muted);
+  content: attr(data-language);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+figure[data-rehype-pretty-code-figure]:has(figcaption) pre::before {
+  content: none;
+}
+figure[data-rehype-pretty-code-figure]:has(figcaption) pre {
+  padding-top: 0.9rem;
 }
 figure[data-rehype-pretty-code-figure] pre {
   margin: 0;

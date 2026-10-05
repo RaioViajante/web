@@ -14,6 +14,11 @@ code with copying, related posts by shared tags, adjacent posts, and matching
 Lab experiments where an existing experiment is available. Giscus uses a
 custom stylesheet served from `/giscus.css`.
 
+MDX posts can use `<Note>`, `<Important>`, `<Warning>`, and `<Deprecated>` for
+left-rule callouts. Fenced code can include a title and highlighted lines using
+`rehype-pretty-code` metadata. The renderer labels the language and adds copy
+controls and line numbers to ordinary fenced blocks.
+
 The `/about` route redirects to Root's About page. `/uses` remains local because
 it lists tools in use for this writing site.
 

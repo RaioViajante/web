@@ -90,7 +90,7 @@ describe("<Comments />", () => {
     intersectFirst();
     expect(document.querySelector(SCRIPT_SELECTOR)).toHaveAttribute(
       "data-theme",
-      "https://dump.raioviajante.com/giscus.css",
+      `${window.location.origin}/giscus.css`,
     );
   });
 });

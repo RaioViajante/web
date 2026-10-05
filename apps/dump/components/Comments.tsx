@@ -10,8 +10,6 @@ const REPO_ID = "R_kgDOUu8oYA";
 const CATEGORY = "Comments";
 const CATEGORY_ID = "DIC_kwDOUu8oYM4DGx0J";
 
-const THEME = "https://dump.raioviajante.com/giscus.css";
-
 function loadGiscus(container: HTMLDivElement) {
   const script = document.createElement("script");
   script.src = "https://giscus.app/client.js";
@@ -25,7 +23,7 @@ function loadGiscus(container: HTMLDivElement) {
   script.setAttribute("data-strict", "1");
   script.setAttribute("data-reactions-enabled", "0");
   script.setAttribute("data-emit-metadata", "0");
-  script.setAttribute("data-theme", THEME);
+  script.setAttribute("data-theme", `${window.location.origin}/giscus.css`);
   script.setAttribute("data-lang", "en");
 
   container.appendChild(script);
