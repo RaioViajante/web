@@ -33,7 +33,7 @@ Sidebar links only brighten on hover. In content rows, the left label brightens
 without changing size, while the right note brightens and scales by 1.8%.
 Linked rows are clickable across their full width, with a pointer cursor. Either
 side activates the same row response and optional short menu hover sound.
-Linked rows give a small pressed response and a distinct click sound when sound
+Linked rows give a subtle inset press response and a distinct click sound when sound
 is enabled. Primary links show short descriptions on hover or keyboard focus.
 Project rows show longer descriptions when any part of their row is hovered or
 focused. The avatar flips on click with a separate two-part flip sound.
