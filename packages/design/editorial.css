@@ -36,6 +36,7 @@
 .rv-shell a {
   color: inherit;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .rv-shell a:hover {
@@ -172,6 +173,7 @@ footer.rv-frame {
 }
 
 .rv-leader {
+  position: relative;
   display: flex;
   align-items: baseline;
   gap: 0.75rem;
@@ -207,6 +209,17 @@ footer.rv-frame {
   transition: color 420ms ease;
 }
 
+.rv-leader:has(.rv-leader-name a) {
+  cursor: pointer;
+}
+
+.rv-leader-name a::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: "";
+}
+
 .rv-leader:hover .rv-leader-name a,
 .rv-leader:focus-within .rv-leader-name a {
   color: #f4f6f9;
@@ -214,7 +227,7 @@ footer.rv-frame {
 
 .rv-leader:hover .rv-leader-note,
 .rv-leader:focus-within .rv-leader-note {
-  color: #bdc7d1;
+  color: #e1e6ed;
   transform: scale(1.018);
 }
 

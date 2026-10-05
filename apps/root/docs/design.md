@@ -30,7 +30,8 @@ provided yet.
 The home page links to Setup under "Other links" after "Latest writing".
 Sidebar links only brighten on hover. In content rows, the left label brightens
 without changing size, while the right note brightens and scales by 1.8%.
-Either side activates the same row response and optional short menu click sound.
+Linked rows are clickable across their full width, with a pointer cursor. Either
+side activates the same row response and optional short menu hover sound.
 The avatar flips on hover with a separate two-part flip sound, and project names
 show larger description previews when any part of their row is hovered or focused.
 Sound is off until enabled by the visitor and its preference is stored in the browser.
