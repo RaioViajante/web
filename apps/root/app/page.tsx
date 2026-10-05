@@ -34,11 +34,7 @@ export default async function Home() {
         {primaryLinks.map((link) => (
           <LeaderRow
             key={link.href}
-            name={
-              <a href={link.href} data-sound="nav">
-                {link.label}
-              </a>
-            }
+            name={<a href={link.href}>{link.label}</a>}
             note={link.category}
           />
         ))}
@@ -62,11 +58,7 @@ export default async function Home() {
         {posts.map((post) => (
           <LeaderRow
             key={post.url}
-            name={
-              <a href={post.url} data-sound="nav">
-                {post.title}
-              </a>
-            }
+            name={<a href={post.url}>{post.title}</a>}
             note={post.date}
           />
         ))}
@@ -79,14 +71,7 @@ export default async function Home() {
           number="00.3"
           title="Other links"
         />
-        <LeaderRow
-          name={
-            <Link href="/setup" data-sound="nav">
-              Setup
-            </Link>
-          }
-          note="gear"
-        />
+        <LeaderRow name={<Link href="/setup">Setup</Link>} note="gear" />
       </section>
     </>
   );

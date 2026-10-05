@@ -250,25 +250,26 @@ footer.rv-frame {
   color: var(--rv-page-muted);
   font-size: 0.9375rem;
   text-align: right;
-  transition: color 380ms ease;
+  transform-origin: right center;
+  transition:
+    color 420ms ease,
+    transform 560ms cubic-bezier(0.2, 0.75, 0.2, 1);
 }
 
 .rv-leader-name a {
   display: inline-block;
-  transition:
-    color 380ms ease,
-    transform 520ms cubic-bezier(0.2, 0.75, 0.2, 1);
-  transform-origin: left center;
+  transition: color 420ms ease;
 }
 
 .rv-leader:hover .rv-leader-name a,
-.rv-leader-name a:focus-visible {
-  color: #fff;
-  transform: scale(1.055);
+.rv-leader:focus-within .rv-leader-name a {
+  color: #f4f6f9;
 }
 
-.rv-leader:hover .rv-leader-note {
-  color: #b6c0cb;
+.rv-leader:hover .rv-leader-note,
+.rv-leader:focus-within .rv-leader-note {
+  color: #bdc7d1;
+  transform: scale(1.06);
 }
 
 .rv-footer {
@@ -297,19 +298,18 @@ footer.rv-frame {
   column-gap: 0.45rem;
 }
 
-.rv-footer-links a:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.2rem;
-}
-
 .rv-footer-email {
   display: inline-block;
   margin-top: 0.2rem;
 }
 
-.rv-footer-email:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.2rem;
+.rv-footer a {
+  transition: color 420ms ease;
+}
+
+.rv-footer a:hover,
+.rv-footer a:focus-visible {
+  color: #aab5c1;
 }
 
 .rv-footer-cnpj {
@@ -335,11 +335,12 @@ footer.rv-frame {
   .rv-subnav a,
   .rv-subnav-detail,
   .rv-leader-name a,
-  .rv-leader-note {
+  .rv-leader-note,
+  .rv-footer a {
     transition: none;
   }
-  .rv-leader:hover .rv-leader-name a,
-  .rv-leader-name a:focus-visible {
+  .rv-leader:hover .rv-leader-note,
+  .rv-leader:focus-within .rv-leader-note {
     transform: none;
   }
 }

@@ -14,7 +14,7 @@ export default function Privacy() {
       <section className="rv-section" aria-labelledby="controller-heading">
         <SectionHeading
           id="controller-heading"
-          number="06."
+          number="05."
           title="Controller and contact"
         />
         <p className="rv-copy">
@@ -26,7 +26,7 @@ export default function Privacy() {
       <section className="rv-section" aria-labelledby="data-heading">
         <SectionHeading
           id="data-heading"
-          number="06.1"
+          number="05.1"
           title="Data and preferences"
         />
         <p className="rv-copy">
@@ -41,14 +41,14 @@ export default function Privacy() {
         </p>
       </section>
       <section className="rv-section" aria-labelledby="links-heading">
-        <SectionHeading id="links-heading" number="06.2" title="Other sites" />
+        <SectionHeading id="links-heading" number="05.2" title="Other sites" />
         <p className="rv-copy">
           Links to dump, docs, lab, GitHub and other destinations open separate
           websites. Their data practices may differ from this root site.
         </p>
       </section>
       <section className="rv-section" aria-labelledby="rights-heading">
-        <SectionHeading id="rights-heading" number="06.3" title="Your rights" />
+        <SectionHeading id="rights-heading" number="05.3" title="Your rights" />
         <p className="rv-copy">
           You can contact us to ask about personal information provided by
           email, or to request access, correction or deletion where applicable.
@@ -61,7 +61,7 @@ export default function Privacy() {
         </p>
       </section>
       <section className="rv-section" aria-labelledby="updates-heading">
-        <SectionHeading id="updates-heading" number="06.4" title="Updates" />
+        <SectionHeading id="updates-heading" number="05.4" title="Updates" />
         <p className="rv-copy">
           This page will be updated when the site&apos;s data practices change.
         </p>

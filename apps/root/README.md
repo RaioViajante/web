@@ -11,10 +11,10 @@ Internal routes:
 - `/setup` — personal gear
 - `/about` — brief introduction
 - `/projects` — projects
-- `/now` — current activities
 - `/contact` — contact email
 - `/gallery` — original character art, with room for future work
 - `/privacy` — privacy information for the root site
+- `/terms` — terms of use for the root site
 
 Related independent websites:
 

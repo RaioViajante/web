@@ -14,7 +14,7 @@ export default function Contact() {
         </p>
       </div>
       <section className="rv-section" aria-labelledby="contact-heading">
-        <SectionHeading id="contact-heading" number="04." title="Email" />
+        <SectionHeading id="contact-heading" number="03." title="Email" />
         <p className="rv-copy">
           <a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a>
         </p>

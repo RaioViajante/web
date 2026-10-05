@@ -13,9 +13,8 @@ const ecosystem = [
 const pages = [
   { number: "01.", label: "about", href: "/about" },
   { number: "02.", label: "projects", href: "/projects" },
-  { number: "03.", label: "now", href: "/now" },
-  { number: "04.", label: "contact", href: "/contact" },
-  { number: "05.", label: "gallery", href: "/gallery" },
+  { number: "03.", label: "contact", href: "/contact" },
+  { number: "04.", label: "gallery", href: "/gallery" },
 ];
 
 export function SiteNavigation() {

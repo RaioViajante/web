@@ -8,7 +8,7 @@ export function ProjectPreviewRow({ project }: { project: Project }) {
     <div className="project-preview-row">
       <LeaderRow
         name={
-          <a href={project.href} aria-describedby={tooltipId} data-sound="nav">
+          <a href={project.href} aria-describedby={tooltipId}>
             {project.name}
           </a>
         }

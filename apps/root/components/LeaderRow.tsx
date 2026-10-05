@@ -8,7 +8,7 @@ export function LeaderRow({
   note: ReactNode;
 }) {
   return (
-    <div className="rv-leader">
+    <div className="rv-leader" data-sound="nav">
       <span className="rv-leader-name">{name}</span>
       <span className="rv-leader-dots" aria-hidden="true" />
       <span className="rv-leader-note">{note}</span>

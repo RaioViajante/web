@@ -15,7 +15,7 @@ export default function Gallery() {
       <section className="rv-section" aria-labelledby="collection-heading">
         <SectionHeading
           id="collection-heading"
-          number="05."
+          number="04."
           title="Collection"
         />
         <figure className="gallery-artwork">

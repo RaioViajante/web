@@ -23,7 +23,11 @@ export function SiteFooter() {
           mail@raioviajante.com
         </a>
         <p className="rv-footer-cnpj">CNPJ: 53.021.377/0001-93</p>
-        <Link href="/privacy">Privacy Policy</Link>
+        <nav className="rv-footer-legal" aria-label="Legal">
+          <Link href="/terms">Terms of Use</Link>
+          <span aria-hidden="true"> · </span>
+          <Link href="/privacy">Privacy Policy</Link>
+        </nav>
       </div>
     </footer>
   );
