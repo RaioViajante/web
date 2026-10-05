@@ -41,9 +41,13 @@ Sound is off until enabled by the visitor and its preference is stored in the br
 Its text toggle sits alone at the top of the reading column. The Projects page
 uses an editorial list with name, status, description, type, and destination for
 each entry.
-The gallery currently contains the original avatar artwork; additional art
-awaits user-supplied assets. The About page contains only verified project context
-until the user provides biographical details.
+The gallery opens with the user's illustrated character, then reveals two
+overlapping groups of the supplied artwork. Each image rises gently on hover or
+keyboard focus and opens the full image when selected. Its short paper-like sounds
+use the existing sound preference: entry sounds only play if the audio context was
+already unlocked by an interaction, and individual artwork sounds play on hover
+or click. Reduced-motion visitors see the collection immediately. The About page
+contains only verified project context until the user provides biographical details.
 
 The earlier Claude export in the local `reference/` directory remains an
 untracked historical reference. It is not the source of truth for this redesign.

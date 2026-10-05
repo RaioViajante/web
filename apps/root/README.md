@@ -12,7 +12,7 @@ Internal routes:
 - `/about` — brief introduction
 - `/projects` — projects
 - `/contact` — contact email
-- `/gallery` — original character art, with room for future work
+- `/gallery` — animated collection of original character art
 - `/privacy` — privacy information for the root site
 - `/terms` — terms of use for the root site
 
