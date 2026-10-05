@@ -7,7 +7,7 @@ import { primaryLinks } from "../lib/links";
 import { projects } from "../lib/projects";
 import { getRecentPosts } from "../lib/writing";
 
-export const revalidate = 900;
+export const revalidate = 60;
 
 export default async function Home() {
   const posts = await getRecentPosts();

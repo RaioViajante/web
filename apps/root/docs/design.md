@@ -17,8 +17,9 @@ Root has routes for home, about, projects, contact, gallery, setup, privacy,
 and terms of use. The primary navigation contains the local content routes except Setup,
 which is linked from the home page. The footer links to the four independently
 deployed sites. The home page shows recent dump posts from its public RSS feed;
-the feed is revalidated every 15 minutes, with a known-post fallback if the
-feed is unavailable. The footer contains the supplied public email. Its CNPJ
+the feed is eligible for revalidation after 60 seconds. A known-post fallback
+keeps the section populated if the feed is unavailable. The footer contains the
+supplied public email. Its CNPJ
 line shows the CNPJ supplied by the user. The footer links to the root site's
 privacy policy and terms of use.
 

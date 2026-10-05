@@ -88,7 +88,7 @@ export function parseRecentPosts(feed: string): RecentPost[] {
 export async function getRecentPosts(): Promise<RecentPost[]> {
   try {
     const response = await fetch(FEED_URL, {
-      next: { revalidate: 900 },
+      next: { revalidate: 60 },
       signal: AbortSignal.timeout(5000),
     });
     if (!response.ok) return fallbackPosts;
