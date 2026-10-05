@@ -1,76 +1,15 @@
-import { render, screen } from "@testing-library/react";
-
 import UsesPage from "@/app/uses/page";
 
-describe("<UsesPage />", () => {
-  it("keeps the editorial, text-first structure: no cards, tables, or lists", () => {
-    const { container } = render(<UsesPage />);
+jest.mock("next/navigation", () => ({
+  redirect: jest.fn(() => {
+    throw new Error("redirect");
+  }),
+}));
 
-    expect(
-      screen.getByRole("heading", { level: 1, name: "Uses" }),
-    ).toBeInTheDocument();
-    expect(container.querySelector(".uses-page")).toBeInTheDocument();
-    expect(container.querySelector("section")).not.toBeInTheDocument();
-    expect(container.querySelector("dl")).not.toBeInTheDocument();
-    expect(container.querySelector("ul")).not.toBeInTheDocument();
-    expect(container.querySelector("table")).not.toBeInTheDocument();
-    expect(container.querySelector("img")).not.toBeInTheDocument();
-  });
-
-  it("opens with the muted intro line and the drier mono aside", () => {
-    const { container } = render(<UsesPage />);
-
-    expect(container.querySelector(".uses-intro")).toHaveTextContent(
-      "A running, incomplete inventory. Updated whenever I remember to.",
-    );
-    expect(container.querySelector(".uses-aside")).toHaveTextContent(
-      "mostly things I use to convince computers to cooperate.",
-    );
-  });
-
-  it("lays the four sections out in a single grid in mobile reading order", () => {
-    const { container } = render(<UsesPage />);
-
-    const grid = container.querySelector(".uses-grid");
-    expect(grid).toBeInTheDocument();
-
-    // Sections are direct grid children (flat DOM), so document order and the
-    // one-column mobile order are the same; desktop columns come purely from
-    // grid auto-flow, not `order`.
-    const sections = grid
-      ? Array.from(grid.children).filter((node) =>
-          node.classList.contains("uses-section"),
-        )
-      : [];
-    expect(sections).toHaveLength(4);
-
-    const headings = Array.from(
-      container.querySelectorAll(".uses-section-heading"),
-    ).map((node) => node.textContent);
-    expect(headings).toEqual([
-      "Machines",
-      "Operating Systems",
-      "Editors",
-      "Terminal",
-    ]);
-  });
-
-  it("renders item names with an optional quiet secondary detail", () => {
-    const { container } = render(<UsesPage />);
-
-    expect(screen.getByText("Desktop")).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "Ryzen 7 5700X3D · 32 GB RAM · Fedora Workstation / Windows 11",
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("planned VM on Fedora Workstation"),
-    ).toBeInTheDocument();
-
-    // Names are always present; notes are optional (Terminal entries carry none).
-    expect(
-      container.querySelectorAll(".uses-item-name").length,
-    ).toBeGreaterThan(container.querySelectorAll(".uses-item-note").length);
+describe("legacy uses route", () => {
+  it("redirects to the Root setup page", () => {
+    expect(() => UsesPage()).toThrow("redirect");
+    const { redirect } = jest.requireMock("next/navigation");
+    expect(redirect).toHaveBeenCalledWith("https://raioviajante.com/setup");
   });
 });

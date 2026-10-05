@@ -15,14 +15,6 @@ const pages = [
   { href: "/", label: "posts" },
   { href: "/archive", label: "archive" },
   { href: "/tags", label: "tags" },
-  { href: "/uses", label: "uses" },
-];
-
-const sites = [
-  { href: "https://raioviajante.com", label: "raioviajante.com" },
-  { href: "https://dump.raioviajante.com", label: "dump" },
-  { href: "https://docs.raioviajante.com", label: "docs" },
-  { href: "https://lab.raioviajante.com", label: "lab" },
 ];
 
 export function PrimaryNavigation({ posts = [] }: { posts?: SearchPost[] }) {
@@ -43,6 +35,7 @@ export function PrimaryNavigation({ posts = [] }: { posts?: SearchPost[] }) {
                 className="rv-nav-link"
                 href={href}
                 aria-current={active ? "page" : undefined}
+                data-sound="nav"
               >
                 {String(index).padStart(2, "0")}. {label}
               </Link>
@@ -51,20 +44,6 @@ export function PrimaryNavigation({ posts = [] }: { posts?: SearchPost[] }) {
         })}
       </ol>
       <PostSearch posts={posts} />
-      <p className="rv-nav-label">Sites</p>
-      <ul className="rv-nav-list">
-        {sites.map(({ href, label }) => (
-          <li key={href}>
-            <a
-              className="rv-nav-link"
-              href={href}
-              aria-current={label === "dump" ? "page" : undefined}
-            >
-              {label}
-            </a>
-          </li>
-        ))}
-      </ul>
       <div id="post-toc-slot" />
     </nav>
   );

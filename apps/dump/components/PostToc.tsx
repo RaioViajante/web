@@ -21,7 +21,7 @@ export function PostToc({ headings }: { headings: Heading[] }) {
       <ol>
         {headings.map((heading) => (
           <li key={heading.id}>
-            <a href={`#${heading.id}`}>
+            <a href={`#${heading.id}`} data-sound="nav">
               {heading.number}. {heading.title}
             </a>
           </li>

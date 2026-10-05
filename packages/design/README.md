@@ -8,6 +8,8 @@
   timing. It defines custom properties only, so Astro and Next.js can both use it.
 - `editorial.css` imports `editorial-tokens.css` and provides the existing
   `.rv-shell` layout and interaction selectors. Root and Dump consume it.
+- `editorial-sound` provides the Root and Dump sound palette and interaction
+  event handling for links and buttons marked with `data-sound`.
 
 An app that only needs editorial values imports
 `@raioviajante/design/editorial-tokens.css`. An app using the complete shell

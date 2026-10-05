@@ -64,6 +64,7 @@ export function PostSearch({ posts }: { posts: SearchPost[] }) {
             results.map((post) => (
               <Link
                 href={`/posts/${post.slug}`}
+                data-sound="nav"
                 key={post.slug}
                 onClick={() => setQuery("")}
               >

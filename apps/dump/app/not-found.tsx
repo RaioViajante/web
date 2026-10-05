@@ -31,13 +31,18 @@ export default function NotFound() {
         </h2>
         {destinations.map(({ label, note, href }) =>
           href.startsWith("/") ? (
-            <Link className="dump-leader" href={href} key={href}>
+            <Link
+              className="dump-leader"
+              data-sound="nav"
+              href={href}
+              key={href}
+            >
               <span>{label}</span>
               <span className="dump-dots" aria-hidden="true" />
               <span>{note}</span>
             </Link>
           ) : (
-            <a className="dump-leader" href={href} key={href}>
+            <a className="dump-leader" data-sound="nav" href={href} key={href}>
               <span>{label}</span>
               <span className="dump-dots" aria-hidden="true" />
               <span>{note}</span>

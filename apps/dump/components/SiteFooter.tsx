@@ -16,20 +16,29 @@ export function SiteFooter() {
               <a
                 href={href}
                 aria-current={label === "dump" ? "page" : undefined}
+                data-sound="nav"
               >
                 {label}
               </a>
             </span>
           ))}
         </nav>
-        <a className="rv-footer-email" href="mailto:mail@raioviajante.com">
+        <a
+          className="rv-footer-email"
+          data-sound="nav"
+          href="mailto:mail@raioviajante.com"
+        >
           mail@raioviajante.com
         </a>
         <p className="rv-footer-cnpj">CNPJ: 53.021.377/0001-93</p>
         <nav className="rv-footer-legal" aria-label="Legal">
-          <a href="https://raioviajante.com/terms">Terms of Use</a>
+          <a href="https://raioviajante.com/terms" data-sound="nav">
+            Terms of Use
+          </a>
           <span aria-hidden="true"> · </span>
-          <a href="https://raioviajante.com/privacy">Privacy Policy</a>
+          <a href="https://raioviajante.com/privacy" data-sound="nav">
+            Privacy Policy
+          </a>
         </nav>
       </div>
     </footer>

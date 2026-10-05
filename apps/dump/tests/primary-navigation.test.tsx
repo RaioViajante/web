@@ -9,6 +9,17 @@ jest.mock("next/navigation", () => ({
 }));
 
 describe("<PrimaryNavigation />", () => {
+  it("keeps sibling sites and the legacy uses page out of the sidebar", () => {
+    pathname = "/";
+    render(<PrimaryNavigation />);
+
+    expect(screen.queryByText("Sites")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /uses/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link")).toHaveLength(3);
+  });
+
   it("marks posts as current on the homepage", () => {
     pathname = "/";
     render(<PrimaryNavigation />);

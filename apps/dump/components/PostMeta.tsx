@@ -18,7 +18,9 @@ export function PostMeta({ date, tags = [] }: PostMetaProps) {
           {tags.map((tag, index) => (
             <span key={tag}>
               {index > 0 && ", "}
-              <Link href={`/tags/${encodeURIComponent(tag)}`}>{tag}</Link>
+              <Link href={`/tags/${encodeURIComponent(tag)}`} data-sound="nav">
+                {tag}
+              </Link>
             </span>
           ))}
         </>

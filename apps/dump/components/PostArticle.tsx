@@ -54,7 +54,9 @@ export function PostArticle({
               {post.tags.map((tag, index) => (
                 <span key={tag}>
                   {index > 0 && " · "}
-                  <Link href={`/tags/${tag}`}>{tag}</Link>
+                  <Link href={`/tags/${tag}`} data-sound="nav">
+                    {tag}
+                  </Link>
                 </span>
               ))}
             </span>
@@ -75,6 +77,7 @@ export function PostArticle({
             {details.related.map((item) => (
               <Link
                 className="dump-leader"
+                data-sound="nav"
                 key={item.slug}
                 href={`/posts/${item.slug}`}
               >
@@ -84,7 +87,11 @@ export function PostArticle({
               </Link>
             ))}
             {details.lab && (
-              <a className="dump-leader" href={details.lab.href}>
+              <a
+                className="dump-leader"
+                data-sound="nav"
+                href={details.lab.href}
+              >
                 <span>Try it: {details.lab.title}</span>
                 <span className="dump-dots" aria-hidden="true" />
                 <span>lab ↗</span>
@@ -97,7 +104,7 @@ export function PostArticle({
             {details.previous && (
               <>
                 <span>Previous</span>
-                <Link href={`/posts/${details.previous.slug}`}>
+                <Link href={`/posts/${details.previous.slug}`} data-sound="nav">
                   {details.previous.title}
                 </Link>
               </>
@@ -107,7 +114,7 @@ export function PostArticle({
             {details.next && (
               <>
                 <span>Next</span>
-                <Link href={`/posts/${details.next.slug}`}>
+                <Link href={`/posts/${details.next.slug}`} data-sound="nav">
                   {details.next.title}
                 </Link>
               </>

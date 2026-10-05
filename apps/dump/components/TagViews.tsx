@@ -25,6 +25,7 @@ export function TagIndex({ tags }: { tags: TagCount[] }) {
                   <li className="tag-index-item" key={tag}>
                     <Link
                       className="dump-leader tag-index-link"
+                      data-sound="nav"
                       href={tagHref(tag)}
                     >
                       <span>{tag}</span>
@@ -48,7 +49,11 @@ export function TagPostList({ posts }: { posts: Post[] }) {
     <ol className="tag-post-list">
       {sortPostsNewestFirst(posts).map((post) => (
         <li key={post.slug}>
-          <Link className="dump-leader" href={`/posts/${post.slug}`}>
+          <Link
+            className="dump-leader"
+            data-sound="nav"
+            href={`/posts/${post.slug}`}
+          >
             <span>{post.title}</span>
             <span className="dump-dots" aria-hidden="true" />
             <time dateTime={post.date}>{formatTagPostDate(post.date)}</time>

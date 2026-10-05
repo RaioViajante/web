@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  attachEditorialSoundEvents,
+  createEditorialSound,
+} from "@raioviajante/design/editorial-sound";
 
 export function SoundToggle() {
   const [enabled, setEnabled] = useState(false);
-  const audio = useRef<AudioContext | null>(null);
+  const sound = useRef<ReturnType<typeof createEditorialSound> | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -15,49 +19,31 @@ export function SoundToggle() {
 
   useEffect(() => {
     if (!enabled) return;
-    function onClick(event: MouseEvent) {
-      if (
-        !(event.target instanceof Element) ||
-        !event.target.closest("a, button")
-      )
-        return;
-      const context = (audio.current ??= new AudioContext());
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      const start = context.currentTime;
-      oscillator.type = "triangle";
-      oscillator.frequency.setValueAtTime(580, start);
-      oscillator.frequency.exponentialRampToValueAtTime(400, start + 0.055);
-      gain.gain.setValueAtTime(0.012, start);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.055);
-      oscillator.connect(gain).connect(context.destination);
-      oscillator.start(start);
-      oscillator.stop(start + 0.06);
-    }
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
+    const controller = (sound.current ??= createEditorialSound());
+    return attachEditorialSoundEvents(controller.play);
   }, [enabled]);
 
   useEffect(
     () => () => {
-      void audio.current?.close();
+      sound.current?.close();
     },
     [],
   );
 
   return (
     <button
-      className="rv-sound-toggle"
       type="button"
+      className="rv-sound-toggle"
+      aria-label={`Sound ${enabled ? "on" : "off"}. Click to ${enabled ? "mute" : "enable"}.`}
       aria-pressed={enabled}
-      aria-label={`Sound ${enabled ? "on" : "off"}`}
       onClick={() => {
         const next = !enabled;
+        if (next) (sound.current ??= createEditorialSound()).resume();
         setEnabled(next);
         window.localStorage.setItem("rv-sound", next ? "on" : "off");
       }}
     >
-      SOUND <span>{enabled ? "ON" : "OFF"}</span>
+      SOUND <span aria-hidden="true">{enabled ? "ON" : "OFF"}</span>
     </button>
   );
 }

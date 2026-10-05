@@ -36,7 +36,11 @@ export function HomePostList({ posts }: { posts: Post[] }) {
         <h2 className="rv-section-heading" id="latest-heading">
           <span className="rv-section-number">00.</span>Latest
         </h2>
-        <Link className="featured-post" href={`/posts/${latest.slug}`}>
+        <Link
+          className="featured-post"
+          data-sound="nav"
+          href={`/posts/${latest.slug}`}
+        >
           <strong>{latest.title}</strong>
           <span>{latest.description}</span>
         </Link>
@@ -59,7 +63,11 @@ export function HomePostList({ posts }: { posts: Post[] }) {
           <ol className="month-post-list">
             {month.posts.map((post) => (
               <li className="month-post" key={post.slug}>
-                <Link className="dump-leader" href={`/posts/${post.slug}`}>
+                <Link
+                  className="dump-leader"
+                  data-sound="nav"
+                  href={`/posts/${post.slug}`}
+                >
                   <span>{post.title}</span>
                   <span className="dump-dots" aria-hidden="true" />
                   <time dateTime={post.date}>{post.date.slice(5)}</time>
@@ -93,6 +101,7 @@ export function HomePostList({ posts }: { posts: Post[] }) {
               {parts.map((post) => (
                 <Link
                   className="dump-leader"
+                  data-sound="nav"
                   key={post.slug}
                   href={`/posts/${post.slug}`}
                 >
@@ -112,12 +121,16 @@ export function HomePostList({ posts }: { posts: Post[] }) {
           </span>
           Follow along
         </h2>
-        <a className="dump-leader" href="/rss.xml">
+        <a className="dump-leader" data-sound="nav" href="/rss.xml">
           <span>RSS</span>
           <span className="dump-dots" aria-hidden="true" />
           <span>feed</span>
         </a>
-        <a className="dump-leader" href="https://github.com/RaioViajante">
+        <a
+          className="dump-leader"
+          data-sound="nav"
+          href="https://github.com/RaioViajante"
+        >
           <span>GitHub</span>
           <span className="dump-dots" aria-hidden="true" />
           <span>code ↗</span>

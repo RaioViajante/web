@@ -19,8 +19,8 @@ left-rule callouts. Fenced code can include a title and highlighted lines using
 `rehype-pretty-code` metadata. The renderer labels the language and adds copy
 controls and line numbers to ordinary fenced blocks.
 
-The `/about` route redirects to Root's About page. `/uses` remains local because
-it lists tools in use for this writing site.
+The legacy `/about` and `/uses` routes redirect to Root's About and Setup
+pages. Neither appears in Dump navigation or its sitemap.
 
 Series membership is curated in `lib/post-details.ts` until it becomes part of
 post frontmatter. Reading times use a 220 words per minute estimate, excluding
