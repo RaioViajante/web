@@ -38,7 +38,7 @@ Linked rows give a subtle inset press response and a distinct click sound when s
 is enabled. Primary links and project rows reveal their descriptions after 400 ms
 of pointer hover, or immediately on keyboard focus. The avatar flips on click
 with a separate two-part flip sound.
-Its eight-frame illustration loops every three seconds after the frames have
+Its ten-frame illustration loops every three seconds after the frames have
 loaded. Reduced motion keeps the centered portrait still and disables the flip.
 Sound is off until enabled by the visitor and its preference is stored in the browser.
 Its text toggle sits alone at the top of the reading column. The Projects page

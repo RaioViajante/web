@@ -7,11 +7,13 @@ const frames = [
   { src: "/art/avatar/frame-01.webp", duration: 250 },
   { src: "/art/avatar/frame-02.webp", duration: 150 },
   { src: "/art/avatar/frame-03.webp", duration: 150 },
-  { src: "/art/avatar/frame-04.webp", duration: 400 },
-  { src: "/art/avatar/frame-05.webp", duration: 600 },
-  { src: "/art/avatar/frame-06.webp", duration: 650 },
-  { src: "/art/avatar/frame-07.webp", duration: 250 },
-  { src: "/art/avatar/frame-08.webp", duration: 550 },
+  { src: "/art/avatar/frame-04.webp", duration: 300 },
+  { src: "/art/avatar/frame-05.webp", duration: 200 },
+  { src: "/art/avatar/frame-06.webp", duration: 300 },
+  { src: "/art/avatar/frame-07.webp", duration: 400 },
+  { src: "/art/avatar/frame-08.webp", duration: 400 },
+  { src: "/art/avatar/frame-09.webp", duration: 250 },
+  { src: "/art/avatar/frame-10.webp", duration: 600 },
 ] as const;
 
 const centeredFrame = 3;
