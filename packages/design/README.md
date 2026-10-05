@@ -9,7 +9,8 @@
 - `editorial.css` imports `editorial-tokens.css` and provides the existing
   `.rv-shell` layout and interaction selectors. Root and Dump consume it.
 - `editorial-sound` provides the Root and Dump sound palette and interaction
-  event handling for links and buttons marked with `data-sound`.
+  event handling for links and buttons marked with `data-sound`. Inputs marked
+  with `data-sound="typing"` play a quiet key sound while sound is enabled.
 
 An app that only needs editorial values imports
 `@raioviajante/design/editorial-tokens.css`. An app using the complete shell

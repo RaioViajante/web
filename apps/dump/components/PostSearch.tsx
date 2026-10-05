@@ -52,6 +52,7 @@ export function PostSearch({ posts }: { posts: SearchPost[] }) {
           ref={input}
           id="post-search"
           type="search"
+          data-sound="typing"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="find a post"

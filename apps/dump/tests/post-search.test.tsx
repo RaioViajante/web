@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { attachEditorialSoundEvents } from "@raioviajante/design/editorial-sound";
 import { PostSearch } from "@/components/PostSearch";
 
 const posts = [
@@ -33,5 +34,22 @@ describe("post search", () => {
     render(<PostSearch posts={posts} />);
     fireEvent.keyDown(document, { key: "/" });
     expect(screen.getByRole("searchbox", { name: "Search" })).toHaveFocus();
+  });
+
+  it("plays a key sound only for typed or deleted search text", () => {
+    render(<PostSearch posts={posts} />);
+    const input = screen.getByRole("searchbox", { name: "Search" });
+    const play = jest.fn();
+    const detach = attachEditorialSoundEvents(play);
+
+    fireEvent.input(input, { inputType: "insertText", data: "a" });
+    fireEvent.input(input, { inputType: "deleteContentBackward" });
+    fireEvent.input(input, { inputType: "insertFromPaste", data: "pasted" });
+
+    expect(play).toHaveBeenCalledTimes(2);
+    expect(play).toHaveBeenCalledWith("typing", "click");
+    detach();
+    fireEvent.input(input, { inputType: "insertText", data: "b" });
+    expect(play).toHaveBeenCalledTimes(2);
   });
 });

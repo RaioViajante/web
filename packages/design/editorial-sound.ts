@@ -72,6 +72,8 @@ export function createEditorialSound() {
     } else if (kind === "gallery") {
       paperTap(0, action === "click" ? 0.009 : 0.005);
       pulse(0, action === "click" ? 600 : 480, 0.045, 0.006);
+    } else if (kind === "typing") {
+      paperTap(0, 0.003);
     } else if (action === "click") {
       pulse(0, 620, 0.06, 0.017);
       pulse(0.065, 810, 0.075, 0.012);
@@ -122,12 +124,32 @@ export function attachEditorialSoundEvents(
   function onGalleryReveal() {
     play("gallery-reveal", "click");
   }
+
+  function onTyping(event: Event) {
+    if (!(event instanceof InputEvent) || event.isComposing) return;
+    const target = event.target;
+    if (
+      !(target instanceof HTMLInputElement) ||
+      target.dataset.sound !== "typing"
+    )
+      return;
+    if (
+      event.inputType === "insertText" ||
+      event.inputType === "deleteContentBackward" ||
+      event.inputType === "deleteContentForward"
+    ) {
+      play("typing", "click");
+    }
+  }
+
   document.addEventListener("pointerover", onHover);
   document.addEventListener("click", onClick);
+  document.addEventListener("input", onTyping);
   window.addEventListener("rv-gallery-reveal", onGalleryReveal);
   return () => {
     document.removeEventListener("pointerover", onHover);
     document.removeEventListener("click", onClick);
+    document.removeEventListener("input", onTyping);
     window.removeEventListener("rv-gallery-reveal", onGalleryReveal);
   };
 }
