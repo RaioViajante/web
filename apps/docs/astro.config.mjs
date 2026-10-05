@@ -18,7 +18,7 @@ export default defineConfig({
 			// concept distinct from the per-page template.
 			title: 'docs',
 			titleDelimiter: '—',
-			favicon: '/icon.png?v=2',
+			favicon: '/favicon.ico?v=3',
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/RaioViajante/web' },
 			],
@@ -46,6 +46,14 @@ export default defineConfig({
 				},
 			],
 			head: [
+			{
+				tag: 'link',
+				attrs: { rel: 'icon', type: 'image/png', sizes: '512x512', href: '/icon.png?v=3' },
+			},
+			{
+				tag: 'link',
+				attrs: { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png?v=3' },
+			},
 				{
 					tag: 'link',
 					attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
