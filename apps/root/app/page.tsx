@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AvatarCoin } from "../components/AvatarCoin";
 import { ProjectPreviewRow } from "../components/ProjectPreviewRow";
+import { PreviewRow } from "../components/PreviewRow";
 import { LeaderRow } from "../components/LeaderRow";
 import { SectionHeading } from "../components/SectionHeading";
 import { primaryLinks } from "../lib/links";
@@ -23,10 +24,13 @@ export default async function Home() {
       <section className="rv-section" aria-labelledby="links-heading">
         <SectionHeading id="links-heading" number="00." title="Primary links" />
         {primaryLinks.map((link) => (
-          <LeaderRow
+          <PreviewRow
             key={link.href}
-            name={<a href={link.href}>{link.label}</a>}
+            id={`primary-link-${link.category}`}
+            label={link.label}
+            href={link.href}
             note={link.category}
+            description={link.description}
           />
         ))}
       </section>

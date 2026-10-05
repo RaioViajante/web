@@ -16,7 +16,7 @@ export function SoundToggle() {
   useEffect(() => {
     if (!enabled) return;
 
-    function play(kind: string) {
+    function play(kind: string, action: "hover" | "click" = "hover") {
       const context = (audio.current ??= new AudioContext());
       if (context.state === "suspended") void context.resume();
       const pulse = (
@@ -45,6 +45,9 @@ export function SoundToggle() {
       if (kind === "flip") {
         pulse(0, 690, 0.075, 0.022);
         pulse(0.13, 820, 0.085, 0.018);
+      } else if (action === "click") {
+        pulse(0, 620, 0.06, 0.017);
+        pulse(0.065, 810, 0.075, 0.012);
       } else {
         pulse(0, 430, 0.045, 0.012);
       }
@@ -58,6 +61,8 @@ export function SoundToggle() {
       if (
         !element ||
         element.dataset.soundOn === "click" ||
+        (!element.matches("a, button") &&
+          !element.querySelector("a, button")) ||
         (event.relatedTarget instanceof Node &&
           element.contains(event.relatedTarget))
       )
@@ -68,8 +73,9 @@ export function SoundToggle() {
     function onClick(event: MouseEvent) {
       const target = event.target;
       if (!(target instanceof Element)) return;
-      const element = target.closest<HTMLElement>("[data-sound-on='click']");
-      if (element) play(element.dataset.sound ?? "nav");
+      const control = target.closest("a, button");
+      const element = control?.closest<HTMLElement>("[data-sound]");
+      if (element) play(element.dataset.sound ?? "nav", "click");
     }
 
     document.addEventListener("pointerover", onHover);

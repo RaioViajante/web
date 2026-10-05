@@ -61,11 +61,11 @@ html {
   }
 }
 
-.project-preview-row {
+.preview-row {
   position: relative;
 }
 
-.project-preview {
+.row-preview {
   position: absolute;
   z-index: 2;
   top: calc(100% - 0.3rem);
@@ -88,16 +88,16 @@ html {
   pointer-events: none;
 }
 
-.project-preview p {
+.row-preview p {
   margin: 0;
 }
-.project-preview p.project-preview-meta {
+.row-preview p.row-preview-meta {
   margin-top: 0.45rem;
   color: var(--rv-page-muted);
 }
 
-.project-preview-row:has(.rv-leader:hover) .project-preview,
-.project-preview-row:has(.rv-leader:focus-within) .project-preview {
+.preview-row:has(.rv-leader:hover) .row-preview,
+.preview-row:has(.rv-leader:focus-within) .row-preview {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -191,7 +191,7 @@ html {
   .avatar-coin.is-flipping .home-avatar {
     animation: none;
   }
-  .project-preview {
+  .row-preview {
     transition: none;
     transform: none;
   }

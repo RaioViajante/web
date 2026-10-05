@@ -211,6 +211,14 @@ footer.rv-frame {
 
 .rv-leader:has(.rv-leader-name a) {
   cursor: pointer;
+  transition:
+    filter 180ms ease,
+    transform 180ms ease;
+}
+
+.rv-leader:has(.rv-leader-name a):active {
+  filter: brightness(1.1);
+  transform: translateY(1px) scale(0.997);
 }
 
 .rv-leader-name a::after {
@@ -292,11 +300,13 @@ footer.rv-frame {
   .rv-nav-link,
   .rv-leader-name a,
   .rv-leader-note,
+  .rv-leader:has(.rv-leader-name a),
   .rv-footer a {
     transition: none;
   }
   .rv-leader:hover .rv-leader-note,
-  .rv-leader:focus-within .rv-leader-note {
+  .rv-leader:focus-within .rv-leader-note,
+  .rv-leader:has(.rv-leader-name a):active {
     transform: none;
   }
 }
