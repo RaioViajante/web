@@ -96,11 +96,18 @@ html {
   color: var(--rv-page-muted);
 }
 
-.preview-row:has(.rv-leader:hover) .row-preview,
+.preview-row:has(.rv-leader:hover) .row-preview {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition-delay: 400ms;
+}
+
 .preview-row:has(.rv-leader:focus-within) .row-preview {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+  transition-delay: 0ms;
 }
 
 .home-feed-note {
@@ -192,7 +199,7 @@ html {
     animation: none;
   }
   .row-preview {
-    transition: none;
+    transition: visibility 0s linear;
     transform: none;
   }
   .project-entry .project-detail a {

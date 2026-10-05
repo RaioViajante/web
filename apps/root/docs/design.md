@@ -34,9 +34,9 @@ without changing size, while the right note brightens and scales by 1.8%.
 Linked rows are clickable across their full width, with a pointer cursor. Either
 side activates the same row response and optional short menu hover sound.
 Linked rows give a subtle inset press response and a distinct click sound when sound
-is enabled. Primary links show short descriptions on hover or keyboard focus.
-Project rows show longer descriptions when any part of their row is hovered or
-focused. The avatar flips on click with a separate two-part flip sound.
+is enabled. Primary links and project rows reveal their descriptions after 400 ms
+of pointer hover, or immediately on keyboard focus. The avatar flips on click
+with a separate two-part flip sound.
 Sound is off until enabled by the visitor and its preference is stored in the browser.
 Its text toggle sits alone at the top of the reading column. The Projects page
 uses an editorial list with name, status, description, type, and destination for
