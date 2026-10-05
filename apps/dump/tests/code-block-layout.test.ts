@@ -25,7 +25,7 @@ describe("fenced code layout", () => {
   it("preserves source lines in a naturally sized scrolling block", () => {
     const pre = cssRule(".prose pre");
 
-    expect(pre).toMatch(/white-space:\s*pre/);
+    expect(cssRule(".prose pre code")).toMatch(/font:\s*inherit/);
     expect(pre).toMatch(/overflow-x:\s*auto/);
     expect(pre).not.toMatch(/(?:^|[;\n]\s*)(?:min-)?height\s*:/);
   });

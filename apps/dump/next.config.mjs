@@ -1,115 +1,61 @@
 import createMDX from "@next/mdx";
 
-/**
- * Syntax highlighting themes for `rehype-pretty-code` (Shiki). Highlighting
- * runs at build time, so no highlighter ships to the browser. Both themes are
- * emitted per token as `--shiki-light`/`--shiki-dark` CSS variables (see
- * `keepBackground: false` below and the `.prose pre code span` rules in
- * globals.css), so the active site theme picks the right one with no client
- * JS and no flicker.
- */
-const shikiThemeDark = {
-  name: "dump-ink",
+const shikiTheme = {
+  name: "raioviajante-editorial",
   type: "dark",
   colors: {
-    "editor.background": "#201c29",
-    "editor.foreground": "#eae6f0",
+    "editor.background": "#202020",
+    "editor.foreground": "#ececec",
   },
   tokenColors: [
-    {
-      settings: {
-        background: "#201c29",
-        foreground: "#eae6f0",
-      },
-    },
+    { settings: { background: "#202020", foreground: "#ececec" } },
     {
       scope: ["comment", "punctuation.definition.comment"],
-      settings: { foreground: "#8f88a3" },
+      settings: { foreground: "#7b818a", fontStyle: "italic" },
     },
     {
       scope: ["string", "punctuation.definition.string"],
-      settings: { foreground: "#8f88a3" },
+      settings: { foreground: "#a8c791" },
+    },
+    { scope: ["keyword", "storage"], settings: { foreground: "#d8bd84" } },
+    {
+      scope: ["entity.name.type", "support.type"],
+      settings: { foreground: "#bfa6d9" },
     },
     {
-      scope: [
-        "keyword",
-        "storage",
-        "constant.numeric",
-        "constant.language",
-        "entity.name.function",
-        "entity.name.label",
-        "support.function",
-        "support.type",
-      ],
-      settings: { foreground: "#b7a4dd" },
+      scope: ["entity.name.function", "support.function"],
+      settings: { foreground: "#8fb8d6" },
     },
+    {
+      scope: ["constant.numeric", "constant.language"],
+      settings: { foreground: "#de9f8c" },
+    },
+    { scope: ["punctuation"], settings: { foreground: "#9aa0a8" } },
   ],
 };
 
-// Same restrained palette as `shikiThemeDark`, tuned for the warm-paper light
-// theme instead of a stark white editor surface. Foreground/accent match
-// `--fg`/`--accent` in `[data-theme="light"]`; the muted tone is that same
-// 65%-of-`--fg`-over-`--bg` mix pre-computed to a literal hex, since a Shiki
-// theme can't reference CSS custom properties.
-const shikiThemeLight = {
-  name: "dump-paper",
-  type: "light",
-  colors: {
-    "editor.background": "#e5e3e0",
-    "editor.foreground": "#201e1d",
-  },
-  tokenColors: [
-    {
-      settings: {
-        background: "#e5e3e0",
-        foreground: "#201e1d",
-      },
-    },
-    {
-      scope: ["comment", "punctuation.definition.comment"],
-      settings: { foreground: "#656361" },
-    },
-    {
-      scope: ["string", "punctuation.definition.string"],
-      settings: { foreground: "#656361" },
-    },
-    {
-      scope: [
-        "keyword",
-        "storage",
-        "constant.numeric",
-        "constant.language",
-        "entity.name.function",
-        "entity.name.label",
-        "support.function",
-        "support.type",
-      ],
-      settings: { foreground: "#4a3d68" },
-    },
-  ],
-};
-
-/** @type {import('next').NextConfig} */
 const nextConfig = {
-  // `.mdx` files under `app/` are treated as routes; `.md`/`.markdown` are not,
-  // so plain notes in `content/` never accidentally become pages.
   pageExtensions: ["ts", "tsx", "mdx"],
+  async headers() {
+    return [
+      {
+        source: "/giscus.css",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "https://giscus.app" },
+        ],
+      },
+    ];
+  },
 };
-
 const withMDX = createMDX({
   extension: /\.mdx$/,
   options: {
-    // Plugins are passed as strings so they stay serializable for Turbopack.
     remarkPlugins: ["remark-frontmatter", "remark-gfm"],
     rehypePlugins: [
       "rehype-slug",
       [
         "rehype-pretty-code",
-        {
-          theme: { light: shikiThemeLight, dark: shikiThemeDark },
-          keepBackground: false,
-          grid: false,
-        },
+        { theme: shikiTheme, keepBackground: false, grid: false },
       ],
     ],
   },

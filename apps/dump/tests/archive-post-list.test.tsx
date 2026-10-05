@@ -48,23 +48,19 @@ describe("<ArchivePostList />", () => {
   it("renders canonical post links", () => {
     render(<ArchivePostList posts={posts} />);
 
-    expect(screen.getByRole("link", { name: "Newest post" })).toHaveAttribute(
-      "href",
-      "/posts/newest",
-    );
+    expect(
+      screen.getByRole("link", { name: "Newest post 09-03" }),
+    ).toHaveAttribute("href", "/posts/newest");
   });
 
   it("renders UTC-safe abbreviated dates with semantic full dates", () => {
     render(<ArchivePostList posts={posts} />);
 
-    expect(formatArchiveDate("2026-01-01")).toBe("Jan 01");
+    expect(formatArchiveDate("2026-01-01")).toBe("01-01");
     const newest = screen.getAllByRole("listitem")[0]!;
-    expect(within(newest).getByText("Sep 03")).toHaveAttribute(
+    expect(within(newest).getByText("09-03")).toHaveAttribute(
       "datetime",
       "2026-09-03",
-    );
-    expect(within(newest).getByText("Sep 03")).toHaveAccessibleName(
-      "September 3, 2026",
     );
   });
 

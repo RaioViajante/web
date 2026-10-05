@@ -1,68 +1,41 @@
 import Link from "next/link";
+import { sortPostsNewestFirst, type Post } from "@/lib/posts";
 
-import { formatPostDate, sortPostsNewestFirst, type Post } from "@/lib/posts";
-
-interface ArchivePostListProps {
-  posts: Post[];
-}
-
-interface PostYear {
-  year: string;
-  posts: Post[];
-}
-
-const archiveDateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "2-digit",
-  timeZone: "UTC",
-});
+type PostYear = { year: string; posts: Post[] };
 
 export function formatArchiveDate(date: string): string {
-  return archiveDateFormatter.format(new Date(`${date}T00:00:00Z`));
+  return date.slice(5);
 }
-
 export function groupPostsByYear(posts: readonly Post[]): PostYear[] {
   const years = new Map<string, Post[]>();
-
   for (const post of sortPostsNewestFirst(posts)) {
     const year = post.date.slice(0, 4);
-    const yearPosts = years.get(year);
-
-    if (yearPosts) {
-      yearPosts.push(post);
-    } else {
-      years.set(year, [post]);
-    }
+    years.set(year, [...(years.get(year) ?? []), post]);
   }
-
   return [...years].map(([year, yearPosts]) => ({ year, posts: yearPosts }));
 }
 
-export function ArchivePostList({ posts }: ArchivePostListProps) {
-  if (posts.length === 0) {
-    return <p className="archive-empty">No posts yet.</p>;
-  }
-
+export function ArchivePostList({ posts }: { posts: Post[] }) {
+  if (!posts.length) return <p className="archive-empty">No posts yet.</p>;
   return (
-    <div className="archive-years">
-      {groupPostsByYear(posts).map(({ year, posts: yearPosts }) => (
-        <section className="archive-year" key={year}>
-          <h2 className="archive-year-heading">{year}</h2>
+    <div>
+      {groupPostsByYear(posts).map(({ year, posts: yearPosts }, index) => (
+        <section className="rv-section" key={year}>
+          <h2 className="rv-section-heading">
+            <span className="rv-section-number">
+              {String(index + 1).padStart(2, "0")}.
+            </span>
+            {year}
+          </h2>
           <ol className="archive-post-list">
             {yearPosts.map((post) => (
-              <li className="archive-post" key={post.slug}>
-                <time
-                  className="archive-post-date"
-                  dateTime={post.date}
-                  aria-label={formatPostDate(post.date)}
-                >
-                  {formatArchiveDate(post.date)}
-                </time>
-                <Link
-                  className="archive-post-title"
-                  href={`/posts/${post.slug}`}
-                >
-                  {post.title}
+              <li key={post.slug}>
+                <Link className="dump-leader" href={`/posts/${post.slug}`}>
+                  <span>{post.title}</span>
+                  <span className="dump-dots" aria-hidden="true" />
+                  <time dateTime={post.date}>
+                    {formatArchiveDate(post.date)}
+                  </time>
                 </Link>
               </li>
             ))}

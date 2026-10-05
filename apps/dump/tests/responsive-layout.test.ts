@@ -6,21 +6,13 @@ const css = fs.readFileSync(
   "utf8",
 );
 
-function cssRule(selector: string): string {
-  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return css.match(new RegExp(`${escaped}\\s*\\{([^}]+)\\}`))?.[1] ?? "";
-}
-
-describe("responsive layout containment", () => {
-  it("lets the body grid shrink around internally scrolling content", () => {
-    expect(cssRule("body")).toMatch(
-      /grid-template-columns:\s*minmax\(0,\s*1fr\)/,
+describe("responsive layout", () => {
+  it("moves the sidebar above content on narrow screens", () => {
+    expect(css).toMatch(
+      /@media \(max-width: 760px\)[\s\S]*?\.dump-shell \.rv-layout\s*\{\s*display: block/,
     );
   });
-
-  it("reserves narrow-screen footer space for the fixed theme control", () => {
-    expect(css).toMatch(
-      /@media \(max-width: 768px\)[\s\S]*?\.site-footer\s*\{[\s\S]*?padding-bottom:\s*max\(/,
-    );
+  it("allows code to scroll within the reading column", () => {
+    expect(css).toMatch(/\.prose pre\s*\{[^}]*overflow-x: auto/);
   });
 });

@@ -23,7 +23,7 @@ describe("MDX prose elements", () => {
   it("keeps inline code separate from fenced-code layout", () => {
     const inlineCode = cssRule(".prose :not(pre) > code");
 
-    expect(inlineCode).toMatch(/font-family:\s*var\(--font-mono\)/);
+    expect(inlineCode).toMatch(/font:\s*0\.85em var\(--font-mono\)/);
     expect(inlineCode).not.toMatch(/display:\s*(?:block|grid|flex)/);
     expect(inlineCode).not.toMatch(/white-space:\s*pre/);
     expect(inlineCode).not.toMatch(/overflow-x:\s*auto/);

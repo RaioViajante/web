@@ -1,14 +1,12 @@
 import {
   loadOgFonts,
-  OG_ACCENT,
-  OG_FONT_MONO,
-  OG_FONT_SERIF,
+  OG_BG,
+  OG_FG,
+  OG_FONT,
   OG_IMAGE_CONTENT_TYPE,
   OG_IMAGE_SIZE,
-  OG_INK,
   OG_MUTED,
   ogDate,
-  OG_PAPER,
   titleFontSize,
 } from "@/lib/og-image";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
@@ -57,16 +55,16 @@ export default async function Image({ params }: ImageProps) {
         width: "100%",
         height: "100%",
         padding: 96,
-        backgroundColor: OG_PAPER,
+        backgroundColor: OG_BG,
       }}
     >
       <div
         style={{
           display: "flex",
-          fontFamily: OG_FONT_MONO,
+          fontFamily: OG_FONT,
           fontSize: 24,
           letterSpacing: 1,
-          color: OG_ACCENT,
+          color: OG_MUTED,
         }}
       >
         {site.name}
@@ -83,11 +81,11 @@ export default async function Image({ params }: ImageProps) {
         <div
           style={{
             display: "flex",
-            fontFamily: OG_FONT_SERIF,
+            fontFamily: OG_FONT,
             fontWeight: 700,
             fontSize: titleFontSize(post.title),
             lineHeight: 1.15,
-            color: OG_INK,
+            color: OG_FG,
           }}
         >
           {post.title}
@@ -96,7 +94,7 @@ export default async function Image({ params }: ImageProps) {
       <div
         style={{
           display: "flex",
-          fontFamily: OG_FONT_MONO,
+          fontFamily: OG_FONT,
           fontSize: 24,
           color: OG_MUTED,
         }}

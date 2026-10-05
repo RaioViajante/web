@@ -13,7 +13,7 @@ describe("<PrimaryNavigation />", () => {
     pathname = "/";
     render(<PrimaryNavigation />);
 
-    expect(screen.getByRole("link", { name: "posts" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "00. posts" })).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -23,7 +23,7 @@ describe("<PrimaryNavigation />", () => {
     pathname = "/posts/booting-512-bytes";
     render(<PrimaryNavigation />);
 
-    expect(screen.getByRole("link", { name: "posts" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "00. posts" })).toHaveAttribute(
       "aria-current",
       "page",
     );
@@ -33,11 +33,11 @@ describe("<PrimaryNavigation />", () => {
     pathname = "/tags/osdev";
     render(<PrimaryNavigation />);
 
-    expect(screen.getByRole("link", { name: "tags" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "02. tags" })).toHaveAttribute(
       "aria-current",
       "page",
     );
-    expect(screen.getByRole("link", { name: "posts" })).not.toHaveAttribute(
+    expect(screen.getByRole("link", { name: "00. posts" })).not.toHaveAttribute(
       "aria-current",
     );
   });

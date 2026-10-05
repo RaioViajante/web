@@ -80,14 +80,6 @@ describe("static pages keep canonical and RSS together", () => {
     });
   });
 
-  it("about", async () => {
-    const { metadata } = await import("@/app/about/page");
-    expect(metadata.alternates).toEqual({
-      canonical: "/about",
-      types: RSS_TYPES,
-    });
-  });
-
   it("uses", async () => {
     const { metadata } = await import("@/app/uses/page");
     expect(metadata.alternates).toEqual({

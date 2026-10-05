@@ -3,6 +3,18 @@ import { render, screen } from "@testing-library/react";
 import { PostArticle } from "@/components/PostArticle";
 import type { Post } from "@/lib/posts";
 
+jest.mock("../lib/post-details", () => ({
+  getPostDetails: () => ({
+    headings: [],
+    minutes: 2,
+    related: [],
+    previous: null,
+    next: null,
+    currentSeries: null,
+    lab: null,
+  }),
+}));
+
 const post: Post = {
   slug: "article",
   title: "Article title",

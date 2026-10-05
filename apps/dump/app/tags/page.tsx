@@ -15,7 +15,13 @@ export default function TagsPage() {
 
   return (
     <div className="tags-page">
-      <h1 className="tags-heading">Tags</h1>
+      <header className="tags-page-header">
+        <p className="page-kicker">Writing</p>
+        <h1 className="tags-heading">Tags</h1>
+        <p className="page-intro">
+          Browse the recurring ideas and one-off notes.
+        </p>
+      </header>
       <TagIndex tags={tags} />
     </div>
   );

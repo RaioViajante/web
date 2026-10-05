@@ -1,0 +1,37 @@
+/* Giscus iframe theme aligned with @raioviajante/design editorial tokens. */
+main {
+  --color-canvas-default: #191919;
+  --color-canvas-overlay: #202020;
+  --color-canvas-inset: #202020;
+  --color-canvas-subtle: #202020;
+  --color-fg-default: #edf1f6;
+  --color-fg-muted: #8792a1;
+  --color-fg-subtle: #8792a1;
+  --color-border-default: #555;
+  --color-border-muted: #2e2e2e;
+  --color-accent-fg: #edf1f6;
+  --color-accent-emphasis: #edf1f6;
+  --color-accent-muted: #555;
+  --color-accent-subtle: #2e2e2e;
+  --color-btn-text: #edf1f6;
+  --color-btn-bg: #202020;
+  --color-btn-border: #555;
+  --color-btn-shadow: 0 0 transparent;
+  --color-btn-hover-bg: #2e2e2e;
+  --color-btn-hover-border: #8792a1;
+  --color-btn-primary-text: #191919;
+  --color-btn-primary-bg: #edf1f6;
+  --color-btn-primary-border: #edf1f6;
+  --color-btn-primary-hover-bg: #d9dee5;
+  --color-btn-primary-hover-border: #d9dee5;
+}
+.gsc-main,
+.gsc-comment-box-textarea {
+  font-family: "Noto Sans Mono", ui-monospace, monospace;
+}
+.gsc-comment,
+.gsc-comment-box,
+.gsc-comment-box-main {
+  border-radius: 0;
+  box-shadow: none;
+}

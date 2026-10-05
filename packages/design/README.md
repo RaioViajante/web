@@ -7,8 +7,7 @@
   Noto Sans Mono font specification, type scale, layout measures, and interaction
   timing. It defines custom properties only, so Astro and Next.js can both use it.
 - `editorial.css` imports `editorial-tokens.css` and provides the existing
-  `.rv-shell` layout and interaction selectors. The root site is its current
-  consumer.
+  `.rv-shell` layout and interaction selectors. Root and Dump consume it.
 
 An app that only needs editorial values imports
 `@raioviajante/design/editorial-tokens.css`. An app using the complete shell
@@ -21,5 +20,5 @@ The shared shell handles hover, keyboard focus, and reduced motion for its own
 selectors. An app introducing additional animations must handle reduced motion
 in its own styles or components.
 
-Dump and Docs do not consume this package yet. Before either app imports it,
-update that Vercel project's Ignored Build Step to watch `../../packages/design`.
+Docs does not consume this package yet. Before it imports the package, update
+its Vercel project's Ignored Build Step to watch `../../packages/design`.

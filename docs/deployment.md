@@ -37,7 +37,7 @@ other exit code builds.
 The check fails open: a missing, malformed, or unresolvable previous SHA, or a
 `git diff` error, exits non-zero and builds rather than skipping.
 
-root and lab consume `@raioviajante/design`, so their command also watches
+root, dump, and lab consume `@raioviajante/design`, so their command also watches
 `../../packages/design`. It uses a shorter, equivalent form so that it stays
 within Vercel's 256-character limit for this setting:
 
@@ -45,7 +45,7 @@ within Vercel's 256-character limit for this setting:
 p=$VERCEL_GIT_PREVIOUS_SHA; printf %s "$p" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e "$p^{commit}" && git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design
 ```
 
-dump and docs do not consume it and use:
+docs does not consume it and uses:
 
 ```sh
 p=${VERCEL_GIT_PREVIOUS_SHA:-}; [ "${#p}" -eq 40 ] || exit 1; case "$p" in *[!0-9A-Fa-f]*) exit 1;; esac; git cat-file -e "$p^{commit}" || exit 1; git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml
@@ -57,7 +57,7 @@ The paths cover:
 - `../../package.json` — root workspace scripts and package-manager metadata.
 - `../../pnpm-lock.yaml` — dependency changes, which may affect any app.
 - `../../pnpm-workspace.yaml` — workspace membership and install-script policy.
-- `../../packages/design` (root and lab only) — the shared package they consume.
+- `../../packages/design` (root, dump, and lab) — the shared package they consume.
 
 ## Environment
 
@@ -67,11 +67,10 @@ The other apps do not use custom environment variables.
 
 ## Shared packages
 
-`packages/design` (`@raioviajante/design`) is consumed by root and lab. A commit
-that changes only `packages/design` rebuilds root and lab and skips dump and
-docs.
+`packages/design` (`@raioviajante/design`) is consumed by root, dump, and lab.
+A commit that changes only `packages/design` rebuilds those three apps and
+skips docs.
 
 Before another app starts consuming a shared package, add that package's path
 to the app's Ignored Build Step first, so a shared change can never skip one of
-its consumers. dump does not list `../../packages/design` yet; docs is not a
-consumer.
+its consumers. docs is not a consumer.

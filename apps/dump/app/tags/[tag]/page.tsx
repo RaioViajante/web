@@ -33,7 +33,13 @@ export default async function TagPage({ params }: PageProps) {
 
   return (
     <div className="tag-page">
-      <h1 className="tag-page-heading">tag: {tag}</h1>
+      <header className="tags-page-header">
+        <p className="page-kicker">Tag</p>
+        <h1 className="tag-page-heading">{tag}</h1>
+        <p className="page-intro">
+          {posts.length} {posts.length === 1 ? "post" : "posts"}
+        </p>
+      </header>
       <TagPostList posts={posts} />
     </div>
   );

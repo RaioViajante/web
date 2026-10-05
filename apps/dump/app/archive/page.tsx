@@ -15,7 +15,11 @@ export default function ArchivePage() {
 
   return (
     <div className="archive">
-      <h1 className="archive-heading">Archive</h1>
+      <header className="archive-page-header">
+        <p className="page-kicker">Writing</p>
+        <h1 className="archive-heading">Archive</h1>
+        <p className="page-intro">Every post, newest first.</p>
+      </header>
       <ArchivePostList posts={posts} />
     </div>
   );

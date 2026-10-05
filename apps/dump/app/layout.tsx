@@ -1,41 +1,22 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
+import { Noto_Sans_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { PrimaryNavigation } from "@/components/PrimaryNavigation";
+import { getPublishedPosts } from "@/lib/posts";
 import { alternatesFor, site } from "@/lib/site";
 import { jsonLdScript, websiteJsonLd } from "@/lib/structured-data";
 
+import "@raioviajante/design/editorial.css";
 import "./globals.css";
 
-const sourceSerif = Source_Serif_4({
+const mono = Noto_Sans_Mono({
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  variable: "--font-source-serif",
+  display: "swap",
+  variable: "--font-mono",
 });
-
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-ibm-plex-mono",
-  weight: ["400", "500"],
-});
-
-const themeScript = `
-(function(){
-  var theme = "light";
-  var stored;
-  try {
-    stored = localStorage.getItem("dump-theme");
-  } catch (error) {}
-  if (stored === "light" || stored === "dark") {
-    theme = stored;
-  } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    theme = "dark";
-  }
-  document.documentElement.setAttribute("data-theme", theme);
-})();`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -69,28 +50,36 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang={site.locale}
-      className={`${sourceSerif.variable} ${ibmPlexMono.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang={site.locale} className={mono.variable}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
         />
       </head>
-      <body>
+      <body className="rv-shell dump-shell">
         <a href="#content" className="skip-link">
           Skip to content
         </a>
         <SiteHeader />
-        <main id="content" tabIndex={-1}>
-          {children}
-        </main>
+        <div className="rv-frame rv-layout">
+          <aside className="rv-sidebar">
+            <PrimaryNavigation
+              posts={getPublishedPosts().map(
+                ({ slug, title, description, tags }) => ({
+                  slug,
+                  title,
+                  description,
+                  tags,
+                }),
+              )}
+            />
+          </aside>
+          <main id="content" className="rv-content" tabIndex={-1}>
+            {children}
+          </main>
+        </div>
         <SiteFooter />
-        <ThemeToggle />
       </body>
     </html>
   );

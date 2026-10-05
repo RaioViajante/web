@@ -1,7 +1,6 @@
 import {
   loadOgFonts,
-  OG_FONT_MONO,
-  OG_FONT_SERIF,
+  OG_FONT,
   OG_IMAGE_CONTENT_TYPE,
   OG_IMAGE_SIZE,
   ogDate,
@@ -11,22 +10,22 @@ import { getPostSlugs } from "@/lib/posts";
 
 describe("titleFontSize", () => {
   it("uses the largest size for short titles", () => {
-    expect(titleFontSize("A short title")).toBe(72);
+    expect(titleFontSize("A short title")).toBe(70);
   });
 
   it("steps down for medium titles", () => {
     const title = "A".repeat(55);
-    expect(titleFontSize(title)).toBe(60);
+    expect(titleFontSize(title)).toBe(58);
   });
 
   it("steps down further for long titles", () => {
     const title = "A".repeat(85);
-    expect(titleFontSize(title)).toBe(48);
+    expect(titleFontSize(title)).toBe(46);
   });
 
   it("never shrinks past a legible floor, however long the title", () => {
     const title = "A".repeat(500);
-    expect(titleFontSize(title)).toBe(40);
+    expect(titleFontSize(title)).toBe(38);
   });
 });
 
@@ -42,13 +41,13 @@ describe("loadOgFonts", () => {
 
     expect(fonts).toEqual([
       expect.objectContaining({
-        name: OG_FONT_SERIF,
-        weight: 700,
+        name: OG_FONT,
+        weight: 400,
         style: "normal",
       }),
       expect.objectContaining({
-        name: OG_FONT_MONO,
-        weight: 400,
+        name: OG_FONT,
+        weight: 700,
         style: "normal",
       }),
     ]);

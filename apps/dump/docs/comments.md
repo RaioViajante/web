@@ -43,5 +43,5 @@ RaioViajante moderates the `Comments` discussion category (same as repository ma
 ## Notes
 
 - Comments load lazily (`IntersectionObserver`, scoped to `Comments.tsx`) once the widget nears the viewport, so they never block article rendering.
-- The widget's theme (`noborder_light` / `noborder_dark`) tracks the site's `data-theme` attribute on mount, and stays in sync live via giscus's `setConfig` postMessage when the floating theme toggle is used — no global comments state, no extra context provider.
+- The widget uses the custom editorial theme at `/giscus.css`, served with a CORS header for the giscus iframe.
 - Reactions and metadata emission are disabled to keep the widget minimal.

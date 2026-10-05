@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
 import { groupPostsByMonth, HomePostList } from "@/components/HomePostList";
 import type { Post } from "@/lib/posts";
@@ -41,34 +41,17 @@ describe("<HomePostList />", () => {
     ]);
   });
 
-  it("renders canonical post and tag links", () => {
+  it("features the newest post and links older posts", () => {
     render(<HomePostList posts={posts} />);
-
-    expect(screen.getByRole("link", { name: "Newer day" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /Newer day/ })).toHaveAttribute(
       "href",
       "/posts/newer-day",
     );
-    expect(screen.getByRole("link", { name: "testing" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /Older day/ })).toHaveAttribute(
       "href",
-      "/tags/testing",
+      "/posts/older-day",
     );
-    expect(screen.getByRole("link", { name: "x86" })).toHaveAttribute(
-      "href",
-      "/tags/x86",
-    );
-  });
-
-  it("presents UTC-safe month labels and machine-readable days", () => {
-    render(<HomePostList posts={posts} />);
-
-    expect(
-      screen.getByRole("heading", { name: "2026.01 January" }),
-    ).toBeInTheDocument();
-    const newest = screen.getAllByRole("listitem")[0]!;
-    expect(within(newest).getByText("15")).toHaveAttribute(
-      "datetime",
-      "2026-01-15",
-    );
+    expect(screen.getByText("January 2026")).toBeInTheDocument();
   });
 
   it("renders an honest empty state", () => {
