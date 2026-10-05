@@ -1,16 +1,50 @@
 import Link from "next/link";
 
+const destinations = [
+  {
+    label: "raioviajante.com",
+    note: "start here",
+    href: "https://raioviajante.com",
+  },
+  { label: "dump", note: "writing", href: "/" },
+  {
+    label: "docs",
+    note: "documentation",
+    href: "https://docs.raioviajante.com",
+  },
+  { label: "lab", note: "experiments", href: "https://lab.raioviajante.com" },
+];
+
 export default function NotFound() {
   return (
     <div className="not-found-page">
-      <p className="not-found-eyebrow">404</p>
-      <h1 className="not-found-heading">Nothing here.</h1>
-      <p className="not-found-copy">
-        Either this page never existed, or I broke something again.
-      </p>
-      <p className="not-found-back">
-        <Link href="/">← back to posts</Link>
-      </p>
+      <header className="rv-hero">
+        <p className="rv-eyebrow">404</p>
+        <h1>not here</h1>
+        <p className="rv-dek">
+          this page moved, never existed, or broke in the lab.
+        </p>
+      </header>
+      <section className="rv-section">
+        <h2 className="rv-section-heading">
+          <span className="rv-section-number">01.</span>Go somewhere else
+        </h2>
+        {destinations.map(({ label, note, href }) =>
+          href.startsWith("/") ? (
+            <Link className="dump-leader" href={href} key={href}>
+              <span>{label}</span>
+              <span className="dump-dots" aria-hidden="true" />
+              <span>{note}</span>
+            </Link>
+          ) : (
+            <a className="dump-leader" href={href} key={href}>
+              <span>{label}</span>
+              <span className="dump-dots" aria-hidden="true" />
+              <span>{note}</span>
+            </a>
+          ),
+        )}
+      </section>
     </div>
   );
 }
