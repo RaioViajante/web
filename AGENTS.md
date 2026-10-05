@@ -16,7 +16,7 @@ Precedence:
 | `apps/dump`       | `@raioviajante/dump`   | personal technical writing      |
 | `apps/docs`       | `@raioviajante/docs`   | curated technical documentation |
 | `apps/lab`        | `@raioviajante/lab`    | interactive experiments         |
-| `packages/design` | `@raioviajante/design` | shared color tokens (CSS)       |
+| `packages/design` | `@raioviajante/design` | shared color and editorial CSS  |
 
 - The apps are deployed independently. Apps must not import from one another.
 - Shared code lives in `packages/`. Move code there only when it has a real
@@ -60,13 +60,16 @@ to enforce it.
 
 - root, dump, docs, and lab share the broader RaioViajante identity. They are
   not required to be pixel-identical; each app implements it for its framework.
-- Shared design code should come from proven reuse. `@raioviajante/design`
-  provides only the five shared color primitives (`--rv-color-*` in
-  `tokens.css`). root and lab consume it; dump and docs do not.
-- A consuming app keeps its own semantic aliases (for example
-  `--bg: var(--rv-color-bg)`) and its app-specific tokens. Selectors, focus and
-  selection rules, theme bootstrap, typography, layout, width, and gutter stay
-  in each app.
+- Shared design code should come from proven reuse or a clear architectural
+  reason. `@raioviajante/design` exposes the existing five light/dark color
+  primitives in `tokens.css`, the editorial design values in
+  `editorial-tokens.css`, and the root's editorial shell in `editorial.css`.
+  Root consumes the editorial shell; lab consumes the color primitives. Dump
+  and docs do not consume this package yet.
+- The editorial token file is a framework-neutral specification. Each app
+  loads its own font assets and retains its routes, content, framework-specific
+  components, theme bootstrap, and app-specific interactions. Apps can use
+  shared CSS selectors when the shell fits their structure.
 - Play is planned separately and must not automatically inherit the
   RaioViajante shared design package.
 - Do not default to generic SaaS layouts, card-heavy dashboards, bento grids,

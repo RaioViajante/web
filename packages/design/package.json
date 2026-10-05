@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     "./tokens.css": "./tokens.css",
+    "./editorial-tokens.css": "./editorial-tokens.css",
     "./editorial.css": "./editorial.css"
   }
 }

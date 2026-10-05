@@ -1,6 +1,6 @@
 html {
   color-scheme: dark;
-  font-size: 110%;
+  font-size: var(--rv-editorial-root-font-size);
 }
 
 .rv-topline {
@@ -123,12 +123,12 @@ html {
 .home-feed-note a {
   color: inherit;
   cursor: pointer;
-  transition: color 420ms ease;
+  transition: color var(--rv-editorial-link-duration) ease;
 }
 
 .home-feed-note a:hover,
 .home-feed-note a:focus-visible {
-  color: #aab5c1;
+  color: var(--rv-editorial-hover-link);
 }
 
 .setup-empty {
@@ -159,8 +159,8 @@ html {
 .project-description {
   margin: 0 0 0.55rem;
   color: var(--rv-page-fg);
-  font-size: 0.9375rem;
-  line-height: 1.82;
+  font-size: var(--rv-editorial-body-font-size);
+  line-height: var(--rv-editorial-body-line-height);
 }
 
 .project-detail {
@@ -174,10 +174,10 @@ html {
 }
 
 .project-entry .project-detail a {
-  color: #d9dee5;
+  color: var(--rv-editorial-inline-link);
   text-decoration: underline;
   text-underline-offset: 0.2rem;
-  transition: color 420ms ease;
+  transition: color var(--rv-editorial-link-duration) ease;
 }
 
 .project-entry .project-detail a:hover {
@@ -186,7 +186,7 @@ html {
 
 .rv-copy {
   margin: 0 0 1rem;
-  line-height: 1.82;
+  line-height: var(--rv-editorial-body-line-height);
 }
 .rv-copy a {
   text-decoration: underline;
@@ -197,7 +197,7 @@ html {
   margin: 0;
   padding: 0;
   list-style: none;
-  line-height: 1.82;
+  line-height: var(--rv-editorial-body-line-height);
 }
 
 .rv-dash-list li {
@@ -218,7 +218,7 @@ html {
   padding-left: 1rem;
   border-left: 2px solid var(--rv-page-rule);
   color: var(--rv-page-muted);
-  line-height: 1.82;
+  line-height: var(--rv-editorial-body-line-height);
 }
 .gallery-board {
   position: relative;

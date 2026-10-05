@@ -6,12 +6,13 @@ typography, numbered navigation and sections, dotted leader rows, generous
 whitespace, and a small centered footer. The character illustration and content
 are original to RaioViajante.
 
-The shared shell rules live in `@raioviajante/design/editorial.css`. Root imports
-them in `app/layout.tsx`, then defines page-specific styling in
+The shared editorial values live in `@raioviajante/design/editorial-tokens.css`.
+The shell in `@raioviajante/design/editorial.css` imports those values. Root
+imports the shell in `app/layout.tsx`, then defines page-specific styling in
 `app/globals.css`. The shell covers the top line, navigation, page grid, hero,
 section headings, leader rows, footer, focus states, and responsive behavior.
-Other apps will consume the shell as they are migrated. Each app keeps its own
-routes and content.
+Other apps can consume the tokens or shell as they are migrated. Each app keeps
+its own routes and content.
 
 Root has routes for home, about, projects, contact, gallery, this site, setup,
 privacy, and terms of use. The primary navigation contains the local content
