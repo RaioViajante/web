@@ -63,14 +63,14 @@ html {
   z-index: 2;
   top: calc(100% - 0.3rem);
   left: 0;
-  width: min(34rem, 100%);
-  padding: 0.65rem 0.8rem;
+  width: min(38rem, 100%);
+  padding: 0.95rem 1rem;
   border: 1px solid var(--rv-page-rule);
   background: #202020;
   box-shadow: 0 0.7rem 1.3rem rgba(0, 0, 0, 0.3);
   color: var(--rv-page-fg);
-  font-size: 0.82rem;
-  line-height: 1.6;
+  font-size: 0.9rem;
+  line-height: 1.7;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-0.35rem);
@@ -84,7 +84,8 @@ html {
 .project-preview p {
   margin: 0;
 }
-.project-preview-meta {
+.project-preview p.project-preview-meta {
+  margin-top: 0.45rem;
   color: var(--rv-page-muted);
 }
 

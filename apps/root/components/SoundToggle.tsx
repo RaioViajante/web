@@ -19,24 +19,35 @@ export function SoundToggle() {
     function play(kind: string) {
       const context = (audio.current ??= new AudioContext());
       if (context.state === "suspended") void context.resume();
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      const start = context.currentTime;
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(kind === "flip" ? 520 : 660, start);
-      oscillator.frequency.exponentialRampToValueAtTime(
-        kind === "flip" ? 780 : 880,
-        start + 0.09,
-      );
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.028, start + 0.012);
-      gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        start + (kind === "flip" ? 0.2 : 0.11),
-      );
-      oscillator.connect(gain).connect(context.destination);
-      oscillator.start(start);
-      oscillator.stop(start + (kind === "flip" ? 0.21 : 0.12));
+      const pulse = (
+        delay: number,
+        frequency: number,
+        duration: number,
+        volume: number,
+      ) => {
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        const start = context.currentTime + delay;
+        oscillator.type = "triangle";
+        oscillator.frequency.setValueAtTime(frequency, start);
+        oscillator.frequency.exponentialRampToValueAtTime(
+          frequency * 0.64,
+          start + duration,
+        );
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(volume, start + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        oscillator.connect(gain).connect(context.destination);
+        oscillator.start(start);
+        oscillator.stop(start + duration + 0.005);
+      };
+
+      if (kind === "flip") {
+        pulse(0, 690, 0.075, 0.022);
+        pulse(0.13, 820, 0.085, 0.018);
+      } else {
+        pulse(0, 430, 0.045, 0.012);
+      }
     }
 
     function onHover(event: PointerEvent) {

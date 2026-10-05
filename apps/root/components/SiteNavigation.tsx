@@ -5,13 +5,12 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const ecosystem = [
-  { label: "dump", href: "https://dump.raioviajante.com" },
-  { label: "lab", href: "https://lab.raioviajante.com" },
-  { label: "docs", href: "https://docs.raioviajante.com" },
+  { label: "dump", detail: "writing", href: "https://dump.raioviajante.com" },
+  { label: "lab", detail: "experiments", href: "https://lab.raioviajante.com" },
+  { label: "docs", detail: "reference", href: "https://docs.raioviajante.com" },
 ];
 
 const pages = [
-  { number: "00.1", label: "setup", href: "/setup", subitem: true },
   { number: "01.", label: "about", href: "/about" },
   { number: "02.", label: "projects", href: "/projects" },
   { number: "03.", label: "now", href: "/now" },
@@ -50,7 +49,8 @@ export function SiteNavigation() {
             {ecosystem.map((site) => (
               <li key={site.href}>
                 <a href={site.href} data-sound="nav">
-                  {site.label}
+                  <span>{site.label}</span>
+                  <span className="rv-subnav-detail">{site.detail} ↗</span>
                 </a>
               </li>
             ))}
@@ -60,7 +60,7 @@ export function SiteNavigation() {
           <li key={page.href}>
             <Link
               href={page.href}
-              className={`rv-nav-link${page.subitem ? " rv-nav-subitem" : ""}`}
+              className="rv-nav-link"
               aria-current={pathname === page.href ? "page" : undefined}
               data-sound="nav"
             >
