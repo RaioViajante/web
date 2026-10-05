@@ -41,13 +41,15 @@ Sound is off until enabled by the visitor and its preference is stored in the br
 Its text toggle sits alone at the top of the reading column. The Projects page
 uses an editorial list with name, status, description, type, and destination for
 each entry.
-The gallery opens with the user's illustrated character, then reveals two
-overlapping groups of the supplied artwork. Each image rises gently on hover or
-keyboard focus and opens the full image when selected. Its short paper-like sounds
-use the existing sound preference: entry sounds only play if the audio context was
-already unlocked by an interaction, and individual artwork sounds play on hover
-or click. Reduced-motion visitors see the collection immediately. The About page
-contains only verified project context until the user provides biographical details.
+The gallery opens with the user's "Work of Art" illustration. It floats subtly
+on hover or keyboard focus; clicking or tapping it reveals two overlapping groups
+of artwork with a short paper-like sound when SOUND is enabled. Each artwork rises
+gently on hover or keyboard focus and opens the full image when selected. Reduced
+motion keeps the click-to-reveal interaction without the movement. The homepage
+portrait and favicon also come from the user's art collection. Gallery and portrait
+assets live under `public/art/` as lossless WebP files; the supplied favicon lives
+in `app/favicon.ico`. The About page contains only verified project context until
+the user provides biographical details.
 
 The earlier Claude export in the local `reference/` directory remains an
 untracked historical reference. It is not the source of truth for this redesign.

@@ -115,7 +115,7 @@ export function SoundToggle() {
     }
 
     function onGalleryReveal() {
-      if (audio.current?.state === "running") play("gallery-reveal");
+      play("gallery-reveal", "click");
     }
 
     document.addEventListener("pointerover", onHover);
