@@ -9,10 +9,11 @@ Internal routes:
 
 - `/` — home
 - `/setup` — personal gear
-- `/about` — brief introduction
+- `/about` — personal introduction
 - `/projects` — projects
-- `/contact` — contact email
+- `/contact` — contact email and message guidance
 - `/gallery` — animated collection of original character art
+- `/this-site` — notes on the site and its source code
 - `/privacy` — privacy information for the root site
 - `/terms` — terms of use for the root site
 

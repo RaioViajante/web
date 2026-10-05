@@ -1,7 +1,7 @@
 # Architecture
 
 Root is a Next.js application deployed independently at `raioviajante.com`.
-It owns `/`, `/about`, `/projects`, `/contact`, `/gallery`, `/setup`,
+It owns `/`, `/about`, `/projects`, `/contact`, `/gallery`, `/this-site`, `/setup`,
 `/privacy`, and `/terms`. Dump, docs, and lab are separate apps at
 their respective subdomains; root links to them by URL and does not import
 their source code.

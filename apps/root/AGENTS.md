@@ -10,7 +10,7 @@ RaioViajante ecosystem. It is not a portfolio, résumé, developer sales page, o
 SaaS landing page.
 
 Its routes are `/`, `/about`, `/projects`, `/contact`, `/gallery`,
-`/setup`, `/privacy`, and `/terms`. dump, docs, and lab are separate
+`/this-site`, `/setup`, `/privacy`, and `/terms`. dump, docs, and lab are separate
 apps with their own domains; link to their full URLs and never implement them as
 routes here.
 

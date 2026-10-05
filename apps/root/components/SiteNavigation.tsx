@@ -8,6 +8,7 @@ const pages = [
   { number: "02.", label: "projects", href: "/projects" },
   { number: "03.", label: "contact", href: "/contact" },
   { number: "04.", label: "gallery", href: "/gallery" },
+  { number: "05.", label: "this site", href: "/this-site" },
 ];
 
 export function SiteNavigation() {

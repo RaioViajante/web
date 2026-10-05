@@ -177,6 +177,34 @@ html {
   text-decoration: underline;
   text-underline-offset: 0.2rem;
 }
+
+.rv-dash-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  line-height: 1.82;
+}
+
+.rv-dash-list li {
+  position: relative;
+  padding-left: 1.15rem;
+  margin-bottom: 0.45rem;
+}
+
+.rv-dash-list li::before {
+  position: absolute;
+  left: 0;
+  color: var(--rv-page-muted);
+  content: "-";
+}
+
+.rv-callout {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--rv-page-rule);
+  color: var(--rv-page-muted);
+  line-height: 1.82;
+}
 .gallery-board {
   position: relative;
   min-height: 22rem;

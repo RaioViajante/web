@@ -13,8 +13,9 @@ section headings, leader rows, footer, focus states, and responsive behavior.
 Other apps will consume the shell as they are migrated. Each app keeps its own
 routes and content.
 
-Root has routes for home, about, projects, contact, gallery, setup, privacy,
-and terms of use. The primary navigation contains the local content routes except Setup,
+Root has routes for home, about, projects, contact, gallery, this site, setup,
+privacy, and terms of use. The primary navigation contains the local content
+routes except Setup,
 which is linked from the home page. The footer links to the four independently
 deployed sites. The home page shows recent dump posts from its public RSS feed;
 the feed is eligible for revalidation after 60 seconds. A known-post fallback
@@ -51,8 +52,10 @@ art collection. Gallery and portrait assets live under `public/art/` as lossless
 WebP files. The supplied favicon PNG is
 the source for the multi-size `app/favicon.ico`, `app/icon.png`,
 `app/apple-icon.png`, and the 192-pixel icon referenced by `app/manifest.ts`.
-The About page contains only verified project context until the user provides
-biographical details.
+The About page uses Bryan's supplied personal introduction and interests without
+turning into a résumé. Contact keeps email as the primary channel and gives a
+short guide to first messages. This Site describes the root app and links to the
+public source repository.
 
 The earlier Claude export in the local `reference/` directory remains an
 untracked historical reference. It is not the source of truth for this redesign.
