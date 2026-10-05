@@ -57,7 +57,11 @@ export default async function Home() {
             note={post.date}
           />
         ))}
-        <p className="home-feed-note">from dump.raioviajante.com</p>
+        <p className="home-feed-note">
+          <a href="https://dump.raioviajante.com" data-sound="nav">
+            from dump.raioviajante.com
+          </a>
+        </p>
       </section>
 
       <section className="rv-section" aria-labelledby="other-links-heading">
