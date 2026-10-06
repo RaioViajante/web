@@ -1,5 +1,6 @@
 @import "./tokens.css";
-.rv-search {
+.rv-search,
+.rv-shell a.rv-search {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -11,7 +12,10 @@
 }
 .rv-search:hover,
 .rv-search:focus-visible,
-.rv-search[aria-current="page"] {
+.rv-search[aria-current="page"],
+.rv-shell a.rv-search:hover,
+.rv-shell a.rv-search:focus-visible,
+.rv-shell a.rv-search[aria-current="page"] {
   color: var(--fg);
 }
 .rv-search[aria-current="page"] {
@@ -190,10 +194,15 @@
   padding: 8px 3px;
   cursor: pointer;
 }
+.rv-search-scope button {
+  text-decoration: none;
+}
 .rv-search-scope button[aria-pressed="true"] {
+  color: var(--fg-2);
+}
+.rv-search-scope button:hover,
+.rv-search-scope button:focus-visible {
   color: var(--fg);
-  text-decoration: underline;
-  text-underline-offset: 6px;
 }
 .rv-search-group {
   margin: 28px 0;
