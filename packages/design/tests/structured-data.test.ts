@@ -6,6 +6,7 @@ import {
   personJsonLd,
   personRef,
   sitemapResponse,
+  webManifest,
   websiteJsonLd,
 } from "../seo";
 
@@ -67,5 +68,16 @@ describe("sitemap", () => {
       "<loc>https://x.example/b</loc><lastmod>2026-09-07</lastmod>",
     );
     expect(xml.match(/<lastmod>/g)).toHaveLength(1);
+  });
+});
+
+describe("manifest", () => {
+  it("names the site and colors without claiming an app shell", () => {
+    const manifest = webManifest("docs", { themeColor: "#191919" });
+    expect(manifest.display).toBe("browser");
+    expect(manifest.theme_color).toBe("#191919");
+    expect(manifest.background_color).toBe("#191919");
+    expect(webManifest("docs")).not.toHaveProperty("theme_color");
+    expect(manifest).not.toHaveProperty("scope");
   });
 });

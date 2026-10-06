@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
 import { alternatesFor, site } from "@/lib/site";
 import { Behavior } from "@raioviajante/design/behavior-react";
+import { themeColor } from "@raioviajante/design/theme-color";
 
 import "@raioviajante/design/styles.css";
 import "./globals.css";
@@ -45,6 +46,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
   },
 };
+
+export async function generateViewport(): Promise<Viewport> {
+  return { themeColor: await themeColor() };
+}
 
 export default async function RootLayout({
   children,

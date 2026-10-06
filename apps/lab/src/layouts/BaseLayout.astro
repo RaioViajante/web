@@ -2,6 +2,7 @@
 import { isNotFoundPath } from "@raioviajante/design/seo";
 import { SeoHead } from "@raioviajante/design/seo-head";
 import { jsonLdScript } from "@raioviajante/design/seo";
+import { themeColor } from "@raioviajante/design/theme-color";
 import fontUrl from "@raioviajante/design/fonts/NotoSansMono-Latin-Variable.woff2?url";
 import "@raioviajante/design/fonts.css";
 import "@raioviajante/design/styles.css";
@@ -21,6 +22,7 @@ const {
   current = Astro.url.pathname,
   jsonLd,
 } = Astro.props;
+const color = await themeColor();
 const title = formatTitle(pageTitle);
 ---
 
@@ -42,6 +44,7 @@ const title = formatTitle(pageTitle);
       title={title}
       description={description}
       noindex={isNotFoundPath(Astro.url.pathname)}
+      themeColor={color}
     />
     {jsonLd && (
       <script

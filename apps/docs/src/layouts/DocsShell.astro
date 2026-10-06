@@ -2,6 +2,7 @@
 import { isNotFoundPath } from "@raioviajante/design/seo";
 import { SeoHead } from "@raioviajante/design/seo-head";
 import { jsonLdScript } from "@raioviajante/design/seo";
+import { themeColor } from "@raioviajante/design/theme-color";
 import fontUrl from "@raioviajante/design/fonts/NotoSansMono-Latin-Variable.woff2?url";
 import "@raioviajante/design/fonts.css";
 import "@raioviajante/design/styles.css";
@@ -24,6 +25,7 @@ interface Props {
 }
 
 const { title, description, current, toc, fullTitle = false, jsonLd } = Astro.props;
+const color = await themeColor();
 const pageTitle = fullTitle ? title : `${title} — docs`;
 const items = await navItems();
 const number = await searchNumber();
@@ -41,6 +43,7 @@ const number = await searchNumber();
 			title={pageTitle}
 			description={description}
 			noindex={isNotFoundPath(Astro.url.pathname)}
+			themeColor={color}
 		/>
 		{jsonLd && <script is:inline type="application/ld+json" set:html={jsonLdScript(...jsonLd)} />}
 		<meta name="viewport" content="width=device-width, initial-scale=1" />

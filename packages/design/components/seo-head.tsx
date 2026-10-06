@@ -6,6 +6,7 @@ export function SeoHead({
   title,
   description,
   noindex = false,
+  themeColor,
 }: {
   origin: string;
   site: string;
@@ -13,12 +14,14 @@ export function SeoHead({
   title: string;
   description: string;
   noindex?: boolean;
+  themeColor?: string;
 }) {
   const image = socialUrl(origin, path);
   return (
     <>
       {!noindex && <link rel="canonical" href={new URL(path, origin).href} />}
       {noindex && <meta name="robots" content="noindex, follow" />}
+      {themeColor && <meta name="theme-color" content={themeColor} />}
       <meta property="og:site_name" content={site} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />

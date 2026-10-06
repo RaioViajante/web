@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { connection } from "next/server";
 import type { ReactNode } from "react";
 import localFont from "next/font/local";
 import { Behavior } from "@raioviajante/design/behavior-react";
+import { themeColor } from "@raioviajante/design/theme-color";
 import "@raioviajante/design/styles.css";
 import "./globals.css";
 
@@ -33,6 +34,10 @@ export const metadata: Metadata = {
     description: "curious enough to build it myself.",
   },
 };
+
+export async function generateViewport(): Promise<Viewport> {
+  return { themeColor: await themeColor() };
+}
 
 export default async function RootLayout({
   children,

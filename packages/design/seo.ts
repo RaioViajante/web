@@ -96,13 +96,20 @@ export function notFoundMetadata(origin: string, site: string) {
   return { ...metadata, alternates: {} };
 }
 
-/** Web app manifest: every site serves the same generated icon set. */
-export function webManifest(name: string) {
+/**
+ * Web app manifest: every site serves the same generated icon set. It names
+ * the site and its icons and colors only. The sites have no service worker or
+ * offline mode, so `display` stays `browser` rather than claiming an app shell.
+ */
+export function webManifest(name: string, colors?: { themeColor: string }) {
   return {
     name,
     short_name: name,
     start_url: "/",
-    display: "standalone" as const,
+    display: "browser" as const,
+    ...(colors
+      ? { theme_color: colors.themeColor, background_color: colors.themeColor }
+      : {}),
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { src: "/icon.png", sizes: "512x512", type: "image/png" },

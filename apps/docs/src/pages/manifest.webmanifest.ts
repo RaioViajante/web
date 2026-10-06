@@ -1,7 +1,8 @@
 import { webManifest } from "@raioviajante/design/seo";
+import { themeColor } from "@raioviajante/design/theme-color";
 
-export function GET() {
-	return new Response(JSON.stringify(webManifest("docs")), {
+export async function GET() {
+	return new Response(JSON.stringify(webManifest("docs", { themeColor: await themeColor() })), {
 		headers: { "Content-Type": "application/manifest+json" },
 	});
 }
