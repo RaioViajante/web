@@ -83,3 +83,23 @@ export function notFoundMetadata(origin: string, site: string) {
   // Next.js already marks not-found responses noindex.
   return { ...metadata, alternates: {} };
 }
+
+/** Web app manifest: every site serves the same generated icon set. */
+export function webManifest(name: string) {
+  return {
+    name,
+    short_name: name,
+    start_url: "/",
+    display: "standalone" as const,
+    icons: [
+      { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { src: "/icon.png", sizes: "512x512", type: "image/png" },
+      {
+        src: "/icon-maskable.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable" as const,
+      },
+    ],
+  };
+}

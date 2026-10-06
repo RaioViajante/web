@@ -41,6 +41,8 @@ Read `docs/design-system.md` and `docs/blocks.md` for the implemented contract.
 - Artwork lives once in `packages/design/assets`, with its all-rights-reserved
   license. Use `Art`/gallery static imports, meaningful alt text (empty for
   decorative images), explicit dimensions and lazy loading below the fold.
+- Site icons are generated from `assets/icons/source.png` with
+  `pnpm --filter @raioviajante/design icons`; never edit the app copies.
 - The avatar belongs on index headers and social cards; the search character
   belongs on search, the 404 sticker on 404, and the empty-search sticker on
   empty results. Search heads are at least 28px. Other placements need a task.
