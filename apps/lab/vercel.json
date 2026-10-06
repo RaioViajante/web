@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "astro",
-  "ignoreCommand": "p=$VERCEL_GIT_PREVIOUS_SHA; printf %s \"$p\" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e \"$p^{commit}\" && git diff --quiet \"$p\" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design"
+  "ignoreCommand": "p=$VERCEL_GIT_PREVIOUS_SHA; printf %s \"$p\" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e \"$p^{commit}\" && git diff --quiet \"$p\" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design || exit 1"
 }

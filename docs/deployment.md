@@ -50,19 +50,21 @@ the app's `build` script.
 Every project skips builds for commits that do not affect it. The command runs
 from the project's Root Directory and compares `VERCEL_GIT_PREVIOUS_SHA` (the
 commit of the project's last successful deployment) with `HEAD`, so every
-commit in a push is taken into account. Exit code `0` skips the build; any
-other exit code builds.
+commit in a push is taken into account. Exit code `0` skips the build and `1`
+builds; Vercel treats any other exit code as a failed deployment.
 
 The check fails open: a missing, malformed, or unresolvable previous SHA, or a
-`git diff` error, exits non-zero and builds rather than skipping.
+`git diff` error, ends in `|| exit 1` and builds rather than skipping. Without
+that normalization, `git cat-file` exits `128` when the previous commit is not
+in Vercel's shallow clone, which fails the deployment instead of building it.
 
 All four apps consume `@raioviajante/design`, so every `ignoreCommand` watches
 `../../packages/design`. The command is identical in all four files. It uses a
 short form so that it stays within Vercel's 256-character limit for this
-setting (it is 229 characters):
+setting (it is 239 characters):
 
 ```sh
-p=$VERCEL_GIT_PREVIOUS_SHA; printf %s "$p" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e "$p^{commit}" && git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design
+p=$VERCEL_GIT_PREVIOUS_SHA; printf %s "$p" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e "$p^{commit}" && git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design || exit 1
 ```
 
 The paths cover:
