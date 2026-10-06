@@ -21,13 +21,15 @@ const prompts: Record<SiteId, string> = {
 export function SearchNavItem({
   number,
   current = false,
+  href = "/search",
 }: {
   number: string;
   current?: boolean;
+  href?: string;
 }) {
   return (
     <a
-      href="/search"
+      href={href}
       className="rv-search"
       aria-current={current ? "page" : undefined}
       aria-keyshortcuts="Meta+K Control+K /"

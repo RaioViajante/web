@@ -2,6 +2,12 @@ import { SITES, type SiteId } from "../components/sites";
 import type { SearchEntry } from "../components/search";
 
 const indexPath = "/search-index.json";
+const localPorts: Record<SiteId, readonly number[]> = {
+  root: [3000, 3002],
+  dump: [3000, 3001],
+  docs: [4321],
+  lab: [4322],
+};
 
 function isTyping(target: EventTarget | null) {
   return (
@@ -15,14 +21,48 @@ function indexHref(site: SiteId) {
   return SITES.find((item) => item.id === site)!.href + indexPath;
 }
 
-async function readIndex(site: SiteId): Promise<SearchEntry[]> {
-  const url =
-    location.hostname === new URL(indexHref(site)).hostname
-      ? indexPath
-      : indexHref(site);
+function localHost() {
+  return location.hostname === "localhost" || location.hostname === "127.0.0.1";
+}
+
+async function fetchIndex(url: string, site: SiteId, localOrigin?: string) {
   const response = await fetch(url, { mode: "cors" });
   if (!response.ok) throw new Error(`Search index unavailable: ${site}`);
-  return response.json() as Promise<SearchEntry[]>;
+  const entries = (await response.json()) as SearchEntry[];
+  if (!Array.isArray(entries) || entries.some((entry) => entry.site !== site)) {
+    throw new Error(`Unexpected search index: ${site}`);
+  }
+  const canonicalOrigin = SITES.find((item) => item.id === site)!.href;
+  return localOrigin
+    ? entries.map((entry) => ({
+        ...entry,
+        href: entry.href.replace(canonicalOrigin, localOrigin),
+      }))
+    : entries;
+}
+
+async function readIndex(
+  site: SiteId,
+  currentSite: SiteId,
+): Promise<SearchEntry[]> {
+  if (site === currentSite) {
+    return fetchIndex(
+      indexPath,
+      site,
+      localHost() ? location.origin : undefined,
+    );
+  }
+  if (localHost()) {
+    for (const port of localPorts[site]) {
+      const origin = `${location.protocol}//${location.hostname}:${port}`;
+      try {
+        return await fetchIndex(origin + indexPath, site, origin);
+      } catch {
+        // Try another local port before the deployed index.
+      }
+    }
+  }
+  return fetchIndex(indexHref(site), site);
 }
 
 function matches(entry: SearchEntry, words: string[]) {
@@ -117,7 +157,7 @@ function mountPage(page: HTMLElement) {
   async function loadEverywhere() {
     const indexes = await Promise.allSettled(
       SITES.map((item) =>
-        item.id === site ? Promise.resolve(own) : readIndex(item.id),
+        item.id === site ? Promise.resolve(own) : readIndex(item.id, site),
       ),
     );
     all = indexes.flatMap((result) =>
@@ -126,7 +166,7 @@ function mountPage(page: HTMLElement) {
     render();
   }
 
-  void readIndex(site)
+  void readIndex(site, site)
     .then((entries) => {
       own = entries;
       all = entries;
@@ -198,7 +238,10 @@ export function attachSearch() {
     event.preventDefault();
     if (page)
       page.querySelector<HTMLInputElement>("[data-search-input]")?.focus();
-    else location.href = "/search";
+    else
+      location.href =
+        document.querySelector<HTMLAnchorElement>(".rv-search")?.href ??
+        "/search";
   };
   document.addEventListener("keydown", onKey);
   return () => document.removeEventListener("keydown", onKey);
