@@ -253,16 +253,27 @@
   width: 180px;
   height: 180px;
 }
+/* Suggestions read like the scope row: a caps label, then words and dots. */
 .rv-search-suggestions {
   display: flex;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
-  color: var(--fg-2);
+  color: var(--fg-3);
+}
+.rv-search-suggestions .rv-label {
+  margin-right: 10px;
+}
+.rv-search-suggestions > span:not(.rv-label) {
+  padding: 0 2px;
 }
 .rv-search-suggestions button {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  color: var(--fg-2);
+  transition: color var(--ease-link) ease;
+}
+.rv-search-suggestions button:hover,
+.rv-search-suggestions button:focus-visible {
+  color: var(--fg);
 }
 @media (max-width: 500px) {
   .rv-ask img {
