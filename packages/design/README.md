@@ -63,5 +63,6 @@ pnpm --filter @raioviajante/design test
 
 ## Deployment
 
-An app that consumes this package needs `../../packages/design` in its Vercel
-Ignored Build Step. See [docs/deployment.md](../../docs/deployment.md).
+An app that consumes this package needs `../../packages/design` in the
+`ignoreCommand` of its `vercel.json`. See
+[docs/deployment.md](../../docs/deployment.md).

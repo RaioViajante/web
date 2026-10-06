@@ -94,11 +94,11 @@ Never push without explicit authorization or rewrite imported history/tags
 ## Production and generated files
 
 - See `docs/deployment.md`: four Vercel projects, Root Directory `apps/<app>`.
-  Settings, domains, environment and Ignored Build Steps are infrastructure;
-  change them only when explicitly requested. Do not claim an unverified rollout.
-- Every consumer must watch `../../packages/design` in its Ignored Build Step.
-  Dump/docs owner confirmation remains in the deployment docs. Docs should set
-  `VERCEL_DEEP_CLONE=true`; dump uses public `NEXT_PUBLIC_SITE_URL`.
+  Each app's `vercel.json` holds its framework and Ignored Build Step, which
+  must watch `../../packages/design`. Dashboard settings, domains and
+  environment (docs `VERCEL_DEEP_CLONE=true`, dump `NEXT_PUBLIC_SITE_URL`) are
+  infrastructure; change them only when explicitly requested. Do not claim an
+  unverified rollout.
 - Never edit generated `node_modules/`, `.next/`, `dist/`, `.astro/`, coverage,
   `*.tsbuildinfo` or framework-generated `next-env.d.ts` by hand.
 - Root/docs/lab have app rules. Dump's framework-generated `AGENTS.md` and

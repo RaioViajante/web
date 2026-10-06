@@ -891,19 +891,17 @@ docs, and the reference comparison are in place, so the owner may delete it.
 
 Owner actions before or at deployment:
 
-1. Vercel, dump and docs projects: set the Ignored Build Step from
-   [deployment.md](deployment.md) so changes to `packages/design` rebuild them.
-2. Vercel, docs project: set `VERCEL_DEEP_CLONE=true` for git-based
-   last-updated dates.
-3. Vercel, all projects: keep "Include files outside the Root Directory"
-   enabled (social cards read shared fonts, artwork and tokens at build time).
-4. Vercel, dump project: keep `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com`
-   in Production.
-5. After deploying, verify each site's sitemap, robots, social cards, host 404,
+1. Vercel settings that can live in the repository now do: each app's
+   `vercel.json` sets the framework and the Ignored Build Step. What remains
+   in the dashboard is the "Owner checklist (Vercel dashboard)" in
+   [deployment.md](deployment.md): Root Directory, "Include files outside the
+   Root Directory", production branch, domains, docs `VERCEL_DEEP_CLONE=true`
+   and dump `NEXT_PUBLIC_SITE_URL`.
+2. After deploying, verify each site's sitemap, robots, social cards, host 404,
    cross-origin search indexes and the sound voices by ear.
-6. Legal facts still unknown and omitted from public pages: legal last-updated
+3. Legal facts still unknown and omitted from public pages: legal last-updated
    dates for dump, docs and lab; text and snippet licensing; quoting and artwork
    reuse permission; governing law; analytics/tracking statement; host log
    retention. Root's existing Terms and Privacy keep their own date.
-7. Decide whether to keep the unused artwork `character/head-box.png` and
+4. Decide whether to keep the unused artwork `character/head-box.png` and
    `stickers/work-of-art-pt.png`.
