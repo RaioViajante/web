@@ -17,9 +17,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: absoluteUrl(path),
   }));
 
+  // No lastModified: a post's frontmatter date is its publication date, not a
+  // modification date, and nothing else records one. Add it here, and as the
+  // BlogPosting dateModified, only if posts gain an explicit modified date.
   const postRoutes = posts.map((post) => ({
     url: absoluteUrl(`/posts/${post.slug}`),
-    lastModified: post.date,
   }));
 
   const tagRoutes = getAllTags().map(({ tag }) => ({

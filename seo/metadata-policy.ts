@@ -291,7 +291,8 @@ export function checkSitemap(site: Site, xml: string, now = new Date()) {
         p.push(`${at}: ${loc} lastmod ${lastmod} is not a W3C date`);
       else if (Date.parse(lastmod) > now.getTime())
         p.push(`${at}: ${loc} lastmod ${lastmod} is in the future`);
-      // Only real content dates: dump posts (frontmatter) and docs pages with an explicit lastUpdated.
+      // Only an explicit modification date, and only where content can have one:
+      // dump posts and docs pages (none has one today).
       const allowed =
         (site === "dump" && url.pathname.startsWith("/posts/")) ||
         site === "docs";
@@ -558,9 +559,15 @@ export function checkJsonLd(ctx: JsonLdContext) {
       p.push(
         `${at}: BlogPosting datePublished ${JSON.stringify(post.datePublished)} is not a date`,
       );
-    if ("dateModified" in post)
+    // Posts only have a publication date today. dateModified and sitemap
+    // lastmod are both an explicit modification date, or both absent.
+    if ((post.dateModified ?? undefined) !== (lastmod ?? undefined))
       p.push(
-        `${at}: BlogPosting has dateModified, but posts have no modification date`,
+        `${at}: BlogPosting dateModified ${post.dateModified} and sitemap lastmod ${lastmod} must both come from an explicit modification date`,
+      );
+    if (post.dateModified && post.dateModified === post.datePublished)
+      p.push(
+        `${at}: dateModified repeats datePublished; a publication date is not a modification date`,
       );
     if (
       norm(post.url) !== norm(canonical) ||
@@ -573,9 +580,9 @@ export function checkJsonLd(ctx: JsonLdContext) {
       p.push(`${at}: BlogPosting is not part of ${siteOrigins.dump}/#blog`);
     if (post.image !== og("og:image"))
       p.push(`${at}: BlogPosting image differs from og:image`);
-    if (lastmod && lastmod.slice(0, 10) !== post.datePublished)
+    if (lastmod && lastmod.slice(0, 10) === post.datePublished)
       p.push(
-        `${at}: sitemap lastmod ${lastmod} does not match datePublished ${post.datePublished}`,
+        `${at}: sitemap lastmod ${lastmod} is the publication date, which is not a modification date`,
       );
     const item = ctx.rss?.find((i) => norm(i.link) === norm(canonical));
     if (ctx.rss) {

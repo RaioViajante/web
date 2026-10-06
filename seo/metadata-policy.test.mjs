@@ -162,7 +162,7 @@ const sitemap = (urls) =>
 test("sitemap rules", () => {
   const ok = checkSitemap(
     "dump",
-    sitemap([["https://dump.raioviajante.com/"], [dumpPost, "2026-01-15"]]),
+    sitemap([["https://dump.raioviajante.com/"], [dumpPost]]),
   );
   assert.deepEqual(ok.problems, []);
   assert.equal(ok.entries.length, 2);
@@ -325,7 +325,19 @@ test("BlogPosting rules", () => {
     broken({ headline: "Bar" }),
     /headline "Bar" does not match the page title/,
   );
-  assert.match(broken({ dateModified: "2026-02-01" }), /has dateModified/);
+  assert.match(
+    broken({ dateModified: "2026-02-01" }),
+    /dateModified 2026-02-01 and sitemap lastmod undefined/,
+  );
+  assert.match(
+    broken({ dateModified: "2026-01-15" }, { lastmod: "2026-01-15" }),
+    /repeats datePublished/,
+  );
+  // A future explicit modification date is allowed, in both places.
+  assert.deepEqual(
+    broken({ dateModified: "2026-02-01" }, { lastmod: "2026-02-01" }),
+    "",
+  );
   assert.match(
     broken({ datePublished: "yesterday" }),
     /datePublished "yesterday" is not a date/,
@@ -356,7 +368,11 @@ test("BlogPosting rules", () => {
   );
   assert.match(
     broken({}, { lastmod: "2026-03-03T00:00:00.000Z" }),
-    /lastmod 2026-03-03.* does not match datePublished/,
+    /dateModified undefined and sitemap lastmod 2026-03-03/,
+  );
+  assert.match(
+    broken({}, { lastmod: "2026-01-15" }),
+    /lastmod 2026-01-15 is the publication date/,
   );
   assert.match(broken({}, { rss: [] }), /not in the RSS feed/);
   assert.match(

@@ -43,8 +43,13 @@ is not a software product or a creative work in any sense the data states), and
 any page-level type for search, legal and archive pages.
 
 - `BlogPosting.datePublished` is the post's frontmatter date, which is the
-  only date posts have; there is no `dateModified`. Its image is the post's
-  generated social card.
+  only date posts have. A publication date is not a modification date, so
+  there is no `dateModified` and no sitemap `lastmod` for posts (sitemaps.org
+  defines `lastmod` as the page's last modification, and Google uses it only
+  when it is consistently and verifiably accurate). If posts later gain an
+  explicit modified date, it becomes both `dateModified` and `lastmod`; the
+  checks accept exactly that pairing. The RSS feed keeps the publication date.
+  The image is the post's generated social card.
 - Docs `dateModified` and sitemap `lastmod` use only an explicit `lastUpdated`
   frontmatter date. No docs page has one yet, so neither is emitted. The page's
   visible "last updated" line may still fall back to the last git commit, but
@@ -74,9 +79,9 @@ nonce or hash change was needed.
 
 Each host serves `/sitemap.xml` (absolute production URLs, no 404 or utility
 pages) and `/robots.txt` (`Allow: /`, absolute sitemap URL). `lastmod` appears
-only with a real content date: dump posts (frontmatter date) and, when a page
-has one, a docs page's explicit `lastUpdated`. Root, lab, and dump's listing pages have none, rather than a
-build time.
+only with an explicit modification date: none exists today, so no sitemap has
+one. A docs page's explicit `lastUpdated` (or a future explicit post date) would
+add it; git dates and build times never do.
 
 ## Indexing decisions
 
@@ -128,9 +133,9 @@ Sitemap line, nothing blocking a sitemap page), manifest (`display: browser`,
 theme and background color), and Dump's RSS (production URLs, real dates, every
 item in the sitemap). JSON-LD is checked per page class (see Structured data):
 valid JSON, `https://schema.org`, the expected types, production URLs only, one
-shared Person, no author on Docs or Lab, no publisher, no `dateModified` on
-posts, `dateModified` on a docs article only together with the same sitemap
-`lastmod`, breadcrumb positions and URLs that are real sitemap pages, and
+shared Person, no author on Docs or Lab, no publisher, `dateModified` on a
+docs article or post only together with the same sitemap `lastmod` (and never
+equal to the publication date), breadcrumb positions and URLs that are real sitemap pages, and
 `BlogPosting` headline and date agreeing with the page and the RSS item.
 
 Not covered: that a search engine accepts the markup, Vercel's production
