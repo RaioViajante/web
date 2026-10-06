@@ -1,14 +1,11 @@
-import type { Metadata } from "next";
+import { staticMetadata } from "@/lib/seo";
 
 import { DumpShell } from "@/components/DumpShell";
 import { HomePostList } from "@/components/HomePostList";
 import { getPostDetails } from "@/lib/post-details";
 import { getPublishedPosts } from "@/lib/posts";
-import { alternatesFor } from "@/lib/site";
 
-export const metadata: Metadata = {
-  alternates: alternatesFor("/"),
-};
+export const metadata = staticMetadata("/");
 
 export default function HomePage() {
   const posts = getPublishedPosts();

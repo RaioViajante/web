@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+import { metadataFor } from "../../lib/seo";
 import { PageHeader, Quote, Section } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
 
-export const metadata: Metadata = { title: "contact" };
+export const metadata = metadataFor("/contact");
 
 export default function Contact() {
   return (

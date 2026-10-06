@@ -1,11 +1,4 @@
-import {
-  loadOgFonts,
-  OG_FONT,
-  OG_IMAGE_CONTENT_TYPE,
-  OG_IMAGE_SIZE,
-  ogDate,
-  titleFontSize,
-} from "@/lib/og-image";
+import { loadOgFonts, OG_FONT, ogDate, titleFontSize } from "@/lib/og-image";
 import { getPostSlugs } from "@/lib/posts";
 
 describe("titleFontSize", () => {
@@ -63,32 +56,21 @@ describe("loadOgFonts", () => {
   });
 });
 
-describe("site-level opengraph-image", () => {
-  it("declares the standard OG dimensions and PNG content type", async () => {
-    const mod = await import("@/app/opengraph-image");
-    expect(mod.size).toEqual(OG_IMAGE_SIZE);
-    expect(mod.contentType).toBe(OG_IMAGE_CONTENT_TYPE);
-    expect(mod.alt).toContain("dump");
-  });
-});
-
-describe("per-post opengraph-image", () => {
-  it("declares the standard OG dimensions and PNG content type", async () => {
-    const mod = await import("@/app/posts/[slug]/opengraph-image");
-    expect(mod.size).toEqual(OG_IMAGE_SIZE);
-    expect(mod.contentType).toBe(OG_IMAGE_CONTENT_TYPE);
-  });
-
-  it("does not statically render slugs outside the real content set", async () => {
-    const mod = await import("@/app/posts/[slug]/opengraph-image");
+describe("shared social image route", () => {
+  it("renders at build time only for real pages", async () => {
+    const mod = await import("@/app/og/[...slug]/route");
+    expect(mod.dynamic).toBe("force-static");
     expect(mod.dynamicParams).toBe(false);
   });
 
-  it("generates one image per real published post, so future posts get one automatically", async () => {
-    const mod = await import("@/app/posts/[slug]/opengraph-image");
-    expect(mod.generateStaticParams()).toEqual(
-      getPostSlugs().map((slug) => ({ slug })),
-    );
+  it("generates one image per published post, so future posts get one automatically", async () => {
+    const mod = await import("@/app/og/[...slug]/route");
+    const keys = mod.generateStaticParams().map(({ slug }) => slug.join("/"));
+    for (const slug of getPostSlugs()) {
+      expect(keys).toContain(`posts/${slug}.png`);
+    }
+    expect(keys).toContain("index.png");
+    expect(new Set(keys).size).toBe(keys.length);
   });
 });
 

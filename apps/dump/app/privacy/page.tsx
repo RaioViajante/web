@@ -1,14 +1,9 @@
-import type { Metadata } from "next";
+import { staticMetadata } from "@/lib/seo";
 import { LegalPage } from "@raioviajante/design/templates";
 
 import { DumpShell } from "@/components/DumpShell";
-import { alternatesFor } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "What dump.raioviajante.com stores and who sees it.",
-  alternates: alternatesFor("/privacy"),
-};
+export const metadata = staticMetadata("/privacy");
 
 export default function Privacy() {
   return (

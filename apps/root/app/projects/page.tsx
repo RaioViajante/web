@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { metadataFor } from "../../lib/seo";
 import Link from "next/link";
 import {
   LeaderRow,
@@ -8,7 +8,7 @@ import {
 import { RootShell } from "../../components/RootShell";
 import { projects } from "../../lib/projects";
 
-export const metadata: Metadata = { title: "projects" };
+export const metadata = metadataFor("/projects");
 
 export default function Projects() {
   return (

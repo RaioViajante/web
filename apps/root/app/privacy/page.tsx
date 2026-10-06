@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+import { metadataFor } from "../../lib/seo";
 import { LegalPage } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
 
-export const metadata: Metadata = { title: "privacy policy" };
+export const metadata = metadataFor("/privacy");
 
 export default function Privacy() {
   return (

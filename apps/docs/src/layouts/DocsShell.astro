@@ -1,5 +1,8 @@
 ---
-import "@fontsource-variable/noto-sans-mono/wght.css";
+import { isNotFoundPath } from "@raioviajante/design/seo";
+import { SeoHead } from "@raioviajante/design/seo-head";
+import fontUrl from "@raioviajante/design/fonts/NotoSansMono-Latin-Variable.woff2?url";
+import "@raioviajante/design/fonts.css";
 import "@raioviajante/design/styles.css";
 import "../styles/docs.css";
 import type { NavItem } from "@raioviajante/design/shell";
@@ -21,25 +24,27 @@ const { title, description, current, toc, fullTitle = false } = Astro.props;
 const pageTitle = fullTitle ? title : `${title} — docs`;
 const items = await navItems();
 const number = await searchNumber();
-const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
+		<SeoHead
+			origin={Astro.site!.href}
+			site="docs"
+			path={Astro.url.pathname}
+			title={pageTitle}
+			description={description}
+			noindex={isNotFoundPath(Astro.url.pathname)}
+		/>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>{pageTitle}</title>
 		<meta name="description" content={description} />
-		<link rel="canonical" href={canonical} />
 		<link rel="icon" href="/favicon.ico?v=3" sizes="any" />
 		<link rel="icon" type="image/png" sizes="512x512" href="/icon.png?v=3" />
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
-		<meta property="og:site_name" content="docs" />
-		<meta property="og:title" content={pageTitle} />
-		<meta property="og:description" content={description} />
-		<meta property="og:url" content={canonical} />
-		<meta property="og:type" content="website" />
 	</head>
 	<body>
 		<DocsFrame pages={items} current={current} toc={toc} searchNumber={number}>

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Noto_Sans_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Behavior } from "@raioviajante/design/behavior-react";
 import "@raioviajante/design/styles.css";
 import "./globals.css";
 
-const mono = Noto_Sans_Mono({
-  subsets: ["latin"],
-  display: "swap",
+const mono = localFont({
+  src: "../../../packages/design/fonts/NotoSansMono-Latin-Variable.woff2",
+  weight: "100 900",
+  display: "optional",
   variable: "--font-mono",
 });
 

@@ -1,3 +1,5 @@
+import { socialUrl } from "@raioviajante/design/seo";
+
 import type { Post } from "@/lib/posts";
 import { absoluteUrl, site } from "@/lib/site";
 
@@ -31,7 +33,7 @@ export function blogPostingJsonLd(post: Post) {
     datePublished: post.date,
     url: absoluteUrl(`/posts/${post.slug}`),
     author: { "@type": "Person", name: site.author },
-    image: absoluteUrl(`/posts/${post.slug}/opengraph-image`),
+    image: socialUrl(site.url, `/posts/${post.slug}`),
   };
 }
 

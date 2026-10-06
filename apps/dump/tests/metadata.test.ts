@@ -119,7 +119,7 @@ describe("blogPostingJsonLd", () => {
       datePublished: "2026-01-15",
       url: `${PRODUCTION_ORIGIN}/posts/example-post`,
       author: { "@type": "Person", name: "RaioViajante" },
-      image: `${PRODUCTION_ORIGIN}/posts/example-post/opengraph-image`,
+      image: `${PRODUCTION_ORIGIN}/og/posts/example-post.png`,
     });
   });
 

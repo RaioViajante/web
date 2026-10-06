@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+import { metadataFor } from "../../lib/seo";
 import Link from "next/link";
 import { LegalPage } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
 
-export const metadata: Metadata = { title: "terms of use" };
+export const metadata = metadataFor("/terms");
 
 export default function Terms() {
   return (

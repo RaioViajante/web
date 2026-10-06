@@ -1,9 +1,12 @@
-import type { Metadata } from "next";
+import { notFoundMetadata } from "@raioviajante/design/seo";
 import Link from "next/link";
 import { NotFoundPage } from "@raioviajante/design/components";
 import { RootShell } from "../components/RootShell";
 
-export const metadata: Metadata = { title: "404 — not found" };
+export const metadata = notFoundMetadata(
+  "https://raioviajante.com",
+  "raioviajante",
+);
 
 export default function NotFound() {
   return (

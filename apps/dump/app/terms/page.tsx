@@ -1,15 +1,10 @@
-import type { Metadata } from "next";
+import { staticMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { LegalPage } from "@raioviajante/design/templates";
 
 import { DumpShell } from "@/components/DumpShell";
-import { alternatesFor } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Terms of Use",
-  description: "The short version of how to use dump.raioviajante.com.",
-  alternates: alternatesFor("/terms"),
-};
+export const metadata = staticMetadata("/terms");
 
 export default function Terms() {
   return (

@@ -1,16 +1,11 @@
-import type { Metadata } from "next";
+import { staticMetadata } from "@/lib/seo";
 import { PageHeader } from "@raioviajante/design/parts";
 
 import { DumpShell } from "@/components/DumpShell";
 import { TagIndex } from "@/components/TagViews";
 import { getAllTags } from "@/lib/posts";
-import { alternatesFor } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Tags",
-  description: "Browse posts by topic.",
-  alternates: alternatesFor("/tags"),
-};
+export const metadata = staticMetadata("/tags");
 
 export default function TagsPage() {
   const tags = getAllTags();

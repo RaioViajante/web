@@ -1,5 +1,8 @@
 ---
-import "@fontsource-variable/noto-sans-mono";
+import { isNotFoundPath } from "@raioviajante/design/seo";
+import { SeoHead } from "@raioviajante/design/seo-head";
+import fontUrl from "@raioviajante/design/fonts/NotoSansMono-Latin-Variable.woff2?url";
+import "@raioviajante/design/fonts.css";
 import "@raioviajante/design/styles.css";
 import "../styles/lab.css";
 import { LabFrame } from "../components/LabFrame";
@@ -15,16 +18,29 @@ const {
   current = Astro.url.pathname,
 } = Astro.props;
 const title = formatTitle(pageTitle);
-const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <link
+      rel="preload"
+      href={fontUrl}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <SeoHead
+      origin={Astro.site!.href}
+      site="lab"
+      path={Astro.url.pathname}
+      title={title}
+      description={description}
+      noindex={isNotFoundPath(Astro.url.pathname)}
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.ico?v=3" sizes="any" />
     <link rel="icon" type="image/png" href="/icon.png?v=3" sizes="512x512" />
     <link

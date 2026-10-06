@@ -1,3 +1,4 @@
+import { notFoundMetadata } from "@raioviajante/design/seo";
 import Link from "next/link";
 import { NotFoundPage } from "@raioviajante/design/templates";
 
@@ -24,3 +25,8 @@ export default function NotFound() {
     </DumpShell>
   );
 }
+
+export const metadata = notFoundMetadata(
+  "https://dump.raioviajante.com",
+  "dump",
+);

@@ -14,7 +14,8 @@ describe("shared design system", () => {
   it("loads the shared styles, font and behavior script", () => {
     expect(layout).toContain("@raioviajante/design/styles.css");
     expect(layout).toContain("@raioviajante/design/behavior-react");
-    expect(layout).toContain("Noto_Sans_Mono");
+    expect(layout).toContain("next/font/local");
+    expect(layout).toContain("NotoSansMono-Latin-Variable.woff2");
     expect(layout).not.toContain("editorial.css");
   });
 

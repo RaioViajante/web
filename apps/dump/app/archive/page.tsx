@@ -1,16 +1,11 @@
-import type { Metadata } from "next";
+import { staticMetadata } from "@/lib/seo";
 import { PageHeader } from "@raioviajante/design/parts";
 
 import { ArchivePostList } from "@/components/ArchivePostList";
 import { DumpShell } from "@/components/DumpShell";
 import { getPublishedPosts, sortPostsNewestFirst } from "@/lib/posts";
-import { alternatesFor } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Archive",
-  description: "Every post, newest first.",
-  alternates: alternatesFor("/archive"),
-};
+export const metadata = staticMetadata("/archive");
 
 export default function ArchivePage() {
   const posts = sortPostsNewestFirst(getPublishedPosts());

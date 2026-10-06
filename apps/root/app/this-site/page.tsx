@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+import { metadataFor } from "../../lib/seo";
 import Link from "next/link";
 import { PageHeader, Section } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
 
-export const metadata: Metadata = { title: "this site" };
+export const metadata = metadataFor("/this-site");
 
 export default function ThisSite() {
   return (

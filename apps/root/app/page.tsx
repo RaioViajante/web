@@ -1,3 +1,4 @@
+import { metadataFor } from "../lib/seo";
 import Link from "next/link";
 import {
   IndexHeader,
@@ -11,6 +12,8 @@ import { RootShell } from "../components/RootShell";
 import { primaryLinks } from "../lib/links";
 import { projects } from "../lib/projects";
 import { getRecentPosts } from "../lib/writing";
+
+export const metadata = metadataFor("/");
 
 export const revalidate = 60;
 
