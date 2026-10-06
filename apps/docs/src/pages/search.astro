@@ -1,8 +1,8 @@
 ---
-import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
-import { SearchPage } from '@raioviajante/design/search';
+import { SearchPage } from "@raioviajante/design/search";
+import DocsShell from "../layouts/DocsShell.astro";
 ---
 
-<StarlightPage frontmatter={{ title: 'Search', description: 'Search RaioViajante docs and sites.', hero: {} }}>
+<DocsShell title="Search" description="Search RaioViajante docs and sites." current="/search/">
 	<SearchPage site="docs" />
-</StarlightPage>
+</DocsShell>

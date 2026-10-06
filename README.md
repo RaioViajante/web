@@ -7,12 +7,12 @@ small packages under `packages/`.
 
 ## Applications
 
-| Path        | Package              | Role                                     | Stack             | Production                                             |
-| ----------- | -------------------- | ---------------------------------------- | ----------------- | ------------------------------------------------------ |
-| `apps/root` | `@raioviajante/root` | personal home and index of the ecosystem | Next.js           | [raioviajante.com](https://raioviajante.com)           |
-| `apps/dump` | `@raioviajante/dump` | personal technical writing               | Next.js + MDX     | [dump.raioviajante.com](https://dump.raioviajante.com) |
-| `apps/docs` | `@raioviajante/docs` | curated public technical documentation   | Astro + Starlight | [docs.raioviajante.com](https://docs.raioviajante.com) |
-| `apps/lab`  | `@raioviajante/lab`  | interactive experiments                  | Astro             | [lab.raioviajante.com](https://lab.raioviajante.com)   |
+| Path        | Package              | Role                                     | Stack         | Production                                             |
+| ----------- | -------------------- | ---------------------------------------- | ------------- | ------------------------------------------------------ |
+| `apps/root` | `@raioviajante/root` | personal home and index of the ecosystem | Next.js       | [raioviajante.com](https://raioviajante.com)           |
+| `apps/dump` | `@raioviajante/dump` | personal technical writing               | Next.js + MDX | [dump.raioviajante.com](https://dump.raioviajante.com) |
+| `apps/docs` | `@raioviajante/docs` | curated public technical documentation   | Astro         | [docs.raioviajante.com](https://docs.raioviajante.com) |
+| `apps/lab`  | `@raioviajante/lab`  | interactive experiments                  | Astro         | [lab.raioviajante.com](https://lab.raioviajante.com)   |
 
 Each app keeps its own README and `docs/` directory for app-specific details.
 

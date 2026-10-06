@@ -34,11 +34,11 @@ See [`docs/architecture.md`](docs/architecture.md) and [`AGENTS.md`](AGENTS.md) 
 ## Intended stack
 
 - Astro
-- Starlight
+- Plain Astro content collection, with the shared design system
 - TypeScript
 - pnpm
 - Markdown / MDX
-- Pagefind (via Starlight)
+- The shared client-side search over a static index
 - Vercel
 
 ## Current and future content areas
@@ -58,7 +58,7 @@ Other projects may receive documentation only when their implemented behavior is
 ```
 pnpm install   # install dependencies
 pnpm dev       # start the local development server
-pnpm build     # production build (also builds the Pagefind search index)
+pnpm build     # production build
 pnpm preview   # serve the production build locally
 pnpm check     # run Astro/TypeScript diagnostics
 ```
@@ -67,4 +67,4 @@ See [`docs/development.md`](docs/development.md) for more detail.
 
 ## Current status
 
-The Astro/Starlight application is initialized and includes the approved RaioViajante visual system, a bespoke homepage, article navigation, table-of-contents support, heading permalinks, and a fixed dark palette. Published content includes the Sweep project page and the two RaioViajante pages under `src/content/docs/`.
+The Astro application is initialized and includes the approved RaioViajante visual system, a bespoke homepage, article navigation, table-of-contents support, heading permalinks, and a fixed dark palette. Published content includes the Sweep project page and the two RaioViajante pages under `src/content/docs/`.

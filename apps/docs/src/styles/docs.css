@@ -1,0 +1,76 @@
+/* Docs' own pieces. Everything shared comes from @raioviajante/design. */
+
+:root {
+	--font: "Noto Sans Mono Variable", "Noto Sans Mono", ui-monospace, monospace;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+}
+
+/* breadcrumb in the page label */
+.rv-label a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.rv-label a:hover {
+	color: var(--fg);
+}
+
+.rv-label [aria-current="page"] {
+	color: var(--fg);
+}
+
+/* home */
+.docs-entry {
+	margin-bottom: 26px;
+}
+
+.rv-section .docs-entry p {
+	margin: 0;
+	color: var(--fg-2);
+}
+
+.rv-section .docs-entry p.docs-entry__note {
+	margin-top: 4px;
+	color: var(--fg-3);
+	font-size: var(--size-small);
+}
+
+.rv-leader--quiet > span:first-child {
+	color: var(--fg-2);
+}
+
+/* the foot of a documentation page */
+.page-foot {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 8px 24px;
+	margin: 64px 0 28px;
+	padding-top: 20px;
+	border-top: 1px solid var(--line);
+	color: var(--fg-3);
+	font-size: var(--size-small);
+}
+
+.page-foot a {
+	color: var(--fg-3);
+	text-decoration: underline;
+	text-underline-offset: 3.52px;
+}
+
+.page-foot a:hover {
+	color: var(--fg);
+}
+
+.rv-pager {
+	margin-bottom: 0;
+}

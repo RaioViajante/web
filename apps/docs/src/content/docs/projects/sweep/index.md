@@ -1,7 +1,17 @@
 ---
 title: Sweep
 description: A Python command-line tool for organizing files in a selected directory.
+tagline: File organizer for a selected directory.
+order: 1
+group: projects
+status: active
+meta:
+  - python cli
+source: https://github.com/RaioViajante/sweep
+summary: file organizer for a selected directory
 ---
+
+## Overview
 
 Sweep is a small Python command-line tool that organizes files in a selected directory. It scans files directly inside that directory, classifies them by their final extension, and calculates a category destination. `preview` reports those destinations without moving files; `run` performs the moves.
 
@@ -45,7 +55,9 @@ README        → Other
 .hidden       → Other
 ```
 
+:::note
 `archive.tar.gz` is classified as an archive because `.gz` is its final suffix. `.hidden` has no suffix according to Python's `Path.suffix` behavior.
+:::
 
 ## Preview and run
 
@@ -55,7 +67,11 @@ README        → Other
 sweep preview ~/Downloads
 ```
 
-`preview` scans and classifies the files, calculates their destinations, and reports the planned organization. It does not move files. Preview does not perform the move-time destination conflict check.
+`preview` scans and classifies the files, calculates their destinations, and reports the planned organization. It does not move files.
+
+:::important
+Preview does not perform the move-time destination conflict check.
+:::
 
 ### Run
 
@@ -69,7 +85,9 @@ sweep run ~/Downloads
 
 Sweep does not overwrite an existing destination file. When the destination already exists, the move is skipped and the source file is left in place.
 
+:::warning
 There is no automatic rename, overwrite option, conflict-resolution strategy, transaction, or rollback.
+:::
 
 ## Current limitations
 
@@ -87,4 +105,9 @@ The current implementation does not provide:
 
 The target directory is supplied by the user. Downloads is only an example; it is not hardcoded.
 
-[Source repository](https://github.com/RaioViajante/sweep)
+## Try it and read more
+
+- [001 filename classifier](https://lab.raioviajante.com/experiments/filename-classifier/): classify names in your browser (lab)
+- [Apparently Moving a File Has Edge Cases](https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases) (dump)
+- [A TOML File Changed What Sweep Was](https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was) (dump)
+- [Source repository](https://github.com/RaioViajante/sweep)

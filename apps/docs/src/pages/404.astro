@@ -1,0 +1,17 @@
+---
+import { NotFoundPage } from "@raioviajante/design/templates";
+import DocsShell from "../layouts/DocsShell.astro";
+---
+
+<DocsShell title="404 — not found" description="This page moved, never existed, or has not been written yet.">
+	<NotFoundPage
+		site="docs"
+		line="this page moved, never existed, or I haven't documented it yet."
+		tryInstead={[
+			{ label: "docs", value: "start over", href: "/" },
+			{ label: "sweep", value: "guide", href: "/projects/sweep/" },
+			{ label: "design language", value: "standard", href: "/raioviajante/design-language/" },
+			{ label: "raioviajante.com", value: "home", href: "https://raioviajante.com" },
+		]}
+	/>
+</DocsShell>

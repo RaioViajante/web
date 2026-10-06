@@ -1,0 +1,44 @@
+import { LegalPage } from "@raioviajante/design/templates";
+
+export function PrivacyPage() {
+	return (
+<LegalPage
+		site="docs"
+		title="Privacy Policy"
+		inShort={[
+			{ label: "accounts", value: "none" },
+			{ label: "comments", value: "none" },
+			{ label: "sound preference", value: "saved in a cookie" },
+		]}
+		sections={[
+			{
+				title: "In your browser",
+				body: (
+					<p>
+						Your sound preference is saved in a small cookie on .raioviajante.com, so every raioviajante site remembers it. It is
+						not used for tracking.
+					</p>
+				),
+			},
+			{
+				title: "On the way to the page",
+				body: (
+					<p>
+						Like any website, the host (Vercel) receives standard request data — IP address, browser and the page asked for — to
+						deliver it.
+					</p>
+				),
+			},
+			{
+				title: "Search",
+				body: (
+					<p>
+						Search runs in your browser over a static index. The “everywhere” scope also reads the search indexes of the other
+						RaioViajante sites; nothing you type is sent anywhere.
+					</p>
+				),
+			},
+		]}
+	/>
+	);
+}

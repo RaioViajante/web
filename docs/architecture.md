@@ -33,12 +33,12 @@ another site as a local route.
 
 ## Frameworks
 
-| App  | Framework                     |
-| ---- | ----------------------------- |
-| root | Next.js (App Router)          |
-| dump | Next.js (App Router) with MDX |
-| docs | Astro with Starlight          |
-| lab  | Astro                         |
+| App  | Framework                        |
+| ---- | -------------------------------- |
+| root | Next.js (App Router)             |
+| dump | Next.js (App Router) with MDX    |
+| docs | Astro (plain content collection) |
+| lab  | Astro                            |
 
 The split follows what each site needs. There is no goal of converging on one
 framework.

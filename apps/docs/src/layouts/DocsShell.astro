@@ -1,0 +1,53 @@
+---
+import "@fontsource-variable/noto-sans-mono/wght.css";
+import "@raioviajante/design/styles.css";
+import "../styles/docs.css";
+import type { NavItem } from "@raioviajante/design/shell";
+import { DocsFrame } from "../components/DocsFrame";
+import { navItems, searchNumber } from "../lib/docs";
+
+interface Props {
+	title: string;
+	description: string;
+	/** The page's path; the home page is "/". */
+	current?: string;
+	/** "On this page" list of a documentation page. */
+	toc?: NavItem[];
+	/** The home page uses its own, full-site title. */
+	fullTitle?: boolean;
+}
+
+const { title, description, current, toc, fullTitle = false } = Astro.props;
+const pageTitle = fullTitle ? title : `${title} — docs`;
+const items = await navItems();
+const number = await searchNumber();
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{pageTitle}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<link rel="icon" href="/favicon.ico?v=3" sizes="any" />
+		<link rel="icon" type="image/png" sizes="512x512" href="/icon.png?v=3" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
+		<meta property="og:site_name" content="docs" />
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:type" content="website" />
+	</head>
+	<body>
+		<DocsFrame pages={items} current={current} toc={toc} searchNumber={number}>
+			<slot />
+		</DocsFrame>
+		<script>
+			import { startBehavior } from "@raioviajante/design/behavior";
+			startBehavior();
+		</script>
+	</body>
+</html>

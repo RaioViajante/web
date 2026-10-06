@@ -1,0 +1,58 @@
+---
+import { render } from "astro:content";
+import { Pager, Prose } from "@raioviajante/design/parts";
+import { sectionNumber } from "@raioviajante/design/sections";
+import { DocHeader } from "../components/DocHeader";
+import DocsShell from "../layouts/DocsShell.astro";
+import { editUrl, getPages, labelOf, lastUpdated, pathOf } from "../lib/docs";
+
+export async function getStaticPaths() {
+	const pages = await getPages();
+	return pages.map((entry, index) => ({
+		params: { slug: pathOf(entry).slice(1, -1) },
+		props: { entry, index },
+	}));
+}
+
+const { entry, index } = Astro.props;
+const { Content, headings } = await render(entry);
+const pages = await getPages();
+const { data } = entry;
+const path = pathOf(entry);
+
+const toc = headings
+	.filter((heading) => heading.depth === 2)
+	.map((heading, number) => ({
+		label: heading.text.replace(/^\d{2}(\.\d+)?\.?\s*/, ""),
+		href: `#${heading.slug}`,
+		number: sectionNumber(number),
+	}));
+
+const crumbs = path.split("/").filter(Boolean);
+if (data.sub) crumbs[crumbs.length - 1] = "cli reference";
+const updated = lastUpdated(entry);
+
+const neighbor = (page: (typeof pages)[number] | undefined, label: string) =>
+	page ? { label, title: labelOf(page), href: pathOf(page) } : undefined;
+const previous = index === 0 ? { label: "← Previous", title: "index", href: "/" } : neighbor(pages[index - 1], "← Previous");
+const next = neighbor(pages[index + 1], "Next →");
+---
+
+<DocsShell title={data.title} description={data.description} current={path} toc={toc}>
+	<DocHeader
+		crumbs={crumbs}
+		title={data.title}
+		line={data.tagline ?? data.description}
+		status={data.status}
+		meta={[...data.meta, ...(updated ? [`updated ${updated}`] : [])]}
+		source={data.source}
+	/>
+
+	<Prose><Content /></Prose>
+
+	<div class="page-foot">
+		<span>{updated ? `last updated ${updated}` : ""}</span>
+		<a href={editUrl(entry)}>edit this page on GitHub ↗</a>
+	</div>
+	<Pager prev={previous} next={next} />
+</DocsShell>

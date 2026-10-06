@@ -1,0 +1,65 @@
+---
+import { IndexHeader, LeaderRow, Section } from "@raioviajante/design/parts";
+import DocsShell from "../layouts/DocsShell.astro";
+import { getPages, pathOf } from "../lib/docs";
+
+const pages = (await getPages()).filter((entry) => !entry.data.sub);
+const guides = pages.filter((entry) => entry.data.group === "projects");
+const standards = pages.filter((entry) => entry.data.group === "raioviajante");
+---
+
+<DocsShell
+	title="docs — technical documentation for things built under raioviajante."
+	description="Public technical documentation for projects and systems built under RaioViajante."
+	current="/"
+	fullTitle
+>
+	<IndexHeader name="docs" line="technical documentation for things built under raioviajante." />
+
+	<LeaderRow label="search" value="what do you need to look up? /" href="/search/" />
+
+	<Section number="01." title="projects/" index>
+		{
+			guides.map((entry) => (
+				<div class="docs-entry">
+					<LeaderRow label={entry.data.title.toLowerCase()} value={entry.data.status} href={pathOf(entry)} />
+					<p>{entry.data.summary}</p>
+					<p class="docs-entry__note">guide · reference</p>
+				</div>
+			))
+		}
+		<div class="docs-entry">
+			<LeaderRow label="hum" value="exploring" href="https://github.com/RaioViajante/hum" />
+			<p>terminal music player</p>
+		</div>
+		<div class="docs-entry">
+			<LeaderRow
+				label="orbit"
+				value="not documented yet"
+				href="https://dump.raioviajante.com/posts/building-orbit"
+			/>
+			<p>self-hosted job scheduler</p>
+			<p class="docs-entry__note">read about it on dump ↗</p>
+		</div>
+		<div class="docs-entry">
+			<LeaderRow
+				label="yanawa"
+				value="not documented yet"
+				href="https://dump.raioviajante.com/posts/started-designing-a-language-before-i-could-compile-one"
+			/>
+			<p>programming language in design</p>
+			<p class="docs-entry__note">read about it on dump ↗</p>
+		</div>
+	</Section>
+
+	<Section number="02." title="raioviajante/" index>
+		{
+			standards.map((entry) => (
+				<div class="docs-entry">
+					<LeaderRow label={entry.data.title.toLowerCase()} value={entry.data.status} href={pathOf(entry)} />
+					<p>{entry.data.summary}</p>
+				</div>
+			))
+		}
+	</Section>
+</DocsShell>
