@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SearchNavItem } from "@raioviajante/design/search";
 
 const pages = [
   { number: "01.", label: "about", href: "/about" },
@@ -40,6 +41,9 @@ export function SiteNavigation() {
             </Link>
           </li>
         ))}
+        <li>
+          <SearchNavItem number="06." current={pathname === "/search"} />
+        </li>
       </ol>
     </nav>
   );

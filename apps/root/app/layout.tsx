@@ -4,7 +4,9 @@ import { Noto_Sans_Mono } from "next/font/google";
 import { SiteFooter } from "../components/SiteFooter";
 import { SiteHeader } from "../components/SiteHeader";
 import { SiteNavigation } from "../components/SiteNavigation";
+import { SearchBehavior } from "@raioviajante/design/search-react";
 import "@raioviajante/design/editorial.css";
+import "@raioviajante/design/search.css";
 import "./globals.css";
 
 const mono = Noto_Sans_Mono({
@@ -49,6 +51,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </main>
         </div>
         <SiteFooter />
+        <SearchBehavior />
       </body>
     </html>
   );
