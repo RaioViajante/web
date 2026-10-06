@@ -253,8 +253,8 @@
   height: 180px;
 }
 /* Suggestions continue the character's sentence, quietly: the words share
-   its color and differ only in weight until hover or focus lights them up
-   like a pressed row. */
+   its color and differ only in weight; hover and focus brighten the text,
+   like every other link on the sites. */
 .rv-search-suggestions {
   margin-top: 6px;
   color: var(--fg-2);
@@ -266,23 +266,18 @@
 }
 .rv-search-suggestions button {
   display: inline;
-  margin: 0 -3px;
-  padding: 1px 3px;
+  padding: 0;
   border: 0;
-  border-radius: 3px;
   background: none;
   color: inherit;
   font: inherit;
   font-weight: var(--weight-heading);
   cursor: pointer;
-  transition:
-    color var(--ease-link) ease,
-    background-color var(--ease-link) ease;
+  transition: color var(--ease-link) ease;
 }
 .rv-search-suggestions button:hover,
 .rv-search-suggestions button:focus-visible {
   color: var(--fg);
-  background: var(--press-bg);
 }
 @media (max-width: 500px) {
   .rv-ask img {
