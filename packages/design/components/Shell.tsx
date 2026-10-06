@@ -145,6 +145,7 @@ export function Shell({
         Skip to content
       </a>
       <div className="rv-shell">
+        <SoundToggle />
         <aside className="rv-sidebar">
           <NavGroup
             label="PAGES"
@@ -170,7 +171,6 @@ export function Shell({
         </aside>
         <main className="rv-main" id="main">
           <div className="rv-column">
-            <SoundToggle />
             {children}
             <Footer {...footer} />
           </div>

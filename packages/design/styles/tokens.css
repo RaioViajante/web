@@ -14,12 +14,30 @@
   --bg: #191919;
   --fg: #edf1f6; /* text, titles, active state; root source */
   --fg-2: #8792a1; /* secondary text, status words, subtitles; root muted */
-  --fg-3: #858b94; /* section numbers, caps labels, meta */
+  --fg-3: #8792a1; /* section numbers, caps labels, meta; root muted */
 
   /* rules */
   --line: rgba(215, 223, 234, 0.3); /* dividers; root rule */
-  --dots: #444444; /* dotted leaders */
+  --dots: rgba(215, 223, 234, 0.3); /* dotted leaders; root rule */
   --rule-note: #555555; /* quotes */
+
+  /* interaction (root's original values) */
+  --accent: #b9a1d2; /* text selection and focus ring only, never links */
+  --hover-link: #aab5c1; /* footer and feed links */
+  --hover-label: #f4f6f9; /* a leader row's name on hover */
+  --hover-note: #e1e6ed; /* a leader row's value on hover */
+  --inline-link: #d9dee5; /* underlined links inside lists of details */
+  --press-bg: rgba(237, 241, 246, 0.055); /* pressed row */
+  --press-shadow: rgba(0, 0, 0, 0.28); /* pressed row, inset */
+  --card: #202020; /* hover description card */
+  --hover-inline: #ffffff; /* an inline link on hover */
+  --art-shadow: rgba(0, 0, 0, 0.22); /* gallery tiles only */
+  --art-shadow-hover: rgba(0, 0, 0, 0.34);
+  --ease-nav: 220ms;
+  --ease-link: 420ms;
+  --ease-note: 560ms;
+  --ease-press: 180ms;
+  --ease-motion: cubic-bezier(0.2, 0.75, 0.2, 1);
 
   /* soft blocks: code, terminals, notes, tables, lab benches */
   --block: #212121;
@@ -51,34 +69,32 @@
 
   /* type */
   --font: "Noto Sans Mono", ui-monospace, monospace;
-  --size-index-title: 56px;
-  --size-page-title: 48px;
+  --size-index-title: clamp(35.2px, 4.4vw, 45.76px); /* root hero */
+  --size-page-title: clamp(35.2px, 4.4vw, 45.76px);
   --size-post-title: 44px;
-  --size-section: 18px;
+  --size-section: 17.952px; /* root: 1.02rem */
   --size-body: 16.5px; /* root: 110% × 0.9375rem */
   --size-small: 14px;
   --size-code: 13.5px;
-  --size-label: 12px;
-  --tracking-label: 0.12em;
+  --size-label: 13.728px; /* root: 0.78rem */
+  --tracking-label: 0.08em;
+  --weight-heading: 650;
   --leading-body: 1.82;
   --weight-body: 500;
   --leading-code: 1.6;
 
   /* layout */
-  --measure: 740px; /* content column */
+  --measure: 739.2px; /* content column; root: 42rem */
   --shell: 1320px; /* sidebar + content (+ toc on docs) */
-  --sidebar: 230px;
+  --sidebar: 228.8px; /* root: 13rem */
   --toc: 200px;
-  --gutter: 48px;
-  --section-gap: 56px; /* 80px on index pages */
+  --gutter: 61.6px; /* root: 3.5rem */
+  --section-gap: 42.24px; /* root: 2.4rem */
   --touch: 44px;
 }
 
 @media (max-width: 720px) {
   :root {
-    --size-index-title: 40px;
-    --size-page-title: 34px;
     --size-post-title: 32px;
-    --gutter: 32px;
   }
 }

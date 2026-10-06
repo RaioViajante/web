@@ -58,41 +58,55 @@ All files are exports of the original artwork. The screenshot crops from the des
 4. **Whitespace organizes, not boxes.** Only code blocks and lab benches get a frame.
 5. **Soft blocks.** Everything that interrupts prose (code, terminals, notes, tables, lab benches) sits on one surface: `#212121`, 10px corners, no border, label above. Only warnings are outlined. Sections are never boxed.
 6. **Sound and character are identity.** Every site uses the root's sounds, the avatar and the sticker.
-7. **Never:** gradients, glow, shadows, bento grids, colored badges, emoji, a second typeface, an accent color for links.
+7. **Never:** gradients, glow, shadows, bento grids, colored badges, emoji, a second typeface, an accent color for links. One exception: the root gallery's tiles keep their shadows (artwork pinned to a board). The pressed state of a leader row also keeps root's inset shadow.
 
 ## 2. Tokens
 
 All tokens live in `packages/design/styles/tokens.css`. The two `[CHECK]` values were resolved against the root site: `--bg` is `#191919` (the design measured `#1b1b1b`) and `--font` keeps the root's Noto Sans Mono stack.
 
-| token           | value                      | use                                |
-| --------------- | -------------------------- | ---------------------------------- |
-| `--bg`          | `#191919`                  | page (root's value)                |
-| `--fg`          | `#edf1f6`                  | text, titles, current item (root)  |
-| `--fg-2`        | `#8792a1`                  | secondary text (root muted)        |
-| `--fg-3`        | `#858b94`                  | section numbers, caps labels, meta |
-| `--line`        | `rgba(215, 223, 234, 0.3)` | rules, frames (root)               |
-| `--dots`        | `#444444`                  | dotted leaders                     |
-| `--rule-note`   | `#555555`                  | quotes, NOTE                       |
-| `--code-bg`     | `#202020`                  | code blocks, benches               |
-| `--code-inline` | `#262626`                  | inline code                        |
+| token           | value                      | use                                             |
+| --------------- | -------------------------- | ----------------------------------------------- |
+| `--bg`          | `#191919`                  | page (root's value)                             |
+| `--fg`          | `#edf1f6`                  | text, titles, current item (root)               |
+| `--fg-2`        | `#8792a1`                  | secondary text (root muted)                     |
+| `--fg-3`        | `#8792a1`                  | section numbers, caps labels, meta (root muted) |
+| `--line`        | `rgba(215, 223, 234, 0.3)` | rules, frames (root)                            |
+| `--dots`        | `rgba(215, 223, 234, 0.3)` | dotted leaders (root rule)                      |
+| `--rule-note`   | `#555555`                  | quotes, NOTE                                    |
+| `--code-bg`     | `#202020`                  | code blocks, benches                            |
+| `--code-inline` | `#262626`                  | inline code                                     |
 
 Syntax: keyword `#d8bd84` · type `#bfa6d9` · function `#8fb8d6` · string `#a8c791` · number `#de9f8c` · comment `#7b818a` italic · punctuation `--fg-2`.
 
 ## 3. Typography
 
-| role         | size / weight                   | where                                     |
-| ------------ | ------------------------------- | ----------------------------------------- |
-| index title  | 56 / 700                        | root, site index pages                    |
-| page title   | 44–48 / 700                     | posts, docs pages, experiments            |
-| section      | 17–18 / 700, number in `--fg-3` | everywhere                                |
-| body         | 16.5 / 500 / line-height 1.82   | everywhere; root computed size            |
-| code, tables | 13–13.5 / 1.75                  | everywhere                                |
-| caps label   | 12–12.5, uppercase, +0.12em     | page label, sidebar groups, table headers |
+These are the root site's original values, restored in Phase 4a after a
+before/after comparison. The root is the reference for the system.
+
+| role         | size / weight                              | where                                     |
+| ------------ | ------------------------------------------ | ----------------------------------------- |
+| index title  | clamp(35.2, 4.4vw, 45.76) / 650 / 1.28     | site index pages                          |
+| page title   | clamp(35.2, 4.4vw, 45.76) / 650 / 1.28     | pages, docs, experiments (post title 44)  |
+| section      | 17.95 / 650, number 16.5 / 500 in `--fg-3` | everywhere; number column 52.8px          |
+| body         | 16.5 / 500 / line-height 1.82              | everywhere; root computed size            |
+| sidebar item | 15.84 / 500, padding 4.4px 13.2px          | PAGES, ON THIS PAGE, EXPERIMENTS          |
+| code, tables | 13–13.5 / 1.75                             | everywhere                                |
+| caps label   | 13.73, uppercase, +0.08em                  | page label, sidebar groups, table headers |
+| sound toggle | 14.08 / 500                                | top center of the content column          |
+| footer       | 12.32 / line-height 1.9                    | everywhere                                |
+
+Layout: shell 1320px wide, sidebar 228.8px, gutter 61.6px, content column
+739.2px, section gap 42.24px. Interaction (tokens `--hover-*`, `--ease-*`,
+`--press-*`): sidebar items brighten in 220ms; a linked leader row brightens
+its name (`--hover-label`), brightens and scales its value by 1.8%
+(`--hover-note`, 560ms), and presses in on `:active`; footer links go to
+`--hover-link` in 420ms; the selection and the focus ring use `--accent`
+(`#b9a1d2`), never links. The sidebar's current item has a 1px `--fg-2` rule.
 
 ## 4. Structure (shared by all sites)
 
 - **Sound toggle** — `SOUND ON` at the top center of the **content column** (not the page), exactly like the root.
-- **Sidebar** — caps group labels; items numbered `00.`, `01.`; the current item has a 1px `--fg` rule on its left. Groups: PAGES, ON THIS PAGE where useful, EXPERIMENTS on lab. **No SITES group** — the footer links the sites. Search is the last item of PAGES: `03. search ····· (avatar) ⌘K` — see `dump/search-brand.html`.
+- **Sidebar** — caps group labels; items numbered `00.`, `01.`; the current item has a 1px `--fg-2` rule on its left. Groups: PAGES, ON THIS PAGE where useful, EXPERIMENTS on lab. **No SITES group** — the footer links the sites. Search is the last item of PAGES: `03. search ····· (avatar) ⌘K` — see `dump/search-brand.html`.
 - **Page header** — centered: caps label (or breadcrumb in caps on docs), title, one line, meta row separated by middots. The first meta item is the status word in `--fg`.
 - **Numbered sections** — `01.`, `01.1`, `01.2`. The same numbers appear in "on this page" and in search results.
 - **Dotted leader** — `name ····· value` for lists, metadata, statuses, tags, related links.

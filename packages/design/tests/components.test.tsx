@@ -62,9 +62,9 @@ describe("Shell", () => {
     );
   });
 
-  it("puts the sound toggle at the top of the content column, then content, then the footer", () => {
+  it("puts the sound toggle first, centered over the content column, then content, then the footer", () => {
+    expect(html.indexOf("rv-sound")).toBeLessThan(html.indexOf("rv-sidebar"));
     const column = html.slice(html.indexOf('class="rv-column"'));
-    expect(column.indexOf("rv-sound")).toBeLessThan(column.indexOf("content"));
     expect(column.indexOf("content")).toBeLessThan(column.indexOf("rv-footer"));
     expect(html).not.toMatch(/SITES/);
   });

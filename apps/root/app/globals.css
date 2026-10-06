@@ -53,18 +53,18 @@ html {
 .row-preview {
   position: absolute;
   z-index: 2;
-  top: calc(100% - 5px);
+  top: calc(100% - 5.28px);
   left: 0;
-  width: min(676px, 100%);
-  padding: 16px 18px;
-  border-radius: var(--radius);
-  background: var(--block);
+  width: min(668.8px, 100%);
+  padding: 16.72px 17.6px;
+  border: 1px solid var(--line);
+  background: var(--card);
   color: var(--fg);
-  font-size: var(--size-small);
+  font-size: 15.84px;
   line-height: 1.7;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-6px);
+  transform: translateY(-6.2px);
   transition:
     opacity 180ms ease,
     transform 180ms ease,
@@ -77,7 +77,7 @@ html {
 }
 
 .row-preview p.row-preview-meta {
-  margin-top: 8px;
+  margin-top: 7.92px;
   color: var(--fg-2);
 }
 
@@ -95,44 +95,46 @@ html {
   transition-delay: 0ms;
 }
 
-.home-feed-note {
-  margin: 4px 0 0 70px;
+.rv-section p.home-feed-note {
+  margin: 22px 0 0 69.52px;
   color: var(--fg-3);
   font-size: 11px;
 }
 
 .home-feed-note a {
   color: inherit;
+  cursor: pointer;
   text-decoration: none;
+  transition: color var(--ease-link) ease;
 }
 
 .home-feed-note a:hover,
 .home-feed-note a:focus-visible {
-  color: var(--fg);
+  color: var(--hover-link);
 }
 
-.setup-empty {
-  margin-left: 66px;
+.rv-section p.setup-empty {
+  margin: 0 0 0 66px;
   color: var(--fg-3);
 }
 
 /* projects page */
 .project-entry {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 26px;
+  margin-bottom: 38.72px;
 }
 
 .project-entry .rv-leader {
+  margin-bottom: 8.8px;
   font-weight: 700;
 }
 
-.project-description {
+.rv-section p.project-description {
+  margin: 0 0 9.68px;
   color: var(--fg);
 }
 
-.project-detail {
+.rv-section p.project-detail {
+  margin: 4.4px 0;
   color: var(--fg-2);
 }
 
@@ -141,12 +143,19 @@ html {
   font-weight: 700;
 }
 
-.project-detail a {
+.project-entry .project-detail a {
+  color: var(--inline-link);
   text-decoration: underline;
-  text-underline-offset: 4px;
+  text-underline-offset: 3.52px;
+  transition: color var(--ease-link) ease;
 }
 
-/* gallery: the board is a pile that the visitor opens */
+.project-entry .project-detail a:hover {
+  color: var(--hover-inline);
+}
+
+/* gallery: the board is a pile that the visitor opens. The tiles keep their
+   shadows: artwork pinned to a board is the one exception to "no shadows". */
 .gallery-board {
   position: relative;
   min-height: 22rem;
@@ -181,6 +190,7 @@ html {
 .gallery-opening:hover img,
 .gallery-opening:focus-visible img {
   animation: gallery-float 2.6s ease-in-out infinite;
+  filter: brightness(1.05);
 }
 
 .gallery-opening:active img {
@@ -242,6 +252,9 @@ html {
   transform-origin: center;
   opacity: 0;
   cursor: pointer;
+  transition:
+    filter 420ms ease,
+    box-shadow 420ms ease;
 }
 
 .gallery-board[data-revealed="true"] .gallery-tile {
@@ -252,18 +265,23 @@ html {
   display: block;
   width: 100%;
   height: auto;
-  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0.9rem 1.6rem var(--art-shadow);
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 520ms ease;
 }
 
 .gallery-tile:hover,
 .gallery-tile:focus-visible {
   z-index: 10;
+  filter: brightness(1.08);
 }
 
 .gallery-tile:hover img,
 .gallery-tile:focus-visible img {
   transform: translateY(-0.55rem) scale(1.055)
     rotate(calc(-1 * var(--tile-rotate)));
+  box-shadow: 0 1.3rem 2.1rem var(--art-shadow-hover);
 }
 
 .gallery-tile:active img {
@@ -354,6 +372,10 @@ html {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .home-feed-note a,
+  .project-entry .project-detail a {
+    transition: none;
+  }
   .avatar-coin.is-flipping .rv-avatar {
     animation: none;
   }
@@ -423,8 +445,13 @@ html {
 }
 
 @media (max-width: 480px) {
-  .home-feed-note,
-  .setup-empty {
+  .rv-avatar {
+    width: 92px;
+    height: 92px;
+  }
+
+  .rv-section p.home-feed-note,
+  .rv-section p.setup-empty {
     margin-left: 0;
   }
 }
