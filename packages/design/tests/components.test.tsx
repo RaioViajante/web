@@ -71,9 +71,11 @@ describe("Shell", () => {
 
   it("renders the four sites, email, CNPJ and this site's legal pages", () => {
     expect(html).toContain('href="https://raioviajante.com"');
-    expect(html).toContain(
-      'href="https://dump.raioviajante.com" data-sound="nav" aria-current="page"',
-    );
+    expect(html).toContain('href="https://dump.raioviajante.com"');
+    // No site is marked as current in the footer, on any site.
+    expect(
+      html.slice(html.indexOf('aria-label="RaioViajante sites"')),
+    ).not.toMatch(/aria-current[^>]*>dump/);
     expect(html).toContain("mail@raioviajante.com");
     expect(html).toContain("CNPJ: 53.021.377/0001-93");
     expect(html).toContain('href="/terms"');

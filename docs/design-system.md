@@ -113,7 +113,7 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 - **Soft blocks** — callouts NOTE / IMPORTANT on `#212121`; WARNING outlined 1px `--fg-2`; DEPRECATED dotted. Quotes keep a 2px left rule.
 - **Related rows** — `title ····· site ↗`. Every post, docs page and experiment links to its siblings on the other sites.
 - **Prev / next** — caps label above title, no box.
-- **Footer** — identical everywhere: four sites (current one in `--fg`), email, CNPJ, and that site's own Terms of Use and Privacy Policy.
+- **Footer** — identical everywhere: four sites (none marked as current), email, CNPJ, and that site's own Terms of Use and Privacy Policy.
 - **Index header** — avatar (112px circle), site name, one line — like the root.
 - **Search ("Ask RaioViajante")** — menu item ends in the hand-on-chin head (30px, peeking above the row) and `⌘K` (ctrl K off Mac, `/` also opens); on hover the head hops once and a "?" sticker bubble pops. The search page: the full search character asks in a white sticker bubble in the site's voice (root: "what are you looking for?", dump: "what are you curious about?", docs: "what do you need to look up?", lab: "what do you want to poke at?"); the bubble answers while you type ("found 4 things about “sweep”!", "hmm… nothing yet."); results are numbered leader rows grouped by site; scope "this site · everywhere"; empty search shows the sticker and "maybe I haven't built it yet."
 - **Legal pages** — Terms of Use and Privacy Policy on every site: "In short" leaders first, then numbered sections; site-specific sections (dump comments via giscus, docs accuracy/search, lab experiments).

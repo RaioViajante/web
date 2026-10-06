@@ -7,6 +7,8 @@ export interface NavItem {
   href: string;
   /** Overrides the automatic `00.` numbering, for example `001` on lab. */
   number?: string;
+  /** A page that sits under the previous one (`01.1 cli reference`). */
+  sub?: boolean;
 }
 
 export interface NavGroupProps {
@@ -39,6 +41,7 @@ export function NavGroup({
           linkComponent={linkComponent}
           href={item.href}
           data-sound="nav"
+          className={item.sub ? "rv-nav__sub" : undefined}
           aria-current={item.href === current ? "page" : undefined}
         >
           <span className="rv-nav__num">{item.number ?? pad(index)}</span>
@@ -86,11 +89,7 @@ export function Footer({
         {SITES.map((item, index) => (
           <span key={item.id}>
             {index > 0 ? <span aria-hidden="true"> · </span> : null}
-            <a
-              href={item.href}
-              data-sound="nav"
-              aria-current={item.id === site ? "page" : undefined}
-            >
+            <a href={item.href} data-sound="nav">
               {item.label}
             </a>
           </span>

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 
-import { sectionNumber } from "@/lib/section-number";
+import { sectionNumber } from "@raioviajante/design/sections";
 import {
   getPublishedPosts,
   sortPostsNewestFirst,

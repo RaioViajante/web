@@ -24,6 +24,7 @@
     "./search-react": "./search-react.tsx",
     "./search-client": "./search/client.ts",
     "./blocks": "./blocks/index.ts",
+    "./sections": "./blocks/sections.ts",
     "./sound": "./sound/index.ts",
     "./behavior": "./behavior.ts",
     "./behavior-react": "./behavior-react.tsx",

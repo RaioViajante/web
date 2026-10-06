@@ -491,3 +491,32 @@
   border: 0;
   border-top: 1px solid var(--line);
 }
+
+/* ---------- steps: a numbered list read in order ---------- */
+.prose ol.steps {
+  margin: 0 0 17.6px;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.prose ol.steps > li {
+  display: flex;
+  gap: 17.6px;
+  margin: 0;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--block-hairline);
+  counter-increment: step;
+}
+.prose ol.steps > li::before {
+  flex: 0 0 26px;
+  color: var(--fg-3);
+  content: counter(step, decimal-leading-zero);
+}
+.prose ol.steps > li > :is(p, ul, .block) {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+.prose ol.steps > li > * + * {
+  margin-top: 8px;
+}

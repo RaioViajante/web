@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { GET as giscusTheme } from "@/app/giscus.css/route";
-import { sectionNumber } from "@/lib/section-number";
+import { sectionNumber } from "@raioviajante/design/sections";
 
 const nextConfig = fs.readFileSync(
   path.join(process.cwd(), "next.config.mjs"),

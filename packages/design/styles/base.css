@@ -142,6 +142,9 @@ a:hover {
 .rv-nav a.is-current {
   border-left-color: var(--fg-2);
 }
+.rv-nav a.rv-nav__sub {
+  padding-left: 33px;
+}
 .rv-nav__num {
   color: inherit;
 }
