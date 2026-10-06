@@ -12,7 +12,7 @@ This file has four parts:
 4. [Next session](#4-next-session): exact instructions for the next agent.
 
 Repo rules for agents are in `AGENTS.md` and `CLAUDE.md` (section "Migration
-migration"). Design rules and tokens: [design-system.md](design-system.md).
+sessions"). Design rules and tokens: [design-system.md](design-system.md).
 Blocks: [blocks.md](blocks.md).
 
 ---
