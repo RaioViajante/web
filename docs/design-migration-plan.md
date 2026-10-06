@@ -558,7 +558,7 @@ small cookie on .raioviajante.com" (the "Last updated" date was not changed).
   component in `src/components/`. Fonts: `@fontsource-variable/noto-sans-mono`.
   Removed: the purple accent, IBM Plex, Source Serif, the theme toggle, Google
   Fonts and every Starlight override.
-- Pages: home (`IndexHeader` with the animated `AvatarCoin`, the dotted search row, `01. projects/` and
+- Pages: home (`IndexHeader` with the animated `AvatarCoin` (the search lives only in the sidebar item, by the owner's choice), `01. projects/` and
   `02. raioviajante/` with status words), guide and reference layout
   (`[...slug].astro`: breadcrumb label, status and meta row, numbered sections,
   steps, tables, callouts, last updated, edit on GitHub, prev/next), search,
