@@ -1,6 +1,7 @@
 /** Gallery artwork (root only). Kept apart from art.tsx so other sites never bundle it. */
 import blackCats from "../assets/gallery/black-cats.webp";
 import calvesPlaying from "../assets/gallery/calves-playing.webp";
+import characterStickerSheet from "../assets/gallery/character-sticker-sheet.webp";
 import cowMuhh from "../assets/gallery/cow-muhh.webp";
 import graveyardRun from "../assets/gallery/graveyard-run.webp";
 import hospitalBed from "../assets/gallery/hospital-bed.webp";
@@ -20,6 +21,7 @@ const image = (asset: StaticAsset, width: number, height: number) => ({
 export const gallery = {
   blackCats: image(blackCats, 1536, 1024),
   calvesPlaying: image(calvesPlaying, 1448, 1086),
+  characterStickerSheet: image(characterStickerSheet, 1122, 1402),
   cowMuhh: image(cowMuhh, 1536, 1024),
   graveyardRun: image(graveyardRun, 1600, 900),
   hospitalBed: image(hospitalBed, 1600, 900),

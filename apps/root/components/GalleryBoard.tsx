@@ -51,6 +51,11 @@ const artworks = [
     image: gallery.hospitalBed,
     alt: "RaioViajante resting in a hospital bed beside a binary monitor",
   },
+  {
+    id: "stickers",
+    image: gallery.characterStickerSheet,
+    alt: "A sheet of stickers showing the RaioViajante character in different poses",
+  },
 ] as const;
 
 function Artwork({

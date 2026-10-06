@@ -52,7 +52,7 @@ uses an editorial list with name, status, description, type, and destination for
 each entry.
 The gallery opens with the user's "Work of Art" illustration. It floats subtly
 on hover or keyboard focus; clicking or tapping it reveals two overlapping groups
-of artwork, including the hospital scene, with a short paper-like sound when
+of artwork, including the character sticker sheet and hospital scene, with a short paper-like sound when
 SOUND is enabled. Each artwork rises gently on hover or keyboard focus and opens
 the full image when selected. Reduced motion keeps the click-to-reveal interaction
 without the movement. The homepage avatar and favicon also come from the user's
