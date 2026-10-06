@@ -558,7 +558,7 @@ small cookie on .raioviajante.com" (the "Last updated" date was not changed).
   component in `src/components/`. Fonts: `@fontsource-variable/noto-sans-mono`.
   Removed: the purple accent, IBM Plex, Source Serif, the theme toggle, Google
   Fonts and every Starlight override.
-- Pages: home (`IndexHeader`, the dotted search row, `01. projects/` and
+- Pages: home (`IndexHeader` with the animated `AvatarCoin`, the dotted search row, `01. projects/` and
   `02. raioviajante/` with status words), guide and reference layout
   (`[...slug].astro`: breadcrumb label, status and meta row, numbered sections,
   steps, tables, callouts, last updated, edit on GitHub, prev/next), search,
@@ -632,7 +632,7 @@ only. Do not start Phase 5 or 6.
 2. Read `AGENTS.md`, `docs/design-system.md`, `docs/blocks.md`,
    `apps/docs/docs/design.md` (the closest example: Astro, shared React
    rendered statically) and `apps/lab/AGENTS.md`.
-3. Lab is Astro. Follow the docs pattern: a layout that renders a React
+3. Lab is Astro. Its index header uses the animated `AvatarCoin` like root, dump and docs (`@raioviajante/design/avatar-coin`). Follow the docs pattern: a layout that renders a React
    `*Frame.tsx` around the shared `Shell` (`.astro` files cannot pass JSX in
    props), `styles.css`, a `<script>` calling `startBehavior()`, the font from
    `@fontsource-variable/noto-sans-mono` (family `"Noto Sans Mono Variable"`),
