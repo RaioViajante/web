@@ -1,9 +1,9 @@
+import { socialUrl } from "@raioviajante/design/seo";
 import {
   personRef,
-  socialUrl,
   websiteId,
   websiteJsonLd,
-} from "@raioviajante/design/seo";
+} from "../../../seo/structured-data";
 
 import type { Post } from "@/lib/posts";
 import { absoluteUrl, site } from "@/lib/site";
@@ -11,7 +11,7 @@ import { absoluteUrl, site } from "@/lib/site";
 /**
  * Minimal JSON-LD, derived from the same `site`/`Post` data that already
  * feeds ordinary metadata — not a separate source of truth. The author is the
- * shared person identity from the design package (one `@id` across the
+ * shared person identity from `seo/structured-data.ts` (one `@id` across the
  * sites); serialization is the shared `jsonLdScript`.
  */
 

@@ -5,6 +5,7 @@ import {
   pageMetadata,
   socialKey,
   sitemapResponse,
+  webManifest,
 } from "../seo";
 
 describe("page metadata", () => {
@@ -85,4 +86,29 @@ it("keeps every code text color at 4.5:1 on all solid code surfaces", () => {
       expect(contrast, `${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
     }
   }
+});
+
+describe("sitemap lastmod", () => {
+  it("emits lastmod only for entries that have one", async () => {
+    const xml = await sitemapResponse("https://x.example", [
+      "/a",
+      { path: "/b", lastmod: "2026-09-07" },
+    ]).text();
+    expect(xml).toContain("<loc>https://x.example/a</loc></url>");
+    expect(xml).toContain(
+      "<loc>https://x.example/b</loc><lastmod>2026-09-07</lastmod>",
+    );
+    expect(xml.match(/<lastmod>/g)).toHaveLength(1);
+  });
+});
+
+describe("manifest", () => {
+  it("names the site and colors without claiming an app shell", () => {
+    const manifest = webManifest("docs", { themeColor: "#191919" });
+    expect(manifest.display).toBe("browser");
+    expect(manifest.theme_color).toBe("#191919");
+    expect(manifest.background_color).toBe("#191919");
+    expect(webManifest("docs")).not.toHaveProperty("theme_color");
+    expect(manifest).not.toHaveProperty("scope");
+  });
 });

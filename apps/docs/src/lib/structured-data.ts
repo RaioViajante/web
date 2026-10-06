@@ -1,10 +1,5 @@
-import {
-	breadcrumbJsonLd,
-	personRef,
-	socialUrl,
-	websiteId,
-	websiteJsonLd,
-} from "@raioviajante/design/seo";
+import { socialUrl } from "@raioviajante/design/seo";
+import { breadcrumbJsonLd, personRef, websiteId, websiteJsonLd } from "../../../../seo/structured-data";
 import { getPages, lastUpdated, pathOf, type DocEntry } from "./docs";
 import { origin } from "./seo";
 

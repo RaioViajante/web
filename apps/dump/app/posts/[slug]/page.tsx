@@ -6,7 +6,7 @@ import { PostArticle } from "@/components/PostArticle";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
 import { renderPost } from "@/lib/render-post";
 import { metadataFor } from "@/lib/seo";
-import { jsonLdScript } from "@raioviajante/design/seo";
+import { jsonLdScript } from "../../../../../seo/structured-data";
 import { blogPostingJsonLd } from "@/lib/structured-data";
 
 export const dynamicParams = false;

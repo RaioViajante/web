@@ -61,20 +61,20 @@ in Vercel's shallow clone, which fails the deployment instead of building it.
 All four apps consume `@raioviajante/design`, so every `ignoreCommand` watches
 `../../packages/design`. The command is identical in all four files. It uses a
 short form so that it stays within Vercel's 256-character limit for this
-setting (it is 254 characters):
+setting (it is 230 characters):
 
 ```sh
-p=$VERCEL_GIT_PREVIOUS_SHA; printf %s "$p" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e "$p^{commit}" && git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design ../../security || exit 1
+p=$VERCEL_GIT_PREVIOUS_SHA; printf %s "$p" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e "$p^{commit}" && git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-* ../../packages/design ../../security ../../seo || exit 1
 ```
 
 The paths cover:
 
 - `.` — changes inside the app's own directory.
 - `../../package.json` — root workspace scripts and package-manager metadata.
-- `../../pnpm-lock.yaml` — dependency changes, which may affect any app.
-- `../../pnpm-workspace.yaml` — workspace membership and install-script policy.
+- `../../pnpm-*` — the lockfile (dependency changes, which may affect any app) and the workspace file (membership and install-script policy).
 - `../../packages/design` — the shared package all four apps consume.
 - `../../security` — security header builders consumed by every app.
+- `../../seo` — the shared public identity and JSON-LD builders consumed by every app.
 
 Security header architecture, local verification, and the intentional Next.js
 rendering change are documented in [security-headers.md](security-headers.md).

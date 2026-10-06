@@ -13,7 +13,8 @@
     "test": "pnpm -r --if-present test",
     "format:check": "pnpm -r --if-present format:check",
     "security:origins": "node security/verify-origins.mjs",
+    "seo:check": "node --test seo/*.test.mjs",
     "security:check": "node --test security/*.test.mjs && node security/sync-vercel.mjs --check",
-    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm security:check"
+    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm security:check && pnpm seo:check"
   }
 }

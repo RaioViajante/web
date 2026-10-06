@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { jsonLdScript } from "@raioviajante/design/seo";
+import { jsonLdScript } from "../../../seo/structured-data";
 
 import { staticMetadata } from "@/lib/seo";
 import { homeJsonLd } from "@/lib/structured-data";

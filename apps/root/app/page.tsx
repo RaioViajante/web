@@ -3,7 +3,7 @@ import {
   jsonLdScript,
   personJsonLd,
   websiteJsonLd,
-} from "@raioviajante/design/seo";
+} from "../../../seo/structured-data";
 import { metadataFor, origin, pages } from "../lib/seo";
 import Link from "next/link";
 import {

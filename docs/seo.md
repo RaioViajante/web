@@ -16,7 +16,9 @@ read from `styles/tokens.css`). Titles and descriptions are unique across all
 ## Identity
 
 One person, `https://raioviajante.com/#person`, defined in `identity` in
-`packages/design/seo.ts`. Facts published: the handle `RaioViajante` (already
+`seo/structured-data.ts` (a plain module imported by relative path, like
+`security/headers.ts`, and watched by every app's Ignored Build Step; it is not
+part of the design system). Facts published: the handle `RaioViajante` (already
 the author name on dump), the home URL and the GitHub profile
 `https://github.com/RaioViajante` (the primary link on the root home page and
 the follow link on dump). Nothing else is claimed. The full node (with

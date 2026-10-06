@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { IndexHeader, LeaderRow, Section } from "@raioviajante/design/parts";
-import { identity } from "@raioviajante/design/seo";
+import { identity } from "../../../seo/structured-data";
 
 import { series } from "@/lib/post-details";
 import { formatPostMonth, sortPostsNewestFirst, type Post } from "@/lib/posts";

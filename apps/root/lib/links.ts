@@ -1,4 +1,4 @@
-import { identity } from "@raioviajante/design/seo";
+import { identity } from "../../../seo/structured-data";
 
 export interface PrimaryLink {
   label: string;
