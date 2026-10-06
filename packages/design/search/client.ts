@@ -227,8 +227,17 @@ export function attachSearch() {
         ? "⌘K"
         : "ctrl K";
     });
-  const page = document.querySelector<HTMLElement>("[data-search-page]");
-  if (page) mountPage(page);
+  let mountedPage: HTMLElement | null = null;
+  const mountCurrentPage = () => {
+    const page = document.querySelector<HTMLElement>("[data-search-page]");
+    if (page && page !== mountedPage) {
+      mountedPage = page;
+      mountPage(page);
+    }
+  };
+  mountCurrentPage();
+  const observer = new MutationObserver(mountCurrentPage);
+  observer.observe(document.body, { childList: true, subtree: true });
   const onKey = (event: KeyboardEvent) => {
     const command =
       (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
@@ -236,13 +245,20 @@ export function attachSearch() {
       event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey;
     if ((!command && !slash) || isTyping(event.target)) return;
     event.preventDefault();
-    if (page)
-      page.querySelector<HTMLInputElement>("[data-search-input]")?.focus();
+    const currentPage =
+      document.querySelector<HTMLElement>("[data-search-page]");
+    if (currentPage)
+      currentPage
+        .querySelector<HTMLInputElement>("[data-search-input]")
+        ?.focus();
     else
       location.href =
         document.querySelector<HTMLAnchorElement>(".rv-search")?.href ??
         "/search";
   };
   document.addEventListener("keydown", onKey);
-  return () => document.removeEventListener("keydown", onKey);
+  return () => {
+    observer.disconnect();
+    document.removeEventListener("keydown", onKey);
+  };
 }

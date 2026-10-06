@@ -12,11 +12,6 @@ const { sidebar } = Astro.locals.starlightRoute;
 <SidebarSublist sublist={sidebar} />
 <SearchNavItem number="03." href="/search/" current={Astro.url.pathname.startsWith('/search')} />
 
-<script>
-	import { attachSearch } from '@raioviajante/design/search-client';
-	attachSearch();
-</script>
-
 <div class="md:sl-hidden">
 	<MobileMenuFooter />
 </div>
