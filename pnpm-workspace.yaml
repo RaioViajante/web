@@ -15,3 +15,16 @@ minimumReleaseAgeExclude:
   - "@astrojs/internal-helpers@0.12.0"
   - "@astrojs/markdown-satteri@0.4.3"
   - astro@7.3.6
+
+# Security overrides. Each pins an upstream-exact version to its patched
+# release; remove an entry when the owning package ships the fix.
+# - fflate: satori (through @vercel/og) pins 0.7.3 exactly, which has a
+#   denial-of-service advisory in unzipSync. 0.7.5 patches the same 0.7 line.
+# - sharp: @vercel/og 0.11.1 asks for ^0.34.5, which has libvips/librsvg
+#   advisories fixed in 0.35.5. The 75 generated social images were compared
+#   byte for byte before and after and are identical. @vercel/og 1.0.3 drops
+#   sharp but does not load in Astro's prerender ("Dynamic require of fs"), so
+#   it is not used.
+overrides:
+  "fflate@0.7.3": "0.7.5"
+  "sharp@0.34.5": "0.35.5"
