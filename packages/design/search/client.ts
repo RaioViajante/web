@@ -72,7 +72,8 @@ function resultRow(entry: SearchEntry, index: number) {
   row.href = entry.href;
   row.dataset.searchResult = "";
   row.dataset.sound = "nav";
-  row.setAttribute("aria-selected", index === 0 ? "true" : "false");
+  // Links cannot be "selected"; the row Enter would open is the current one.
+  if (index === 0) row.setAttribute("aria-current", "true");
   const number = document.createElement("span");
   number.className = "rv-result__number";
   number.textContent = entry.number ?? String(index + 1).padStart(2, "0") + ".";
@@ -111,9 +112,10 @@ function mountPage(page: HTMLElement) {
     ];
     if (!rows.length) return;
     selected = (next + rows.length) % rows.length;
-    rows.forEach((row, index) =>
-      row.setAttribute("aria-selected", String(index === selected)),
-    );
+    rows.forEach((row, index) => {
+      if (index === selected) row.setAttribute("aria-current", "true");
+      else row.removeAttribute("aria-current");
+    });
     rows[selected]?.scrollIntoView({ block: "nearest" });
   }
 
@@ -124,6 +126,11 @@ function mountPage(page: HTMLElement) {
     note.textContent = "";
     note.hidden = true;
     selected = 0;
+    page
+      .querySelectorAll<HTMLElement>("[data-search-suggestions]")
+      .forEach((line) => {
+        line.hidden = line.dataset.searchSuggestions !== scope;
+      });
     if (!query) {
       bubble.textContent = initialPrompt;
       return;
