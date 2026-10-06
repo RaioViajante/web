@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 export type Site = "root" | "dump" | "docs" | "lab";
 
-const origins: Record<Site, string> = {
+export const siteOrigins: Record<Site, string> = {
   root: "https://raioviajante.com",
   dump: "https://dump.raioviajante.com",
   docs: "https://docs.raioviajante.com",
@@ -40,7 +40,7 @@ export function contentSecurityPolicy(
     `style-src-attr ${styles ? `'unsafe-hashes' ${styles.map(styleHash).join(" ")}` : "'none'"}`,
     "img-src 'self'",
     "font-src 'self'",
-    `connect-src 'self' ${Object.entries(origins)
+    `connect-src 'self' ${Object.entries(siteOrigins)
       .filter(([id]) => id !== site)
       .map(([, origin]) => origin)
       .join(" ")}`,

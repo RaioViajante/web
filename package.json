@@ -12,7 +12,7 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "format:check": "pnpm -r --if-present format:check",
-    "security:check": "node --test security/headers.test.mjs && node security/sync-vercel.mjs --check",
+    "security:check": "node --test security/*.test.mjs && node security/sync-vercel.mjs --check",
     "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm security:check"
   }
 }
