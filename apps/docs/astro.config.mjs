@@ -11,6 +11,11 @@ import {
 } from "@raioviajante/design/blocks";
 
 export default defineConfig({
+	vite: {
+		environments: {
+			prerender: { resolve: { external: ["@vercel/og", "harfbuzzjs"] } },
+		},
+	},
 	site: "https://docs.raioviajante.com",
 	trailingSlash: "always",
 	integrations: [react()],

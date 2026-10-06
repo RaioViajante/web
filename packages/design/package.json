@@ -30,9 +30,15 @@
     "./behavior": "./behavior.ts",
     "./behavior-react": "./behavior-react.tsx",
     "./gallery": "./components/gallery.ts",
-    "./avatar": "./components/avatar.ts"
+    "./avatar": "./components/avatar.ts",
+    "./seo": "./seo.ts",
+    "./social-image": "./social-image.tsx",
+    "./seo-head": "./components/seo-head.tsx",
+    "./fonts/*": "./fonts/*",
+    "./fonts.css": "./styles/fonts.css"
   },
   "dependencies": {
+    "@vercel/og": "0.11.1",
     "hast-util-to-html": "^9.0.5",
     "hast-util-to-jsx-runtime": "^2.3.6",
     "hast-util-to-string": "^3.0.1",
