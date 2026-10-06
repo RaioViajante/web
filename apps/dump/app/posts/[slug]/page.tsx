@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 
 import { PostArticle } from "@/components/PostArticle";
@@ -46,10 +47,12 @@ export default async function PostPage({ params }: PageProps) {
   if (!post) notFound();
 
   const Content = await renderPost(slug);
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <>
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLdScript(blogPostingJsonLd(post)),

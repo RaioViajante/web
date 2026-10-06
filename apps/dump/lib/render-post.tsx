@@ -15,7 +15,7 @@ import * as runtime from "react/jsx-runtime";
 
 /**
  * Compile a post's MDX with the shared soft-block pipeline. Runs on the
- * server at build time: the page ships no markdown runtime.
+ * server for dynamic article requests: the page ships no markdown runtime.
  */
 export async function renderPost(slug: string) {
   const source = fs.readFileSync(

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import type { ReactNode } from "react";
 import localFont from "next/font/local";
 import { Behavior } from "@raioviajante/design/behavior-react";
@@ -33,7 +34,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  // Nonces must be generated for each document, never at prerender time.
+  await connection();
   return (
     <html lang="en" className={mono.variable}>
       <body>

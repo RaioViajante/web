@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
@@ -46,11 +47,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  // Reading the request opts HTML into dynamic rendering for per-request CSP.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   return (
     <html lang={site.locale} className={mono.variable}>
       <head>
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
         />

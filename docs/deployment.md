@@ -16,8 +16,8 @@
 - Each project uses its app directory as Root Directory, with "Include files
   outside the Root Directory in the Build Step" enabled.
 - Install and build commands use Vercel's detection. Each app's
-  `vercel.json` sets only the framework and the Ignored Build Step (see
-  below); settings Vercel cannot read from the repository are in the
+  `vercel.json` sets the framework and the Ignored Build Step (see
+  below), plus security headers for static Astro apps; settings Vercel cannot read from the repository are in the
   [owner checklist](#owner-checklist-vercel-dashboard).
 - DNS for `raioviajante.com` is managed in Cloudflare.
 
@@ -61,10 +61,10 @@ in Vercel's shallow clone, which fails the deployment instead of building it.
 All four apps consume `@raioviajante/design`, so every `ignoreCommand` watches
 `../../packages/design`. The command is identical in all four files. It uses a
 short form so that it stays within Vercel's 256-character limit for this
-setting (it is 239 characters):
+setting (it is 254 characters):
 
 ```sh
-p=$VERCEL_GIT_PREVIOUS_SHA; printf %s "$p" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e "$p^{commit}" && git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design || exit 1
+p=$VERCEL_GIT_PREVIOUS_SHA; printf %s "$p" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e "$p^{commit}" && git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design ../../security || exit 1
 ```
 
 The paths cover:
@@ -74,6 +74,12 @@ The paths cover:
 - `../../pnpm-lock.yaml` — dependency changes, which may affect any app.
 - `../../pnpm-workspace.yaml` — workspace membership and install-script policy.
 - `../../packages/design` — the shared package all four apps consume.
+- `../../security` — security header builders consumed by every app.
+
+Security header architecture, local verification, and the intentional Next.js
+rendering change are documented in [security-headers.md](security-headers.md).
+Astro header literals are generated with `node security/sync-vercel.mjs` and
+checked by `pnpm security:check`; no Vercel dashboard settings are changed.
 
 Changes only under `docs/`, other apps or the root README skip every project
 that they do not touch. When another app starts consuming a shared package,

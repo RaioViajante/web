@@ -1,3 +1,5 @@
+import { staticHeaders } from "../../security/headers.ts";
+
 const nextConfig = {
   // About and Uses moved to raioviajante.com; keep the old URLs alive.
   async redirects() {
@@ -16,6 +18,7 @@ const nextConfig = {
   },
   async headers() {
     return [
+      { source: "/(.*)", headers: staticHeaders("dump") },
       {
         source: "/giscus.css",
         headers: [
