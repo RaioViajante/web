@@ -11,7 +11,7 @@ This file has four parts:
 3. [Status](#3-status): what is done, with paths.
 4. [Next session](#4-next-session): exact instructions for the next agent.
 
-Repo rules for agents are in `AGENTS.md` and `CLAUDE.md` (section "Design system
+Repo rules for agents are in `AGENTS.md` and `CLAUDE.md` (section "Migration
 migration"). Design rules and tokens: [design-system.md](design-system.md).
 Blocks: [blocks.md](blocks.md).
 
@@ -356,15 +356,15 @@ Open checks from DESIGN-SYSTEM.md section 7:
 
 Branch `feat/design-migration`. Nothing is pushed.
 
-| Phase                  | State       | Notes                                                                                       |
-| ---------------------- | ----------- | ------------------------------------------------------------------------------------------- |
-| 0. Audit and plan      | done        | this file                                                                                   |
-| 1. Shared home         | done        | styles, assets, sound                                                                       |
-| 2. Shared components   | done        | components, blocks, sound, behavior, templates; no app consumes them yet                    |
-| 3. Search              | done        | shared menu/page/behavior, four static indexes and routes; pending Vercel settings          |
-| 4. Migrate each site   | done        | root (4a), dump (4b), docs (4c) and lab (4d) done                                           |
-| 5. Features to finish  | partly      | `AGENTS.md` / `CLAUDE.md` rules are written; SEO, accessibility and performance work remain |
-| 6. Verify and clean up | not started |                                                                                             |
+| Phase                  | State | Notes                                                                              |
+| ---------------------- | ----- | ---------------------------------------------------------------------------------- |
+| 0. Audit and plan      | done  | this file                                                                          |
+| 1. Shared home         | done  | styles, assets, sound                                                              |
+| 2. Shared components   | done  | components, blocks, sound, behavior, templates; consumed by all four apps          |
+| 3. Search              | done  | shared menu/page/behavior, four static indexes and routes; pending Vercel settings |
+| 4. Migrate each site   | done  | root (4a), dump (4b), docs (4c) and lab (4d) done                                  |
+| 5. Features to finish  | done  | metadata, social cards, sitemaps, robots, self-hosted font, accessibility fixes    |
+| 6. Verify and clean up | done  | screenshots, reference comparison, axe, keyboard pass, final `chore:` cleanup      |
 
 ### Phase 1 (done)
 
@@ -706,7 +706,114 @@ apps/lab/
 apps/docs/           explicit date schema, date resolver and conditional footer
 ```
 
-### Checks run
+### Phase 5 and Phase 6 (done)
+
+Taken over from an interrupted session: the uncommitted Phase 5 work was
+reviewed, corrected and committed.
+
+- Shared metadata (`packages/design/seo.ts`), the build-time social card
+  renderer (`social-image.tsx`, `@vercel/og`, avatar, token colors, Noto Sans
+  Mono TTF with OFL), the Astro `SeoHead`, and the self-hosted Latin variable
+  WOFF2 (`fonts/`, `styles/fonts.css`; Next uses `next/font/local`). `sharp`
+  is allowed to build.
+- Every site: unique titles and descriptions, canonical URLs, Open Graph and
+  Twitter tags, one 1200×630 card per page under `/og/`, `sitemap.xml` (search
+  and legal included, 404 excluded) and `robots.txt`. Root gained both files.
+  404 pages are `noindex` (Next adds it; Astro via `isNotFoundPath`) and have
+  their own card. Dump keeps RSS; its file-based `opengraph-image` routes were
+  replaced by the shared `/og/` route and JSON-LD points at the same card.
+  Route inventories: `apps/root/lib/seo.ts`, `apps/dump/lib/seo.ts`,
+  `apps/docs/src/lib/seo.ts`, `apps/lab/src/lib/seo.ts`.
+- Accessibility: 44px minimum for buttons, tabs, toggles, inputs and search
+  controls (lab filters included). Codex had also applied 44px to sidebar,
+  leader-row and footer links; that visibly loosened root's established rhythm,
+  so link lists keep their compact layout and meet WCAG 2.2 target spacing
+  instead (axe `target-size` passes everywhere). Contrast tokens for comments,
+  line numbers and highlighted lines (tested at 4.5:1). Landmarks: the sound
+  toggle is the banner, `main` wraps page content only, the footer is its own
+  landmark. `scroll-regions.ts` makes sideways-scrolling tables and code
+  focusable, labelled regions only while they overflow (fixes axe
+  `scrollable-region-focusable` on the classifier at 390px). Labelled
+  containers use `role="group"`. Dump post tags keep 24px spacing when wrapped.
+  The search input shows focus as a bright 2px underline (Codex's change had
+  produced an outline box around the underline).
+- Layout: numbered h2 titles with inline code wrap (`/posts/building-orbit` at
+  390px); a step holding a code block puts the block under its text (docs Sweep
+  guide, step 06).
+- Performance: no Next.js prefetching of linked pages (client navigation
+  kept); the 404 sticker is no longer preloaded. The only preloaded images are
+  on screen (the index avatar frame, the 64px sidebar search head, the search
+  character on search pages). Astro pages hydrate no islands.
+- Phase 6 cleanup (final `chore:` commit) deleted:
+  `packages/design/tokens.css`, `packages/design/editorial-tokens.css`,
+  `packages/design/editorial.css`, `packages/design/editorial-sound.ts`,
+  `packages/design/search-react.tsx`, `apps/dump/lib/og-image.ts`,
+  `apps/dump/assets/fonts/` (`NotoSansMono-400.ttf`, `NotoSansMono-700.ttf`,
+  `OFL-NotoSansMono.txt`, `README.md`); the package exports with no consumer
+  (`./tokens.css`, `./editorial-tokens.css`, `./editorial.css`,
+  `./editorial-sound`, `./search-react`, `./search-client`, `./link`,
+  `./assets/*`, `./styles/tokens.css`, `./styles/base.css`,
+  `./styles/blocks.css`, `./search.css`); and the dependencies
+  `@fontsource-variable/noto-sans-mono` (docs, lab) and `hast-util-to-html`
+  (design). Earlier commits removed dump's `app/opengraph-image.tsx` and
+  `app/posts/[slug]/opengraph-image.tsx`.
+- Kept on purpose: `assets/character/head-box.png` and
+  `assets/stickers/work-of-art-pt.png` have no consumer but are owner artwork
+  copied by the artwork map (2.3); delete only on the owner's decision.
+
+Intentional differences from the design references (root compared with
+`175672c`, dump/docs/lab with the handoff HTML):
+
+- Root's tokens, type sizes and spacing win over the handoff snapshots on
+  dump, docs and lab (larger text, more line height).
+- On mobile the sidebar search row spans both columns with its dotted leader.
+- Real dates, revisions and verified content replace handoff placeholders;
+  unknown facts are omitted (see 2.6 and Phase 4d).
+- Docs: guide content keeps its own structure (Preview and Run subsections, no
+  platform tabs; limitations as a list); the last-updated line shows a date
+  only; no version.
+- Lab: execution transition table stays inside Bench; controls keep 44px;
+  the classifier has an explicit try action; wide results scroll inside the
+  bench.
+- Off-site links end in `↗` (the documented related-row convention).
+- The gallery screenshot differs only because the reference was captured
+  after opening the reveal.
+
+### Checks run (Phases 5 and 6)
+
+- `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` under
+  Node 24.20.0 and pnpm 12.8.1 passed before the cleanup and again after it:
+  format, lint, typecheck, 58 design tests, 93 dump tests, 42 lab tests and
+  four production builds.
+- Playwright (Chromium) on local production servers (`next start`,
+  `astro preview`): every sitemap URL plus an unknown path on all four sites at
+  1440px and 390px (150 page views), full-page screenshots, hover states of
+  the search item and a leader row, and the empty search state. axe-core 4.13
+  with WCAG 2.0/2.1/2.2 A/AA and best-practice rules: zero violations on every
+  page view after the fixes. No horizontal overflow, no layout shift (CLS 0),
+  no broken or dimensionless images, no missing alt text, no console errors,
+  one `h1` and one `main` per page, unique titles and descriptions per site.
+- Keyboard pass on all four sites: skip link to `main`, focus order and visible
+  ring, ⌘K, Ctrl+K and `/` open search, `/` stays text inside the input,
+  arrows + Enter open the selected result, Esc clears, the everywhere scope
+  merges all four indexes, copy buttons by keyboard on dump, docs and lab, lab
+  filters, the classifier (Python suffix edge cases, injected HTML, a 300
+  character name) and its focusable region, all 20 lifecycle state/action pairs
+  with rejected fields unchanged, boot Home/End/arrows and both boundaries,
+  the sound toggle cookie and reduced motion. No tabbed code block exists on
+  the current content; tab keys stay covered by unit tests.
+- Everywhere search used the local builds' indexes through intercepted
+  requests; production endpoints were not verified. The synthesized sounds
+  were not auditioned (no audio output in this environment).
+- Page weight at 390px (transfer of the heaviest page per site, including
+  shared assets): root `/gallery` 150 KB gzipped JS (7 files), 253 KB images,
+  31 KB font; dump `/404` 140 KB gzipped JS, 195 KB images (mostly the 640px
+  404 sticker shown at 300px); docs and lab `/404` about 6 KB gzipped JS,
+  195 KB images. Next.js 404 pages get no font preload (the font still loads
+  from CSS with `font-display: optional`).
+- No deployment was made and nothing was pushed.
+
+### Checks run (Phases 0–4)
 
 - Docs follow-up and Phase 4d: under Node 24.20.0 and pnpm 12.8.1,
   `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` passed:
@@ -761,94 +868,26 @@ apps/docs/           explicit date schema, date resolver and conditional footer
 
 ## 4. Next session
 
-Phases 0–4 and the docs date follow-up are complete. **Do Phase 5 next.**
-Do not redo the lab migration. Phase 6 follows Phase 5 in a subsequent session
-unless the owner explicitly requests both. No code has been pushed.
+The migration is complete on `feat/design-migration`. Nothing has been pushed
+or deployed. The local design handoff (`raioviajante-design/`) is no longer
+needed by the repository: every artwork file, the design-system and blocks
+docs, and the reference comparison are in place, so the owner may delete it.
 
-### Before either session
+Owner actions before or at deployment:
 
-1. Stay on `feat/design-migration`; read `git status --short --branch` and
-   `git log --oneline -20`. Preserve any uncommitted playground or owner edits.
-   Activate Node 24.20.0 from `.nvmrc` and pnpm 12.8.1.
-2. Read this file's brief, decisions, Status and handoff; root `AGENTS.md`, each
-   affected app's `AGENTS.md`, `docs/design-system.md`, `docs/blocks.md`, and
-   the affected app's design/development docs.
-3. Shared-only implementations, no color literals, no browser React on Astro,
-   no copied artwork or invented facts. Stage explicit files/hunks, review the
-   staged diff and commit each validated logical step. Never push, amend,
-   rebase shared commits or delete the local design handoff.
-4. Production settings are owner work: docs needs `VERCEL_DEEP_CLONE=true`;
-   dump and docs need Ignored Build Steps watching `../../packages/design`
-   (see `docs/deployment.md`). Do not change settings or claim deployment
-   without explicit owner authorization and actual evidence.
-
-### Phase 5 — finish ecosystem features
-
-1. Audit root/app `AGENTS.md` and `CLAUDE.md` for stale pre-migration wording.
-   Update them consistently with the actual shared shell, tokens, blocks,
-   artwork, sound and framework rules. Lab's final approach is already recorded;
-   `apps/lab/CLAUDE.md` delegates to its `AGENTS.md`.
-2. Inventory every route and current metadata. Complete titles, descriptions,
-   canonical URLs, Open Graph metadata and brand-style OG images on all four
-   apps. Use shared implementation for any repeated artwork/composition;
-   keep framework-specific route generation in each app. Preserve dump RSS;
-   complete sitemaps including search/legal and real public content, excluding
-   404 pages. Verify canonical slash conventions and host 404 behavior.
-3. Audit accessibility across every route: landmarks and heading order, named
-   controls, focus-visible, 44px touch targets, 4.5:1 text contrast, search/live
-   regions, bench state marks, and outcomes conveyed without color or sound.
-   Basic lab keyboard/live feedback is done; it is not a complete axe/contrast
-   audit. Pay particular attention to the intentionally clickable dotted
-   controls and their accessibility semantics. Change shared tokens/components
-   when a fix is shared; check all consumers after doing so.
-4. Audit performance: image dimensions and lazy loading, font preload/self
-   hosting, layout shift, per-page JavaScript and actual network requests.
-   Astro has zero hydrated islands. Its renderer emits a React client asset
-   even for static pages; verify that unused emitted assets are not loaded.
-   Bench scripts are about 1–3 KB each before compression, in addition to
-   shared behavior/sound. Preserve minimal page scripts.
-5. Keep unresolved legal facts out of public pages. No new source link for
-   Orbit without verifying public access. Do not invent dates, licenses,
-   retention, versions or deployment status. The original placeholders in the
-   brief/handoff remain records, not publication content.
-6. Run each affected app's prescribed checks. For shared/workspace changes run
-   `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` from the
-   root under Node 24. Lab's 42 Node tests run as part of this command.
-7. Commit validated steps; update Status and leave the exact Phase 6 handoff.
-   Report what was checked, remaining unknown facts and infrastructure work;
-   stop before Phase 6 unless authorized to proceed.
-
-### Phase 6 — verify everything, then clean up
-
-1. Start from completed Phase 5 and a documented worktree state. Run the full
-   repo validation above and fix every failure without rewriting content or
-   unrelated owner changes.
-2. Use Playwright outside the repo to capture every public route at 1440px and
-   390px (include real post/tag/doc routes and unknown-path host 404s). Open
-   the read-only local reference HTML and compare. Preserve the intentional
-   differences recorded in Status; do not undo the established root tokens or
-   replace real experiment source with reconstructed examples.
-3. Run axe on every page, check contrast and image/font layout shift, inspect
-   missing assets and console/network errors. Exercise reduced motion and
-   sound off/on. Audition the synthesized success/reject/new sound voices;
-   prior sessions have not listened to them.
-4. Keyboard test every site: Meta/Ctrl+K, `/` (ignored in inputs), arrows,
-   Enter, Escape, tabs, code copy and all lab controls. Recheck all 20 lifecycle
-   state/action pairs and rejected-field immutability; test Python 3.14 suffix
-   edge cases, long/injected text, boot sections and both boundaries.
-   Everywhere search should use real locally built indexes during offline
-   checks; distinguish those checks from live endpoint verification.
-5. Only after these checks pass, inventory obsolete exports/assets/styles with
-   `rg`. Prove absence of real consumers before removing legacy design entries
-   (`tokens.css`, `editorial-tokens.css`, `editorial.css`, `editorial-sound.ts`)
-   or other dead migration code. Preserve all artwork still used by gallery,
-   templates or playground. The design-system/block docs already live in
-   `docs/`; maintain them there. Never delete or stage the local handoff.
-6. Put cleanup in its own final `chore:` commit, using explicit staging, then
-   rerun checks justified by those removals. Do not remove imported tags, rewrite
-   history or push.
-7. Update Status and report final trees, copied/renamed artwork (including the
-   prior artwork map), deleted paths, unresolved facts, deliberate visual/source
-   differences, exact validation/browser/axe results and commit list. The local
-   handoff is owner-managed; it is safe to remove only after the reference
-   comparison and final migration checks are complete.
+1. Vercel, dump and docs projects: set the Ignored Build Step from
+   [deployment.md](deployment.md) so changes to `packages/design` rebuild them.
+2. Vercel, docs project: set `VERCEL_DEEP_CLONE=true` for git-based
+   last-updated dates.
+3. Vercel, all projects: keep "Include files outside the Root Directory"
+   enabled (social cards read shared fonts, artwork and tokens at build time).
+4. Vercel, dump project: keep `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com`
+   in Production.
+5. After deploying, verify each site's sitemap, robots, social cards, host 404,
+   cross-origin search indexes and the sound voices by ear.
+6. Legal facts still unknown and omitted from public pages: legal last-updated
+   dates for dump, docs and lab; text and snippet licensing; quoting and artwork
+   reuse permission; governing law; analytics/tracking statement; host log
+   retention. Root's existing Terms and Privacy keep their own date.
+7. Decide whether to keep the unused artwork `character/head-box.png` and
+   `stickers/work-of-art-pt.png`.
