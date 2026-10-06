@@ -110,7 +110,7 @@
   margin: 0 auto;
   padding: 40px 24px 80px;
   color: var(--fg);
-  font-family: var(--font, "Noto Sans Mono", monospace);
+  font-family: var(--font-mono, var(--font));
 }
 .rv-search-page__header {
   text-align: center;
