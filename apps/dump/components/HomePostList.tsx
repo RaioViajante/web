@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { IndexHeader, LeaderRow, Section } from "@raioviajante/design/parts";
 
 import { series } from "@/lib/post-details";
@@ -36,7 +37,11 @@ export function HomePostList({
   const months = groupPostsByMonth(older);
   return (
     <>
-      <IndexHeader name="dump" line="a memory dump, hopefully readable." />
+      <IndexHeader
+        name="dump"
+        line="a memory dump, hopefully readable."
+        avatar={<AvatarCoin />}
+      />
       <Section number="00." title="Latest" id="latest-heading" index>
         <Link
           className="featured-post"

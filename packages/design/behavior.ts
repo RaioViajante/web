@@ -5,6 +5,7 @@
  * Astro:  <script>import { startBehavior } from "@raioviajante/design/behavior"; startBehavior();</script>
  * Next.js: render <Behavior /> from "@raioviajante/design/behavior-react" once in the layout.
  */
+import { attachAvatarCoin } from "./avatar-coin";
 import { attachBlocks } from "./blocks/client";
 import { initSound } from "./sound/init";
 import { attachScroll } from "./scroll";
@@ -20,7 +21,13 @@ function fillRequestedPath() {
 }
 
 export function startBehavior() {
-  const stops = [initSound(), attachBlocks(), attachSearch(), attachScroll()];
+  const stops = [
+    initSound(),
+    attachBlocks(),
+    attachSearch(),
+    attachScroll(),
+    attachAvatarCoin(),
+  ];
   fillRequestedPath();
   // Client-side navigation swaps the page without reloading the script.
   const observer = new MutationObserver(fillRequestedPath);

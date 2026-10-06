@@ -44,3 +44,4 @@ export {
   type TryInstead,
 } from "./templates";
 export { SiteLink, isInternal, type LinkComponent } from "./link";
+export { AvatarCoin } from "./avatar-coin";

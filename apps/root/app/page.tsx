@@ -4,7 +4,7 @@ import {
   LeaderRow,
   Section,
 } from "@raioviajante/design/components";
-import { AvatarCoin } from "../components/AvatarCoin";
+import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { PreviewRow } from "../components/PreviewRow";
 import { ProjectPreviewRow } from "../components/ProjectPreviewRow";
 import { RootShell } from "../components/RootShell";

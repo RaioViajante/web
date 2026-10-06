@@ -19,6 +19,7 @@
     "./parts": "./components/page.tsx",
     "./templates": "./components/templates.tsx",
     "./link": "./components/link.tsx",
+    "./avatar-coin": "./components/avatar-coin.tsx",
     "./search": "./components/search.tsx",
     "./search-react": "./search-react.tsx",
     "./search-client": "./search/client.ts",
