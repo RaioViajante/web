@@ -230,6 +230,14 @@
   white-space: nowrap;
   font-size: 12px;
 }
+.rv-search-note {
+  margin: 0 0 28px;
+  color: var(--fg-3);
+  font-size: 12px;
+}
+.rv-search-note[hidden] {
+  display: none;
+}
 .rv-search-empty {
   text-align: center;
 }

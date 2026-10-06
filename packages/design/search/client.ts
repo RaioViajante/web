@@ -1,5 +1,6 @@
 import { SITES, type SiteId } from "../components/sites";
 import type { SearchEntry } from "../components/search";
+import { loadEverywhere, searchEntries, unavailableNote } from "./engine";
 
 const indexPath = "/search-index.json";
 const localPorts: Record<SiteId, readonly number[]> = {
@@ -65,12 +66,6 @@ async function readIndex(
   return fetchIndex(indexHref(site), site);
 }
 
-function matches(entry: SearchEntry, words: string[]) {
-  const text =
-    `${entry.title} ${entry.description} ${entry.body ?? ""}`.toLocaleLowerCase();
-  return words.every((word) => text.includes(word));
-}
-
 function resultRow(entry: SearchEntry, index: number) {
   const row = document.createElement("a");
   row.className = "rv-result";
@@ -99,6 +94,7 @@ function mountPage(page: HTMLElement) {
   const bubble = page.querySelector<HTMLElement>("[data-search-bubble]")!;
   const results = page.querySelector<HTMLElement>("[data-search-results]")!;
   const empty = page.querySelector<HTMLElement>("[data-search-empty]")!;
+  const note = page.querySelector<HTMLElement>("[data-search-note]")!;
   const buttons = [
     ...page.querySelectorAll<HTMLButtonElement>("[data-search-scope]"),
   ];
@@ -107,6 +103,7 @@ function mountPage(page: HTMLElement) {
   let selected = 0;
   let own: SearchEntry[] = [];
   let all: SearchEntry[] = [];
+  let unavailable: SiteId[] = [];
 
   function setSelected(next: number) {
     const rows = [
@@ -124,15 +121,18 @@ function mountPage(page: HTMLElement) {
     const query = input.value.trim();
     results.replaceChildren();
     empty.hidden = true;
+    note.textContent = "";
+    note.hidden = true;
     selected = 0;
     if (!query) {
       bubble.textContent = initialPrompt;
       return;
     }
-    const words = query.toLocaleLowerCase().split(/\s+/);
-    const found = (scope === "site" ? own : all)
-      .filter((entry) => matches(entry, words))
-      .slice(0, 40);
+    const found = searchEntries(scope === "site" ? own : all, query);
+    if (scope === "everywhere" && unavailable.length) {
+      note.textContent = unavailableNote(unavailable);
+      note.hidden = false;
+    }
     bubble.textContent = found.length
       ? `found ${found.length} ${found.length === 1 ? "thing" : "things"} about “${query}”!`
       : "hmm… nothing yet.";
@@ -154,15 +154,12 @@ function mountPage(page: HTMLElement) {
     }
   }
 
-  async function loadEverywhere() {
-    const indexes = await Promise.allSettled(
-      SITES.map((item) =>
-        item.id === site ? Promise.resolve(own) : readIndex(item.id, site),
-      ),
+  async function loadAll() {
+    const loaded = await loadEverywhere(site, own, (other) =>
+      readIndex(other, site),
     );
-    all = indexes.flatMap((result) =>
-      result.status === "fulfilled" ? result.value : [],
-    );
+    all = loaded.entries;
+    unavailable = loaded.unavailable;
     render();
   }
 
@@ -170,7 +167,7 @@ function mountPage(page: HTMLElement) {
     .then((entries) => {
       own = entries;
       all = entries;
-      if (scope === "everywhere") void loadEverywhere();
+      if (scope === "everywhere") void loadAll();
       else render();
     })
     .catch(() => {
@@ -200,7 +197,7 @@ function mountPage(page: HTMLElement) {
       buttons.forEach((item) =>
         item.setAttribute("aria-pressed", String(item === button)),
       );
-      if (scope === "everywhere") void loadEverywhere();
+      if (scope === "everywhere") void loadAll();
       else render();
     }),
   );

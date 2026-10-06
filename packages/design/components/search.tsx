@@ -110,6 +110,7 @@ export function SearchPage({ site }: { site: SiteId }) {
         </button>
       </div>
       <div data-search-results aria-live="polite" />
+      <p className="rv-search-note" data-search-note role="status" hidden />
       <div className="rv-search-empty" data-search-empty hidden>
         <Art
           name="searchNotFound"
