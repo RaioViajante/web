@@ -23,7 +23,7 @@
   "dependencies": {
     "@astrojs/react": "^7.0.0",
     "@raioviajante/design": "workspace:*",
-    "astro": "^7.3.2",
+    "astro": "^7.3.6",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
