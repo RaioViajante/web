@@ -1,4 +1,4 @@
-import { act, render } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 
 import { Comments } from "@/components/Comments";
 
@@ -11,8 +11,14 @@ class MockIntersectionObserver {
   disconnect = jest.fn();
   unobserve = jest.fn();
 
-  constructor(callback: IntersectionObserverCallback) {
+  options?: IntersectionObserverInit;
+
+  constructor(
+    callback: IntersectionObserverCallback,
+    options?: IntersectionObserverInit,
+  ) {
     this.callback = callback;
+    this.options = options;
     MockIntersectionObserver.instances.push(this);
   }
 
@@ -44,6 +50,50 @@ describe("<Comments />", () => {
 
     expect(container.querySelector("div.comments")).toBeInTheDocument();
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
+  });
+
+  it("shows a local status instead of contacting giscus", () => {
+    render(<Comments />);
+    expect(screen.getByRole("status")).toHaveTextContent(/when you scroll/);
+    expect(document.querySelector("iframe")).not.toBeInTheDocument();
+  });
+
+  it("observes with a 200px margin and loads the script only once", () => {
+    render(<Comments />);
+    const observer = MockIntersectionObserver.instances.at(-1)!;
+    expect(observer.options).toEqual({ rootMargin: "200px" });
+    intersectFirst();
+    intersectFirst();
+    expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
+    expect(screen.getByRole("status")).toHaveTextContent("Loading comments");
+    act(() => {
+      document.querySelector(SCRIPT_SELECTOR)!.dispatchEvent(new Event("load"));
+    });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("without IntersectionObserver waits for an explicit button press", () => {
+    delete (global as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver;
+    render(<Comments />);
+    expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
+    const button = screen.getByRole("button", { name: "Load comments" });
+    fireEvent.click(button);
+    fireEvent.click(button);
+    expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
+  });
+
+  it("reports a failed load and allows a retry", () => {
+    render(<Comments />);
+    intersectFirst();
+    act(() => {
+      document
+        .querySelector(SCRIPT_SELECTOR)!
+        .dispatchEvent(new Event("error"));
+    });
+    expect(screen.getByRole("status")).toHaveTextContent("could not be loaded");
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
   });
 
   it("defers loading giscus until the comments area nears the viewport", () => {

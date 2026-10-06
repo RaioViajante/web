@@ -42,6 +42,6 @@ RaioViajante moderates the `Comments` discussion category (same as repository ma
 
 ## Notes
 
-- Comments load lazily (`IntersectionObserver`, scoped to `Comments.tsx`) once the widget nears the viewport, so they never block article rendering.
+- Comments load lazily (`IntersectionObserver`, `rootMargin: 200px`, scoped to `Comments.tsx`) once the section nears the viewport. Until then the page shows a local status line and makes no request to giscus.app or GitHub; the script is added at most once. Without `IntersectionObserver` the reader gets a "Load comments" button instead of an automatic load. A failed script load shows a message and a "Try again" button. A short article whose comments section starts within 200px of the first screen loads them immediately.
 - The widget uses a custom theme at `/giscus.css` (`app/giscus.css/route.ts`), generated at build time from the shared design tokens and served with a CORS header for the giscus iframe.
 - Reactions and metadata emission are disabled to keep the widget minimal.
