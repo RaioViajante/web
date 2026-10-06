@@ -134,7 +134,7 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 - Three columns: left tree nav, content, "on this page".
 - Guide pages: breadcrumb label, status in meta, steps, tables, callouts, platform tabs, file trees, **try it and read more**, last updated + edit on GitHub.
 - Reference pages: synopsis, commands, behavior matrix, arguments, output fields, exit codes, changelog, version selector.
-- Search: numbered sidebar item `03. search  /` and a dotted search line on the home. It opens a full search page (no icon, no box, no key chips): caps label, plain input, results as numbered leader rows, selected result marked with the sidebar rule. Finds docs sections and dump posts from one shared index. Shortcut `/` on every site.
+- Search: numbered sidebar item `03. search  /`, the only search entry point (the docs home has no search line of its own). It opens a full search page (no icon, no box, no key chips): caps label, plain input, results as numbered leader rows, selected result marked with the sidebar rule. Finds docs sections and dump posts from one shared index. Shortcut `/` on every site.
 - **Design language** page rewritten for this system (the old one described a purple accent and serif prose).
 - Callout and code styles: see `blocks/` (soft direction) — same rules on docs.
 
