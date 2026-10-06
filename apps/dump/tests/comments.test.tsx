@@ -53,6 +53,48 @@ describe("<Comments />", () => {
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
   });
 
+  describe("returning from GitHub sign-in", () => {
+    afterEach(() => window.history.replaceState(null, "", "/"));
+
+    it("loads giscus immediately, once, when the URL carries ?giscus=", () => {
+      window.history.replaceState(null, "", "/posts/x?giscus=token");
+      render(<Comments />);
+      // No scroll or intersection needed.
+      expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
+      expect(screen.getByRole("status")).toHaveTextContent("Loading comments");
+      // A late intersection must not add a second script.
+      const observer = MockIntersectionObserver.instances.at(-1);
+      if (observer) act(() => observer.trigger(true));
+      expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
+    });
+
+    it("also loads without IntersectionObserver, with the configuration unchanged", () => {
+      delete (global as unknown as { IntersectionObserver?: unknown })
+        .IntersectionObserver;
+      window.history.replaceState(null, "", "/posts/x?giscus=token");
+      render(<Comments />);
+      const script = document.querySelector(SCRIPT_SELECTOR);
+      expect(script).toBeInTheDocument();
+      expect(script).toHaveAttribute("data-repo", "RaioViajante/web");
+      expect(script).toHaveAttribute("data-mapping", "pathname");
+    });
+
+    it("does not read, copy or change the token or the URL itself", () => {
+      window.history.replaceState(null, "", "/posts/x?giscus=token");
+      const setItem = jest.spyOn(Storage.prototype, "setItem");
+      render(<Comments />);
+      expect(window.location.search).toBe("?giscus=token");
+      expect(setItem).not.toHaveBeenCalled();
+      setItem.mockRestore();
+    });
+
+    it("keeps the lazy behaviour for ordinary visits and unrelated parameters", () => {
+      window.history.replaceState(null, "", "/posts/x?ref=feed");
+      render(<Comments />);
+      expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
+    });
+  });
+
   it("shows a local status instead of contacting giscus", () => {
     render(<Comments />);
     expect(screen.getByRole("status")).toHaveTextContent(/when you scroll/);

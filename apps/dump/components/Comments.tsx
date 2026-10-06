@@ -59,7 +59,9 @@ const MESSAGES: Record<Exclude<Status, "loaded">, string> = {
  * Article comments, backed by giscus (GitHub Discussions). Isolated client
  * boundary: mounted only from `PostArticle`. Nothing contacts giscus.app until
  * the section nears the viewport (or, without IntersectionObserver, until the
- * reader presses "Load comments"), and the script is added at most once.
+ * reader presses "Load comments"), and the script is added at most once. The
+ * one exception is the return from GitHub sign-in (`?giscus=` in the URL),
+ * which loads giscus immediately so it can finish the sign-in.
  */
 export function Comments() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -98,6 +100,18 @@ export function Comments() {
   useEffect(() => {
     const node = mountRef.current;
     if (!node) return;
+
+    // Coming back from GitHub sign-in, giscus has put its session in the URL
+    // as `?giscus=`. Only the giscus script reads and removes it, so load it
+    // now instead of waiting for the reader to scroll. Nothing here touches
+    // the token: giscus handles its own protocol.
+    if (new URLSearchParams(window.location.search).has("giscus")) {
+      start();
+      return () => {
+        node.replaceChildren();
+        started.current = false;
+      };
+    }
 
     // Hydration renders with the server snapshot (observable), so check the real API.
     if (typeof IntersectionObserver === "undefined") return;
