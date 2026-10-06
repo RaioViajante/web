@@ -91,6 +91,33 @@ describe("preference", () => {
     expect(state.written).toHaveLength(1);
   });
 
+  it("never writes a cookie just by reading", () => {
+    const { env, state } = fakeEnvironment();
+    expect(readPreference(env)).toBe(false);
+    expect(readPreference(env)).toBe(false);
+    expect(state.written).toEqual([]);
+  });
+
+  it("scopes the cookie to production hosts only", () => {
+    for (const host of ["localhost", "root.localhost", "notraioviajante.com"])
+      expect(serializePreference(true, host, "http:")).toBe(
+        "rv-sound=on; Path=/; Max-Age=31536000; SameSite=Lax",
+      );
+    // Browsers reject Secure cookies set over http, so it follows the protocol.
+    expect(
+      serializePreference(false, "raioviajante.com", "http:"),
+    ).not.toContain("Secure");
+    expect(serializePreference(false, "raioviajante.com", "https:")).toBe(
+      "rv-sound=off; Path=/; Max-Age=31536000; SameSite=Lax; Domain=.raioviajante.com; Secure",
+    );
+  });
+
+  it("holds only on/off and ignores other values", () => {
+    expect(parsePreference("rv-sound=maybe")).toBeNull();
+    expect(parsePreference("xrv-sound=on")).toBeNull();
+    expect(parsePreference("")).toBeNull();
+  });
+
   it("prefers the cookie over legacy storage", () => {
     const { env } = fakeEnvironment({ cookie: "rv-sound=off", legacy: "on" });
     expect(readPreference(env)).toBe(false);
