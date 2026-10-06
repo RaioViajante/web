@@ -112,10 +112,10 @@ export function SearchPage({ site }: { site: SiteId }) {
       <div data-search-results aria-live="polite" />
       <div className="rv-search-empty" data-search-empty hidden>
         <Art
-          name="workOfArt"
-          alt="Work of art sticker"
-          width={120}
-          height={213}
+          name="searchNotFound"
+          alt="RaioViajante and a cat looking through a pile of notes"
+          width={180}
+          height={180}
         />
         <p>maybe I haven&apos;t built it yet.</p>
         <div className="rv-search-suggestions">

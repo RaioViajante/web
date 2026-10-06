@@ -86,6 +86,7 @@ packages/design/
     stickers/work-of-art.png
     stickers/not-found.png
     search/search-character.png
+    search/not-found.png
     search/head/frame-01.png … frame-10.png   (from art-concepts icons 1–10)
     search/head/sprite.webp (+ sprite.png fallback), static.png
     gallery/<descriptive-kebab-name>.png      (every gallery artwork)
@@ -127,7 +128,7 @@ Implement every piece in DESIGN-SYSTEM.md section 0, configured by props:
   - Scope toggle: this site / everywhere.
   - Results grouped by site as numbered leader rows: section numbers on docs, dates on dump, 001–003 on lab.
   - Arrow keys, Enter and Esc work.
-  - Empty state shows the work-of-art sticker with "maybe I haven't built it yet." and suggestion chips.
+  - Empty state shows `art-concepts/not-found.png` (exported once as `search/not-found.png`) with "maybe I haven't built it yet." and suggestion chips.
 - **Index:** build-time static JSON per site (or Pagefind), merged client-side for "everywhere". No server and no tracking.
 
 ## Phase 4 — migrate each site

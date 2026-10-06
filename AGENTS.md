@@ -120,7 +120,7 @@ Design rules:
   cookie on `.raioviajante.com`. Respect reduced motion.
 - **Character.** The avatar belongs to index headers (112px), the search
   character to the search page, the "404" sticker to every 404, the
-  "work of art" sticker to empty search. The search head is never smaller than
+  search `not-found` sticker to empty search. The search head is never smaller than
   28px. Do not add the character anywhere else without being asked.
 - **Soft blocks.** Code, terminals, diffs, callouts, tables and figures use the
   markup in `docs/blocks.md`, built by `packages/design/blocks`. Code is
