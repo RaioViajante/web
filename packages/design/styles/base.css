@@ -20,6 +20,7 @@ body {
   font-family: var(--font);
   font-size: var(--size-body);
   line-height: var(--leading-body);
+  font-weight: var(--weight-body);
 }
 a {
   color: var(--fg);
@@ -389,85 +390,6 @@ kbd {
 }
 .rv-requested__host {
   color: var(--fg-3);
-}
-
-/* ---------- search: "Ask RaioViajante" ---------- */
-.rv-search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: var(--fg-2);
-  border-left: 1px solid transparent;
-  padding: 6px 0 6px 14px;
-}
-.rv-search[aria-current="page"] {
-  color: var(--fg);
-  border-left-color: var(--fg);
-}
-.rv-search__dots {
-  flex: 1 1 12px;
-  border-bottom: 1px dotted var(--dots);
-  transform: translateY(4px);
-}
-.rv-search__key {
-  color: var(--fg-3);
-  font-size: 12.5px;
-}
-.rv-ask {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 14px;
-}
-.rv-ask img {
-  width: 150px;
-  height: auto;
-}
-.rv-bubble {
-  position: relative;
-  background: var(--bubble-bg);
-  color: var(--bubble-fg);
-  border-radius: 18px;
-  padding: 12px 18px;
-  margin-bottom: 34px;
-  font-size: 19px;
-  font-weight: 700;
-  line-height: 1.35;
-}
-.rv-bubble::before {
-  content: "";
-  position: absolute;
-  left: -5px;
-  bottom: 14px;
-  width: 14px;
-  height: 14px;
-  background: var(--bubble-bg);
-  transform: rotate(45deg);
-}
-.rv-search-input {
-  flex: 1;
-  min-width: 0;
-  background: none;
-  border: 0;
-  outline: none;
-  color: var(--fg);
-  font: inherit;
-  font-size: 24px;
-  caret-color: var(--fg);
-}
-.rv-result {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  text-decoration: none;
-  color: var(--fg-2);
-  border-left: 1px solid transparent;
-  padding: 6px 0 6px 14px;
-}
-.rv-result[aria-selected="true"] {
-  color: var(--fg);
-  border-left-color: var(--fg);
 }
 
 /* ---------- footer (identical on all four sites) ---------- */

@@ -1,4 +1,5 @@
 export { Art, art, type ArtName } from "./art";
+export { SearchNavItem, SearchPage, type SearchEntry } from "./search";
 export { CONTACT, SITES, siteById, type Site, type SiteId } from "./sites";
 export {
   Footer,

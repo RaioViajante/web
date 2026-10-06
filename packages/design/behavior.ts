@@ -7,6 +7,7 @@
  */
 import { attachBlocks } from "./blocks/client";
 import { initSound } from "./sound/init";
+import { attachSearch } from "./search/client";
 
 function fillRequestedPath() {
   document
@@ -17,7 +18,7 @@ function fillRequestedPath() {
 }
 
 export function startBehavior() {
-  const stops = [initSound(), attachBlocks()];
+  const stops = [initSound(), attachBlocks(), attachSearch()];
   fillRequestedPath();
   return () => stops.forEach((stop) => stop());
 }
