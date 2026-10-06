@@ -39,7 +39,7 @@ export async function loadEverywhere(
   const unavailable: SiteId[] = [];
   settled.forEach((result, index) => {
     if (result.status === "fulfilled") entries.push(...result.value);
-    else unavailable.push(others[index].id);
+    else if (others[index]) unavailable.push(others[index].id);
   });
   return { entries, unavailable };
 }
