@@ -9,8 +9,8 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,11 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
----
+This license covers code in `apps/` and `packages/`, except for the paths
+listed below, which are excluded and carry their own licenses:
 
-The license above covers the source code of this repository only.
-
-The original written content under `content/posts/` (the published articles)
-is excluded from this license. That content is Copyright (c) 2026
-RaioViajante. All rights reserved — no permission is granted to copy,
-redistribute, or republish it. See `content/README.md`.
+- `apps/docs/src/content/docs/`
+- `apps/dump/content/posts/`
+- `packages/design/assets/`

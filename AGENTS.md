@@ -114,6 +114,8 @@ Design rules:
   exported at the sizes it is displayed, and is used through `Art`/`gallery`
   (static imports). Images need explicit width and height; lazy-load below the
   fold.
+- New artwork goes in `packages/design/assets` and is covered by its
+  all-rights-reserved LICENSE.
 - **Sound.** Sounds are synthesized with Web Audio in `packages/design/sound`;
   there are no audio files. Mark elements with `data-sound`, or call
   `playSound(kind)`. Never play on page load. One preference: the `rv-sound`
