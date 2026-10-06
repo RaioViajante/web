@@ -1,3 +1,4 @@
+import { renderToString } from "react-dom/server";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 
 import { Comments } from "@/components/Comments";
@@ -81,6 +82,44 @@ describe("<Comments />", () => {
     fireEvent.click(button);
     fireEvent.click(button);
     expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
+  });
+
+  it("hydrates without IntersectionObserver and offers the button", () => {
+    delete (global as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver;
+    const container = document.createElement("div");
+    container.innerHTML = renderToString(<Comments />);
+    document.body.appendChild(container);
+    render(<Comments />, { container, hydrate: true });
+    expect(screen.getByRole("button", { name: "Load comments" })).toBeVisible();
+    expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
+    container.remove();
+  });
+
+  it("keeps keyboard focus on the status text after Load comments", () => {
+    delete (global as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver;
+    render(<Comments />);
+    const button = screen.getByRole("button", { name: "Load comments" });
+    button.focus();
+    fireEvent.click(button);
+    expect(screen.getByRole("status")).toHaveFocus();
+  });
+
+  it("moves focus into the widget when a keyboard reader's load finishes", () => {
+    delete (global as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver;
+    render(<Comments />);
+    const button = screen.getByRole("button", { name: "Load comments" });
+    button.focus();
+    fireEvent.click(button);
+    const script = document.querySelector(SCRIPT_SELECTOR)!;
+    const frame = document.createElement("iframe");
+    script.parentElement!.appendChild(frame);
+    act(() => {
+      script.dispatchEvent(new Event("load"));
+    });
+    expect(frame).toHaveFocus();
   });
 
   it("reports a failed load and allows a retry", () => {

@@ -63,6 +63,7 @@ const MESSAGES: Record<Exclude<Status, "loaded">, string> = {
  */
 export function Comments() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const statusRef = useRef<HTMLParagraphElement>(null);
   const started = useRef(false);
   const [phase, setStatus] = useState<Status>("waiting");
   // Server and first client render assume support, so hydration matches.
@@ -81,7 +82,12 @@ export function Comments() {
     setStatus("loading");
     loadGiscus(
       node,
-      () => setStatus("loaded"),
+      () => {
+        // The status text unmounts; if the reader was on it, move them into the widget.
+        if (document.activeElement === statusRef.current)
+          node.querySelector("iframe")?.focus();
+        setStatus("loaded");
+      },
       () => {
         started.current = false;
         setStatus("failed");
@@ -93,7 +99,8 @@ export function Comments() {
     const node = mountRef.current;
     if (!node) return;
 
-    if (!observable) return;
+    // Hydration renders with the server snapshot (observable), so check the real API.
+    if (typeof IntersectionObserver === "undefined") return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -111,13 +118,25 @@ export function Comments() {
       node.replaceChildren();
       started.current = false;
     };
-  }, [observable, start]);
+  }, [start]);
 
   return (
     <div className="comments">
-      {status !== "loaded" && <p role="status">{MESSAGES[status]}</p>}
+      {status !== "loaded" && (
+        <p ref={statusRef} role="status" tabIndex={-1}>
+          {MESSAGES[status]}
+        </p>
+      )}
       {(status === "manual" || status === "failed") && (
-        <button type="button" className="rv-btn" onClick={start}>
+        <button
+          type="button"
+          className="rv-btn"
+          onClick={() => {
+            start();
+            // The button unmounts; keep the keyboard position on the status text.
+            statusRef.current?.focus();
+          }}
+        >
           {status === "failed" ? "Try again" : "Load comments"}
         </button>
       )}
