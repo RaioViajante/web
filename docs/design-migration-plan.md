@@ -418,7 +418,7 @@ the two throwaway builds.
 - `apps/root` now uses `@raioviajante/design/styles.css` and `<Behavior />`
   (which also runs search). Every page renders `components/RootShell.tsx`
   (the shared `Shell`, root's pages, the search item). Pages use `IndexHeader`,
-  `PageHeader`, `Section`, `LeaderRow`, `Callout` (contact), `LegalPage`
+  `PageHeader`, `Section`, `LeaderRow`, `Quote` (contact), `LegalPage`
   (terms, privacy) and `NotFoundPage` (`app/not-found.tsx`, the host 404).
 - Removed from root: `SiteNavigation`, `SiteHeader`, `SiteFooter`,
   `SoundToggle`, `LeaderRow`, `SectionHeading` and all of `public/art`.
@@ -440,8 +440,7 @@ the two throwaway builds.
   and update `docs/design-system.md`.
 - Differences from the old root look (all follow the shared rules or tokens):
   the hover description and gallery tiles lost their box-shadows and
-  brightness filter; the description card uses `--block`; the contact
-  callout now shows the "Note" label; the sound toggle and sidebar sit in the
+  brightness filter; the description card uses `--block`; the sound toggle and sidebar sit in the
   shared positions (on 390px the sidebar is above the toggle, as in the
   reference); rows are taller (shared leader spacing); navigation is full page
   loads, not client transitions.
@@ -490,8 +489,8 @@ at 1440px and 390px, plus hover states. Values restored in
   the old root; the mobile PAGES list is two columns (search spans the row),
   "on this page" stays one column.
 - After the pass the root pages differ from the old ones by 0.2 to 2% of
-  pixels at both widths. Known differences: the contact note is the shared
-  callout (label "Note", taller); Terms and Privacy use the legal template
+  pixels at both widths. Known differences: the contact line is the shared
+  `Quote` (same as before); Terms and Privacy use the legal template
   (new "In short" section); the root footer no longer marks the current site.
 
 Follow-ups done in the same session: shared components take a `linkComponent`

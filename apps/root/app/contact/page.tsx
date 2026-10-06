@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Callout, PageHeader, Section } from "@raioviajante/design/components";
+import { PageHeader, Quote, Section } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
 
 export const metadata: Metadata = { title: "contact" };
@@ -37,9 +37,9 @@ export default function Contact() {
         </ul>
       </Section>
       <Section number="03.2" title="An easy first step" id="first-step-heading">
-        <Callout>
+        <Quote>
           A few lines of context are enough to start. No formal brief needed.
-        </Callout>
+        </Quote>
       </Section>
     </RootShell>
   );

@@ -322,13 +322,13 @@
 }
 
 /* ---------- quotes ---------- */
-.prose blockquote {
+.prose blockquote,
+.quote {
   margin: 0;
-  border-left: 2px solid #3a3a3a;
-  padding: 2px 0 2px 18px;
-  color: #b5bac0;
-  font-size: 15px;
-  line-height: 1.75;
+  border-left: 2px solid var(--line);
+  padding: 0 0 0 17.6px;
+  color: var(--fg-2);
+  line-height: var(--leading-body);
 }
 .prose blockquote cite {
   display: block;

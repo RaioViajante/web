@@ -11,7 +11,7 @@ imports `@raioviajante/design/styles.css` and renders the shared `<Behavior />`
 script once. Each page renders `components/RootShell.tsx`, which configures the
 shared `Shell` (sidebar, sound toggle, 740px column, footer) with root's pages
 and the search menu item. Page parts (`IndexHeader`, `PageHeader`, `Section`,
-`LeaderRow`), the `Callout` block, `LegalPage` and `NotFoundPage` also come from
+`LeaderRow`), the `Quote` block, `LegalPage` and `NotFoundPage` also come from
 the package. Navigation between pages is by full page load.
 
 Root keeps only what is its own, in `app/globals.css` and `components/`: the

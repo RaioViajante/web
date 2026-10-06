@@ -28,6 +28,7 @@ export {
   Footnotes,
   highlightBlock,
   PullQuote,
+  Quote,
   TableBlock,
 } from "./blocks";
 export {

@@ -98,6 +98,11 @@ export function Footnotes({
   );
 }
 
+/** A quotation: a 2px rule on the left, muted text. */
+export function Quote({ children }: { children: ReactNode }) {
+  return <blockquote className="quote">{children}</blockquote>;
+}
+
 export function PullQuote({ children }: { children: ReactNode }) {
   return <p className="pull">{children}</p>;
 }
