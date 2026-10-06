@@ -1,7 +1,13 @@
 import { SearchPage } from "@raioviajante/design/search";
 
+import { DumpShell } from "@/components/DumpShell";
+
 export const metadata = { title: "Search" };
 
 export default function Page() {
-  return <SearchPage site="dump" />;
+  return (
+    <DumpShell current="/search">
+      <SearchPage site="dump" />
+    </DumpShell>
+  );
 }

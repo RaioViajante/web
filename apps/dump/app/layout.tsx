@@ -2,16 +2,11 @@ import type { Metadata } from "next";
 import { Noto_Sans_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import { PrimaryNavigation } from "@/components/PrimaryNavigation";
-import { getPublishedPosts } from "@/lib/posts";
 import { alternatesFor, site } from "@/lib/site";
 import { jsonLdScript, websiteJsonLd } from "@/lib/structured-data";
-import { SearchBehavior } from "@raioviajante/design/search-react";
+import { Behavior } from "@raioviajante/design/behavior-react";
 
-import "@raioviajante/design/editorial.css";
-import "@raioviajante/design/search.css";
+import "@raioviajante/design/styles.css";
 import "./globals.css";
 
 const mono = Noto_Sans_Mono({
@@ -59,30 +54,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
         />
       </head>
-      <body className="rv-shell dump-shell">
-        <a href="#content" className="skip-link">
-          Skip to content
-        </a>
-        <SiteHeader />
-        <div className="rv-frame rv-layout">
-          <aside className="rv-sidebar">
-            <PrimaryNavigation
-              posts={getPublishedPosts().map(
-                ({ slug, title, description, tags }) => ({
-                  slug,
-                  title,
-                  description,
-                  tags,
-                }),
-              )}
-            />
-          </aside>
-          <main id="content" className="rv-content" tabIndex={-1}>
-            {children}
-          </main>
-        </div>
-        <SiteFooter />
-        <SearchBehavior />
+      <body>
+        {children}
+        <Behavior />
       </body>
     </html>
   );

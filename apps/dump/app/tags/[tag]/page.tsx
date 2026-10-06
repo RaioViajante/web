@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { PageHeader } from "@raioviajante/design/parts";
 
+import { DumpShell } from "@/components/DumpShell";
 import { TagPostList, tagHref } from "@/components/TagViews";
 import { getAllTags, getPostsByTag } from "@/lib/posts";
 import { alternatesFor } from "@/lib/site";
@@ -32,15 +34,13 @@ export default async function TagPage({ params }: PageProps) {
   if (posts.length === 0) notFound();
 
   return (
-    <div className="tag-page">
-      <header className="tags-page-header">
-        <p className="page-kicker">Tag</p>
-        <h1 className="tag-page-heading">{tag}</h1>
-        <p className="page-intro">
-          {posts.length} {posts.length === 1 ? "post" : "posts"}
-        </p>
-      </header>
+    <DumpShell current="/tags">
+      <PageHeader
+        label="Tag"
+        title={tag}
+        line={`${posts.length} ${posts.length === 1 ? "post" : "posts"}`}
+      />
       <TagPostList posts={posts} />
-    </div>
+    </DumpShell>
   );
 }

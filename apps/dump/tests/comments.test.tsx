@@ -39,10 +39,9 @@ describe("<Comments />", () => {
     document.documentElement.dataset.theme = "light";
   });
 
-  it("renders the quiet rule and container immediately, without loading giscus", () => {
+  it("renders the container immediately, without loading giscus", () => {
     const { container } = render(<Comments />);
 
-    expect(container.querySelector("hr.comments-rule")).toBeInTheDocument();
     expect(container.querySelector("div.comments")).toBeInTheDocument();
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
   });

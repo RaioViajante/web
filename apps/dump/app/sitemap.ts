@@ -6,9 +6,11 @@ import { absoluteUrl } from "@/lib/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getPublishedPosts();
 
-  const staticRoutes = ["/", "/archive", "/tags"].map((path) => ({
-    url: absoluteUrl(path),
-  }));
+  const staticRoutes = ["/", "/archive", "/tags", "/terms", "/privacy"].map(
+    (path) => ({
+      url: absoluteUrl(path),
+    }),
+  );
 
   const postRoutes = posts.map((post) => ({
     url: absoluteUrl(`/posts/${post.slug}`),

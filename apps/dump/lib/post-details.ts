@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 
+import { sectionNumber } from "@/lib/section-number";
 import {
   getPublishedPosts,
   sortPostsNewestFirst,
@@ -37,7 +38,7 @@ export function getPostDetails(post: Post) {
   const content = matter(raw).content;
   const seen = new Map<string, number>();
   const headings = [...content.matchAll(/^## (.+)$/gm)].map((match, index) => ({
-    number: String(index + 1).padStart(2, "0"),
+    number: sectionNumber(index),
     title: (match[1] ?? "").replace(/[`*_]/g, ""),
     id: (() => {
       const base = (match[1] ?? "")

@@ -43,5 +43,5 @@ RaioViajante moderates the `Comments` discussion category (same as repository ma
 ## Notes
 
 - Comments load lazily (`IntersectionObserver`, scoped to `Comments.tsx`) once the widget nears the viewport, so they never block article rendering.
-- The widget uses the custom editorial theme at `/giscus.css`, served with a CORS header for the giscus iframe.
+- The widget uses a custom theme at `/giscus.css` (`app/giscus.css/route.ts`), generated at build time from the shared design tokens and served with a CORS header for the giscus iframe.
 - Reactions and metadata emission are disabled to keep the widget minimal.

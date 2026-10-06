@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { PageHeader } from "@raioviajante/design/parts";
 
 import { ArchivePostList } from "@/components/ArchivePostList";
-import { getPublishedPosts } from "@/lib/posts";
+import { DumpShell } from "@/components/DumpShell";
+import { getPublishedPosts, sortPostsNewestFirst } from "@/lib/posts";
 import { alternatesFor } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -11,16 +13,21 @@ export const metadata: Metadata = {
 };
 
 export default function ArchivePage() {
-  const posts = getPublishedPosts();
+  const posts = sortPostsNewestFirst(getPublishedPosts());
+  const first = posts[posts.length - 1];
 
   return (
-    <div className="archive">
-      <header className="archive-page-header">
-        <p className="page-kicker">Writing</p>
-        <h1 className="archive-heading">Archive</h1>
-        <p className="page-intro">Every post, newest first.</p>
-      </header>
+    <DumpShell current="/archive">
+      <PageHeader
+        label="Archive"
+        title="Everything"
+        line={
+          first
+            ? `${posts.length} ${posts.length === 1 ? "post" : "posts"} since ${first.date}.`
+            : "Every post, newest first."
+        }
+      />
       <ArchivePostList posts={posts} />
-    </div>
+    </DumpShell>
   );
 }

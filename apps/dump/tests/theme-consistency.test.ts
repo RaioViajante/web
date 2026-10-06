@@ -5,27 +5,20 @@ const layout = fs.readFileSync(
   path.join(process.cwd(), "app", "layout.tsx"),
   "utf8",
 );
-const tokens = fs.readFileSync(
-  path.join(
-    process.cwd(),
-    "..",
-    "..",
-    "packages",
-    "design",
-    "editorial-tokens.css",
-  ),
+const globals = fs.readFileSync(
+  path.join(process.cwd(), "app", "globals.css"),
   "utf8",
 );
 
-describe("shared editorial design", () => {
-  it("uses the Root's shell and Noto Sans Mono", () => {
-    expect(layout).toContain("@raioviajante/design/editorial.css");
+describe("shared design system", () => {
+  it("loads the shared styles, font and behavior script", () => {
+    expect(layout).toContain("@raioviajante/design/styles.css");
+    expect(layout).toContain("@raioviajante/design/behavior-react");
     expect(layout).toContain("Noto_Sans_Mono");
-    expect(layout).toContain('className="rv-shell dump-shell"');
+    expect(layout).not.toContain("editorial.css");
   });
-  it("keeps typography and shell measures in shared tokens", () => {
-    expect(tokens).toContain("--rv-editorial-font-family");
-    expect(tokens).toContain("--rv-editorial-content-width");
-    expect(tokens).toContain("--rv-editorial-shell-gap");
+
+  it("keeps no literal colors in the app's own styles", () => {
+    expect(globals).not.toMatch(/#[0-9a-fA-F]{3,8}\b|rgba?\(/);
   });
 });

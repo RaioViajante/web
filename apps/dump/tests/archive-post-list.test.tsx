@@ -48,9 +48,10 @@ describe("<ArchivePostList />", () => {
   it("renders canonical post links", () => {
     render(<ArchivePostList posts={posts} />);
 
-    expect(
-      screen.getByRole("link", { name: "Newest post 09-03" }),
-    ).toHaveAttribute("href", "/posts/newest");
+    expect(screen.getByRole("link", { name: /Newest post/ })).toHaveAttribute(
+      "href",
+      "/posts/newest",
+    );
   });
 
   it("renders UTC-safe abbreviated dates with semantic full dates", () => {

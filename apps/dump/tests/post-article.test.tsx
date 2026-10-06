@@ -36,7 +36,7 @@ describe("<PostArticle />", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "Article title" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("September 3, 2026")).toBeInTheDocument();
+    expect(screen.getAllByText("2026-09-03")).toHaveLength(2);
     expect(screen.getByText("Article description.")).toBeInTheDocument();
     expect(screen.getByText("Article body.")).toBeInTheDocument();
   });

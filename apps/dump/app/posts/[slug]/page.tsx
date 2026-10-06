@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { PostArticle } from "@/components/PostArticle";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
+import { renderPost } from "@/lib/render-post";
 import { alternatesFor } from "@/lib/site";
 import { blogPostingJsonLd, jsonLdScript } from "@/lib/structured-data";
 
@@ -43,7 +44,7 @@ export default async function PostPage({ params }: PageProps) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  const { default: Content } = await import(`@/content/posts/${slug}.mdx`);
+  const Content = await renderPost(slug);
 
   return (
     <>

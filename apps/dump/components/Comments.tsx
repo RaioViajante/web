@@ -68,10 +68,5 @@ export function Comments() {
     };
   }, []);
 
-  return (
-    <>
-      <hr className="comments-rule" />
-      <div ref={containerRef} className="comments" />
-    </>
-  );
+  return <div ref={containerRef} className="comments" />;
 }

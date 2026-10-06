@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { PageHeader } from "@raioviajante/design/parts";
 
+import { DumpShell } from "@/components/DumpShell";
 import { TagIndex } from "@/components/TagViews";
 import { getAllTags } from "@/lib/posts";
 import { alternatesFor } from "@/lib/site";
@@ -14,15 +16,13 @@ export default function TagsPage() {
   const tags = getAllTags();
 
   return (
-    <div className="tags-page">
-      <header className="tags-page-header">
-        <p className="page-kicker">Writing</p>
-        <h1 className="tags-heading">Tags</h1>
-        <p className="page-intro">
-          Browse the recurring ideas and one-off notes.
-        </p>
-      </header>
+    <DumpShell current="/tags">
+      <PageHeader
+        label="Tags"
+        title="Topics"
+        line="What keeps showing up, sorted by how often."
+      />
       <TagIndex tags={tags} />
-    </div>
+    </DumpShell>
   );
 }

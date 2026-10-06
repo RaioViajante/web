@@ -1,13 +1,20 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import {
+  LeaderRow,
+  PageHeader,
+  Pager,
+  Prose,
+  Section,
+} from "@raioviajante/design/parts";
 
-import { CodeCopy } from "@/components/CodeCopy";
 import { Comments } from "@/components/Comments";
-import { PostMeta } from "@/components/PostMeta";
-import { ReadingProgress } from "@/components/ReadingProgress";
-import { PostToc } from "@/components/PostToc";
+import { DumpShell } from "@/components/DumpShell";
 import { getPostDetails } from "@/lib/post-details";
 import type { Post } from "@/lib/posts";
+
+const REPOSITORY_EDIT_URL =
+  "https://github.com/RaioViajante/web/edit/main/apps/dump/content/posts";
 
 export function PostArticle({
   post,
@@ -17,118 +24,130 @@ export function PostArticle({
   children: ReactNode;
 }) {
   const details = getPostDetails(post);
+  const toc = [
+    ...details.headings.map((heading) => ({
+      label: heading.title,
+      href: `#${heading.id}`,
+      number: heading.number,
+    })),
+    { label: "Keep reading", href: "#keep-reading", number: "02." },
+    { label: "Comments", href: "#comments", number: "03." },
+  ];
+  const hasRelated = details.related.length > 0 || details.lab;
+
   return (
-    <article className="post-article">
-      <ReadingProgress />
-      <header className="post-header">
-        <p className="rv-eyebrow">
-          Writing / {details.currentSeries?.name ?? "post"}
-        </p>
-        <h1 className="post-title">{post.title}</h1>
-        <p className="post-dek">{post.description}</p>
-        <PostMeta date={post.date} tags={post.tags} />
-        <p className="post-meta">{details.minutes} min read</p>
-      </header>
-      <PostToc headings={details.headings} />
-      <div className="prose">{children}</div>
-      <CodeCopy />
-      <div className="post-end">
-        <section className="rv-section">
-          <h2 className="rv-section-heading">
-            <span className="rv-section-number">01.</span>Filed under
-          </h2>
-          <div className="dump-leader">
-            <span>published</span>
-            <span className="dump-dots" aria-hidden="true" />
-            <time dateTime={post.date}>{post.date}</time>
-          </div>
-          <div className="dump-leader">
-            <span>reading time</span>
-            <span className="dump-dots" aria-hidden="true" />
-            <span>{details.minutes} min</span>
-          </div>
-          <div className="dump-leader">
-            <span>tags</span>
-            <span className="dump-dots" aria-hidden="true" />
-            <span>
-              {post.tags.map((tag, index) => (
-                <span key={tag}>
-                  {index > 0 && " · "}
-                  <Link href={`/tags/${tag}`} data-sound="nav">
+    <DumpShell current="/" toc={toc}>
+      <div className="rv-progress" data-reading-progress aria-hidden="true" />
+      <article className="post-article">
+        <PageHeader
+          label={`Post · ${post.tags[0] ?? "dump"}`}
+          title={post.title}
+          line={post.description}
+          meta={[
+            <time key="date" dateTime={post.date}>
+              {post.date}
+            </time>,
+            `${details.minutes} min read`,
+            <span key="tags" className="post-tags">
+              {post.tags.map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/tags/${encodeURIComponent(tag)}`}
+                  data-sound="nav"
+                >
+                  {tag}
+                </Link>
+              ))}
+            </span>,
+          ]}
+        />
+        <Prose>{children}</Prose>
+        <div className="post-end">
+          <LeaderRow
+            label="published"
+            value={<time dateTime={post.date}>{post.date}</time>}
+          />
+          <LeaderRow
+            label="tags"
+            value={
+              <span className="post-tags">
+                {post.tags.map((tag) => (
+                  <Link
+                    key={tag}
+                    href={`/tags/${encodeURIComponent(tag)}`}
+                    data-sound="nav"
+                  >
                     {tag}
                   </Link>
-                </span>
-              ))}
-            </span>
-          </div>
+                ))}
+              </span>
+            }
+          />
           {details.currentSeries && (
-            <div className="dump-leader">
-              <span>series</span>
-              <span className="dump-dots" aria-hidden="true" />
-              <span>{details.currentSeries.name}</span>
+            <LeaderRow label="series" value={details.currentSeries.name} />
+          )}
+          <LeaderRow
+            label="source"
+            value="edit on GitHub ↗"
+            href={`${REPOSITORY_EDIT_URL}/${post.slug}.mdx`}
+          />
+        </div>
+        <Section number="02." title="Keep reading" id="keep-reading">
+          <Pager
+            linkComponent={Link}
+            prev={
+              details.previous
+                ? {
+                    label: "← Previous",
+                    title: details.previous.title,
+                    href: `/posts/${details.previous.slug}`,
+                  }
+                : undefined
+            }
+            next={
+              details.next
+                ? {
+                    label: "Next →",
+                    title: details.next.title,
+                    href: `/posts/${details.next.slug}`,
+                  }
+                : undefined
+            }
+          />
+          {hasRelated && (
+            <div className="post-related">
+              {details.related.length > 0 && (
+                <>
+                  <p className="rv-label">Related by tag</p>
+                  {details.related.map((item) => (
+                    <LeaderRow
+                      key={item.slug}
+                      label={item.title}
+                      value={item.date.slice(5)}
+                      href={`/posts/${item.slug}`}
+                      linkComponent={Link}
+                    />
+                  ))}
+                </>
+              )}
+              {details.lab && (
+                <>
+                  <p className="rv-label">Try it</p>
+                  <LeaderRow
+                    label={details.lab.title}
+                    value="lab ↗"
+                    href={details.lab.href}
+                  />
+                </>
+              )}
             </div>
           )}
-        </section>
-        {(details.related.length > 0 || details.lab) && (
-          <section className="rv-section">
-            <h2 className="rv-section-heading">
-              <span className="rv-section-number">02.</span>Related
-            </h2>
-            {details.related.map((item) => (
-              <Link
-                className="dump-leader"
-                data-sound="nav"
-                key={item.slug}
-                href={`/posts/${item.slug}`}
-              >
-                <span>{item.title}</span>
-                <span className="dump-dots" aria-hidden="true" />
-                <span>dump</span>
-              </Link>
-            ))}
-            {details.lab && (
-              <a
-                className="dump-leader"
-                data-sound="nav"
-                href={details.lab.href}
-              >
-                <span>Try it: {details.lab.title}</span>
-                <span className="dump-dots" aria-hidden="true" />
-                <span>lab ↗</span>
-              </a>
-            )}
-          </section>
-        )}
-        <nav className="post-neighbors" aria-label="Adjacent posts">
-          <div>
-            {details.previous && (
-              <>
-                <span>Previous</span>
-                <Link href={`/posts/${details.previous.slug}`} data-sound="nav">
-                  {details.previous.title}
-                </Link>
-              </>
-            )}
-          </div>
-          <div>
-            {details.next && (
-              <>
-                <span>Next</span>
-                <Link href={`/posts/${details.next.slug}`} data-sound="nav">
-                  {details.next.title}
-                </Link>
-              </>
-            )}
-          </div>
-        </nav>
-        <section className="rv-section">
-          <h2 className="rv-section-heading">
-            <span className="rv-section-number">03.</span>Comments
-          </h2>
-          <p className="page-intro">Powered by GitHub Discussions.</p>
+        </Section>
+        <Section number="03." title="Comments" id="comments">
+          <p>Powered by GitHub Discussions.</p>
           <Comments />
-        </section>
-      </div>
-    </article>
+        </Section>
+      </article>
+    </DumpShell>
   );
 }

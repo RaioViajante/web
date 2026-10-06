@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { series } from "@/lib/post-details";
+import { IndexHeader, LeaderRow, Section } from "@raioviajante/design/parts";
 
+import { series } from "@/lib/post-details";
 import { formatPostMonth, sortPostsNewestFirst, type Post } from "@/lib/posts";
 
 interface PostMonth {
@@ -21,21 +22,22 @@ export function groupPostsByMonth(posts: readonly Post[]): PostMonth[] {
   return [...months.values()];
 }
 
-export function HomePostList({ posts }: { posts: Post[] }) {
+export function HomePostList({
+  posts,
+  latestMinutes,
+}: {
+  posts: Post[];
+  /** Reading time of the newest post, computed by the page from its source. */
+  latestMinutes?: number;
+}) {
   const sorted = sortPostsNewestFirst(posts);
   const [latest, ...older] = sorted;
   if (!latest) return <p className="home-empty">No posts yet.</p>;
+  const months = groupPostsByMonth(older);
   return (
     <>
-      <header className="rv-hero dump-hero">
-        <p className="rv-eyebrow">Writing</p>
-        <h1>dump</h1>
-        <p className="rv-dek">a memory dump, hopefully readable.</p>
-      </header>
-      <section className="rv-section" aria-labelledby="latest-heading">
-        <h2 className="rv-section-heading" id="latest-heading">
-          <span className="rv-section-number">00.</span>Latest
-        </h2>
+      <IndexHeader name="dump" line="a memory dump, hopefully readable." />
+      <Section number="00." title="Latest" id="latest-heading" index>
         <Link
           className="featured-post"
           data-sound="nav"
@@ -47,95 +49,73 @@ export function HomePostList({ posts }: { posts: Post[] }) {
         <p className="post-meta">
           <time dateTime={latest.date}>{latest.date}</time>
           <span aria-hidden="true"> · </span>
+          {latestMinutes ? (
+            <>
+              {latestMinutes} min read
+              <span aria-hidden="true"> · </span>
+            </>
+          ) : null}
           {latest.tags.join(" · ")}
         </p>
-      </section>
-      {groupPostsByMonth(older).map((month, index) => (
-        <section
-          className="rv-section post-month"
+      </Section>
+      {months.map((month, index) => (
+        <Section
           key={month.key}
-          aria-labelledby={`month-${month.key}`}
+          number={`00.${index + 1}`}
+          title={`${month.name} ${month.key.slice(0, 4)}`}
+          id={`month-${month.key}`}
+          index
         >
-          <h2 className="rv-section-heading" id={`month-${month.key}`}>
-            <span className="rv-section-number">00.{index + 1}</span>
-            {month.name} {month.key.slice(0, 4)}
-          </h2>
           <ol className="month-post-list">
             {month.posts.map((post) => (
               <li className="month-post" key={post.slug}>
-                <Link
-                  className="dump-leader"
-                  data-sound="nav"
+                <LeaderRow
+                  label={post.title}
+                  value={<time dateTime={post.date}>{post.date.slice(5)}</time>}
                   href={`/posts/${post.slug}`}
-                >
-                  <span>{post.title}</span>
-                  <span className="dump-dots" aria-hidden="true" />
-                  <time dateTime={post.date}>{post.date.slice(5)}</time>
-                </Link>
+                  linkComponent={Link}
+                />
                 <p>{post.description}</p>
                 <span className="post-tags">{post.tags.join(" · ")}</span>
               </li>
             ))}
           </ol>
-        </section>
+        </Section>
       ))}
-      <section className="rv-section" aria-labelledby="series-heading">
-        <h2 className="rv-section-heading" id="series-heading">
-          <span className="rv-section-number">
-            00.{groupPostsByMonth(older).length + 1}
-          </span>
-          Series
-        </h2>
+      <Section
+        number={`00.${months.length + 1}`}
+        title="Series"
+        id="series-heading"
+        index
+      >
         {series.map((item) => {
           const parts = item.slugs
             .map((slug) => posts.find((post) => post.slug === slug))
             .filter((post): post is Post => Boolean(post));
           return parts.length > 0 ? (
-            <div className="series-entry" key={item.name}>
-              <h3>
-                {item.name}{" "}
-                <span>
-                  · {parts.length} {parts.length === 1 ? "part" : "parts"}
-                </span>
-              </h3>
-              {parts.map((post) => (
-                <Link
-                  className="dump-leader"
-                  data-sound="nav"
-                  key={post.slug}
-                  href={`/posts/${post.slug}`}
-                >
-                  <span>{post.title}</span>
-                  <span className="dump-dots" aria-hidden="true" />
-                  <span>read</span>
-                </Link>
-              ))}
-            </div>
+            <LeaderRow
+              key={item.name}
+              label={item.name}
+              value={`${parts.length} ${parts.length === 1 ? "part" : "parts"}`}
+              href={`/posts/${parts[0]!.slug}`}
+              linkComponent={Link}
+            />
           ) : null;
         })}
-      </section>
-      <section className="rv-section" aria-labelledby="follow-heading">
-        <h2 className="rv-section-heading" id="follow-heading">
-          <span className="rv-section-number">
-            00.{groupPostsByMonth(older).length + 2}
-          </span>
-          Follow along
-        </h2>
-        <a className="dump-leader" data-sound="nav" href="/rss.xml">
-          <span>RSS</span>
-          <span className="dump-dots" aria-hidden="true" />
-          <span>feed</span>
-        </a>
-        <a
-          className="dump-leader"
-          data-sound="nav"
+      </Section>
+      <Section
+        number={`00.${months.length + 2}`}
+        title="Follow along"
+        id="follow-heading"
+        index
+      >
+        <LeaderRow label="RSS" value="feed" href="/rss.xml" />
+        <LeaderRow
+          label="GitHub"
+          value="code ↗"
           href="https://github.com/RaioViajante"
-        >
-          <span>GitHub</span>
-          <span className="dump-dots" aria-hidden="true" />
-          <span>code ↗</span>
-        </a>
-      </section>
+        />
+      </Section>
     </>
   );
 }

@@ -17,9 +17,9 @@ somewhere to write things down while learning and building in public.
 
 - Next.js (App Router) and React
 - TypeScript
-- MDX through `@next/mdx`, with frontmatter parsed by `gray-matter`
-- `rehype-pretty-code` and Shiki for build-time syntax highlighting
-- `remark-gfm`, `rehype-slug`
+- MDX compiled on the server by `@mdx-js/mdx` (`lib/render-post.tsx`), with frontmatter parsed by `gray-matter`
+- The shared soft blocks and Shiki theme from `@raioviajante/design` for build-time syntax highlighting
+- `remark-gfm`, `remark-directive`, `rehype-slug`
 - Giscus for comments, backed by GitHub Discussions
 - Jest and Testing Library
 
@@ -70,7 +70,7 @@ pnpm run build
 
 ```
 app/         routes, layout, feed, sitemap
-components/  the site shell and post listings
+components/  the dump shell, post listings and article
 content/     posts, as MDX
 lib/         content pipeline, feed, site config
 tests/       Jest specs

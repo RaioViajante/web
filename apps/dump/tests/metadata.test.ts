@@ -1,3 +1,7 @@
+jest.mock("../lib/render-post", () => ({
+  renderPost: async () => () => null,
+}));
+
 import type { Post } from "@/lib/posts";
 
 // jest.mock() takes a literal specifier, not one resolved through the "@/"

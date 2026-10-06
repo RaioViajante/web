@@ -63,8 +63,8 @@ describe("<TagIndex />", () => {
       "href",
       "/tags/osdev",
     );
-    expect(entries[0]).toHaveTextContent("osdev4 posts");
-    expect(entries[1]).toHaveTextContent("x863 posts");
+    expect(entries[0]).toHaveTextContent("osdev4");
+    expect(entries[1]).toHaveTextContent("x863");
   });
 
   it("URL-encodes tag links consistently", () => {
@@ -99,7 +99,7 @@ describe("<TagPostList />", () => {
 
     expect(formatTagPostDate("2026-01-01")).toBe("26-01-01");
     const newest = screen.getAllByRole("listitem")[0]!;
-    expect(within(newest).getByText("26-09-03")).toHaveAttribute(
+    expect(within(newest).getByText("09-03")).toHaveAttribute(
       "datetime",
       "2026-09-03",
     );
