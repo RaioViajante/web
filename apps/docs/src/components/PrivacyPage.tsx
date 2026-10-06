@@ -14,10 +14,16 @@ export function PrivacyPage() {
 			{
 				title: "In your browser",
 				body: (
+					<>
 					<p>
 						Your sound preference is saved in a small cookie on .raioviajante.com, so every raioviajante site remembers it. The cookie is created only when you switch sound on or off, holds just that choice, and lasts one year. It is
 						not used for tracking.
 					</p>
+					<p>
+						Older versions of this site had a theme switcher that stored a choice in your browser as starlight-theme. Nothing reads or
+						writes it now, so a leftover value is inert and can be cleared.
+					</p>
+					</>
 				),
 			},
 			{

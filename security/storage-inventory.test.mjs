@@ -78,3 +78,53 @@ test("no analytics or telemetry dependency is installed", async () => {
     );
   }
 });
+
+// Keys we do not write. giscus-session is created by the giscus script, and the
+// two theme keys belong to switchers that no longer exist. If our own source
+// starts touching any of them, the inventory and the privacy copy need review.
+test("our source never touches the third-party and legacy storage keys", async () => {
+  // The privacy pages may name them; nothing else may.
+  const copy = /privacy|PrivacyPage|LegalPages/;
+  for await (const [file, text] of shippedSources())
+    if (!copy.test(file))
+      for (const key of ["giscus-session", "starlight-theme", "lab-theme"])
+        assert.ok(!text.includes(key), `${file} references ${key}`);
+});
+
+test("there is no theme switching or theme persistence", async () => {
+  for await (const [file, text] of shippedSources())
+    for (const pattern of [
+      /prefers-color-scheme/,
+      /dataset\.theme/,
+      /\[data-theme/,
+      /\bthemeToggle\b/i,
+    ])
+      assert.ok(!pattern.test(text), `${file} matches ${pattern}`);
+});
+
+test("docs/privacy-storage.md names every storage item it covers", async () => {
+  const doc = await readFile(
+    new URL("../docs/privacy-storage.md", import.meta.url),
+    "utf8",
+  );
+  for (const key of [
+    "rv-sound",
+    "giscus-session",
+    "starlight-theme",
+    "lab-theme",
+  ])
+    assert.ok(
+      doc.includes(`\`${key}\``),
+      `docs/privacy-storage.md omits ${key}`,
+    );
+  assert.match(doc, /\.raioviajante\.com/);
+});
+
+test("the dump privacy copy discloses the giscus session", async () => {
+  const page = await readFile(
+    new URL("../apps/dump/app/privacy/page.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(page, /giscus-session/);
+  assert.match(page, /sign in/);
+});

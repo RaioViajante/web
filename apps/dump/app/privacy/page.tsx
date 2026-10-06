@@ -20,13 +20,23 @@ export default function Privacy() {
           {
             title: "In your browser",
             body: (
-              <p>
-                Your sound preference is saved in a small cookie on
-                .raioviajante.com, so every raioviajante site remembers it. The
-                cookie is created only when you switch sound on or off, holds
-                just that choice, and lasts one year. It is not used for
-                tracking.
-              </p>
+              <>
+                <p>
+                  Your sound preference is saved in a small cookie on
+                  .raioviajante.com, so every raioviajante site remembers it.
+                  The cookie is created only when you switch sound on or off,
+                  holds just that choice, and lasts one year. It is not used for
+                  tracking.
+                </p>
+                <p>
+                  If you sign in with GitHub to comment, the giscus script that
+                  runs on this page keeps a sign-in value in your browser&apos;s
+                  local storage for dump.raioviajante.com, under the name
+                  giscus-session. dump does not read or use it; giscus and
+                  GitHub decide how long it stays valid. It is not created
+                  unless you sign in.
+                </p>
+              </>
             ),
           },
           {
