@@ -13,12 +13,12 @@ export const SYNTAX = {
   string: "#a8c791",
   number: "#de9f8c",
   comment: "#7b818a",
-  punct: "#9aa0a8",
+  punct: "#8792a1",
 } as const;
 
 export type TokenClass = keyof typeof SYNTAX;
 
-export const FOREGROUND = "#ececec";
+export const FOREGROUND = "#edf1f6";
 export const CODE_BACKGROUND = "#212121";
 
 export const raioviajanteTheme: ThemeRegistration = {

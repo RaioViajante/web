@@ -12,12 +12,12 @@
 :root {
   /* page */
   --bg: #191919;
-  --fg: #ececec; /* text, titles, active state */
-  --fg-2: #9aa0a8; /* secondary text, status words, subtitles */
+  --fg: #edf1f6; /* text, titles, active state; root source */
+  --fg-2: #8792a1; /* secondary text, status words, subtitles; root muted */
   --fg-3: #858b94; /* section numbers, caps labels, meta */
 
   /* rules */
-  --line: #2e2e2e; /* dividers, prev/next rule, footer rule */
+  --line: rgba(215, 223, 234, 0.3); /* dividers; root rule */
   --dots: #444444; /* dotted leaders */
   --rule-note: #555555; /* quotes */
 
@@ -50,17 +50,18 @@
   --bubble-fg: #141414;
 
   /* type */
-  --font: "Noto Sans Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font: "Noto Sans Mono", ui-monospace, monospace;
   --size-index-title: 56px;
   --size-page-title: 48px;
   --size-post-title: 44px;
   --size-section: 18px;
-  --size-body: 15px;
+  --size-body: 16.5px; /* root: 110% × 0.9375rem */
   --size-small: 14px;
   --size-code: 13.5px;
   --size-label: 12px;
   --tracking-label: 0.12em;
-  --leading-body: 1.85;
+  --leading-body: 1.82;
+  --weight-body: 500;
   --leading-code: 1.6;
 
   /* layout */

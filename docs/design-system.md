@@ -37,14 +37,15 @@ Everything below that appears on more than one page or site is **one shared impl
 
 **Images** live in `packages/design/assets/`, shared by all apps, never duplicated per site. Components import them from the package (`Art`, `art`, `gallery`).
 
-| file                                                                         | where                                                                         |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `character/avatar.png`                                                       | index headers (112px)                                                         |
-| `search/search-character.png`                                                | search page, full pose next to the bubble (150px)                             |
-| `search/head/` (`frame-01…10.png`, `sprite.webp`/`sprite.png`, `static.png`) | search menu item (30px) and "ask RaioViajante" rows (34px) — never below 28px |
-| `stickers/work-of-art.png`                                                   | empty search                                                                  |
-| `stickers/not-found.png` ("404 page not found")                              | every 404                                                                     |
-| `gallery/*.webp`                                                             | root gallery                                                                  |
+| file                                            | where                                                                         |
+| ----------------------------------------------- | ----------------------------------------------------------------------------- |
+| `character/avatar.png`                          | index headers (112px)                                                         |
+| `search/search-character.png`                   | search page, full pose next to the bubble (150px)                             |
+| `search/head/static.png`                        | search menu item (30px) and "ask RaioViajante" rows (34px) — never below 28px |
+| `character/avatar-frames/frame-01…10.png`       | reserved for the root avatar animation                                        |
+| `stickers/work-of-art.png`                      | empty search                                                                  |
+| `stickers/not-found.png` ("404 page not found") | every 404                                                                     |
+| `gallery/*.webp`                                | root gallery                                                                  |
 
 All files are exports of the original artwork. The screenshot crops from the design handoff were not used.
 
@@ -62,17 +63,17 @@ All files are exports of the original artwork. The screenshot crops from the des
 
 All tokens live in `packages/design/styles/tokens.css`. The two `[CHECK]` values were resolved against the root site: `--bg` is `#191919` (the design measured `#1b1b1b`) and `--font` keeps the root's Noto Sans Mono stack.
 
-| token           | value     | use                                |
-| --------------- | --------- | ---------------------------------- |
-| `--bg`          | `#191919` | page (root's value)                |
-| `--fg`          | `#ececec` | text, titles, current item         |
-| `--fg-2`        | `#9aa0a8` | secondary text, status words       |
-| `--fg-3`        | `#858b94` | section numbers, caps labels, meta |
-| `--line`        | `#2e2e2e` | rules, frames                      |
-| `--dots`        | `#444444` | dotted leaders                     |
-| `--rule-note`   | `#555555` | quotes, NOTE                       |
-| `--code-bg`     | `#202020` | code blocks, benches               |
-| `--code-inline` | `#262626` | inline code                        |
+| token           | value                      | use                                |
+| --------------- | -------------------------- | ---------------------------------- |
+| `--bg`          | `#191919`                  | page (root's value)                |
+| `--fg`          | `#edf1f6`                  | text, titles, current item (root)  |
+| `--fg-2`        | `#8792a1`                  | secondary text (root muted)        |
+| `--fg-3`        | `#858b94`                  | section numbers, caps labels, meta |
+| `--line`        | `rgba(215, 223, 234, 0.3)` | rules, frames (root)               |
+| `--dots`        | `#444444`                  | dotted leaders                     |
+| `--rule-note`   | `#555555`                  | quotes, NOTE                       |
+| `--code-bg`     | `#202020`                  | code blocks, benches               |
+| `--code-inline` | `#262626`                  | inline code                        |
 
 Syntax: keyword `#d8bd84` · type `#bfa6d9` · function `#8fb8d6` · string `#a8c791` · number `#de9f8c` · comment `#7b818a` italic · punctuation `--fg-2`.
 
@@ -83,7 +84,7 @@ Syntax: keyword `#d8bd84` · type `#bfa6d9` · function `#8fb8d6` · string `#a8
 | index title  | 56 / 700                        | root, site index pages                    |
 | page title   | 44–48 / 700                     | posts, docs pages, experiments            |
 | section      | 17–18 / 700, number in `--fg-3` | everywhere                                |
-| body         | 15 / line-height 1.85           | everywhere                                |
+| body         | 16.5 / 500 / line-height 1.82   | everywhere; root computed size            |
 | code, tables | 13–13.5 / 1.75                  | everywhere                                |
 | caps label   | 12–12.5, uppercase, +0.12em     | page label, sidebar groups, table headers |
 
@@ -99,7 +100,7 @@ Syntax: keyword `#d8bd84` · type `#bfa6d9` · function `#8fb8d6` · string `#a8
 - **Prev / next** — caps label above title, no box.
 - **Footer** — identical everywhere: four sites (current one in `--fg`), email, CNPJ, and that site's own Terms of Use and Privacy Policy.
 - **Index header** — avatar (112px circle), site name, one line — like the root.
-- **Search ("Ask RaioViajante")** — menu item ends in the search character's head (30px, peeking above the row) and `⌘K` (ctrl K off Mac, `/` also opens); on hover the avatar hops once and a "?" sticker bubble pops. The search page: the full search character (hand on chin) asks in a white sticker bubble in the site's voice (dump: "what are you curious about?", docs: "what do you need to look up?", lab: "what do you want to poke at?"); the bubble answers while you type ("found 4 things about “sweep”!", "hmm… nothing yet."); results are numbered leader rows grouped by site; scope "this site · everywhere"; empty search shows the sticker and "maybe I haven't built it yet."
+- **Search ("Ask RaioViajante")** — menu item ends in the hand-on-chin head (30px, peeking above the row) and `⌘K` (ctrl K off Mac, `/` also opens); on hover the head hops once and a "?" sticker bubble pops. The search page: the full search character asks in a white sticker bubble in the site's voice (root: "what are you looking for?", dump: "what are you curious about?", docs: "what do you need to look up?", lab: "what do you want to poke at?"); the bubble answers while you type ("found 4 things about “sweep”!", "hmm… nothing yet."); results are numbered leader rows grouped by site; scope "this site · everywhere"; empty search shows the sticker and "maybe I haven't built it yet."
 - **Legal pages** — Terms of Use and Privacy Policy on every site: "In short" leaders first, then numbered sections; site-specific sections (dump comments via giscus, docs accuracy/search, lab experiments).
 
 ## 5. Site features
