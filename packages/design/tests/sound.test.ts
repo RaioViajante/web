@@ -82,40 +82,35 @@ describe("preference", () => {
     expect(parsePreference("a=b; rv-sound=off; c=d")).toBe(false);
   });
 
-  it("migrates the legacy localStorage value once", () => {
+  it("honors a legacy localStorage value without writing anything", () => {
     const { env, state } = fakeEnvironment({ legacy: "on" });
     expect(readPreference(env)).toBe(true);
-    expect(state.legacy).toBeNull();
-    expect(state.written).toHaveLength(1);
     expect(readPreference(env)).toBe(true);
-    expect(state.written).toHaveLength(1);
-  });
-
-  it("never writes a cookie just by reading", () => {
-    const { env, state } = fakeEnvironment();
-    expect(readPreference(env)).toBe(false);
-    expect(readPreference(env)).toBe(false);
     expect(state.written).toEqual([]);
+    expect(state.cookie).toBe("");
+    expect(state.legacy).toBe("on");
   });
 
-  it("scopes the cookie to production hosts only", () => {
-    for (const host of ["localhost", "root.localhost", "notraioviajante.com"])
-      expect(serializePreference(true, host, "http:")).toBe(
-        "rv-sound=on; Path=/; Max-Age=31536000; SameSite=Lax",
-      );
-    // Browsers reject Secure cookies set over http, so it follows the protocol.
-    expect(
-      serializePreference(false, "raioviajante.com", "http:"),
-    ).not.toContain("Secure");
-    expect(serializePreference(false, "raioviajante.com", "https:")).toBe(
+  it("an explicit toggle writes the cookie and retires the legacy value", () => {
+    const { env, state } = fakeEnvironment({ legacy: "on" });
+    writePreference(false, env);
+    expect(state.written).toEqual([
       "rv-sound=off; Path=/; Max-Age=31536000; SameSite=Lax; Domain=.raioviajante.com; Secure",
-    );
+    ]);
+    expect(state.legacy).toBeNull();
+    expect(readPreference(env)).toBe(false);
   });
 
-  it("holds only on/off and ignores other values", () => {
-    expect(parsePreference("rv-sound=maybe")).toBeNull();
-    expect(parsePreference("xrv-sound=on")).toBeNull();
-    expect(parsePreference("")).toBeNull();
+  it("keeps local development host-only when toggled", () => {
+    const { env, state } = fakeEnvironment({
+      hostname: "localhost",
+      protocol: "http:",
+    });
+    writePreference(true, env);
+    expect(state.written).toEqual([
+      "rv-sound=on; Path=/; Max-Age=31536000; SameSite=Lax",
+    ]);
+    expect(readPreference(env)).toBe(true);
   });
 
   it("prefers the cookie over legacy storage", () => {

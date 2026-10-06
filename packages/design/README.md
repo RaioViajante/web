@@ -51,7 +51,7 @@ import {
 ## Shared sound preference
 
 The preference is the `rv-sound` cookie on `.raioviajante.com`. The old
-`rv-sound` localStorage value (root, dump) is migrated on first read.
+`rv-sound` localStorage value (root, dump) is only read, never copied; the next toggle writes the cookie and removes it.
 
 ## Checks
 
