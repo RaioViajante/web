@@ -80,6 +80,7 @@ Security header architecture, local verification, and the intentional Next.js
 rendering change are documented in [security-headers.md](security-headers.md).
 security.txt is documented in [security-txt.md](security-txt.md).
 Browser storage and third-party activity are inventoried in [privacy-storage.md](privacy-storage.md).
+The allowed network origins and their checks are in [network-origins.md](network-origins.md).
 Astro header literals are generated with `node security/sync-vercel.mjs` and
 checked by `pnpm security:check`; no Vercel dashboard settings are changed.
 

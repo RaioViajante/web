@@ -1,37 +1,11 @@
 import assert from "node:assert/strict";
-import { readFile, readdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { shippedSources } from "./source-files.mjs";
 
 // Evidence for docs/privacy-storage.md: every browser-storage API in shipped
 // source, and every third-party script origin, must be on this list. Adding a
 // new use fails here until the inventory and the privacy pages are reviewed.
-const roots = [
-  ...["root", "dump", "docs", "lab"].flatMap((app) =>
-    ["app", "src", "components", "lib", "pages"].map((d) => `apps/${app}/${d}`),
-  ),
-  "packages/design",
-];
-const skip = new Set(["node_modules", "tests", ".next", "dist", ".astro"]);
-
-async function* sources(path) {
-  const base = new URL(`../${path}/`, import.meta.url);
-  let entries;
-  try {
-    entries = await readdir(base, { withFileTypes: true });
-  } catch {
-    return;
-  }
-  for (const entry of entries) {
-    if (skip.has(entry.name)) continue;
-    if (entry.isDirectory()) yield* sources(`${path}/${entry.name}`);
-    else if (/\.(tsx?|astro|mjs|js)$/.test(entry.name))
-      yield [
-        `${path}/${entry.name}`,
-        await readFile(new URL(entry.name, base), "utf8"),
-      ];
-  }
-}
-
 const apis = {
   "document.cookie": ["packages/design/sound/preference.ts"],
   localStorage: ["packages/design/sound/preference.ts"], // legacy value, read once
@@ -47,10 +21,9 @@ test("browser storage APIs appear only where the inventory says", async () => {
   const found = Object.fromEntries(
     Object.keys(apis).map((k) => [k, new Set()]),
   );
-  for (const root of roots)
-    for await (const [file, text] of sources(root))
-      for (const api of Object.keys(apis))
-        if (text.includes(api)) found[api].add(file);
+  for await (const [file, text] of shippedSources())
+    for (const api of Object.keys(apis))
+      if (text.includes(api)) found[api].add(file);
   for (const [api, files] of Object.entries(apis))
     assert.deepEqual([...found[api]].sort(), files, api);
 });
@@ -74,12 +47,11 @@ test("the cookie is written only by an explicit preference change", async () => 
 
 test("giscus is the only third-party script and loads from one place", async () => {
   const origins = new Map();
-  for (const root of roots)
-    for await (const [file, text] of sources(root))
-      for (const [, origin] of text.matchAll(
-        /["'`](https:\/\/[^/"'`]+)\/[^"'`]*\.js["'`]/g,
-      ))
-        origins.set(file, [...(origins.get(file) ?? []), origin]);
+  for await (const [file, text] of shippedSources())
+    for (const [, origin] of text.matchAll(
+      /["'`](https:\/\/[^/"'`]+)\/[^"'`]*\.js["'`]/g,
+    ))
+      origins.set(file, [...(origins.get(file) ?? []), origin]);
   assert.deepEqual(
     [...origins],
     [["apps/dump/components/Comments.tsx", ["https://giscus.app"]]],
