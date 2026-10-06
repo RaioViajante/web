@@ -33,13 +33,13 @@ The earlier demonstration numbers were design fixtures. Real numbering starts at
 - `id`, `slug` — permanent display number and route identity.
 - `title`, `description` — homepage copy.
 - `status` — `active`, `done`, or `archived`.
+- `project`, `revision`, `fidelity` — pinned provenance and browser fidelity.
 - `created` — Lab publication date.
 - `source` — optional, publicly accessible repository URL.
 - `what`, optional `notes` — purpose, boundaries, and provenance.
-- `layout` — `canonical` by default; `wide` is explicit opt-in only when necessary.
 - `surface` — optional key selecting a bespoke Astro component.
 
-No database, CMS, or plugin registry is needed. Keep the approved shell and canonical 680px column intact.
+No database, CMS, or plugin registry is needed. Keep the approved shell and shared content column intact.
 
 ## Source links
 

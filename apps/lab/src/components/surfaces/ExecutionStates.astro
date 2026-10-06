@@ -1,194 +1,56 @@
 ---
-const fields = [
-  "status",
-  "startedAt",
-  "finishedAt",
-  "exitCode",
-  "errorMessage",
-];
+import { ExecutionBench } from "./ExecutionBench";
 ---
 
-<div class="execution" data-execution>
-  <div class="section-label">current/</div>
-  <p class="current" data-current>
-    QUEUED
-  </p>
-  <fieldset disabled>
-    <legend class="section-label">actions/</legend>
-    <div class="inputs">
-      <label for="exit-code">
-        exit code <span>(succeed / fail)</span>
-        <input
-          id="exit-code"
-          type="number"
-          step="1"
-          min="-2147483648"
-          max="2147483647"
-          value="0"
-          required
-        />
-      </label>
-      <label for="failure-message">
-        failure message
-        <input id="failure-message" type="text" value="Example failure" />
-      </label>
-    </div>
-    <div class="actions">
-      <button type="button" data-operation="start">
-        start
-      </button>
-      <button type="button" data-operation="succeed">
-        succeed
-      </button>
-      <button type="button" data-operation="fail">
-        fail
-      </button>
-      <button type="button" data-operation="cancel">
-        cancel
-      </button>
-      <button type="button" data-new>
-        new example
-      </button>
-    </div>
-  </fieldset>
-  <p role="status" aria-live="polite" aria-atomic="true" data-feedback>
-    Sample execution. Try an operation, including one this state rejects.
-  </p>
-  <div class="section-label">state/</div>
-  <dl>
-    {fields.map((field) => (
-      <>
-        <dt>{field}</dt>
-        <dd data-field={field}>{field === "status" ? "QUEUED" : "—"}</dd>
-      </>
-    ))}
-  </dl>
-  <p class="timestamp-note">
-    Times come from this browser’s clock and belong only to this example.
-  </p>
-  <div class="section-label">history/</div>
-  <ol data-history>
-    <li>created → QUEUED</li>
-  </ol>
-  <noscript>Enable JavaScript to try the lifecycle operations.</noscript>
-</div>
-
-<style>
-  .execution {
-    border: 1px solid var(--border);
-    padding: 1rem;
-    overflow-wrap: anywhere;
-  }
-  .current {
-    font: 1.15rem/1.6 var(--font-mono);
-    margin: 0.35rem 0 1rem;
-  }
-  fieldset {
-    border: 0;
-    padding: 0;
-    margin: 0;
-    min-width: 0;
-  }
-  legend {
-    padding: 0;
-    margin-bottom: 0.65rem;
-  }
-  .inputs {
-    display: grid;
-    gap: 0.75rem;
-    grid-template-columns: minmax(0, 1fr);
-  }
-  label {
-    display: block;
-    font: 0.8rem/1.6 var(--font-mono);
-  }
-  label span {
-    color: var(--muted);
-  }
-  input {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    border: 1px solid var(--field-border);
-    border-radius: 0;
-    background: var(--bg);
-    color: var(--fg);
-    font: inherit;
-    padding: 0.5rem;
-    margin-top: 0.3rem;
-  }
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.85rem;
-  }
-  button {
-    border: 1px solid var(--border);
-    border-radius: 0;
-    padding: 0.5rem 0.65rem;
-    background: var(--bg);
-    color: var(--fg);
-    font: 0.8rem/1.4 var(--font-mono);
-    cursor: pointer;
-  }
-  button:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-  }
-  [data-feedback] {
-    min-height: 3.2em;
-    margin: 1rem 0;
-  }
-  dl {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 0.4rem 1rem;
-    font: 0.75rem/1.6 var(--font-mono);
-    margin: 0.65rem 0;
-  }
-  dt {
-    color: var(--muted);
-  }
-  dd {
-    margin: 0;
-  }
-  .timestamp-note {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-bottom: 1.25rem;
-  }
-  ol {
-    font: 0.75rem/1.6 var(--font-mono);
-    padding-left: 1.5rem;
-    margin-bottom: 0;
-  }
-  @media (min-width: 640px) {
-    .inputs {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    }
-  }
-</style>
-
+<ExecutionBench />
 <script>
   import {
     newExecution,
     transition,
     type Operation,
   } from "../../lib/execution-states";
+  import { playSound } from "@raioviajante/design/sound";
   const container = document.querySelector<HTMLElement>("[data-execution]");
   if (container) {
     let state = newExecution();
     const feedback = container.querySelector<HTMLElement>("[data-feedback]")!;
-    const current = container.querySelector<HTMLElement>("[data-current]")!;
     const history =
       container.querySelector<HTMLOListElement>("[data-history]")!;
     const code = container.querySelector<HTMLInputElement>("#exit-code")!;
     const message =
       container.querySelector<HTMLInputElement>("#failure-message")!;
-    container.querySelector("fieldset")!.disabled = false;
     function render() {
-      current.textContent = state.status;
+      const accepted: string[] = [];
+      const rejected: string[] = [];
+      container!
+        .querySelectorAll<HTMLButtonElement>("[data-operation]")
+        .forEach((button) => {
+          const action = button.dataset.operation!;
+          const allowed =
+            action === "start"
+              ? state.status === "QUEUED"
+              : action === "cancel"
+                ? ["QUEUED", "RUNNING"].includes(state.status)
+                : state.status === "RUNNING";
+          button.classList.toggle("rv-btn--rejected", !allowed);
+          button.classList.toggle(
+            "rv-btn--primary",
+            action === "start" && allowed,
+          );
+          button.setAttribute("aria-disabled", String(!allowed));
+          (allowed ? accepted : rejected).push(action);
+          container!
+            .querySelector(`[data-rule="${action}"]`)!
+            .classList.toggle("is-available", allowed);
+        });
+      container!.querySelector("[data-availability]")!.textContent =
+        `Accepted now: ${accepted.join(", ") || "none"}. Rejected now: ${rejected.join(", ") || "none"}.`;
+      container!.querySelectorAll<HTMLElement>(".rv-state").forEach((mark) => {
+        const current = mark.textContent === state.status;
+        mark.classList.toggle("rv-state--current", current);
+        if (current) mark.setAttribute("aria-current", "true");
+        else mark.removeAttribute("aria-current");
+      });
       container!
         .querySelectorAll<HTMLElement>("[data-field]")
         .forEach((field) => {
@@ -208,6 +70,7 @@ const fields = [
           const operation = button.dataset.operation as Operation;
           try {
             if (
+              state.status === "RUNNING" &&
               (operation === "succeed" || operation === "fail") &&
               !code.checkValidity()
             ) {
@@ -224,18 +87,21 @@ const fields = [
             );
             render();
             feedback.textContent = `${operation} accepted → ${state.status}.`;
-            record(`${operation} → ${state.status}`);
+            record(`accepted: ${operation} → ${state.status}`);
+            playSound("success");
           } catch (error) {
             const reason =
               error instanceof Error ? error.message : "Operation rejected";
             feedback.textContent = `${operation} rejected: ${reason}. State remains ${state.status}.`;
-            record(`${operation} rejected → ${state.status}: ${reason}`);
+            record(`rejected: ${operation} from ${state.status}: ${reason}`);
+            playSound("reject");
           }
         });
       });
     container
       .querySelector<HTMLButtonElement>("[data-new]")!
       .addEventListener("click", () => {
+        playSound("success");
         state = newExecution();
         code.value = "0";
         message.value = "Example failure";

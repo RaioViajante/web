@@ -7,8 +7,8 @@ export const GET: APIRoute = () => {
     site: "lab",
     title: item.title,
     href: `https://lab.raioviajante.com/experiments/${item.slug}/`,
-    description: item.description,
-    body: `${item.what} ${item.notes ?? ""}`,
+    description: `${item.project} · ${item.fidelity}`,
+    body: `${item.description} ${item.what} ${item.notes ?? ""}`,
     number: item.id,
   }));
   return new Response(JSON.stringify(entries), {

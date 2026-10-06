@@ -1,58 +1,56 @@
 # Design
 
-## Source of truth
+Lab uses `@raioviajante/design`: one shared shell, Noto Sans Mono, a fixed gray
+palette, numbered sections, dotted leaders and soft benches. The rules are in
+`docs/design-system.md` and the block contract in `docs/blocks.md` at the
+repository root.
 
-The approved Claude Design export was kept locally at `reference/claude-export/` (`Lab.dc.html`), untracked and not part of the monorepo checkout. Where available, it is read-only visual reference material: never modify, move, format, or commit it. Implement the intended design it represents, not any implementation bug introduced by the design environment itself. Bugs already identified and rejected during design iteration, which must not be reintroduced:
+## Structure
 
-- Experiment surfaces growing to viewport width instead of staying inside the canonical column.
-- Parser playground tokens exploding vertically instead of a compact two-column layout.
-- Code escaping its bounding box instead of scrolling internally.
-- GitHub duplicated in the footer — GitHub only ever appears in the header.
+- `BaseLayout.astro` loads shared `styles.css`, self-hosted Noto Sans Mono and
+  `startBehavior()`. `LabFrame.tsx` renders the shared shell statically: PAGES,
+  EXPERIMENTS, sound toggle, 739.2px content column and footer. No React hydrates.
+- `LabIndex.tsx` uses the shared animated avatar and index header, all/active/done
+  filters, descending permanent IDs, fidelity explanations and dated notebook.
+  The notebook is an index anchor, not a separate route.
+- `ExperimentLayout.astro` uses the shared header and numbered Question, Bench,
+  Fidelity and Related sections. Previous/next follows ascending permanent IDs.
+  Execution's transition table sits with its bench so section numbers stay
+  consistent across the three experiments.
+- Shared `LabBench`, `BenchBand`, `StateMark`, `ActionButton`, `ToggleButton`,
+  `CodeBlock`, `Callout` and `TableBlock` supply every bench's frame and blocks.
+  Assembly is highlighted at build time with the shared syntax theme.
+- Search, Terms, Privacy and the host `404.html` use shared templates. Search
+  shortcuts and the requested 404 path use shared browser behavior.
+- `src/styles/lab.css` contains only the index list and experiment-specific
+  arrangements. General bench helpers live in the design package. There are no
+  local color literals, shell duplicates, Google Fonts or second typeface.
 
-## Shared RaioViajante visual identity
+## Interactivity
 
-- **Background (dark):** `#18161b`
-- **Foreground (dark):** `#ece7e0`
-- **Accent (dark):** `#c3b3e0`
-- **Canonical content width:** 680px
-- **Responsive gutter:** `clamp(1rem, 4vw, 1.25rem)`
-- **IBM Plex Mono** — identity, navigation, paths, labels, experiment IDs, metadata, statuses, code-adjacent UI.
-- **Source Serif 4** — prose, descriptions, editorial voice.
+Small Astro scripts enhance static React output. The classifier updates suffix,
+category, destination preview and counts; reset and samples restore or append
+input. Filename spaces are preserved, and Python 3.14 treats `image.` as suffix
+`.` (category Other). This differs from the older design logic.
 
-Principle: **mono identifies, serif speaks.** Do not substitute fonts, and do not use mono for prose or serif for interface chrome.
+Execution actions show available state transitions with solid controls and
+rejections with dotted controls that remain clickable. The state and every
+field survive a rejection unchanged. Java's nonblank error-message requirement
+and signed integer input restrictions apply; zero does not imply success.
+Results and history use words, with live feedback independent of color or sound.
 
-### Color tokens
+Boot's five sections have source, explanatory notes, selection, previous/next
+and live progress. Section buttons support arrows, Home and End as well as Tab
+and Enter/Space. The actual source excerpts and documented QEMU result are
+preserved; the browser does not run an emulator. Without JavaScript the initial
+section and a link to complete assembly remain available.
 
-lab is the first consumer of `@raioviajante/design` (`"@raioviajante/design": "workspace:*"`). `src/layouts/BaseLayout.astro` imports `@raioviajante/design/tokens.css` before `src/styles/global.css`, and `global.css` keeps lab's own variable names as aliases of the shared primitives:
+Sound comes from the shared map: accepted actions use success, rejected actions
+use reject. Preference is the shared `rv-sound` cookie; nothing plays on load.
 
-- `--bg` → `--rv-color-bg`
-- `--fg` → `--rv-color-fg`
-- `--accent` → `--rv-color-accent`
-- `--muted` → `--rv-color-muted`
-- `--border` → `--rv-color-hairline`
+## Unknown facts
 
-Components and pages use the lab names, never `--rv-color-*` directly. Tokens that are specific to lab stay defined in `global.css`: `--field-border` (the stronger 49% boundary on editable fields) and `--cell` (6% foreground), along with `color-scheme`. The site uses the shared dark palette on every route.
-
-## Header
-
-`raioviajante ~ / lab`, GitHub icon on the right, sharing the canonical 680px container with the rest of the page. Normal document flow — not sticky, not fixed. No additional navigation links.
-
-## Homepage
-
-`lab/` heading, two short editorial lines ("things may break." / the longer description), then an `experiments/` list: number (mono), title (mono), description (serif), status (mono, accent when active). No cards, no thumbnails, no bento layout, no rounded containers — hierarchy is typographic, separated by hairline rules.
-
-## Experiment page
-
-Back link (`← lab/`), `<number> / <title>` heading, a metadata block (status, created, source), a `what` section in prose, an `experiment` section holding the experiment's surface, and an optional `notes` section. All of it shares the canonical column by default.
-
-### Canonical vs. wide
-
-The experiment surface defaults to the same 680px canonical column as everything else. A future experiment may opt into a `wide` layout only when it genuinely needs more horizontal space (a waveform editor, a timeline, a node graph, a large canvas, a code editor with a live preview). Neither original design demo (parser playground, boot sector) used `wide` — `experiment` is not a synonym for full-width.
-
-## Footer
-
-Three links only — `raioviajante.com`, `dump`, `docs` — understated mono type, a restrained top hairline rule, canonical 680px alignment. No GitHub text link (GitHub already lives in the header).
-
-## Explicitly avoid
-
-Generic documentation-SaaS aesthetics, excessive cards, bento grids, glassmorphism, glowing gradients, decorative blobs, fake browser/terminal chrome (no macOS traffic lights), skill bars, giant marketing hero sections, unnecessary animation.
+Public legal pages omit an update date, log retention, analytics assertions,
+quoting/artwork permissions, snippet licensing and governing law until those
+facts are confirmed. Source links are omitted for Orbit while its repository
+is not public. The migration plan records omissions and reference differences.

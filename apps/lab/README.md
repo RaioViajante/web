@@ -13,7 +13,7 @@ Core rule: **the shell is consistent, the experiments are allowed to misbehave.*
 
 ## Stack
 
-Astro, TypeScript, pnpm. Static-first, no UI framework.
+Astro, TypeScript, pnpm. Static output; shared React renders at build time without hydration. Plain TypeScript scripts enhance the benches.
 
 ## Local development
 

@@ -1,20 +1,21 @@
 ---
-import "@raioviajante/design/tokens.css";
-import "@raioviajante/design/search.css";
-import "../styles/global.css";
-import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
+import "@fontsource-variable/noto-sans-mono";
+import "@raioviajante/design/styles.css";
+import "../styles/lab.css";
+import { LabFrame } from "../components/LabFrame";
 import { formatTitle } from "../lib/site";
-
 interface Props {
   pageTitle?: string;
   description?: string;
+  current?: string;
 }
-
-const { pageTitle, description = "lab.raioviajante.com — things may break." } =
-  Astro.props;
-
+const {
+  pageTitle,
+  description = "lab.raioviajante.com — things may break.",
+  current = Astro.url.pathname,
+} = Astro.props;
 const title = formatTitle(pageTitle);
+const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -22,8 +23,8 @@ const title = formatTitle(pageTitle);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.ico?v=3" sizes="any" />
     <link rel="icon" type="image/png" href="/icon.png?v=3" sizes="512x512" />
     <link
@@ -31,24 +32,15 @@ const title = formatTitle(pageTitle);
       href="/apple-touch-icon.png?v=3"
       sizes="180x180"
     />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap"
-    />
-
     <title>{title}</title>
   </head>
   <body>
-    <Header />
-    <slot />
-    <Footer />
+    <LabFrame current={current}>
+      <slot />
+    </LabFrame>
+    <script>
+      import { startBehavior } from "@raioviajante/design/behavior";
+      startBehavior();
+    </script>
   </body>
 </html>
-
-<script>
-  import { attachSearch } from "@raioviajante/design/search-client";
-  attachSearch();
-</script>

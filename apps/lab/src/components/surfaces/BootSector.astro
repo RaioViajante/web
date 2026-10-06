@@ -1,126 +1,75 @@
 ---
-// Actual instruction excerpts from x86-os-experiment e966889, src/main.asm.
-// Source comments are omitted; instructions and labels are unchanged.
-const sections = [
-  {
-    title: "entry/",
-    code: "org 0x7C00\n\nbits 16\n\n%define ENDL 0x0D, 0x0A\n\nstart:\n    jmp main",
-    explanation:
-      "NASM is told to assemble 16-bit code with an origin of 0x7C00. The entry jumps to main; org describes the expected address rather than loading the code.",
-  },
-  {
-    title: "initialization/",
-    code: "main:\n    mov ax, 0\n    mov ds, ax\n    mov es, ax\n\n    mov ss, ax\n    mov sp, 0x7C00\n\n    mov si, msg_hello\n    call puts\n\n    hlt\n\n.halt:\n    jmp .halt",
-    explanation:
-      "The source initializes DS, ES, and SS to zero, sets SP to 0x7C00, points SI at the message, and calls puts. After printing, it reaches hlt and a loop before the data.",
-  },
-  {
-    title: "print loop/",
-    code: "puts:\n    push si\n    push ax\n\n.loop:\n    lodsb\n\n    or al, al\n    jz .done\n\n    mov ah, 0x0E\n    mov bh, 0x00\n    int 0x10\n\n    jmp .loop\n\n.done:\n    pop ax\n    pop si\n    ret",
-    explanation:
-      "The routine saves SI and AX, reads characters with lodsb, and stops at the zero terminator. BIOS interrupt 0x10 with AH = 0x0E prints each character. The saved registers are restored before returning.",
-  },
-  {
-    title: "message/",
-    code: "msg_hello: db 'Hello, World!', ENDL, 0",
-    explanation:
-      "The actual message is followed by ENDL (carriage return and line feed, defined in entry/) and a zero byte that terminates the string.",
-  },
-  {
-    title: "sector ending/",
-    code: "times 510 - ($ - $$) db 0\n\ndw 0xAA55",
-    explanation:
-      "NASM pads the sector with zero bytes up to offset 510, then writes the word 0xAA55. Its little-endian byte order is 55 AA. This explains the source directive; it is not a compiled byte dump.",
-  },
-];
+import { highlightBlock } from "@raioviajante/design/components";
+import { sections } from "../../data/boot-sector";
+import { BootBench } from "./BootBench";
+const models = await Promise.all(
+  sections.map((section) =>
+    highlightBlock({
+      code: section.code,
+      lang: "asm",
+      meta: "showLineNumbers expanded",
+    }),
+  ),
+);
+const output = await highlightBlock({
+  code: "Hello, World!",
+  lang: "text",
+  meta: 'title="documented result · qemu"',
+});
 ---
 
-<div class="boot-source">
-  <p class="source-note">
-    src/main.asm · e966889
-    <br />
-    Select a section to inspect its source and notes. Source comments are
-    omitted.
-  </p>
-  {sections.map((section, index) => (
-    <details open={index === 0}>
-      <summary>{section.title}</summary>
-      <pre><code>{section.code}</code></pre>
-      <p>{section.explanation}</p>
-    </details>
-  ))}
-  <div class="result">
-    <div class="section-label">documented result/</div>
-    <pre><code>Hello, World!</code></pre>
-    <p>
-      The project’s boot-sector learning notes record this output in QEMU. This
-      page does not boot the source or reproduce that verification.
-    </p>
-  </div>
-  <p class="references">
-    <a
-      href="https://github.com/RaioViajante/x86-os-experiment/blob/e966889b56e613d92887338a1bc979674674a115/src/main.asm"
-      target="_blank"
-      rel="noreferrer noopener"
-    >
-      assembly ↗
-    </a>
-    <a
-      href="https://github.com/RaioViajante/x86-os-experiment/blob/e966889b56e613d92887338a1bc979674674a115/docs/01-boot-sector.md"
-      target="_blank"
-      rel="noreferrer noopener"
-    >
-      learning notes ↗
-    </a>
-  </p>
-</div>
-
-<style>
-  .boot-source {
-    border: 1px solid var(--border);
-    padding: 1rem;
-    min-width: 0;
+<BootBench models={models} output={output} />
+<script>
+  import { playSound } from "@raioviajante/design/sound";
+  const container = document.querySelector<HTMLElement>("[data-boot]")!;
+  const buttons = [
+    ...container.querySelectorAll<HTMLButtonElement>("[data-section]"),
+  ];
+  const panels = [...container.querySelectorAll<HTMLElement>("[data-panel]")];
+  const previous = container.querySelector<HTMLButtonElement>("[data-prev]")!;
+  const next = container.querySelector<HTMLButtonElement>("[data-next]")!;
+  let index = 0;
+  function show(target: number, sound = true) {
+    if (target < 0 || target >= buttons.length) {
+      container.querySelector("[data-progress]")!.textContent =
+        `rejected: no ${target < 0 ? "previous" : "next"} section · ${index + 1} / ${buttons.length}`;
+      playSound("reject");
+      return;
+    }
+    index = target;
+    buttons.forEach((button, number) =>
+      button.setAttribute("aria-pressed", String(number === index)),
+    );
+    panels.forEach((panel, number) => (panel.hidden = number !== index));
+    container.querySelector("[data-progress]")!.textContent =
+      `${index + 1} / ${buttons.length} · ${buttons[index].textContent!.slice(3)}`;
+    [previous, next].forEach((button, number) => {
+      const rejected =
+        number === 0 ? index === 0 : index === buttons.length - 1;
+      button.classList.toggle("rv-btn--rejected", rejected);
+      button.setAttribute("aria-disabled", String(rejected));
+    });
+    if (sound) playSound("success");
   }
-  .source-note {
-    font: 0.75rem/1.6 var(--font-mono);
-    color: var(--muted);
-    margin: 0 0 1rem;
-    overflow-wrap: anywhere;
-  }
-  details {
-    border-top: 1px solid var(--border);
-    padding-block: 0.65rem;
-  }
-  summary {
-    font: 0.85rem/1.6 var(--font-mono);
-    cursor: pointer;
-  }
-  summary:hover {
-    color: var(--accent);
-  }
-  pre {
-    max-width: 100%;
-    overflow-x: auto;
-    font: 0.8rem/1.6 var(--font-mono);
-    margin: 0.85rem 0;
-  }
-  code {
-    font: inherit;
-  }
-  p {
-    margin: 0.65rem 0;
-  }
-  .result {
-    border-top: 1px solid var(--border);
-    padding-top: 1rem;
-    margin-top: 0.25rem;
-  }
-  .references {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font: 0.75rem/1.6 var(--font-mono);
-    color: var(--accent);
-    margin-bottom: 0;
-  }
-</style>
+  buttons.forEach((button, number) => {
+    button.addEventListener("click", () => show(number, false));
+    button.addEventListener("keydown", (event) => {
+      const target =
+        event.key === "ArrowRight"
+          ? (index + 1) % buttons.length
+          : event.key === "ArrowLeft"
+            ? (index + buttons.length - 1) % buttons.length
+            : event.key === "Home"
+              ? 0
+              : event.key === "End"
+                ? buttons.length - 1
+                : undefined;
+      if (target === undefined) return;
+      event.preventDefault();
+      show(target);
+      buttons[target].focus();
+    });
+  });
+  previous.addEventListener("click", () => show(index - 1));
+  next.addEventListener("click", () => show(index + 1));
+</script>
