@@ -1,0 +1,444 @@
+/*
+ * Soft blocks: code, tabs, terminal, diff, annotated code, callouts, quotes,
+ * figures, tables, file trees, footnotes. Markup contract in docs/blocks.md.
+ * Requires tokens.css. Used by dump, docs and lab.
+ */
+
+/* ---------- rhythm ---------- */
+.prose > .block,
+.prose > .callout,
+.prose > figure,
+.prose > blockquote,
+.prose > .pull,
+.prose > .table-block {
+  margin: var(--block-gap) 0;
+}
+
+/* ---------- inline code ---------- */
+.prose :not(pre) > code {
+  background: var(--block-inner);
+  border-radius: var(--radius-inline);
+  padding: 2px 6px;
+  font-size: var(--size-code);
+  color: var(--fg);
+}
+
+/* ---------- code block ---------- */
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.block__meta {
+  /* label row ABOVE the block, outside it */
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+  font-size: 12.5px;
+  color: var(--fg-3);
+}
+.block__file {
+  color: var(--fg-2);
+}
+.block__body {
+  position: relative;
+  background: var(--block);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.block pre {
+  margin: 0;
+  padding: 18px 20px;
+  overflow-x: auto;
+  font-family: inherit;
+  font-size: var(--size-code);
+  line-height: var(--leading-code);
+  color: var(--fg);
+}
+.block pre code {
+  display: block;
+  white-space: pre;
+  font: inherit;
+}
+
+/* floating copy button */
+.block__copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--block-button);
+  border: 0;
+  border-radius: var(--radius-control);
+  color: var(--fg-2);
+  font: inherit;
+  font-size: 12px;
+  padding: 0 10px;
+  min-height: 30px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.block__body:hover .block__copy,
+.block__copy:focus-visible,
+.block__copy.is-copied {
+  opacity: 1;
+}
+.block__copy.is-copied {
+  color: var(--fg);
+}
+@media (hover: none) {
+  .block__copy {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .block__copy {
+    transition: none;
+  }
+}
+
+/* lines: each source line is one .line span, no newline characters between */
+.block .line {
+  display: block;
+  min-height: calc(var(--leading-code) * 1em);
+}
+.block--numbered .line,
+.block--diff .line {
+  display: flex;
+}
+
+/* line numbers and highlighted lines (opt-in: .block--numbered) */
+.block--numbered pre {
+  padding-left: 0;
+  padding-right: 0;
+}
+.block--numbered .line::before {
+  content: attr(data-n);
+  flex: 0 0 44px;
+  text-align: right;
+  padding-right: 16px;
+  color: var(--code-line-number);
+  user-select: none;
+}
+.block--numbered .line > span {
+  padding-right: 20px;
+}
+.line.is-hl {
+  background: var(--code-highlight);
+}
+.line.is-hl::before {
+  color: var(--fg);
+}
+
+/* ---------- several files (tabs) ---------- */
+.block--tabs .block__tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 6px 0;
+}
+.block__tab {
+  background: transparent;
+  border: 0;
+  border-radius: 7px 7px 0 0;
+  color: var(--fg-3);
+  font: inherit;
+  font-size: 12.5px;
+  padding: 0 14px;
+  min-height: 34px;
+  cursor: pointer;
+}
+.block__tab[aria-selected="true"] {
+  background: var(--block-inner);
+  color: var(--fg);
+}
+.block--tabs .block__tabs .block__copy {
+  position: static;
+  opacity: 1;
+  margin-left: auto;
+  background: none;
+}
+.block--tabs pre {
+  background: var(--block-inner);
+}
+.block--tabs [role="tabpanel"][hidden] {
+  display: none;
+}
+
+/* ---------- terminal ---------- */
+.block--terminal .block__body {
+  background: var(--block-terminal);
+}
+.block--terminal .block__copy {
+  background: #242424;
+}
+.term-prompt {
+  color: var(--code-line-number);
+  user-select: none;
+}
+.term-cmd {
+  color: var(--fg);
+}
+.term-out {
+  color: var(--fg-3);
+}
+.term-ok {
+  color: var(--syn-string);
+}
+
+/* ---------- diff ---------- */
+.block--diff pre {
+  padding-left: 0;
+  padding-right: 0;
+}
+.block--diff .line::before {
+  content: " ";
+  flex: 0 0 36px;
+  text-align: center;
+  color: var(--code-line-number);
+  user-select: none;
+}
+.block--diff .line.add {
+  background: var(--diff-add-bg);
+}
+.block--diff .line.add::before {
+  content: "+";
+  color: var(--syn-string);
+}
+.block--diff .line.del {
+  background: var(--diff-del-bg);
+  color: var(--fg-2);
+}
+.block--diff .line.del::before {
+  content: "−";
+  color: var(--syn-number);
+}
+.diff-count .add {
+  color: var(--syn-string);
+}
+.diff-count .del {
+  color: var(--syn-number);
+}
+
+/* ---------- annotated code ---------- */
+.mark {
+  display: inline-block;
+  min-width: 18px;
+  margin-left: 1ch;
+  border-radius: 9px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  user-select: none;
+}
+.block__notes {
+  margin: 0;
+  padding: 12px 20px 16px;
+  list-style: none;
+  border-top: 1px solid var(--block-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--size-code);
+  line-height: 1.6;
+  color: #c5c9ce;
+}
+.block__notes li {
+  display: flex;
+  gap: 12px;
+}
+.block__notes li > span:first-child {
+  color: var(--fg-3);
+}
+
+/* ---------- collapsed long code ---------- */
+.block--collapsible.is-collapsed .line:nth-child(n + 7) {
+  display: none;
+}
+.block--collapsible pre {
+  padding-bottom: 0;
+}
+.block__more {
+  display: flex;
+  justify-content: center;
+  padding: 6px 12px 10px;
+}
+.block__more button {
+  background: var(--block-button);
+  border: 0;
+  border-radius: var(--radius-control);
+  color: var(--fg);
+  font: inherit;
+  font-size: 12.5px;
+  padding: 0 14px;
+  min-height: 34px;
+  cursor: pointer;
+}
+
+/* ---------- callouts ---------- */
+.callout {
+  background: var(--block);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+.callout__label {
+  font-size: var(--size-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+.callout--important .callout__label {
+  color: var(--fg);
+}
+/* the only outlined blocks: escalation by rule weight */
+.callout--warning,
+.callout--careful {
+  background: none;
+  border: 1px solid var(--fg-2);
+}
+.callout--warning .callout__label,
+.callout--careful .callout__label {
+  color: var(--fg);
+}
+.callout--deprecated {
+  background: none;
+  border: 1px dotted var(--fg-3);
+  color: var(--fg-2);
+}
+.callout > :first-child {
+  margin-top: 0;
+}
+.callout p {
+  margin: 0;
+}
+
+/* ---------- quotes ---------- */
+.prose blockquote {
+  margin: 0;
+  border-left: 2px solid #3a3a3a;
+  padding: 2px 0 2px 18px;
+  color: #b5bac0;
+  font-size: 15px;
+  line-height: 1.75;
+}
+.prose blockquote cite {
+  display: block;
+  margin-top: 6px;
+  color: var(--fg-3);
+  font-size: 13px;
+  font-style: normal;
+}
+.pull {
+  text-align: center;
+  font-size: 22px;
+  line-height: 1.45;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+/* ---------- figure / table / tree / footnotes ---------- */
+.prose figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.prose figure img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  display: block;
+}
+.prose figcaption {
+  font-size: 12.5px;
+  color: var(--fg-3);
+  text-align: center;
+}
+
+.table-block {
+  background: var(--block);
+  border-radius: var(--radius);
+  padding: 6px 18px;
+  overflow-x: auto;
+}
+.table-block table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--size-code);
+  line-height: 1.6;
+}
+.table-block th {
+  text-align: left;
+  font-weight: 400;
+  font-size: 11.5px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--fg-3);
+  padding: 10px 16px 10px 0;
+}
+.table-block td {
+  padding: 9px 16px 9px 0;
+  border-top: 1px solid #2c2c2c;
+}
+
+.tree-branch {
+  color: var(--code-line-number);
+}
+.tree-dir {
+  color: var(--syn-type);
+}
+
+.footnotes {
+  margin: 0;
+  padding: 12px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--block-hairline);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--fg-2);
+}
+.footnotes li {
+  display: flex;
+  gap: 12px;
+}
+.footnotes li > span:first-child {
+  color: var(--fg-3);
+}
+.footnotes a,
+.prose sup a {
+  color: var(--fg-2);
+  text-decoration: none;
+}
+
+/* ---------- syntax tokens ---------- */
+.tok-keyword {
+  color: var(--syn-keyword);
+}
+.tok-type {
+  color: var(--syn-type);
+}
+.tok-function {
+  color: var(--syn-function);
+}
+.tok-string {
+  color: var(--syn-string);
+}
+.tok-number {
+  color: var(--syn-number);
+}
+.tok-comment {
+  color: var(--syn-comment);
+  font-style: italic;
+}
+.tok-punct {
+  color: var(--syn-punct);
+}

@@ -1,0 +1,83 @@
+/*
+ * RaioViajante design tokens, shared by root, dump, docs and lab.
+ *
+ * Custom properties only: no element rules. Element and component styles
+ * live in base.css and blocks.css.
+ *
+ * [CHECK] values from the design handoff were resolved against the root site:
+ *   --bg    #191919  (root: --rv-editorial-bg; the design measured #1b1b1b)
+ *   --font  Noto Sans Mono with the root's generic fallbacks
+ */
+
+:root {
+  /* page */
+  --bg: #191919;
+  --fg: #ececec; /* text, titles, active state */
+  --fg-2: #9aa0a8; /* secondary text, status words, subtitles */
+  --fg-3: #858b94; /* section numbers, caps labels, meta */
+
+  /* rules */
+  --line: #2e2e2e; /* dividers, prev/next rule, footer rule */
+  --dots: #444444; /* dotted leaders */
+  --rule-note: #555555; /* quotes */
+
+  /* soft blocks: code, terminals, notes, tables, lab benches */
+  --block: #212121;
+  --block-inner: #262626; /* inline code, active tab */
+  --block-terminal: #161616;
+  --block-hairline: #2a2a2a;
+  --block-button: #2a2a2a;
+  --code-highlight: #2b2b2b;
+  --code-line-number: #5a5f66;
+  --radius: 10px; /* blocks */
+  --radius-control: 6px; /* buttons, inputs, floating copy */
+  --radius-inline: 5px; /* inline code */
+  --block-gap: 28px; /* between prose and any block */
+
+  /* syntax: color lives only inside code and bench output */
+  --syn-keyword: #d8bd84;
+  --syn-type: #bfa6d9;
+  --syn-function: #8fb8d6;
+  --syn-string: #a8c791;
+  --syn-number: #de9f8c;
+  --syn-comment: #7b818a; /* italic */
+  --syn-punct: var(--fg-2);
+  --diff-add-bg: rgba(168, 199, 145, 0.1);
+  --diff-del-bg: rgba(222, 159, 140, 0.1);
+
+  /* the one white shape: character sticker bubble */
+  --bubble-bg: #f2f2f2;
+  --bubble-fg: #141414;
+
+  /* type */
+  --font: "Noto Sans Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --size-index-title: 56px;
+  --size-page-title: 48px;
+  --size-post-title: 44px;
+  --size-section: 18px;
+  --size-body: 15px;
+  --size-small: 14px;
+  --size-code: 13.5px;
+  --size-label: 12px;
+  --tracking-label: 0.12em;
+  --leading-body: 1.85;
+  --leading-code: 1.6;
+
+  /* layout */
+  --measure: 740px; /* content column */
+  --shell: 1320px; /* sidebar + content (+ toc on docs) */
+  --sidebar: 230px;
+  --toc: 200px;
+  --gutter: 48px;
+  --section-gap: 56px; /* 80px on index pages */
+  --touch: 44px;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --size-index-title: 40px;
+    --size-page-title: 34px;
+    --size-post-title: 32px;
+    --gutter: 32px;
+  }
+}

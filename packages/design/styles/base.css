@@ -1,0 +1,511 @@
+/*
+ * RaioViajante shared base: page, shell, header, sections, leaders, controls,
+ * lab bench, character, search, footer. Soft blocks live in blocks.css.
+ * Requires tokens.css.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  background: var(--bg);
+  color-scheme: dark;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: var(--size-body);
+  line-height: var(--leading-body);
+}
+a {
+  color: var(--fg);
+}
+a:hover {
+  color: #ffffff;
+}
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+}
+:focus-visible {
+  outline: 1px solid var(--fg);
+  outline-offset: 3px;
+}
+.rv-skip {
+  position: fixed;
+  z-index: 10;
+  top: 12px;
+  left: 12px;
+  transform: translateY(-150%);
+  padding: 8px 12px;
+  background: var(--fg);
+  color: var(--bg);
+}
+.rv-skip:focus {
+  transform: translateY(0);
+}
+
+/* ---------- shell ---------- */
+.rv-shell {
+  max-width: var(--shell);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gutter);
+  padding: 24px 24px 64px;
+}
+.rv-sidebar {
+  flex: 0 1 var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding-top: 112px;
+}
+.rv-main {
+  flex: 999 1 560px;
+  min-width: 0;
+}
+.rv-column {
+  max-width: var(--measure);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.rv-toc {
+  flex: 0 1 var(--toc);
+  padding-top: 32px;
+}
+
+/* sound toggle: top center of the content column */
+.rv-sound {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0 48px;
+}
+.rv-sound button {
+  background: none;
+  border: 0;
+  color: var(--fg);
+  font: inherit;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  min-height: var(--touch);
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.rv-sound span {
+  color: var(--fg-2);
+}
+
+/* caps label: PAGES, ON THIS PAGE, page labels */
+.rv-label {
+  font-size: var(--size-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.rv-header .rv-label {
+  font-size: 12.5px;
+}
+
+/* sidebar and toc: the 1px rule marks "current" */
+.rv-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rv-nav .rv-label {
+  margin-bottom: 12px;
+}
+.rv-nav a {
+  display: flex;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--fg-2);
+  border-left: 1px solid transparent;
+  padding: 6px 0 6px 14px;
+}
+.rv-nav a[aria-current="page"],
+.rv-nav a.is-current {
+  color: var(--fg);
+  border-left-color: var(--fg);
+}
+.rv-nav__num {
+  color: var(--fg-3);
+}
+
+/* ---------- page header ---------- */
+.rv-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 0 0 64px;
+}
+.rv-header h1 {
+  margin: 8px 0 0;
+  font-size: var(--size-page-title);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.rv-header--index h1 {
+  font-size: var(--size-index-title);
+}
+.rv-header p {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 16px;
+  max-width: 560px;
+}
+.rv-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 12px;
+  font-size: 13px;
+  color: var(--fg-3);
+  margin-top: 14px;
+}
+.rv-meta .rv-status {
+  color: var(--fg);
+}
+
+/* ---------- sections ---------- */
+.rv-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: var(--section-gap);
+}
+.rv-section--index {
+  --section-gap: 80px;
+}
+.rv-section > h2 {
+  margin: 0 0 4px;
+  display: flex;
+  gap: 28px;
+  font-size: var(--size-section);
+  font-weight: 700;
+}
+.rv-num {
+  color: var(--fg-3);
+  font-weight: 400;
+  min-width: 38px;
+}
+.rv-section p {
+  margin: 0;
+}
+
+/* dotted leader: name ····· value */
+.rv-leader {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--fg);
+}
+.rv-leader__dots {
+  flex: 1 1 24px;
+  border-bottom: 1px dotted var(--dots);
+  transform: translateY(-5px);
+}
+.rv-leader__value {
+  color: var(--fg-2);
+  font-size: var(--size-small);
+  text-align: right;
+}
+
+/* ---------- prose parts ---------- */
+kbd {
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--fg-2);
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  padding: 0 6px;
+}
+
+/* prev / next: label above title, no box */
+.rv-pager {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.rv-pager a {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rv-pager a:last-child {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* ---------- controls (lab, docs tabs, filters) ---------- */
+.rv-btn {
+  background: none;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--fg-2);
+  color: var(--fg);
+  font: inherit;
+  font-size: 13.5px;
+  padding: 0 16px;
+  min-height: var(--touch);
+  cursor: pointer;
+}
+.rv-btn--rejected {
+  border: 1px dotted var(--dots);
+  color: var(--fg-3);
+} /* still clickable */
+.rv-btn--primary {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+}
+.rv-btn--quiet {
+  background: var(--block);
+  border-color: transparent;
+  font-size: 13px;
+  min-height: 36px;
+  padding: 0 10px;
+}
+.rv-toggle {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  color: var(--fg-3);
+  font: inherit;
+  font-size: 13px;
+  padding: 0 8px;
+  min-height: 36px;
+  cursor: pointer;
+}
+.rv-toggle[aria-pressed="true"],
+.rv-toggle[aria-selected="true"] {
+  color: var(--fg);
+  border-bottom-color: var(--fg);
+}
+.rv-input {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  min-height: var(--touch);
+  width: 100%;
+}
+.rv-input:focus {
+  border-color: var(--fg-2);
+  outline: none;
+}
+
+/* ---------- lab bench (soft surface; the caption says where it runs) ---------- */
+.rv-bench {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rv-bench__caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+  font-size: 12.5px;
+  color: var(--fg-3);
+}
+.rv-bench__frame {
+  background: var(--block);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.rv-bench__band {
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--block-hairline);
+}
+.rv-bench__band:last-child {
+  border-bottom: 0;
+}
+.rv-state {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  color: var(--fg-2);
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.rv-state--current {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+} /* the only filled shape */
+
+/* ---------- character ---------- */
+.rv-avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  display: block;
+} /* index headers; 64px on search */
+.rv-sticker {
+  width: 150px;
+  height: auto;
+  display: block;
+} /* empty search */
+@keyframes rv-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1deg);
+  }
+}
+.rv-404-art {
+  width: 300px;
+  max-width: 80%;
+  height: auto;
+  display: block;
+  margin: 0 auto 20px;
+  animation: rv-float 4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-404-art {
+    animation: none;
+  }
+}
+
+.rv-requested {
+  margin-bottom: 64px;
+}
+.rv-requested__host {
+  color: var(--fg-3);
+}
+
+/* ---------- search: "Ask RaioViajante" ---------- */
+.rv-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--fg-2);
+  border-left: 1px solid transparent;
+  padding: 6px 0 6px 14px;
+}
+.rv-search[aria-current="page"] {
+  color: var(--fg);
+  border-left-color: var(--fg);
+}
+.rv-search__dots {
+  flex: 1 1 12px;
+  border-bottom: 1px dotted var(--dots);
+  transform: translateY(4px);
+}
+.rv-search__key {
+  color: var(--fg-3);
+  font-size: 12.5px;
+}
+.rv-ask {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+}
+.rv-ask img {
+  width: 150px;
+  height: auto;
+}
+.rv-bubble {
+  position: relative;
+  background: var(--bubble-bg);
+  color: var(--bubble-fg);
+  border-radius: 18px;
+  padding: 12px 18px;
+  margin-bottom: 34px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.rv-bubble::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  bottom: 14px;
+  width: 14px;
+  height: 14px;
+  background: var(--bubble-bg);
+  transform: rotate(45deg);
+}
+.rv-search-input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  outline: none;
+  color: var(--fg);
+  font: inherit;
+  font-size: 24px;
+  caret-color: var(--fg);
+}
+.rv-result {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--fg-2);
+  border-left: 1px solid transparent;
+  padding: 6px 0 6px 14px;
+}
+.rv-result[aria-selected="true"] {
+  color: var(--fg);
+  border-left-color: var(--fg);
+}
+
+/* ---------- footer (identical on all four sites) ---------- */
+.rv-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 96px;
+  font-size: 12.5px;
+  color: var(--fg-3);
+  text-align: center;
+}
+.rv-footer::before {
+  content: "";
+  width: 44px;
+  border-top: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+.rv-footer a {
+  color: var(--fg-3);
+  text-decoration: none;
+}
+.rv-footer a:hover {
+  color: var(--fg);
+}
+.rv-footer a[aria-current="page"] {
+  color: var(--fg);
+}
+
+/* ---------- small screens ---------- */
+@media (max-width: 720px) {
+  .rv-sidebar,
+  .rv-toc {
+    flex-basis: 100%;
+    padding-top: 0;
+  }
+  .rv-pager {
+    grid-template-columns: 1fr;
+  }
+}
