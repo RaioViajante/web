@@ -1,20 +1,25 @@
 import { socialUrl } from "@raioviajante/design/seo";
-import { breadcrumbJsonLd, personRef, websiteId, websiteJsonLd } from "../../../../seo/structured-data";
-import { getPages, lastUpdated, pathOf, type DocEntry } from "./docs";
+import { breadcrumbJsonLd, websiteId, websiteJsonLd } from "../../../../seo/structured-data";
+import { getPages, pathOf, type DocEntry } from "./docs";
 import { origin } from "./seo";
 
 export const docsDescription =
 	"Public technical documentation for projects and systems built under RaioViajante.";
 
-/** The home page: the site identity, which every page's `isPartOf` points at. */
+/**
+ * The home page: the site identity, which every page's `isPartOf` points at.
+ * No author: nothing the docs publish says who writes them (the content
+ * LICENSE names a copyright holder, which is not the same claim).
+ */
 export const homeJsonLd = () => [websiteJsonLd(origin, "docs", docsDescription)];
 
 /**
  * A documentation page: `TechArticle` plus a breadcrumb that follows the
  * navigation (docs, the page it is listed under, the page), not URL segments:
  * the `projects/` and `raioviajante/` folders have no pages of their own.
- * `dateModified` is the page's own "last updated" value and is left out when
- * that is unknown; no publication date exists, so none is claimed.
+ * `dateModified` is the explicit `lastUpdated` frontmatter date only. Git
+ * history is not used: a commit can be a design or tooling change, not an edit
+ * of the documentation. No publication date exists, so none is claimed.
  */
 export async function pageJsonLd(entry: DocEntry) {
 	const pages = await getPages();
@@ -24,7 +29,7 @@ export async function pageJsonLd(entry: DocEntry) {
 		: undefined;
 	const path = pathOf(entry);
 	const url = new URL(path, origin).href;
-	const modified = lastUpdated(entry);
+	const modified = entry.data.lastUpdated;
 	return [
 		{
 			"@type": "TechArticle",
@@ -33,7 +38,6 @@ export async function pageJsonLd(entry: DocEntry) {
 			url,
 			mainEntityOfPage: { "@type": "WebPage", "@id": url },
 			inLanguage: "en",
-			author: personRef(),
 			isPartOf: { "@id": websiteId(origin) },
 			image: socialUrl(origin, path),
 			...(modified ? { dateModified: modified } : {}),

@@ -35,7 +35,9 @@ export default async function Home() {
         dangerouslySetInnerHTML={{
           __html: jsonLdScript(
             personJsonLd(),
-            websiteJsonLd(origin, "raioviajante", pages[0]!.description),
+            websiteJsonLd(origin, "raioviajante", pages[0]!.description, {
+              author: true,
+            }),
           ),
         }}
       />

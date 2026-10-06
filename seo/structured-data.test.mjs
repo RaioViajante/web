@@ -24,12 +24,16 @@ test("identity is absolute, on the root host, and the single Person id", () => {
   ]);
 });
 
-test("a WebSite references the person and has no SearchAction", () => {
-  const site = websiteJsonLd("https://lab.raioviajante.com", "lab", "d");
-  assert.equal(site["@id"], "https://lab.raioviajante.com/#website");
-  assert.equal(site.url, "https://lab.raioviajante.com/");
-  assert.equal(site.author["@id"], identity.id);
-  assert.ok(!("potentialAction" in site));
+test("a WebSite names an author only when asked to", () => {
+  const plain = websiteJsonLd("https://lab.raioviajante.com", "lab", "d");
+  assert.equal(plain["@id"], "https://lab.raioviajante.com/#website");
+  assert.equal(plain.url, "https://lab.raioviajante.com/");
+  assert.ok(!("author" in plain));
+  assert.ok(!("potentialAction" in plain));
+  const authored = websiteJsonLd("https://raioviajante.com", "r", "d", {
+    author: true,
+  });
+  assert.equal(authored.author["@id"], identity.id);
 });
 
 test("JSON-LD serializes to one parseable graph that cannot close its script", () => {

@@ -1,4 +1,4 @@
-import { getPages, lastUpdated, pathOf } from "./docs";
+import { getPages, pathOf } from "./docs";
 import { notFoundSeo } from "@raioviajante/design/seo";
 export const origin = "https://docs.raioviajante.com";
 interface SeoPage {
@@ -18,7 +18,8 @@ export async function getSeoPages(): Promise<SeoPage[]> {
 		...(await getPages()).map((page) => ({
 			path: pathOf(page),
 			title: page.data.title,
-			lastmod: lastUpdated(page),
+			// Only an explicit editorial date; git history is not a content date.
+			lastmod: page.data.lastUpdated,
 		})),
 	];
 }

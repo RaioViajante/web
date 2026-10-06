@@ -45,25 +45,37 @@ any page-level type for search, legal and archive pages.
 - `BlogPosting.datePublished` is the post's frontmatter date, which is the
   only date posts have; there is no `dateModified`. Its image is the post's
   generated social card.
-- Docs `dateModified` is the page's "last updated" value: an explicit
-  frontmatter date, otherwise the last git commit that touched the file, and
-  nothing when history is shallow (the same value the page shows). Docs have no
-  publication date, so none is claimed.
+- Docs `dateModified` and sitemap `lastmod` use only an explicit `lastUpdated`
+  frontmatter date. No docs page has one yet, so neither is emitted. The page's
+  visible "last updated" line may still fall back to the last git commit, but
+  that is not a content date for search engines: today it is a design-system
+  migration commit, not an edit of the documentation. Docs have no publication
+  date, so none is claimed.
+- Authors: dump posts and the root and dump sites name the shared person (dump
+  states `site.author`; root is the person's own home). Docs and Lab do not: no
+  page says who writes them. The docs content `LICENSE` names `RaioViajante` as
+  copyright holder, which is not an authorship statement, and the terms pages say
+  the sites are run by RaioViajante (the CNPJ holder). Adding an author or
+  `copyrightHolder` there needs an explicit decision.
 - Docs breadcrumbs follow the navigation: `docs`, the page a sub-page is
   listed under, then the page. The `projects/` and `raioviajante/` folders have
   no pages, so they are not breadcrumb items. (The visible breadcrumb on a docs
   page does show folder names; the structured one lists only real pages.)
 
 JSON-LD is serialized by `jsonLdScript` (escapes `<`). Dump and Root nonce
-their blocks; on Docs and Lab it is an inline data block, which the CSP does
-not govern because the browser never executes it.
+their blocks. On Docs and Lab it is an inline block without a nonce. Firefox
+against the production builds and their committed CSP reported no violation
+for any of these blocks (root, dump home and article, docs, lab), no
+console errors, and unaffected hydration; the same listener did report a
+blocked `fetch` and a blocked inline script, so it would have caught one. No
+nonce or hash change was needed.
 
 ## Sitemaps and robots
 
 Each host serves `/sitemap.xml` (absolute production URLs, no 404 or utility
 pages) and `/robots.txt` (`Allow: /`, absolute sitemap URL). `lastmod` appears
-only with a real content date: dump posts (frontmatter date) and docs pages
-(as above). Root, lab, and dump's listing pages have none, rather than a
+only with a real content date: dump posts (frontmatter date) and, when a page
+has one, a docs page's explicit `lastUpdated`. Root, lab, and dump's listing pages have none, rather than a
 build time.
 
 ## Indexing decisions
@@ -76,8 +88,8 @@ authors had them; search keeps one canonical URL (`?q=` is never canonical).
 ## Manifest
 
 Name, start URL, icons and the background color. `display` is `browser`: the
-sites have no service worker, offline mode or app shell, so they do not claim
-one.
+sites have no service worker, offline mode or app shell (a test fails if a
+service worker is added), so they do not claim one.
 
 ## Not verifiable locally
 

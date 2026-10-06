@@ -20,7 +20,7 @@ const blogId = () => `${site.url}/#blog`;
 /** Home page: the `WebSite` and the `Blog` it contains, by the same person. */
 export function homeJsonLd() {
   return [
-    websiteJsonLd(site.url, site.name, site.description),
+    websiteJsonLd(site.url, site.name, site.description, { author: true }),
     {
       "@type": "Blog" as const,
       "@id": blogId(),

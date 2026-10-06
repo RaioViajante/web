@@ -33,10 +33,14 @@ export function websiteId(origin: string) {
   return new URL("/#website", origin).href;
 }
 
+/**
+ * `author` is opt-in: set it only where the site itself states who writes it.
+ */
 export function websiteJsonLd(
   origin: string,
   name: string,
   description: string,
+  options: { author?: boolean } = {},
 ) {
   return {
     "@type": "WebSite" as const,
@@ -45,7 +49,7 @@ export function websiteJsonLd(
     description,
     url: new URL("/", origin).href,
     inLanguage: "en",
-    author: personRef(),
+    ...(options.author ? { author: personRef() } : {}),
   };
 }
 
