@@ -1,5 +1,6 @@
 ---
 import "@raioviajante/design/tokens.css";
+import "@raioviajante/design/search.css";
 import "../styles/global.css";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
@@ -46,3 +47,8 @@ const title = formatTitle(pageTitle);
     <Footer />
   </body>
 </html>
+
+<script>
+  import { attachSearch } from "@raioviajante/design/search-client";
+  attachSearch();
+</script>

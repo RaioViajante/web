@@ -17,9 +17,9 @@ must not redesign or destabilize the shell.
 
 ## Stack
 
-Astro and TypeScript, static-first. No React, Vue, Svelte, or other UI framework
-unless a specific experiment needs more client-side interactivity than a small
-inline script can provide.
+Astro and TypeScript, static-first. No client-side React: shared React components
+render statically, with no hydration. Keep experiment interactivity in small
+browser scripts unless the experiment needs a more capable client framework.
 
 ## Experiments
 

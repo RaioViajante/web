@@ -1,11 +1,14 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import react from '@astrojs/react';
 
 export default defineConfig({
 	site: 'https://docs.raioviajante.com',
 	integrations: [
+		react(),
 		starlight({
+			pagefind: false,
 			// Matches dump.raioviajante.com's own document-title convention: a
 			// short lowercase site identity joined to the page title with an
 			// em dash (`app/layout.tsx`'s `title.template: "%s — ${site.name}"`,

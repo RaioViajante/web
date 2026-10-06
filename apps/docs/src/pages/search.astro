@@ -1,0 +1,8 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { SearchPage } from '@raioviajante/design/search';
+---
+
+<StarlightPage frontmatter={{ title: 'Search', description: 'Search RaioViajante docs and sites.', hero: {} }}>
+	<SearchPage site="docs" />
+</StarlightPage>

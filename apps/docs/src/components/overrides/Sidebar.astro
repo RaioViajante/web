@@ -3,11 +3,19 @@
 // override below instead of the default collapsible-group one.
 import MobileMenuFooter from 'virtual:starlight/components/MobileMenuFooter';
 import SidebarSublist from './SidebarSublist.astro';
+import { SearchNavItem } from '@raioviajante/design/search';
+import '@raioviajante/design/search.css';
 
 const { sidebar } = Astro.locals.starlightRoute;
 ---
 
 <SidebarSublist sublist={sidebar} />
+<SearchNavItem number="03." current={Astro.url.pathname.startsWith('/search')} />
+
+<script>
+	import { attachSearch } from '@raioviajante/design/search-client';
+	attachSearch();
+</script>
 
 <div class="md:sl-hidden">
 	<MobileMenuFooter />
