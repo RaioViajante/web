@@ -51,7 +51,7 @@ const next = neighbor(pages[index + 1], "Next →");
 	<Prose><Content /></Prose>
 
 	<div class="page-foot">
-		<span>{updated ? `last updated ${updated}` : ""}</span>
+		{updated && <span>last updated {updated}</span>}
 		<a href={editUrl(entry)}>edit this page on GitHub ↗</a>
 	</div>
 	<Pager prev={previous} next={next} />

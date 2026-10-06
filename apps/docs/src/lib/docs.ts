@@ -51,10 +51,12 @@ export async function searchNumber() {
 }
 
 /**
- * The date of the last commit that touched a page's source, or nothing when
- * git history is unavailable (a shallow clone, a tarball). Never invented.
+ * An explicit editorial date, then the last source commit's date. Omit when
+ * neither is available; shallow history cannot reliably date a source edit.
  */
 export function lastUpdated(entry: DocEntry) {
+	if (entry.data.lastUpdated) return entry.data.lastUpdated;
+	if (!entry.filePath) return undefined;
 	try {
 		// A shallow clone would report the oldest commit it has, not the last
 		// edit: leave the date out rather than show a wrong one.
