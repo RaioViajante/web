@@ -1,93 +1,52 @@
-# RaioViajante Web
+<p align="center">
+  <img src="packages/design/assets/stickers/sitting.png" alt="RaioViajante sitting" width="220">
+</p>
 
-This repository contains the web applications that make up the RaioViajante
-internet ecosystem. Each application is developed, validated, and deployed
-independently; they share repository infrastructure and, where reuse is proven,
-small packages under `packages/`.
+<h1 align="center">raioviajante</h1>
 
-## Applications
+<p align="center">curious enough to build it myself.</p>
 
-| Path        | Package              | Role                                     | Stack         | Production                                             |
-| ----------- | -------------------- | ---------------------------------------- | ------------- | ------------------------------------------------------ |
-| `apps/root` | `@raioviajante/root` | personal home and index of the ecosystem | Next.js       | [raioviajante.com](https://raioviajante.com)           |
-| `apps/dump` | `@raioviajante/dump` | personal technical writing               | Next.js + MDX | [dump.raioviajante.com](https://dump.raioviajante.com) |
-| `apps/docs` | `@raioviajante/docs` | curated public technical documentation   | Astro         | [docs.raioviajante.com](https://docs.raioviajante.com) |
-| `apps/lab`  | `@raioviajante/lab`  | interactive experiments                  | Astro         | [lab.raioviajante.com](https://lab.raioviajante.com)   |
+---
 
-Each app keeps its own README and `docs/` directory for app-specific details.
+The home of RaioViajante on the web: four small sites, one design system.
 
-## Repository structure
+| site | what it is |
+|---|---|
+| [raioviajante.com](https://raioviajante.com) | the index — who, what, where |
+| [dump](https://dump.raioviajante.com) | writing — notes from building things |
+| [docs](https://docs.raioviajante.com) | documentation for the projects |
+| [lab](https://lab.raioviajante.com) | experiments you can poke at — things may break |
 
-```text
-.
-├── apps/
-│   ├── root/
-│   ├── dump/
-│   ├── docs/
-│   └── lab/
-├── packages/
-│   └── design/           @raioviajante/design, shared color tokens
-├── docs/                 repository-level documentation
-├── .github/workflows/    CI
-├── package.json          workspace scripts
-├── pnpm-workspace.yaml
-└── pnpm-lock.yaml
-```
+## Structure
 
-Play, a separate project, is planned to live under `apps/play` once its
-implementation begins. It is not part of this repository today.
+    apps/              one folder per site
+    packages/design/   everything shared: tokens, components, sound, search, artwork
+    docs/              design system, blocks, deployment
 
-## Requirements
+Anything used by more than one site lives in `packages/design`, and only there.
 
-- Node.js 24 (the exact version is pinned in [`.nvmrc`](.nvmrc))
-- pnpm 12.8.1 (pinned through `packageManager` in [`package.json`](package.json))
+## Running it
 
-## Getting started
+    pnpm install
+    pnpm --filter ./apps/<site> dev
+    pnpm validate      # format, lint, typecheck, tests and builds
 
-```sh
-pnpm install
-```
+## Read next
 
-Run one application at a time with a named filter:
+- [`docs/design-system.md`](docs/design-system.md) — how everything looks and sounds
+- [`docs/blocks.md`](docs/blocks.md) — code and content blocks
+- [`docs/deployment.md`](docs/deployment.md) — how the sites ship
+- [`AGENTS.md`](AGENTS.md) — rules for anyone (or anything) changing the code
 
-```sh
-pnpm --filter @raioviajante/root dev
-pnpm --filter @raioviajante/dump dev
-pnpm --filter @raioviajante/docs dev
-pnpm --filter @raioviajante/lab dev
-```
+## License
 
-The Next.js apps and the Astro apps each share a default development port, so
-starting several apps at once requires choosing different ports.
+| part | license |
+|---|---|
+| code | [MIT](LICENSE) |
+| docs content | [CC BY 4.0](apps/docs/src/content/docs/LICENSE) |
+| dump posts | [all rights reserved](apps/dump/content/posts/LICENSE) |
+| artwork, character and name | [all rights reserved](packages/design/assets/LICENSE) |
 
-## Validation
+## Contact
 
-```sh
-pnpm validate
-```
-
-`validate` runs the following root scripts in order. Each one runs only in the
-apps that define the corresponding script:
-
-```sh
-pnpm format:check
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-```
-
-See [development](docs/development.md) for what each app validates.
-
-## Deployment
-
-Each app is deployed as a separate Vercel project from this repository's `main`
-branch, using its app directory as the project's Root Directory. See
-[deployment](docs/deployment.md).
-
-## Documentation
-
-- [Architecture](docs/architecture.md)
-- [Development](docs/development.md)
-- [Deployment](docs/deployment.md)
-- [Repository history](docs/repository-history.md)
+mail@raioviajante.com
