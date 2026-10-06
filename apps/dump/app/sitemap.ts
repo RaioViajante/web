@@ -6,15 +6,11 @@ import { absoluteUrl } from "@/lib/site";
 export default function sitemap(): MetadataRoute.Sitemap {
   const posts = getPublishedPosts();
 
-  const staticRoutes = [
-    "/",
-    "/archive",
-    "/tags",
-    "/terms",
-    "/privacy",
-  ].map((path) => ({
-    url: absoluteUrl(path),
-  }));
+  const staticRoutes = ["/", "/archive", "/tags", "/terms", "/privacy"].map(
+    (path) => ({
+      url: absoluteUrl(path),
+    }),
+  );
 
   // No lastModified: a post's frontmatter date is its publication date, not a
   // modification date, and nothing else records one. Add it here, and as the
