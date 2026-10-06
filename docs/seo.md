@@ -110,11 +110,15 @@ two ways. There is no list of pages: the inventory is each app's own
 `/sitemap.xml`.
 
 - `pnpm seo:check` (part of `pnpm validate`, after the build): the rules'
-  own tests with one failing fixture per rule, plus the build output. Docs and
-  Lab are static, so every sitemap page is checked in full (15 documents).
-  Root and Dump render documents per request, so only their static files
-  (sitemap, robots, manifest, RSS) are read from `.next`. It needs the apps
-  built with `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com` and no sockets.
+  own tests with one failing fixture per rule, plus the public build output of
+  the static apps. Docs and Lab publish plain files in `dist/`, so their
+  sitemap, robots.txt, manifest and every sitemap document are checked in full.
+  Root and Dump render documents per request, and their sitemap, robots,
+  manifest and RSS come from Next routes whose build layout is private to Next,
+  so this check deliberately does not read `.next`: a harmless Next update must
+  not fail validation. `pnpm seo:verify` checks all four apps, those included.
+  It needs the apps built with `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com`
+  and no sockets.
 - `pnpm seo:verify`: starts (or reuses) the four built apps and checks every
   sitemap document over local HTTP, all 71 today, plus content types, social
   image and icon URLs, the search canonical with a query string, missing routes
