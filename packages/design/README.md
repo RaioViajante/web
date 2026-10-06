@@ -11,17 +11,16 @@ and [docs/blocks.md](../../docs/blocks.md). Migration status:
 ## Layout
 
 ```text
-styles/      tokens.css, base.css, blocks.css (styles.css imports all three)
+styles/      tokens.css, base.css, blocks.css, search.css (styles.css imports them);
+             fonts.css for Astro
+fonts/       Noto Sans Mono: Latin variable WOFF2 for pages, TTF weights for social cards
 assets/      character/, stickers/, search/ (search/head/ frames + sprite), gallery/
 sound/       Web Audio synthesis, sound map, shared preference, player
 blocks/      Shiki theme, highlighting, markup builder, rehype/remark plugins, client behavior
 components/  Shell, page parts, soft blocks, lab bench, legal and 404 templates
-behavior.ts  one client script: sound toggle, block behavior, 404 path
+behavior.ts  one client script: sound, blocks, search, scroll, avatar, 404 path
+seo.ts       metadata, sitemap and robots conventions; social-image.tsx renders cards
 ```
-
-The older `tokens.css`, `editorial-tokens.css`, `editorial.css` and
-`editorial-sound` entries stay until the apps move to the files above; the
-migration plan lists them for removal.
 
 ## Use
 
