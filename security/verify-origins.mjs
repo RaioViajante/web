@@ -5,6 +5,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   classify,
+  frameInternalOrigins,
+  judge,
   sites,
   siblingOrigins,
   violations,
@@ -74,16 +76,21 @@ let id = 0;
 const pending = new Map();
 let requests = [];
 let top;
+const frameHosts = new Map();
 ws.onmessage = ({ data }) => {
   const message = JSON.parse(data);
   if (message.id && pending.has(message.id)) {
     pending.get(message.id)(message);
     pending.delete(message.id);
-  } else if (message.method === "network.beforeRequestSent")
-    requests.push({
-      url: message.params.request.url,
-      frame: message.params.context !== top,
-    });
+  } else if (message.method === "network.beforeRequestSent") {
+    const { context } = message.params;
+    const url = message.params.request.url;
+    const frame = context !== top;
+    // A frame's first request is its own document: that is the frame host.
+    if (frame && !frameHosts.has(context))
+      frameHosts.set(context, new URL(url).origin);
+    requests.push({ url, frame, frameHost: frameHosts.get(context) });
+  }
 };
 const send = (method, params = {}) =>
   new Promise((resolve) => {
@@ -234,24 +241,49 @@ else {
       `dump ${long}: ${before.length} giscus/GitHub request(s) before the trigger`,
     );
   record("dump", `${long} (before comments trigger)`, "page");
-  requests = [];
-  await evaluate("document.querySelector('#comments').scrollIntoView(); 1");
-  await sleep(7000);
-  const hosts = new Set(requests.map((r) => new URL(r.url).origin));
-  for (const need of ["https://giscus.app", "https://github.githubassets.com"])
-    if (!hosts.has(need))
-      failures.push(
-        `dump ${long}: expected ${need} after the trigger, saw ${[...hosts].join(", ")}`,
-      );
-  if (requests.filter((r) => r.url.endsWith("/client.js")).length !== 1)
-    failures.push(
-      `dump ${long}: giscus client.js was not requested exactly once`,
+  if (process.env.ORIGINS_SKIP_THIRD_PARTY) {
+    console.log(
+      "Skipped the giscus states (ORIGINS_SKIP_THIRD_PARTY): they need the public internet.",
     );
-  const frames = requests.filter((r) => r.frame).length;
-  console.log(
-    `comments after trigger: ${[...hosts].join(", ")} (${frames} of ${requests.length} requests reported from a frame)`,
-  );
-  record("dump", `${long} (after comments trigger)`, "comments");
+  } else {
+    // After the trigger: the page may contact giscus.app; the frame must be
+    // served from giscus.app; what the frame loads is reported only.
+    requests = [];
+    await evaluate("document.querySelector('#comments').scrollIntoView(); 1");
+    await sleep(7000);
+    const hosts = new Set(requests.map((r) => new URL(r.url).origin));
+    if (!hosts.has("https://giscus.app"))
+      failures.push(
+        `dump ${long}: expected https://giscus.app after the trigger, saw ${[...hosts].join(", ")}`,
+      );
+    if (requests.filter((r) => r.url.endsWith("/client.js")).length !== 1)
+      failures.push(
+        `dump ${long}: giscus client.js was not requested exactly once`,
+      );
+    if (![...frameHosts.values()].includes("https://giscus.app"))
+      failures.push(
+        `dump ${long}: no frame was served from https://giscus.app`,
+      );
+    record("dump", `${long} (after comments trigger)`, "comments");
+
+    // Returning from GitHub sign-in: `?giscus=` loads giscus at once, with no
+    // scroll, so giscus can finish the sign-in. A made-up value is enough to
+    // see the load; no real token is used or stored.
+    await visit(`${local("dump")}${long}?giscus=origins-check`);
+    await sleep(7000);
+    // Judge by the DOM: giscus.js may come from the HTTP cache after the
+    // earlier state, which produces no network request to count.
+    const state = JSON.parse(
+      await evaluate(
+        "JSON.stringify({ scripts: document.querySelectorAll('script[src*=\"giscus.app\"]').length, frames: document.querySelectorAll('iframe.giscus-frame').length, scrolled: window.scrollY })",
+      ),
+    );
+    if (state.scripts !== 1 || state.frames < 1 || state.scrolled !== 0)
+      failures.push(
+        `dump ${long}?giscus=…: expected giscus to load once without scrolling on a sign-in return, got ${JSON.stringify(state)}`,
+      );
+    record("dump", `${long}?giscus=… (sign-in return, no scroll)`, "comments");
+  }
 }
 
 // Classify everything.
@@ -267,10 +299,13 @@ for (const site of sites)
 
 const origins = new Map();
 for (const item of observed) {
-  const c = classify(item.url, item.app, item.state, ownOrigins(item.app));
-  const key = `${item.app} ${c.kind} ${c.origin}`;
+  const v = judge(item, item.state, ownOrigins(item.app));
+  const key = `${item.app} ${v.verdict === "fail" ? "FAIL" : v.kind} ${v.origin}`;
   origins.set(key, (origins.get(key) ?? 0) + 1);
 }
+const internal = frameInternalOrigins(observed, stateOf, ownOrigins);
+for (const [origin, count] of [...internal].sort())
+  console.log(`frame-internal (reported, not enforced) ${origin} (${count})`);
 for (const [key, count] of [...origins].sort())
   console.log(`${key} (${count} requests)`);
 console.log(`${pages} sitemap pages, ${observed.length} requests inspected`);

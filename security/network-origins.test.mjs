@@ -3,6 +3,9 @@ import test from "node:test";
 import { contentSecurityPolicy, siteOrigins } from "./headers.ts";
 import {
   classify,
+  frameHosts,
+  frameInternalOrigins,
+  judge,
   siblingOrigins,
   sites,
   thirdParties,
@@ -24,12 +27,12 @@ test("only dump has third parties, and only after comments load", () => {
     assert.deepEqual(thirdPartyAllowances(site, "page"), []);
     assert.equal(
       thirdPartyAllowances(site, "comments").length,
-      site === "dump" ? 2 : 0,
+      site === "dump" ? 1 : 0,
     );
   }
   assert.deepEqual(
     thirdPartyAllowances("dump", "comments").map((item) => item.origin),
-    ["https://giscus.app", "https://github.githubassets.com"],
+    ["https://giscus.app"],
   );
 });
 
@@ -38,10 +41,14 @@ test("the allowlist agrees with the CSP in both directions", () => {
     const csp = contentSecurityPolicy(site, "abcdefghijklmnopqrstuv==");
     for (const origin of siblingOrigins(site))
       assert.ok(csp.includes(origin), `${site}: sibling ${origin} not in CSP`);
+    // Page-level origins and frame hosts must be allowed by our CSP...
     for (const item of thirdParties[site]?.comments ?? [])
-      // Page-level origins must be allowed by the CSP; frame-level ones are
-      // governed by the frame's own policy and must not widen ours.
-      assert.equal(csp.includes(item.origin), item.via === "page", item.origin);
+      assert.ok(csp.includes(item.origin), item.origin);
+    for (const host of frameHosts[site] ?? [])
+      assert.match(csp, new RegExp(`frame-src ${host}`), host);
+    // ...and what a frame loads is the frame owner's business: never listed.
+    assert.ok(!csp.includes("githubassets.com"));
+    assert.ok(!csp.includes("githubusercontent.com"));
     assert.ok(
       (thirdParties[site]?.comments ?? []).every(
         (item) => item.reason.length > 20,
@@ -83,6 +90,73 @@ test("classification", () => {
     "about:blank",
   ])
     assert.equal(dump(url), "internal", url);
+});
+
+test("parent-page origins hard fail; frame hosts are enforced; frame internals are reported", () => {
+  const ob = (url, extra = {}) => ({
+    app: "dump",
+    page: "/posts/x",
+    url,
+    ...extra,
+  });
+  const own = ["http://dump.localhost:3001"];
+  const judged = (observation, state = "comments") =>
+    judge(observation, state, own);
+  // The document itself.
+  assert.equal(judged(ob("https://giscus.app/client.js")).verdict, "ok");
+  assert.equal(judged(ob("https://tracker.example/p.gif")).verdict, "fail");
+  assert.equal(
+    judged(ob("https://giscus.app/client.js"), "page").verdict,
+    "fail",
+  );
+  // Inside an approved frame: whatever it loads is reported, not enforced.
+  const inFrame = (url) =>
+    ob(url, { frame: true, frameHost: "https://giscus.app" });
+  for (const url of [
+    "https://github.githubassets.com/images/mona-loading-default.gif",
+    "https://avatars.githubusercontent.com/u/1?v=4",
+    "https://some-new-cdn.example/x.js",
+  ])
+    assert.deepEqual(judged(inFrame(url)).verdict, "report", url);
+  assert.equal(
+    judged(inFrame("http://dump.localhost:3001/giscus.css")).verdict,
+    "ok",
+  );
+  // The frame's own host and internal URLs are not "frame-internal" findings.
+  assert.equal(judged(inFrame("https://giscus.app/en/widget")).verdict, "ok");
+  assert.equal(judged(inFrame("data:image/png;base64,AA")).verdict, "ok");
+  assert.equal(
+    judged(ob("data:image/png;base64,AA", { frame: true })).verdict,
+    "ok",
+  );
+  assert.equal(
+    judged(inFrame("https://docs.raioviajante.com/search-index.json")).verdict,
+    "ok",
+  );
+  // A frame served from anywhere else fails, whatever it loads.
+  const wrongHost = ob("https://giscus.app/x", {
+    frame: true,
+    frameHost: "https://evil.example",
+  });
+  assert.match(
+    judged(wrongHost).message,
+    /unexpected frame host https:\/\/evil\.example/,
+  );
+  assert.match(
+    judged(ob("https://giscus.app/x", { frame: true })).message,
+    /unexpected frame host \(unknown\)/,
+  );
+  // Reporting lists the frame-internal origins with counts.
+  const seen = frameInternalOrigins(
+    [
+      inFrame("https://github.githubassets.com/a.gif"),
+      inFrame("https://github.githubassets.com/b.gif"),
+      ob("https://giscus.app/client.js"),
+    ],
+    () => "comments",
+    () => own,
+  );
+  assert.deepEqual([...seen], [["https://github.githubassets.com", 2]]);
 });
 
 test("a violation names app, page, origin and URL", () => {
