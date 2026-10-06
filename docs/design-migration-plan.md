@@ -197,12 +197,14 @@ packages/design/
   assets/
     character/   avatar.png, head-box.png
     stickers/    not-found.png, work-of-art.png, work-of-art-pt.png, sitting.png, sticker-sheet.png
-    search/      search-character.png, head/ (frame-01…10.png, sprite.webp, sprite.png, static.png)
+    search/      search-character.png, head/static.png
+    character/avatar-frames/ frame-01…10.png
     gallery/     nine .webp files
   sound/         events.ts (the sound map), synth.ts, preference.ts, player.ts, init.ts, index.ts
   blocks/        theme.ts, highlight.ts, meta.ts, model.ts, build.ts, rehype.ts, client.ts, index.ts
-  components/    Shell.tsx, page.tsx, blocks.tsx, lab.tsx, templates.tsx, art.tsx, gallery.ts, sites.ts, index.ts
-  behavior.ts, behavior-react.tsx
+  components/    Shell.tsx, page.tsx, blocks.tsx, lab.tsx, templates.tsx, art.tsx, gallery.ts, sites.ts, search.tsx, index.ts
+  search/        client.ts
+  behavior.ts, behavior-react.tsx, search-react.tsx
   tests/         blocks, components, sound
   (kept until the apps move: tokens.css, editorial-tokens.css, editorial.css, editorial-sound.ts)
 ```
@@ -222,28 +224,27 @@ interactions.
 All files are in `packages/design/assets/`. Sources are in the local handoff
 `art-concepts/`.
 
-| Source                                               | New path                                    | Notes                                                |
-| ---------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------- |
-| `04.png`                                             | `character/avatar.png`                      | 256px; frame 04 is the centered avatar the root uses |
-| `01.png` … `10.png`                                  | `search/head/frame-01.png` … `frame-10.png` | 96px; see decision D1                                |
-| `01`–`10` composed                                   | `search/head/sprite.webp`, `sprite.png`     | 960×96, ten 96px frames                              |
-| `04.png`                                             | `search/head/static.png`                    | 64px, reduced-motion frame                           |
-| `search.png`                                         | `search/search-character.png`               | 640px, hand on chin                                  |
-| `work-of-art.png`                                    | `stickers/work-of-art.png`                  | 640px                                                |
-| `work-of-art-pt.png`                                 | `stickers/work-of-art-pt.png`               | Portuguese version                                   |
-| `404-not-found.png`                                  | `stickers/not-found.png`                    | 640px                                                |
-| `readme.png`                                         | `stickers/sitting.png`                      | sitting pose, no current use                         |
-| `Artwork/Chibi Character Sticker Sheet.png`          | `stickers/sticker-sheet.png`                | source sheet                                         |
-| `favicon.png`                                        | `character/head-box.png`                    | head in a box, 512px                                 |
-| `Artwork/ChatGPT Image Oct 5, 2026, 01_19_29 AM.png` | `gallery/cow-muhh.webp`                     |                                                      |
-| `Artwork/Moonlit Castle Chase.png`                   | `gallery/graveyard-run.webp`                |                                                      |
-| `Artwork/Neon Code Lab Celebration.png`              | `gallery/laboratory.webp`                   |                                                      |
-| `Artwork/Playful Calves in Motion.png`               | `gallery/calves-playing.webp`               |                                                      |
-| `Artwork/Sad Man, Goofy Mirror Reflection.png`       | `gallery/mirror-donkey.webp`                |                                                      |
-| `Artwork/Three Playful Cats on Purple.png`           | `gallery/black-cats.webp`                   |                                                      |
-| `Artwork/Tired Patient and Binary Monitor.png`       | `gallery/hospital-bed.webp`                 |                                                      |
-| `Artwork/Ukulele Sunset Beneath the Tree.png`        | `gallery/sunset-guitar.webp`                |                                                      |
-| `Artwork/Melancholic Purple Portrait.png`            | `gallery/purple-portrait.webp`              |                                                      |
+| Source                                               | New path                                                | Notes                                                |
+| ---------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- |
+| `04.png`                                             | `character/avatar.png`                                  | 256px; frame 04 is the centered avatar the root uses |
+| `01.png` … `10.png`                                  | `character/avatar-frames/frame-01.png` … `frame-10.png` | 96px; reserved for root avatar                       |
+| crop of `search.png`                                 | `search/head/static.png`                                | 64px hand-on-chin search head                        |
+| `search.png`                                         | `search/search-character.png`                           | 640px, hand on chin                                  |
+| `work-of-art.png`                                    | `stickers/work-of-art.png`                              | 640px                                                |
+| `work-of-art-pt.png`                                 | `stickers/work-of-art-pt.png`                           | Portuguese version                                   |
+| `404-not-found.png`                                  | `stickers/not-found.png`                                | 640px                                                |
+| `readme.png`                                         | `stickers/sitting.png`                                  | sitting pose, no current use                         |
+| `Artwork/Chibi Character Sticker Sheet.png`          | `stickers/sticker-sheet.png`                            | source sheet                                         |
+| `favicon.png`                                        | `character/head-box.png`                                | head in a box, 512px                                 |
+| `Artwork/ChatGPT Image Oct 5, 2026, 01_19_29 AM.png` | `gallery/cow-muhh.webp`                                 |                                                      |
+| `Artwork/Moonlit Castle Chase.png`                   | `gallery/graveyard-run.webp`                            |                                                      |
+| `Artwork/Neon Code Lab Celebration.png`              | `gallery/laboratory.webp`                               |                                                      |
+| `Artwork/Playful Calves in Motion.png`               | `gallery/calves-playing.webp`                           |                                                      |
+| `Artwork/Sad Man, Goofy Mirror Reflection.png`       | `gallery/mirror-donkey.webp`                            |                                                      |
+| `Artwork/Three Playful Cats on Purple.png`           | `gallery/black-cats.webp`                               |                                                      |
+| `Artwork/Tired Patient and Binary Monitor.png`       | `gallery/hospital-bed.webp`                             |                                                      |
+| `Artwork/Ukulele Sunset Beneath the Tree.png`        | `gallery/sunset-guitar.webp`                            |                                                      |
+| `Artwork/Melancholic Purple Portrait.png`            | `gallery/purple-portrait.webp`                          |                                                      |
 
 Gallery images are WebP at 1600px wide at most, quality 82. Frames, stickers
 and character images are palette PNGs. A test fails if two files in `assets/`
@@ -261,16 +262,14 @@ are byte-identical.
 
 ### 2.5 Decisions and deviations
 
-- **D1. Frames 01–10 are avatar frames, not search-icon frames.** The ten
+- **D1. Resolved: frames 01–10 are avatar frames, not search-icon frames.** The ten
   files in `art-concepts/` (01–10) are the round avatar animation (blank
   circle, the avatar, the avatar with a cat, and so on). They match the
   frames the root already ships in `apps/root/public/art/avatar/`. The brief
-  calls them the "search-icon animation frames", so I followed the brief's paths
-  (`search/head/frame-NN.png`, `sprite`, `static`) and built the sprite from
-  them. The search head the handoff draws (`assets/search-icon.png`, a crop of
-  the hand-on-chin pose) has no original animation frames. Confirm that the
-  search head should play the avatar animation; if it should be the
-  hand-on-chin crop, a new set of frames is needed. The root's own avatar
+  calls them the "search-icon animation frames". Phase 3 moved them to
+  `character/avatar-frames/`, cropped the hand-on-chin head from the original
+  search character into `search/head/static.png`, and removed the unused
+  search sprites. The menu head hops in CSS. The root's own avatar
   frames (432px WebP in `apps/root/public/art/avatar/`) are a duplicate of these
   files at a larger size: in Phase 4, serve the root avatar from the package
   (add `character/avatar-frames/` at 432px, or reuse the 256px set) and delete
@@ -280,21 +279,17 @@ are byte-identical.
   Astro components with the two Next.js apps. The shared components are React
   and Astro renders them statically with `@astrojs/react` (checked with a
   throwaway lab build). This adds `@astrojs/react`, `react` and `react-dom` to
-  docs and lab, and conflicts with the sentence "No React, Vue, Svelte, or other
-  UI framework unless a specific experiment needs…" in `apps/lab/AGENTS.md`.
-  Update that sentence when lab adopts the package (Phase 4). Interactivity is
+  docs and lab. `apps/lab/AGENTS.md` now permits shared React rendered
+  statically, with no hydration. Interactivity is
   not React state: it comes from the shared `behavior` script and `data-*`
   attributes.
 - **D3. `raioviajante-design/` was not git-ignored.** The brief says it is; it
   showed as untracked. I added it to `.git/info/exclude` (local only, not
   committed). It is still not in `.gitignore`.
-- **D4. `--bg` is `#191919`, not `#1b1b1b`.** The design marks `--bg` and `--font`
-  as `[CHECK]`. The root's `--rv-editorial-bg` is `#191919`; the font is Noto Sans
-  Mono with `ui-monospace` fallbacks, which the new `--font` keeps. Other
-  values differ between the root and the handoff (`--fg` `#edf1f6` vs
-  `#ececec`, muted `#8792a1` vs `#9aa0a8`, body size) but are not marked
-  `[CHECK]`, so I kept the handoff's values. Compare the root at 1440px in
-  Phase 4 and decide.
+- **D4. Root tokens are the source of truth.** Phase 3 aligned `--bg`, `--fg`,
+  `--fg-2`, `--line`, `--font`, body size, weight, and line height with the
+  root's current editorial CSS. Compare the root at 1440px in Phase 4 after
+  the shell migration and record any remaining visual differences.
 - **D5. The warning callout has no icon.** `docs/sweep.html` draws a triangle
   icon. The system says status is a word and to use no icons where a word
   works, so the label "Warning" and the 1px outline carry it.
@@ -316,15 +311,14 @@ are byte-identical.
 - **D9. CSS class collisions.** `editorial.css` and the new `base.css` both
   define `.rv-leader`, `.rv-footer`, `.rv-sound` and others. An app must switch
   from `editorial.css` to `styles.css` in one commit, not load both.
-- **D10. Vercel Ignored Build Step.** `AGENTS.md` says root's and lab's steps
-  list `../../packages/design` and dump's and docs' do not. `docs/deployment.md`
-  says root, dump and lab list it. dump already imports the package, so check
-  the real setting before deploying. docs must be updated by the owner before
-  docs imports the package. Neither was changed here.
-- **D11. Search head peek and bubble styles** (`.rv-peek`, the "?" bubble, the
-  hop animation) were not copied into `base.css`; Phase 3 owns them and replaces
-  the hop with the sprite animation. `.rv-search` and the search page classes
-  are in `base.css` as a starting point.
+- **D10. Vercel Ignored Build Step.** Phase 3 makes docs a design-package
+  consumer. The owner must apply the `docs/deployment.md` command to dump and
+  docs in Vercel before deployment. Root's and lab's settings already watch
+  `../../packages/design`. No Vercel setting was changed in this session.
+- **D11. Search head peek and bubble styles** live in
+  `packages/design/styles/search.css`. The hand-on-chin head hops once; its
+  "?" bubble appears after 150ms. Reduced motion shows the static head and
+  bubble without the hop.
 
 ### 2.6 Placeholders and open checks found in the handoff
 
@@ -353,7 +347,7 @@ Open checks from DESIGN-SYSTEM.md section 7:
 - Boot sector sections 2–5 are reconstructed: replace with revision e966889.
 - Series on dump (jobs-mcp, orbit, sweep) and reading times are illustrative: compute real ones.
 - Legal pages are a template, not legal advice.
-- The search line for the root ("what are you looking for?") needs confirmation.
+- The root search line is "what are you looking for?" (owner decision, Phase 3).
 
 ---
 
@@ -366,7 +360,7 @@ Branch `feat/design-migration`. Nothing is pushed.
 | 0. Audit and plan      | done        | this file                                                                                   |
 | 1. Shared home         | done        | styles, assets, sound                                                                       |
 | 2. Shared components   | done        | components, blocks, sound, behavior, templates; no app consumes them yet                    |
-| 3. Search              | not started | search menu item, shortcuts, search page, index                                             |
+| 3. Search              | done        | shared menu/page/behavior, four static indexes and routes; pending Vercel settings          |
 | 4. Migrate each site   | not started |                                                                                             |
 | 5. Features to finish  | partly      | `AGENTS.md` / `CLAUDE.md` rules are written; SEO, accessibility and performance work remain |
 | 6. Verify and clean up | not started |                                                                                             |
@@ -374,7 +368,7 @@ Branch `feat/design-migration`. Nothing is pushed.
 ### Phase 1 (done)
 
 - `packages/design/styles/tokens.css`, `base.css`, `blocks.css`, `index.css`
-- `packages/design/assets/` (see 2.3): 9 gallery images, 5 sticker files, 2 character files, `search/search-character.png`, `search/head/` (10 frames, sprite in WebP and PNG, static frame)
+- `packages/design/assets/` (see 2.3): 9 gallery images, 5 sticker files, 2 character files, `search/search-character.png`, `search/head/static.png`, `character/avatar-frames/` (10 frames)
 - `packages/design/sound/`: `events.ts`, `synth.ts`, `preference.ts`, `player.ts`, `init.ts`, `index.ts`
 - `packages/design/editorial-sound.ts`: now a shim over `sound/`
 - Docs copied into the repo: `docs/design-system.md`, `docs/blocks.md`
@@ -397,27 +391,59 @@ pipeline (that happens with the app migration in Phase 4); the markup, the
 plugins and the Next.js and Astro rendering are covered by the package tests and
 the two throwaway builds.
 
+### Phase 3 (done)
+
+- Shared `SearchNavItem` and `SearchPage` in `packages/design/components/search.tsx`;
+  shared CSS in `styles/search.css`; shared browser behavior in
+  `search/client.ts` (shortcuts, live search, scope toggle, grouped results,
+  keyboard selection, and empty state).
+- `/search` and build-time `/search-index.json` on root, dump, docs, and lab.
+  Each endpoint exposes CORS headers for the client-side "everywhere" merge.
+  Dump indexes published post bodies; docs indexes pages and headings; lab
+  indexes experiments; root indexes pages and projects.
+- The root, dump, docs, and lab shells have the search menu item and shortcuts.
+  The rest of each app remains on its existing shell for Phase 4.
+- The hand-on-chin head is cropped from the original search character; the
+  unused search sprite is removed. Avatar frames are retained under
+  `character/avatar-frames/` for Phase 4.
+- `apps/lab/AGENTS.md` now permits static shared React rendering. The design
+  tokens and `docs/design-system.md` use the root's current background,
+  foreground, muted, rule, body size, weight, and leading.
+- `docs/deployment.md` documents the required dump and docs Vercel Ignored
+  Build Step setting. The owner still needs to apply it in Vercel.
+
 ### Checks run
 
-- `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`: format, lint, typecheck, test and build pass for every app and for `packages/design`.
+- Phase 2: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
+  passed for every app and `packages/design` before Phase 3.
+- Phase 3: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
+  passed after the search changes: package and app format, lint, typecheck,
+  35 package tests, 122 dump tests, and production builds for all four apps.
+  The builds emitted `/search` and `/search-index.json` for all four apps.
 - Throwaway pages (not committed): a root page and a lab page rendered `Shell`, `IndexHeader`, `CodeBlock`, `Callout`, `NotFoundPage` and the behavior script; both builds passed and emitted only the artwork they use.
-- Not run: browser checks (Playwright screenshots, axe, keyboard), because no page uses the system yet. The sound voices have not been listened to.
+- Not run in Phase 3: browser screenshots, axe, and manual keyboard checks. The
+  sound voices have not been listened to. Phase 6 owns the full visual and
+  accessibility pass.
 
 ---
 
 ## 4. Next session
 
-The brief asks for Phase 4 next. Phase 4 needs the search item and page from
-Phase 3, which was not started. Do the per-app work below first; each step that
-needs search is marked **(search)** and waits for Phase 3 (or do Phase 3 first).
+Phase 3 is complete. Start Phase 4 with root, then dump, docs, and lab in that
+order. Keep the Phase 3 search routes, indexes, shared markup, CSS, and behavior
+working while each app adopts the shared shell. Do not start Phase 5 or 6.
 
 ### Before you start
 
-1. `git checkout feat/design-migration`; `git log --oneline -12`; `pnpm install`.
+1. Work on `feat/design-migration`; inspect `git status`, `git log --oneline -15`,
+   and the Phase 3 commits. Preserve any pre-existing uncommitted work.
 2. Read `AGENTS.md` (section "Design system migration"), `docs/design-system.md`, `docs/blocks.md`, `packages/design/README.md`, and section 2.5 above.
 3. Open the reference pages in `raioviajante-design/` in a browser (local only).
-4. Run `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` to confirm a clean start.
-5. Ask the owner, before touching docs, to add `../../packages/design` to the docs project's Ignored Build Step (D10). Do not change Vercel settings yourself.
+4. Run `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` to
+   confirm a clean start.
+5. Before deployment, the owner must apply the command in `docs/deployment.md`
+   to the dump and docs Vercel Ignored Build Steps (D10). Do not describe Phase 3
+   as live until those settings and production deployments are confirmed.
 6. Stage files explicitly. One app per commit series; validate the app before each commit.
 
 ### Phase 4a: root (`apps/root`, Next.js)
@@ -427,35 +453,43 @@ needs search is marked **(search)** and waits for Phase 3 (or do Phase 3 first).
 3. Rebuild each page on `Shell` with `site="root"` (about, contact, gallery, privacy, projects, setup, terms, this-site, home). Keep all existing content and text. Home uses `IndexHeader`.
 4. Terms and Privacy: move the existing legal text into `LegalPage` sections without changing the wording.
 5. Add `app/not-found.tsx` with `NotFoundPage` (`site="root"`; line "this page moved, never existed, or I haven't built it yet."; try-instead rows from `raioviajante-design/404.html`).
-6. **(search)** Add the search item and `/search` page.
-7. Compare each page with the reference at 1440px and 390px. Resolve D4 (compare the root before and after) and note any differences.
+6. Keep the existing `/search` page, menu item, and build-time index working
+   after the root shell changes. Remove only obsolete search wrappers.
+7. Compare each page with the reference at 1440px and 390px. Check the aligned
+   D4 tokens against the root before and after, and note any differences.
 8. Validate: `pnpm --filter @raioviajante/root format:check lint typecheck build`.
 
 ### Phase 4b: dump (`apps/dump`, Next.js, MDX)
 
 1. In `next.config.mjs`, replace `rehype-pretty-code` and the inline `shikiTheme` with `remark-directive`, `remarkSoftCallouts` and `rehypeSoftBlocks` from `@raioviajante/design/blocks`. Next's MDX loader needs plugin names as strings or resolvable modules: if the package TypeScript entry cannot be loaded that way, export a small JavaScript wrapper from the package. Keep `remark-frontmatter` and `remark-gfm`, and keep `rehype-slug`.
-2. Switch the layout to `styles.css` and `<Behavior />`; build every page on `Shell` with `site="dump"`. Delete `SiteHeader`, `SiteFooter`, `SoundToggle`, `PrimaryNavigation`, `CodeCopy` and the app's copy of code styles when the shared ones replace them. Keep `PostSearch` until the shared search page replaces it.
+2. Switch the layout to `styles.css` and `<Behavior />`; build every page on `Shell` with `site="dump"`. Delete `SiteHeader`, `SiteFooter`, `SoundToggle`, `PrimaryNavigation`, `CodeCopy`, the now-unused `PostSearch`, and the app's copy of code styles when the shared ones replace them.
 3. Pages: posts index (latest featured, by month, series, follow along), archive and tags (leader lists; tags split recurring/once), post (sidebar TOC from headings, reading progress, numbered sections, computed reading time, metadata leaders, `Pager`, related by tag with `RelatedRows`, "try it in the lab", giscus with a theme built from the tokens in `public/giscus.css`), terms, privacy, `app/not-found.tsx`.
 4. Remove `app/about` and `app/uses` and add permanent redirects from `/about` and `/uses` to `https://raioviajante.com/about` and the matching root page (`redirects()` in `next.config.mjs`). Update `tests/about-page.test.tsx` and `tests/uses-page.test.tsx` (delete them with the pages) and the sitemap.
 5. Series and reading time: compute reading time from the MDX; do not copy the handoff's illustrative series. Add only series that exist in `content/posts`.
-6. **(search)** Search page and index.
+6. Keep the existing `/search` page, menu item, and build-time index working
+   after the dump shell and content pipeline changes.
 7. Tests: update Jest tests that assert the old markup; add tests for the new pages. Keep the RSS, sitemap, robots and OG tests passing.
 8. Validate: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm --filter @raioviajante/dump format:check lint typecheck test build`.
 
 ### Phase 4c: docs (`apps/docs`, Astro + Starlight)
 
-1. After the owner updates the Ignored Build Step: add `@raioviajante/design` (`workspace:*`), `@astrojs/react`, `react`, `react-dom`, and `@types/react` and `@types/react-dom`. Add `integrations: [react()]` in `astro.config.mjs`. Check `pnpm-workspace.yaml` `allowBuilds` if the install asks for it.
+1. The design package, React dependencies, and `react()` integration were
+   added in Phase 3. Keep them while migrating the docs layout. The owner
+   still needs to apply the Vercel Ignored Build Step before deployment.
 2. Decide how much of Starlight stays. The design needs left tree nav, content, "on this page", breadcrumb label, status word, last updated and "edit on GitHub". Keep Starlight for content collections and routing, and override `PageFrame`/`Sidebar`/`TableOfContents`/`Footer` and the page title with shared components, or drop Starlight for a plain Astro content collection. Record the choice in `apps/docs/docs/`.
 3. Replace Starlight's Expressive Code with the shared pipeline (`expressiveCode: false`, then `markdown.remarkPlugins`: `remark-directive`, `remarkSoftCallouts`; `markdown.rehypePlugins`: `rehypeSoftBlocks`; `markdown.syntaxHighlight: false`).
 4. Remove the Google Fonts links (IBM Plex Mono, Source Serif), the theme switcher overrides and `src/styles/theme.css`; load Noto Sans Mono self-hosted or preloaded.
 5. Pages: home (dotted search row, projects with status, standards, "reading these docs"), guide and reference layouts (`raioviajante-design/docs/sweep.html`, `sweep-cli.html`), the rewritten design language page (`docs/components.html`, `design-language.html`; rewrite `src/content/docs/raioviajante/design-language.md` for the new system), terms, privacy, `404.astro`.
 6. Keep `[VERSION]`, `[DATE]`, `[COMMIT]` and other placeholders in the new pages; the existing content in `projects/sweep` and `repository-conventions` stays factual.
-7. **(search)** Search page and index; section numbers in results.
+7. Keep the existing `/search` page, menu item, and build-time index working
+   after the docs layout and content pipeline changes; verify section anchors.
 8. Validate: `pnpm --filter @raioviajante/docs typecheck build` (docs has no lint, format or test scripts: do not invent them).
 
 ### Phase 4d: lab (`apps/lab`, Astro)
 
-1. Add `@astrojs/react`, `react`, `react-dom` and types; `integrations: [react()]`. Update the "No React" sentence in `apps/lab/AGENTS.md` (D2) and `apps/lab/docs/design.md`.
+1. The React dependencies, `react()` integration, and `apps/lab/AGENTS.md`
+   clarification were completed in Phase 3. Update `apps/lab/docs/design.md`
+   for the new shell during the lab migration.
 2. Replace `src/layouts`, `Header.astro`, `Footer.astro` and `src/styles/global.css` with the shared `Shell`, `styles.css` and the `behavior` script. Switch off the old `@raioviajante/design/tokens.css` import.
 3. Pages: experiments index (filter all/active/done, fidelity explained, notebook), the three experiments with `LabBench`, `BenchBand`, `StateMark`, `ActionButton`, terms, privacy, `404.astro`.
 4. Experiments use the existing logic modules (`src/lib/filename-classifier.ts`, `src/lib/execution-states.ts`) and the handoff logic in `source/lab/*.dc.html` (`class Component`, `renderVals()`):
@@ -463,14 +497,16 @@ needs search is marked **(search)** and waits for Phase 3 (or do Phase 3 first).
    - 002 execution states: actions start/succeed/fail/cancel; rejected actions log `rejected: <action> from <STATE>` and change nothing; times from the browser clock; "new example" resets. Verify the rules against the Orbit source (assumed: start from QUEUED; succeed and fail from RUNNING; cancel from QUEUED or RUNNING) and report differences.
    - 003 boot sector: five sections, source and note each, previous/next, progress `n / 5`. Replace the reconstructed code and notes with revision `e966889`; keep `[NOTE FROM LEARNING NOTES]` where there is no real note.
    - Accepted actions call `playSound("success")`, rejected ones `playSound("reject")`; results live in an `aria-live` region.
-5. **(search)** Search page and index (001–003).
+5. Keep the existing `/search` page, menu item, and build-time index working
+   after the lab shell and experiment changes; keep numbers 001–003.
 6. Validate: `pnpm --filter @raioviajante/lab format:check lint typecheck build`.
 
 ### Phase 4e: cross-cutting
 
 - Each app's host 404: Next.js `not-found.tsx` (root, dump); Astro `src/pages/404.astro` (docs, lab). Confirm each builds a `404.html` / not-found response that Vercel serves.
 - Update `docs/architecture.md` and each app's `docs/design.md` so they describe what is implemented, not what is planned.
-- Update `docs/deployment.md` only to match what the owner confirms about the Ignored Build Steps.
+- Update `docs/deployment.md` when the owner confirms the dump and docs Ignored
+  Build Steps were applied in Vercel.
 
 ### Report back
 

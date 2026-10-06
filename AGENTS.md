@@ -129,9 +129,10 @@ Design rules:
   server components; Astro apps render them statically through
   `@astrojs/react` (no hydration). Interactivity comes from the shared
   `behavior` script and `data-*` attributes, not per-app React state.
-- **Packages and deploys.** An app may import `@raioviajante/design` only when
-  its Vercel Ignored Build Step already watches `../../packages/design`. docs
-  does not yet; changing it is the owner's decision.
+- **Packages and deploys.** Every consumer of `@raioviajante/design` must have
+  `../../packages/design` in its Vercel Ignored Build Step. Phase 3 adds docs
+  as a consumer; the owner must apply the documented setting for dump and docs
+  before deploying it.
 
 ## Documentation honesty
 
@@ -183,9 +184,9 @@ Report checks exactly as run; do not claim checks that did not run.
 - Vercel project settings, domains, environment variables, and Ignored Build
   Step commands are production infrastructure. Do not change them unless the
   user explicitly asks.
-- Before an app starts consuming a package from `packages/`, its Ignored Build
-  Step must already list that package's path (for example
-  `../../packages/design`). Today root's and lab's do; dump's and docs' do not.
+- An app consuming a package from `packages/` needs an Ignored Build Step that
+  lists that package's path (for example `../../packages/design`). Root's and
+  lab's do. The owner must add it for dump and docs before deploying Phase 3.
 - `NEXT_PUBLIC_SITE_URL` (dump) is public configuration, not a secret.
 - Do not describe a rollout as live until production actually runs it.
 

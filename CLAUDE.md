@@ -64,6 +64,7 @@ Design rules:
   server components; Astro apps render them statically through
   `@astrojs/react` (no hydration). Interactivity comes from the shared
   `behavior` script and `data-*` attributes, not per-app React state.
-- **Packages and deploys.** An app may import `@raioviajante/design` only when
-  its Vercel Ignored Build Step already watches `../../packages/design`. docs
-  does not yet; changing it is the owner's decision.
+- **Packages and deploys.** Every consumer of `@raioviajante/design` must have
+  `../../packages/design` in its Vercel Ignored Build Step. Phase 3 adds docs
+  as a consumer; the owner must apply the documented setting for dump and docs
+  before deploying it.
