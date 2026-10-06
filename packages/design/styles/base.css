@@ -316,7 +316,8 @@ kbd {
   flex-direction: column;
   gap: 6px;
 }
-.rv-pager a:last-child {
+.rv-pager a[rel="next"] {
+  grid-column: 2;
   align-items: flex-end;
   text-align: right;
 }
@@ -590,6 +591,9 @@ kbd {
   }
   .rv-pager {
     grid-template-columns: 1fr;
+  }
+  .rv-pager a[rel="next"] {
+    grid-column: auto;
   }
   .rv-footer {
     margin-top: 70.4px;
