@@ -97,3 +97,42 @@ Production redirects (www to apex, and whether the hosts redirect
 `/search` to `/search/` for the Astro apps; Astro's local preview does not),
 the live canonical host after deployment, and anything search engines do with
 the markup.
+
+## Automated checks
+
+The contract above is enforced by `seo/metadata-policy.ts` (pure rules) and run
+two ways. There is no list of pages: the inventory is each app's own
+`/sitemap.xml`.
+
+- `pnpm seo:check` (part of `pnpm validate`, after the build): the rules'
+  own tests with one failing fixture per rule, plus the build output. Docs and
+  Lab are static, so every sitemap page is checked in full (15 documents).
+  Root and Dump render documents per request, so only their static files
+  (sitemap, robots, manifest, RSS) are read from `.next`. It needs the apps
+  built with `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com` and no sockets.
+- `pnpm seo:verify`: starts (or reuses) the four built apps and checks every
+  sitemap document over local HTTP, all 71 today, plus content types, social
+  image and icon URLs, the search canonical with a query string, missing routes
+  and the Dump RSS cross-check against each post. Exit code 2 means the apps
+  could not start and nothing was verified. Phase 10 can wire it into CI.
+
+Per page it enforces: one `<title>`, meta description, canonical (absolute
+HTTPS, own production host, no query, equal to the sitemap URL), `lang="en"`,
+no `noindex`, one of each `og:*` and `twitter:*` tag, the theme color token,
+icon, apple-touch-icon and manifest links, Dump's RSS link, and `rel="me"` on
+the Root and Dump GitHub link. Titles and descriptions are unique across all
+documents (the failure names both URLs and the value). Per app: valid sitemap
+(production host, no duplicates, queries, fragments or 404s; `lastmod` only
+where real dates exist and never in the future), robots (Allow, one production
+Sitemap line, nothing blocking a sitemap page), manifest (`display: browser`,
+theme and background color), and Dump's RSS (production URLs, real dates, every
+item in the sitemap). JSON-LD is checked per page class (see Structured data):
+valid JSON, `https://schema.org`, the expected types, production URLs only, one
+shared Person, no author on Docs or Lab, no publisher, no `dateModified` on
+posts, `dateModified` on a docs article only together with the same sitemap
+`lastmod`, breadcrumb positions and URLs that are real sitemap pages, and
+`BlogPosting` headline and date agreeing with the page and the RSS item.
+
+Not covered: that a search engine accepts the markup, Vercel's production
+redirects, and the visual breadcrumb. The HTML is read with small regular
+expressions that match this repository's own markup, not a general parser.

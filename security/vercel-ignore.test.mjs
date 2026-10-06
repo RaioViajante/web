@@ -4,7 +4,13 @@ import test from "node:test";
 
 // Each app's Ignored Build Step must rebuild when shared code outside the app
 // changes, and stay within Vercel's 256-character limit for the command.
-const shared = ["../../packages/design", "../../security", "../../seo"];
+const shared = [
+  "../../package.json",
+  "../../pnpm-*", // lockfile and workspace file
+  "../../packages/design",
+  "../../security",
+  "../../seo",
+];
 
 test("every ignoreCommand is identical, short enough, and watches shared code", async () => {
   const commands = await Promise.all(
