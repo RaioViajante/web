@@ -23,11 +23,13 @@ export function SearchNavItem({
   number,
   current = false,
   href = "/search",
+  label = "search",
   linkComponent,
 }: {
   number: string;
   current?: boolean;
   href?: string;
+  label?: string;
   linkComponent?: LinkComponent;
 }) {
   return (
@@ -40,7 +42,7 @@ export function SearchNavItem({
       data-sound="open"
     >
       <span className="rv-search__num">{number}</span>
-      <span>search</span>
+      <span>{label}</span>
       <span className="rv-search__dots" aria-hidden="true" />
       <span className="rv-peek" aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element -- shared static asset */}

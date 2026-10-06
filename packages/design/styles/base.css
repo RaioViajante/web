@@ -196,7 +196,8 @@ a:hover {
 .rv-section--index {
   --section-gap: 42.24px;
 }
-.rv-section > h2 {
+.rv-section > h2,
+.rv-section__heading > h2 {
   margin: 0 0 15.84px;
   display: flex;
   align-items: baseline;
@@ -245,7 +246,15 @@ a:hover {
     transform var(--ease-note) var(--ease-motion);
 }
 .rv-leader__value--long {
+  flex: 0 1 auto;
+  max-width: 72%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   white-space: normal;
+}
+div.rv-leader:has(.rv-leader__value--long) > span:first-child {
+  min-width: min-content;
+  overflow-wrap: normal;
 }
 a.rv-leader {
   border-radius: 3px;
@@ -381,6 +390,21 @@ kbd {
   border-color: var(--fg-2);
   outline: none;
 }
+.rv-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.rv-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ---------- lab bench (soft surface; the caption says where it runs) ---------- */
 .rv-bench {
@@ -401,6 +425,11 @@ kbd {
   border-radius: var(--radius);
   overflow: hidden;
 }
+.rv-bench + .callout,
+.rv-bench + .block,
+.block + .callout {
+  margin-top: 28px;
+}
 .rv-bench__band {
   padding: 18px 16px;
   border-bottom: 1px solid var(--block-hairline);
@@ -420,6 +449,74 @@ kbd {
   border-color: var(--fg);
   color: var(--bg);
 } /* the only filled shape */
+
+/* Bench content helpers, shared by every interactive surface. */
+.bench-actions,
+.bench-states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.bench-inputs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.bench-inputs label {
+  display: block;
+  min-width: 0;
+}
+.bench-inputs .rv-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.bench-inputs textarea {
+  resize: vertical;
+}
+.bench-states {
+  align-items: center;
+  margin-bottom: 18px;
+}
+.bench-states small {
+  font-size: 12px;
+  color: var(--fg-2);
+}
+.bench-fields {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 24px;
+  margin: 12px 0;
+  font-size: 13px;
+}
+.bench-fields dt {
+  color: var(--fg-3);
+}
+.bench-fields dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.bench-history {
+  padding-left: 24px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.bench-feedback {
+  min-height: 3em;
+  font-size: 14px;
+  margin: 14px 0 8px;
+}
+.bench-help {
+  font-size: 12.5px;
+  color: var(--fg-3);
+  margin: 8px 0;
+}
+@media (max-width: 600px) {
+  .bench-inputs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 
 /* ---------- character ---------- */
 .rv-avatar {
@@ -610,4 +707,12 @@ kbd {
   .rv-leader__dots {
     display: none;
   }
+}
+
+.rv-section__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }

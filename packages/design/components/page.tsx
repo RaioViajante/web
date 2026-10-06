@@ -97,6 +97,7 @@ export function Section({
   title,
   id,
   index = false,
+  headingExtra,
   children,
 }: {
   number: string;
@@ -104,11 +105,20 @@ export function Section({
   id?: string;
   /** Index pages use the larger 80px section gap. */
   index?: boolean;
+  /** Optional controls aligned with the heading (for example lab filters). */
+  headingExtra?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <section className={index ? "rv-section rv-section--index" : "rv-section"}>
-      <SectionHeading number={number} title={title} id={id} />
+      {headingExtra ? (
+        <div className="rv-section__heading">
+          <SectionHeading number={number} title={title} id={id} />
+          {headingExtra}
+        </div>
+      ) : (
+        <SectionHeading number={number} title={title} id={id} />
+      )}
       {children}
     </section>
   );
