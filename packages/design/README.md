@@ -1,27 +1,68 @@
-# Shared design CSS
+# @raioviajante/design
 
-`@raioviajante/design` exposes two visual systems during the site migration:
+The shared design system for raioviajante.com, dump, docs and lab: tokens,
+styles, artwork, sound, soft blocks and the React components that build the
+shared frame. Private, no build step; apps import the source.
 
-- `tokens.css` contains the dark color primitives used by Lab.
-- `editorial-tokens.css` contains the root site's current editorial colors,
-  Noto Sans Mono font specification, type scale, layout measures, and interaction
-  timing. It defines custom properties only, so Astro and Next.js can both use it.
-- `editorial.css` imports `editorial-tokens.css` and provides the existing
-  `.rv-shell` layout and interaction selectors. Root and Dump consume it.
-- `editorial-sound` provides the Root and Dump sound palette and interaction
-  event handling for links and buttons marked with `data-sound`. Inputs marked
-  with `data-sound="typing"` play a quiet key sound while sound is enabled.
+Rules and the full spec: [docs/design-system.md](../../docs/design-system.md)
+and [docs/blocks.md](../../docs/blocks.md). Migration status:
+[docs/design-migration-plan.md](../../docs/design-migration-plan.md).
 
-An app that only needs editorial values imports
-`@raioviajante/design/editorial-tokens.css`. An app using the complete shell
-imports `@raioviajante/design/editorial.css`; it does not need to import the
-tokens separately. The app remains responsible for loading Noto Sans Mono and
-for its own routes, content, and app-specific interactions. The root site loads
-the font through `next/font`.
+## Layout
 
-The shared shell handles hover, keyboard focus, and reduced motion for its own
-selectors. An app introducing additional animations must handle reduced motion
-in its own styles or components.
+```text
+styles/      tokens.css, base.css, blocks.css (styles.css imports all three)
+assets/      character/, stickers/, search/ (search/head/ frames + sprite), gallery/
+sound/       Web Audio synthesis, sound map, shared preference, player
+blocks/      Shiki theme, highlighting, markup builder, rehype/remark plugins, client behavior
+components/  Shell, page parts, soft blocks, lab bench, legal and 404 templates
+behavior.ts  one client script: sound toggle, block behavior, 404 path
+```
 
-Docs does not consume this package yet. Before it imports the package, update
-its Vercel project's Ignored Build Step to watch `../../packages/design`.
+The older `tokens.css`, `editorial-tokens.css`, `editorial.css` and
+`editorial-sound` entries stay until the apps move to the files above; the
+migration plan lists them for removal.
+
+## Use
+
+```ts
+import "@raioviajante/design/styles.css"; // tokens + base + blocks
+import {
+  Shell,
+  PageHeader,
+  Section,
+  LeaderRow,
+} from "@raioviajante/design/components";
+```
+
+- **Next.js**: render `<Behavior />` from `@raioviajante/design/behavior-react`
+  once in the layout. Components are server components.
+- **Astro**: render components with `@astrojs/react` (static, no hydration) and
+  run the behavior from a script:
+  `import { startBehavior } from "@raioviajante/design/behavior"; startBehavior();`
+- **Markdown/MDX**: `remark-directive`, then `remarkSoftCallouts` and
+  `rehypeSoftBlocks` from `@raioviajante/design/blocks` (fence syntax in
+  [docs/blocks.md](../../docs/blocks.md)).
+- **Sound**: add `data-sound="nav"` (and the kinds in `sound/events.ts`) to
+  elements; call `playSound("success")` for events without an element. Nothing
+  plays on load.
+- **Artwork**: `<Art name="avatar" alt="…" />`; gallery images come from
+  `@raioviajante/design/gallery`. Never copy files into an app.
+
+## Shared sound preference
+
+The preference is the `rv-sound` cookie on `.raioviajante.com`. The old
+`rv-sound` localStorage value (root, dump) is migrated on first read.
+
+## Checks
+
+```sh
+pnpm --filter @raioviajante/design format:check
+pnpm --filter @raioviajante/design typecheck
+pnpm --filter @raioviajante/design test
+```
+
+## Deployment
+
+An app that consumes this package needs `../../packages/design` in its Vercel
+Ignored Build Step. See [docs/deployment.md](../../docs/deployment.md).

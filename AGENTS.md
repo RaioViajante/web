@@ -75,6 +75,64 @@ to enforce it.
 - Do not default to generic SaaS layouts, card-heavy dashboards, bento grids,
   gratuitous gradients, decorative blobs, or glassmorphism.
 
+## Design system migration
+
+Applies to the work tracked in `docs/design-migration-plan.md` (branch
+`feat/design-migration`). Read that file first: it holds the full spec, the
+status of each phase, and exact instructions for the next session. Rules and
+tokens: `docs/design-system.md`. Blocks: `docs/blocks.md`.
+
+Working rules for every agent:
+
+- Work on `feat/design-migration`. Do not create another branch.
+- `raioviajante-design/` is the local design handoff. It is not part of the
+  repository: never commit it, never delete it, never link to it from
+  committed files. Copy what the repo needs (artwork into
+  `packages/design/assets`, docs into `docs/`).
+- Stage files explicitly. Never run `git add -A` or `git add .`.
+- Commit after each coherent, validated step. Never push, amend, rebase shared
+  commits, or force-push.
+- Keep every `[CONFIRM]`, `[DATE]`, `[VERSION]`, `[COMMIT]`, `[REVISION]` and
+  similar placeholder. Never invent facts to fill one.
+
+Design rules:
+
+- **Shared only.** Anything that appears on more than one page or site is one
+  implementation in `packages/design` (components, styles, sound, blocks,
+  artwork). Apps import it; never copy markup, CSS, scripts, or images into an
+  app. App-specific pieces stay in the app.
+- **No hardcoded colors.** Use the tokens in `packages/design/styles/tokens.css`
+  (`var(--fg)`, `var(--block)`, `--syn-*`). Literal color values belong only in
+  `tokens.css` and the Shiki theme, which mirrors `--syn-*` (a test checks it).
+  The page is gray; color appears only inside code and lab bench output.
+- **No icons where a word works.** Status is a word, warnings escalate by rule
+  weight, selection is an underline or a 1px left rule. Never: gradients, glow,
+  shadows, bento grids, colored badges, emoji, a second typeface, an accent
+  color for links.
+- **One typeface:** Noto Sans Mono. Each app loads its own font files.
+- **No duplicated assets.** Artwork lives only in `packages/design/assets`, is
+  exported at the sizes it is displayed, and is used through `Art`/`gallery`
+  (static imports). Images need explicit width and height; lazy-load below the
+  fold.
+- **Sound.** Sounds are synthesized with Web Audio in `packages/design/sound`;
+  there are no audio files. Mark elements with `data-sound`, or call
+  `playSound(kind)`. Never play on page load. One preference: the `rv-sound`
+  cookie on `.raioviajante.com`. Respect reduced motion.
+- **Character.** The avatar belongs to index headers (112px), the search
+  character to the search page, the "404" sticker to every 404, the
+  "work of art" sticker to empty search. The search head is never smaller than
+  28px. Do not add the character anywhere else without being asked.
+- **Soft blocks.** Code, terminals, diffs, callouts, tables and figures use the
+  markup in `docs/blocks.md`, built by `packages/design/blocks`. Code is
+  highlighted at build time with the shared theme; no stock Shiki theme.
+- **Frameworks.** Shared components are React. Next.js apps render them as
+  server components; Astro apps render them statically through
+  `@astrojs/react` (no hydration). Interactivity comes from the shared
+  `behavior` script and `data-*` attributes, not per-app React state.
+- **Packages and deploys.** An app may import `@raioviajante/design` only when
+  its Vercel Ignored Build Step already watches `../../packages/design`. docs
+  does not yet; changing it is the owner's decision.
+
 ## Documentation honesty
 
 - Distinguish what is implemented, designed, planned, or experimental. Never

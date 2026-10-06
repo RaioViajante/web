@@ -54,7 +54,7 @@ packages/* never depend on apps/*
 
 ```text
 packages/
-└── design/    @raioviajante/design — color and editorial design CSS
+└── design/    @raioviajante/design — design system: tokens, styles, artwork, sound, blocks, components
 ```
 
 An app depends on a package through `workspace:*` and imports it through the
@@ -101,6 +101,13 @@ typography, and layout behavior.
 | lab  | yes                             |
 | dump | yes                             |
 | docs | no                              |
+
+The package also contains the design system that is replacing the editorial
+and color-primitive entries above: `styles/`, `assets/`, `sound/`, `blocks/`,
+`components/`, and `behavior`. These are built and tested in the package, and
+no app consumes them yet. The migration, with its status and the remaining
+phases, is tracked in [design-migration-plan](design-migration-plan.md); the
+rules are in [design-system](design-system.md) and [blocks](blocks.md).
 
 Each consumer documents its own mapping: see root's
 [design notes](../apps/root/docs/design.md) and lab's
