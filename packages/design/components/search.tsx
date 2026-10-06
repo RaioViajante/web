@@ -1,4 +1,5 @@
 import { Art, art } from "./art";
+import { SiteLink, type LinkComponent } from "./link";
 import type { SiteId } from "./sites";
 
 export interface SearchEntry {
@@ -22,13 +23,16 @@ export function SearchNavItem({
   number,
   current = false,
   href = "/search",
+  linkComponent,
 }: {
   number: string;
   current?: boolean;
   href?: string;
+  linkComponent?: LinkComponent;
 }) {
   return (
-    <a
+    <SiteLink
+      linkComponent={linkComponent}
       href={href}
       className="rv-search"
       aria-current={current ? "page" : undefined}
@@ -46,7 +50,7 @@ export function SearchNavItem({
       <span className="rv-search__key" data-search-key>
         ⌘K
       </span>
-    </a>
+    </SiteLink>
   );
 }
 

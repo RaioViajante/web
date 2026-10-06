@@ -13,12 +13,19 @@ function fillRequestedPath() {
   document
     .querySelectorAll<HTMLElement>("[data-requested-path]")
     .forEach((node) => {
-      node.textContent = window.location.pathname;
+      if (node.textContent !== window.location.pathname)
+        node.textContent = window.location.pathname;
     });
 }
 
 export function startBehavior() {
   const stops = [initSound(), attachBlocks(), attachSearch()];
   fillRequestedPath();
-  return () => stops.forEach((stop) => stop());
+  // Client-side navigation swaps the page without reloading the script.
+  const observer = new MutationObserver(fillRequestedPath);
+  observer.observe(document.body, { childList: true, subtree: true });
+  return () => {
+    observer.disconnect();
+    stops.forEach((stop) => stop());
+  };
 }

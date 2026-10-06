@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { SiteLink, type LinkComponent } from "./link";
 import { CONTACT, SITES, type SiteId } from "./sites";
 
 export interface NavItem {
@@ -16,6 +17,7 @@ export interface NavGroupProps {
   ariaLabel?: string;
   /** Rendered inside the group after the items (the search menu item). */
   extra?: ReactNode;
+  linkComponent?: LinkComponent;
 }
 
 const pad = (index: number) => `${String(index).padStart(2, "0")}.`;
@@ -26,20 +28,22 @@ export function NavGroup({
   current,
   ariaLabel,
   extra,
+  linkComponent,
 }: NavGroupProps) {
   return (
     <nav className="rv-nav" aria-label={ariaLabel ?? label.toLowerCase()}>
       <div className="rv-label">{label}</div>
       {items.map((item, index) => (
-        <a
+        <SiteLink
           key={item.href}
+          linkComponent={linkComponent}
           href={item.href}
           data-sound="nav"
           aria-current={item.href === current ? "page" : undefined}
         >
           <span className="rv-nav__num">{item.number ?? pad(index)}</span>
           <span>{item.label}</span>
-        </a>
+        </SiteLink>
       ))}
       {extra}
     </nav>
@@ -67,12 +71,14 @@ export interface FooterProps {
   /** This site's own legal pages. */
   termsHref?: string;
   privacyHref?: string;
+  linkComponent?: LinkComponent;
 }
 
 export function Footer({
   site,
   termsHref = "/terms",
   privacyHref = "/privacy",
+  linkComponent,
 }: FooterProps) {
   return (
     <footer className="rv-footer">
@@ -97,13 +103,21 @@ export function Footer({
       </div>
       <div>CNPJ: {CONTACT.cnpj}</div>
       <nav aria-label="Legal">
-        <a href={termsHref} data-sound="nav">
+        <SiteLink
+          linkComponent={linkComponent}
+          href={termsHref}
+          data-sound="nav"
+        >
           Terms of Use
-        </a>
+        </SiteLink>
         <span aria-hidden="true"> · </span>
-        <a href={privacyHref} data-sound="nav">
+        <SiteLink
+          linkComponent={linkComponent}
+          href={privacyHref}
+          data-sound="nav"
+        >
           Privacy Policy
-        </a>
+        </SiteLink>
       </nav>
     </footer>
   );
@@ -139,6 +153,7 @@ export function Shell({
   children,
   ...footer
 }: ShellProps) {
+  const { linkComponent } = footer;
   return (
     <>
       <a className="rv-skip" href="#main">
@@ -152,6 +167,7 @@ export function Shell({
             items={pages}
             current={currentPage}
             extra={pagesExtra}
+            linkComponent={linkComponent}
           />
           {toc?.length ? (
             <NavGroup
@@ -159,6 +175,7 @@ export function Shell({
               items={toc}
               current={currentToc}
               ariaLabel="on this page"
+              linkComponent={linkComponent}
             />
           ) : null}
           {experiments?.length ? (
@@ -166,6 +183,7 @@ export function Shell({
               label="EXPERIMENTS"
               items={experiments}
               current={currentExperiment}
+              linkComponent={linkComponent}
             />
           ) : null}
         </aside>

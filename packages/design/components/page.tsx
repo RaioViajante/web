@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 import { Art } from "./art";
+import { SiteLink, type LinkComponent } from "./link";
 import { siteById, type SiteId } from "./sites";
 
 /** Index header: avatar, site name, one line. */
@@ -120,6 +121,7 @@ export function LeaderRow({
   href,
   sound = "nav",
   describedBy,
+  linkComponent,
 }: {
   label: ReactNode;
   value?: ReactNode;
@@ -127,6 +129,7 @@ export function LeaderRow({
   sound?: string;
   /** Id of a tooltip that describes the link. */
   describedBy?: string;
+  linkComponent?: LinkComponent;
 }) {
   const content = (
     <>
@@ -146,14 +149,15 @@ export function LeaderRow({
     </>
   );
   return href ? (
-    <a
+    <SiteLink
+      linkComponent={linkComponent}
       className="rv-leader"
       href={href}
       data-sound={sound}
       aria-describedby={describedBy}
     >
       {content}
-    </a>
+    </SiteLink>
   ) : (
     <div className="rv-leader">{content}</div>
   );
@@ -166,23 +170,41 @@ export interface PagerLink {
 }
 
 /** Previous / next: caps label above the title, no box. */
-export function Pager({ prev, next }: { prev?: PagerLink; next?: PagerLink }) {
+export function Pager({
+  prev,
+  next,
+  linkComponent,
+}: {
+  prev?: PagerLink;
+  next?: PagerLink;
+  linkComponent?: LinkComponent;
+}) {
   if (!prev && !next) return null;
   return (
     <nav className="rv-pager" aria-label="Previous and next">
       {prev ? (
-        <a href={prev.href} rel="prev" data-sound="nav">
+        <SiteLink
+          linkComponent={linkComponent}
+          href={prev.href}
+          rel="prev"
+          data-sound="nav"
+        >
           <span className="rv-label">{prev.label}</span>
           <span>{prev.title}</span>
-        </a>
+        </SiteLink>
       ) : (
         <span />
       )}
       {next ? (
-        <a href={next.href} rel="next" data-sound="nav">
+        <SiteLink
+          linkComponent={linkComponent}
+          href={next.href}
+          rel="next"
+          data-sound="nav"
+        >
           <span className="rv-label">{next.label}</span>
           <span>{next.title}</span>
-        </a>
+        </SiteLink>
       ) : null}
     </nav>
   );

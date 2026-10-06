@@ -43,3 +43,4 @@ export {
   type LegalSection,
   type TryInstead,
 } from "./templates";
+export { SiteLink, isInternal, type LinkComponent } from "./link";

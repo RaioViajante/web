@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Art } from "./art";
+import { type LinkComponent } from "./link";
 import { LeaderRow, PageHeader, Section } from "./page";
 import { siteById, type SiteId } from "./sites";
 
@@ -68,12 +69,14 @@ export function NotFoundPage({
   line,
   tryInstead,
   ask,
+  linkComponent,
 }: {
   site: SiteId;
   line: string;
   tryInstead: TryInstead[];
   /** "ask RaioViajante" row, from the search menu item component. */
   ask?: ReactNode;
+  linkComponent?: LinkComponent;
 }) {
   const host = siteById(site).label;
   return (
@@ -118,6 +121,7 @@ export function NotFoundPage({
             label={row.label}
             value={row.value}
             href={row.href}
+            linkComponent={linkComponent}
           />
         ))}
       </Section>
