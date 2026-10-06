@@ -187,8 +187,7 @@
   margin: 22px 0 36px;
   color: var(--fg-3);
 }
-.rv-search-scope button,
-.rv-search-suggestions button {
+.rv-search-scope button {
   min-height: var(--touch);
   min-width: var(--touch);
   color: inherit;
@@ -253,27 +252,34 @@
   width: 180px;
   height: 180px;
 }
-/* Suggestions read like the scope row: a caps label, then words and dots. */
+/* Suggestions continue the character's sentence. The words are brighter and
+   heavier than the text around them, so they read as choices without relying
+   on color; hover and focus light them up like a pressed row. */
 .rv-search-suggestions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  color: var(--fg-3);
-}
-.rv-search-suggestions .rv-label {
-  margin-right: 10px;
-}
-.rv-search-suggestions > span:not(.rv-label) {
-  padding: 0 2px;
+  margin-top: 6px;
+  color: var(--fg-2);
+  font-size: var(--size-small);
+  text-wrap: balance;
 }
 .rv-search-suggestions button {
-  color: var(--fg-2);
-  transition: color var(--ease-link) ease;
+  display: inline;
+  margin: 0 -3px;
+  padding: 1px 3px;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  color: var(--inline-link);
+  font: inherit;
+  font-weight: var(--weight-heading);
+  cursor: pointer;
+  transition:
+    color var(--ease-link) ease,
+    background-color var(--ease-link) ease;
 }
 .rv-search-suggestions button:hover,
 .rv-search-suggestions button:focus-visible {
   color: var(--fg);
+  background: var(--press-bg);
 }
 @media (max-width: 500px) {
   .rv-ask img {

@@ -788,8 +788,9 @@ Intentional differences from the design references (root compared with
   copies). Every site has a web manifest from the shared `webManifest`; Astro
   icon links moved to `?v=4`. Root's `public/icons/icon-192.png` moved to
   `public/icon-192.png`.
-- The empty-search suggestions are a `TRY sweep · orbit · design · lab` row
-  styled like the scope selector, without underlines.
+- The empty-search suggestions became a sentence in the character's voice,
+  "try sweep, orbit, design or lab.", with the words as bright, heavier
+  buttons and no underlines. The previous `TRY · …` row is `20c8649`.
 
 ### Checks run (Phases 5 and 6)
 

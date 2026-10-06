@@ -3,6 +3,9 @@ import { Art, art } from "./art";
 import { SiteLink, type LinkComponent } from "./link";
 import type { SiteId } from "./sites";
 
+/** Searches that always find something, offered when nothing matched. */
+const SUGGESTIONS = ["sweep", "orbit", "design", "lab"] as const;
+
 export interface SearchEntry {
   site: SiteId;
   title: string;
@@ -126,17 +129,10 @@ export function SearchPage({ site }: { site: SiteId }) {
           height={180}
         />
         <p>maybe I haven&apos;t built it yet.</p>
-        <div
-          className="rv-search-suggestions"
-          role="group"
-          aria-label="Try searching for"
-        >
-          <span className="rv-label" aria-hidden="true">
-            try
-          </span>
-          {(["sweep", "orbit", "design", "lab"] as const).map((term, index) => (
+        <p className="rv-search-suggestions">
+          try{" "}
+          {SUGGESTIONS.map((term, index) => (
             <Fragment key={term}>
-              {index > 0 ? <span aria-hidden="true">·</span> : null}
               <button
                 type="button"
                 data-search-suggestion={term}
@@ -144,9 +140,14 @@ export function SearchPage({ site }: { site: SiteId }) {
               >
                 {term}
               </button>
+              {index < SUGGESTIONS.length - 2
+                ? ", "
+                : index === SUGGESTIONS.length - 2
+                  ? " or "
+                  : "."}
             </Fragment>
           ))}
-        </div>
+        </p>
       </div>
     </section>
   );
