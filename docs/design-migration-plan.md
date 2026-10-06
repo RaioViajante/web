@@ -362,7 +362,7 @@ Branch `feat/design-migration`. Nothing is pushed.
 | 1. Shared home         | done        | styles, assets, sound                                                                       |
 | 2. Shared components   | done        | components, blocks, sound, behavior, templates; no app consumes them yet                    |
 | 3. Search              | done        | shared menu/page/behavior, four static indexes and routes; pending Vercel settings          |
-| 4. Migrate each site   | partly      | root done (4a); dump, docs and lab not started                                              |
+| 4. Migrate each site   | partly      | root (4a) and dump (4b) done; docs and lab not started                                      |
 | 5. Features to finish  | partly      | `AGENTS.md` / `CLAUDE.md` rules are written; SEO, accessibility and performance work remain |
 | 6. Verify and clean up | not started |                                                                                             |
 
@@ -452,6 +452,95 @@ the two throwaway builds.
   Privacy Policy says the sound preference is stored "in this browser"; it is
   now a cookie on `.raioviajante.com`. Wording left as is.
 
+### Root regression pass and follow-ups (done)
+
+The root was the reference, so it was compared with the pre-migration commit
+(`175672c`, run from a worktree) by computed styles and full-page screenshots
+at 1440px and 390px, plus hover states. Values restored in
+`packages/design/styles/tokens.css` and `base.css`:
+
+- Colors: `--fg-3` `#858b94` to `#8792a1`; `--dots` `#444444` to
+  `rgba(215, 223, 234, 0.3)`; new `--accent` `#b9a1d2` (selection and focus ring
+  only), `--hover-link`, `--hover-label`, `--hover-note`, `--hover-inline`,
+  `--inline-link`, `--press-bg`, `--press-shadow`, `--card`, `--art-shadow`,
+  `--art-shadow-hover`.
+- Type: index and page title 56/48 px, weight 700 to
+  `clamp(35.2px, 4.4vw, 45.76px)`, weight 650, line height 1.28; section 18 to
+  17.952 px, weight 650; section number 16.5/500, column 52.8px; caps label 12
+  to 13.728 px, tracking 0.12em to 0.08em; sidebar item 16.5 to 15.84 px;
+  leader value 14 to 16.5 px; footer 12.5 to 12.32 px, line height 1.9; sound
+  toggle 12.5 to 14.08 px; smoothing `antialiased`, `optimizeLegibility`.
+- Layout: content column 740 to 739.2px, sidebar 230 to 228.8px, gutter 48 to
+  61.6px, shell width `min(100% - 35.2px, 1320px)`, section gap 56/80 to
+  42.24px (padding-top 22px), leader gap 13.2px and margin 9.68px, avatar 112 to
+  114.4px, dash list indent 20.24px and spacing 7.92px, paragraph margin
+  17.6px. Sections and the column are block flow again so margins collapse as
+  before; the footer margin is 112.64px on desktop (70.4px on mobile).
+- Interaction: sidebar items transition color and rule in 220ms and the current
+  item's rule is `--fg-2`; a linked leader row brightens its name, brightens and
+  scales its value 1.8% (560ms) and presses in on `:active` (inset shadow);
+  footer links transition to `--hover-link` in 420ms; selection and focus ring
+  use `--accent` (2px, offset 4px); the hover description card, project and
+  feed links and the gallery tiles keep their old effects. The gallery tiles
+  have their shadows and brightness back (the one documented exception to "no
+  shadows"); the hover card has its border and `--card` background and no
+  shadow.
+- Structure: the sound toggle is the first child of the shell (grid row 1,
+  centered over the content column) so it stays first on small screens, as in
+  the old root; the mobile PAGES list is two columns (search spans the row),
+  "on this page" stays one column.
+- After the pass the root pages differ from the old ones by 0.2 to 2% of
+  pixels at both widths. Known differences: the contact note is the shared
+  callout (label "Note", taller); Terms and Privacy use the legal template
+  (new "In short" section); the root footer no longer marks the current site.
+
+Follow-ups done in the same session: shared components take a `linkComponent`
+prop (used for internal paths only; `next/link` on Next apps, plain anchors on
+Astro) and root navigates client-side; the sound toggle repaints and the 404
+requested path fills after client-side page swaps, and the audio context
+survives navigation (tests in `tests/links.test.tsx` and
+`tests/navigation.test.ts`); legal rows that needed a placeholder were removed
+from root, and the Privacy Policy now says the sound preference is "saved in a
+small cookie on .raioviajante.com" (the "Last updated" date was not changed).
+
+### Phase 4b: dump (done)
+
+- `apps/dump` uses `styles.css` and `<Behavior />`; every page renders
+  `components/DumpShell.tsx` (the shared `Shell`, `next/link`, search item;
+  a post counts as "posts" and adds "on this page"). Pages: home
+  (`IndexHeader`, latest, months, series, follow along), archive (year, month,
+  date column, first tag), tags (recurring, once so far), tag, post, search,
+  terms, privacy, `not-found.tsx`.
+- Posts are compiled on the server by `lib/render-post.tsx` (`@mdx-js/mdx`) with
+  `remark-frontmatter`, `remark-gfm`, `remark-directive`, `remarkSoftCallouts`,
+  `rehype-slug`, section numbering and `rehypeSoftBlocks`. All 12 posts render
+  (29 code blocks; the posts use no callouts, tables or footnotes). The MDX
+  loader, `rehype-pretty-code`, `shiki`, `mdx-components.tsx` and the local
+  code, callout and table styles are gone. Post content is unchanged.
+- Removed: `SiteHeader`, `SiteFooter`, `SoundToggle`, `PrimaryNavigation`,
+  `CodeCopy`, `PostSearch`, `PostToc`, `PostMeta`, `ReadingProgress`, About and
+  Uses (with their tests). `/about` redirects permanently to
+  `raioviajante.com/about` and `/uses` to `raioviajante.com/setup` (root has no
+  `/uses`; Setup is its equivalent). Sitemap adds `/terms` and `/privacy`.
+- Giscus: `app/giscus.css/route.ts` generates the theme from the shared
+  `tokens.css` at build time; `public/giscus.css` is deleted.
+- Shared additions: `scroll.ts` (reading progress `[data-reading-progress]`,
+  "on this page" `.is-current`), flat prose styles in `blocks.css`, subpath
+  exports `./shell`, `./parts`, `./templates`, `./link` (dump's Jest cannot load
+  the ESM-only highlighter through the components index), strict-index fixes in
+  `blocks/`, and an optional `lastUpdated` on `LegalPage`.
+- Legal text for dump uses only facts already in the repository. Omitted
+  because they needed an unconfirmed fact: the quoting and artwork reuse
+  permissions, the license for snippets, the log retention period, a "last
+  updated" date, and any analytics statement. The host is named as Vercel
+  (from `docs/deployment.md`); the Google Fonts sentence is dropped (dump
+  self-hosts its font). "All rights reserved" for articles comes from
+  `apps/dump/content/README.md`.
+- Differences from the reference: the post body has no line numbers unless a
+  fence asks for them; each home "Series" row links to the series' first part;
+  reading times are computed (220 words per minute); the giscus box only loads
+  online and when scrolled near.
+
 ### Checks run
 
 - Phase 2: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
@@ -467,6 +556,7 @@ the two throwaway builds.
   typing; Esc cleared it; and the empty state showed the sticker and chips.
   This test found and fixed local index lookup and Astro trailing-slash routes.
 - Throwaway pages (not committed): a root page and a lab page rendered `Shell`, `IndexHeader`, `CodeBlock`, `Callout`, `NotFoundPage` and the behavior script; both builds passed and emitted only the artwork they use.
+- Phase 4b and the root regression pass: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` passed (format, lint, typecheck, 49 package tests, 102 dump tests, four builds; dump prerendered 69 pages). Playwright checked every dump page at 1440px and 390px: no overflow, scroll tracking, 29 copy buttons, sound toggle, ⌘K, search and the 404 path. axe was not run.
 - Phase 4a: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
   passed (format, lint, typecheck, 43 package tests, 122 dump tests, four
   builds). Playwright (Chromium) screenshots of every root page at 1440px and
@@ -481,38 +571,36 @@ the two throwaway builds.
 
 ## 4. Next session
 
-Phase 4a (root) is complete. Do **Phase 4b: dump** only, then docs and lab in
-later sessions. Do not start Phase 5 or 6.
+Phases 4a (root) and 4b (dump) are complete. Do **Phase 4c: docs** only, then
+lab in a later session. Do not start Phase 5 or 6.
 
 ### Before you start
 
 1. Work on `feat/design-migration`. `git status` and `git log --oneline -15`.
-   Preserve uncommitted work (at the time of writing, edits to
+   Preserve uncommitted work (the owner's edits to
    `packages/design/{.prettierignore,package.json,tsconfig.json}` and
-   `packages/design/playground/` belong to the owner: stage only your own
-   hunks, for example with `git apply --cached` on a trimmed diff).
-2. Read `AGENTS.md` (design rules), `docs/design-system.md`, `docs/blocks.md`,
-   `apps/root/docs/design.md` (a worked example) and the root commits.
-3. Pattern from root: one `components/<App>Shell.tsx` wrapping the shared `Shell`
-   with `currentPage`, rendered by every page (Next layouts cannot know the
-   path); `styles.css` and `<Behavior />` in the layout; bind the `next/font`
-   family to `--font`; use `ls`/Playwright to compare before and after at 1440px
-   and 390px (install Playwright outside the repo).
-4. Dump's Vercel Ignored Build Step needs `../../packages/design` (D10) before
-   deploying.
-5. Stage files explicitly; one logical step per commit.
-
-### Phase 4b: dump (`apps/dump`, Next.js, MDX)
-
-1. In `next.config.mjs`, replace `rehype-pretty-code` and the inline `shikiTheme` with `remark-directive`, `remarkSoftCallouts` and `rehypeSoftBlocks` from `@raioviajante/design/blocks`. Next's MDX loader needs plugin names as strings or resolvable modules: if the package TypeScript entry cannot be loaded that way, export a small JavaScript wrapper from the package. Keep `remark-frontmatter` and `remark-gfm`, and keep `rehype-slug`.
-2. Switch the layout to `styles.css` and `<Behavior />`; build every page on `Shell` with `site="dump"`. Delete `SiteHeader`, `SiteFooter`, `SoundToggle`, `PrimaryNavigation`, `CodeCopy`, the now-unused `PostSearch`, and the app's copy of code styles when the shared ones replace them.
-3. Pages: posts index (latest featured, by month, series, follow along), archive and tags (leader lists; tags split recurring/once), post (sidebar TOC from headings, reading progress, numbered sections, computed reading time, metadata leaders, `Pager`, related by tag with `RelatedRows`, "try it in the lab", giscus with a theme built from the tokens in `public/giscus.css`), terms, privacy, `app/not-found.tsx`.
-4. Remove `app/about` and `app/uses` and add permanent redirects from `/about` and `/uses` to `https://raioviajante.com/about` and the matching root page (`redirects()` in `next.config.mjs`). Update `tests/about-page.test.tsx` and `tests/uses-page.test.tsx` (delete them with the pages) and the sitemap.
-5. Series and reading time: compute reading time from the MDX; do not copy the handoff's illustrative series. Add only series that exist in `content/posts`.
-6. Keep the existing `/search` page, menu item, and build-time index working
-   after the dump shell and content pipeline changes.
-7. Tests: update Jest tests that assert the old markup; add tests for the new pages. Keep the RSS, sitemap, robots and OG tests passing.
-8. Validate: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm --filter @raioviajante/dump format:check lint typecheck test build`.
+   `packages/design/playground/`: stage only your own hunks, for example
+   `git diff -U3 <file>`, keep only your hunk, `git apply --cached`).
+2. Read `AGENTS.md` (design rules), `docs/design-system.md` (the restored root
+   values), `docs/blocks.md`, `apps/root/docs/design.md` and
+   `apps/dump/docs/design.md` (worked examples for Next apps).
+3. Docs is Astro. Shared React renders statically through `@astrojs/react`
+   (already installed). There is no `next/link`: omit `linkComponent`. Call
+   `startBehavior()` from a `<script>` in the base layout (see
+   `packages/design/behavior.ts`). Rendering shared components from `.astro`
+   files is already proven by the Phase 3 search pages.
+4. Compare with the reference pages in `raioviajante-design/docs/` at 1440px
+   and 390px using Playwright installed outside the repo, and compare computed
+   styles against the old docs where a value matters. Fonts: load Noto Sans Mono
+   self-hosted; remove the Google Fonts links.
+5. docs has no lint, format or test scripts: do not invent them. Validate with
+   `pnpm --filter @raioviajante/docs typecheck build`, then the whole repo with
+   `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`.
+6. The owner must still add `../../packages/design` to the Vercel Ignored Build
+   Step of dump and docs (D10).
+7. Legal text: no placeholder may render on a public page. Use only facts
+   already in the repository; omit and list anything else.
+8. Stage files explicitly; one logical step per commit.
 
 ### Phase 4c: docs (`apps/docs`, Astro + Starlight)
 
