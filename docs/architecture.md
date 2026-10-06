@@ -80,8 +80,8 @@ It also exports `./editorial-tokens.css`, the framework-neutral specification
 for the root site's current editorial colors, Noto Sans Mono typography,
 layout measures, and interaction timing. `./editorial.css` imports those tokens
 and provides structural selectors for the top line, navigation, content grid,
-sections, rows, and footer. Root and Dump consume the editorial shell and
-shared sound behavior. Lab consumes the color primitives. Docs has not
+sections, rows, and footer. Dump consumes the editorial shell and
+shared sound behavior; root has moved to the new design system. Lab consumes the color primitives. Docs has not
 adopted the package yet. Apps supply their own font loading, routes, and page
 content.
 
@@ -104,8 +104,8 @@ typography, and layout behavior.
 
 The package also contains the design system that is replacing the editorial
 and color-primitive entries above: `styles/`, `assets/`, `sound/`, `blocks/`,
-`components/`, and `behavior`. These are built and tested in the package, and
-no app consumes them yet. The migration, with its status and the remaining
+`components/`, and `behavior`. These are built and tested in the package. Root
+consumes them; the other apps do not yet. The migration, with its status and the remaining
 phases, is tracked in [design-migration-plan](design-migration-plan.md); the
 rules are in [design-system](design-system.md) and [blocks](blocks.md).
 

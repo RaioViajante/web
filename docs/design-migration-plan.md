@@ -362,7 +362,7 @@ Branch `feat/design-migration`. Nothing is pushed.
 | 1. Shared home         | done        | styles, assets, sound                                                                       |
 | 2. Shared components   | done        | components, blocks, sound, behavior, templates; no app consumes them yet                    |
 | 3. Search              | done        | shared menu/page/behavior, four static indexes and routes; pending Vercel settings          |
-| 4. Migrate each site   | not started |                                                                                             |
+| 4. Migrate each site   | partly      | root done (4a); dump, docs and lab not started                                              |
 | 5. Features to finish  | partly      | `AGENTS.md` / `CLAUDE.md` rules are written; SEO, accessibility and performance work remain |
 | 6. Verify and clean up | not started |                                                                                             |
 
@@ -413,6 +413,45 @@ the two throwaway builds.
 - `docs/deployment.md` documents the required dump and docs Vercel Ignored
   Build Step setting. The owner still needs to apply it in Vercel.
 
+### Phase 4a: root (done)
+
+- `apps/root` now uses `@raioviajante/design/styles.css` and `<Behavior />`
+  (which also runs search). Every page renders `components/RootShell.tsx`
+  (the shared `Shell`, root's pages, the search item). Pages use `IndexHeader`,
+  `PageHeader`, `Section`, `LeaderRow`, `Callout` (contact), `LegalPage`
+  (terms, privacy) and `NotFoundPage` (`app/not-found.tsx`, the host 404).
+- Removed from root: `SiteNavigation`, `SiteHeader`, `SiteFooter`,
+  `SoundToggle`, `LeaderRow`, `SectionHeading` and all of `public/art`.
+  The avatar frames, gallery images and the "work of art" sticker come from the
+  package. `AvatarCoin`, `PreviewRow`, `ProjectPreviewRow`, `GalleryBoard` and
+  the projects list stay in the app (root-only); `globals.css` holds only those.
+- Package additions: avatar frames re-exported at 224px (`./avatar`,
+  `components/avatar.ts`; they were 96px), an `avatar` slot in `IndexHeader`, a
+  `describedBy` prop on `LeaderRow`, `.rv-dash-list`, nowrap leader values
+  (long strings wrap), and a narrow `./art` export for client components.
+- Search: the index endpoints already worked in dev for all four sites (checked
+  in a browser with Playwright; I could not reproduce an empty dev search).
+  "Everywhere" now keeps this site's results and shows a quiet note when
+  another site's index is unreachable (`search/engine.ts`, tested).
+- Empty-search artwork: `art-concepts/empty-search.png` does not exist in the
+  handoff, so nothing was copied. The empty state still uses
+  `search/not-found.png`. When the file arrives, export it as
+  `stickers/empty-search.png`, switch `searchNotFound` in `components/art.tsx`
+  and update `docs/design-system.md`.
+- Differences from the old root look (all follow the shared rules or tokens):
+  the hover description and gallery tiles lost their box-shadows and
+  brightness filter; the description card uses `--block`; the contact
+  callout now shows the "Note" label; the sound toggle and sidebar sit in the
+  shared positions (on 390px the sidebar is above the toggle, as in the
+  reference); rows are taller (shared leader spacing); navigation is full page
+  loads, not client transitions.
+- Legal pages: text unchanged. Added the template's "In short" rows from the
+  existing text; `[LICENSE OR ALL RIGHTS RESERVED]` and `none [CONFIRM]` are the
+  handoff placeholders. The existing date "October 4, 2026" is kept. Section
+  numbers are now 00-05 (they were 06.x and 07.x). Open for the owner: the
+  Privacy Policy says the sound preference is stored "in this browser"; it is
+  now a cookie on `.raioviajante.com`. Wording left as is.
+
 ### Checks run
 
 - Phase 2: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
@@ -428,6 +467,13 @@ the two throwaway builds.
   typing; Esc cleared it; and the empty state showed the sticker and chips.
   This test found and fixed local index lookup and Astro trailing-slash routes.
 - Throwaway pages (not committed): a root page and a lab page rendered `Shell`, `IndexHeader`, `CodeBlock`, `Callout`, `NotFoundPage` and the behavior script; both builds passed and emitted only the artwork they use.
+- Phase 4a: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
+  passed (format, lint, typecheck, 43 package tests, 122 dump tests, four
+  builds). Playwright (Chromium) screenshots of every root page at 1440px and
+  390px before and after, no horizontal overflow on any page, the gallery
+  reveal, the sound toggle (cookie `rv-sound`, kept across reload), `/` to open
+  search and a search for a known page, and the 404 requested path all behaved.
+  axe was not run.
 - Not run in Phase 3: browser screenshots and axe. The sound voices have not
   been listened to. Phase 6 owns the full visual and accessibility pass.
 
@@ -435,35 +481,26 @@ the two throwaway builds.
 
 ## 4. Next session
 
-Phase 3 is complete. Start Phase 4 with root, then dump, docs, and lab in that
-order. Keep the Phase 3 search routes, indexes, shared markup, CSS, and behavior
-working while each app adopts the shared shell. Do not start Phase 5 or 6.
+Phase 4a (root) is complete. Do **Phase 4b: dump** only, then docs and lab in
+later sessions. Do not start Phase 5 or 6.
 
 ### Before you start
 
-1. Work on `feat/design-migration`; inspect `git status`, `git log --oneline -15`,
-   and the Phase 3 commits. Preserve any pre-existing uncommitted work.
-2. Read `AGENTS.md` (section "Design system migration"), `docs/design-system.md`, `docs/blocks.md`, `packages/design/README.md`, and section 2.5 above.
-3. Open the reference pages in `raioviajante-design/` in a browser (local only).
-4. Run `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` to
-   confirm a clean start.
-5. Before deployment, the owner must apply the command in `docs/deployment.md`
-   to the dump and docs Vercel Ignored Build Steps (D10). Do not describe Phase 3
-   as live until those settings and production deployments are confirmed.
-6. Stage files explicitly. One app per commit series; validate the app before each commit.
-
-### Phase 4a: root (`apps/root`, Next.js)
-
-1. Replace `@raioviajante/design/editorial.css` with `@raioviajante/design/styles.css` in `app/layout.tsx` (D9: one commit, no mixed loading). Keep `next/font` for Noto Sans Mono and bind its variable to `--font` if the stack must match.
-2. Render `<Behavior />` in the layout. Delete `components/SoundToggle.tsx`, `SiteFooter.tsx`, `SectionHeading.tsx`, `LeaderRow.tsx` and `SiteNavigation.tsx` once the pages use `Shell`, `Footer`, `Section`/`SectionHeading` and `LeaderRow`. Keep `GalleryBoard`, `AvatarCoin` and the `*PreviewRow` components if they stay app-specific; move the avatar frames to the package (D1) and the gallery images to `@raioviajante/design/gallery`, then delete `public/art/`.
-3. Rebuild each page on `Shell` with `site="root"` (about, contact, gallery, privacy, projects, setup, terms, this-site, home). Keep all existing content and text. Home uses `IndexHeader`.
-4. Terms and Privacy: move the existing legal text into `LegalPage` sections without changing the wording.
-5. Add `app/not-found.tsx` with `NotFoundPage` (`site="root"`; line "this page moved, never existed, or I haven't built it yet."; try-instead rows from `raioviajante-design/404.html`).
-6. Keep the existing `/search` page, menu item, and build-time index working
-   after the root shell changes. Remove only obsolete search wrappers.
-7. Compare each page with the reference at 1440px and 390px. Check the aligned
-   D4 tokens against the root before and after, and note any differences.
-8. Validate: `pnpm --filter @raioviajante/root format:check lint typecheck build`.
+1. Work on `feat/design-migration`. `git status` and `git log --oneline -15`.
+   Preserve uncommitted work (at the time of writing, edits to
+   `packages/design/{.prettierignore,package.json,tsconfig.json}` and
+   `packages/design/playground/` belong to the owner: stage only your own
+   hunks, for example with `git apply --cached` on a trimmed diff).
+2. Read `AGENTS.md` (design rules), `docs/design-system.md`, `docs/blocks.md`,
+   `apps/root/docs/design.md` (a worked example) and the root commits.
+3. Pattern from root: one `components/<App>Shell.tsx` wrapping the shared `Shell`
+   with `currentPage`, rendered by every page (Next layouts cannot know the
+   path); `styles.css` and `<Behavior />` in the layout; bind the `next/font`
+   family to `--font`; use `ls`/Playwright to compare before and after at 1440px
+   and 390px (install Playwright outside the repo).
+4. Dump's Vercel Ignored Build Step needs `../../packages/design` (D10) before
+   deploying.
+5. Stage files explicitly; one logical step per commit.
 
 ### Phase 4b: dump (`apps/dump`, Next.js, MDX)
 

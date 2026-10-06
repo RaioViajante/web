@@ -27,7 +27,7 @@ These external websites must not become local routes.
 
 ## Status and stack
 
-The editorial interface is implemented across all root routes,
+The shared design system is implemented across all root routes,
 sharing a common layout, navigation, and footer. The stack is Next.js (App
 Router), React, TypeScript, pnpm, ESLint, and Prettier, ready to deploy to
 Vercel at https://raioviajante.com. See [deployment](docs/deployment.md) for

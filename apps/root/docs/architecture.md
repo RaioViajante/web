@@ -6,10 +6,11 @@ It owns `/`, `/about`, `/projects`, `/contact`, `/gallery`, `/this-site`, `/setu
 their respective subdomains; root links to them by URL and does not import
 their source code.
 
-The app layout imports the framework-neutral editorial shell from
-`@raioviajante/design/editorial.css`. Root-specific styles and content remain
-inside this app. Reusable local pieces such as navigation, section headings,
-leader rows, and the footer live in `components/`.
+The app layout imports `@raioviajante/design/styles.css` and renders the shared
+`<Behavior />` script. Pages are built on the shared `Shell` through
+`components/RootShell.tsx`. Root-specific styles and content remain inside
+this app; the shell, page parts, footer, artwork, sound and search come from
+the package.
 
 Home obtains recent writing from dump's public RSS feed in `lib/writing.ts`.
 The homepage and feed request each revalidate after 60 seconds. New published

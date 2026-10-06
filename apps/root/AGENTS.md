@@ -20,7 +20,7 @@ routes here.
   prefer simple solutions.
 - Do not add Tailwind, MDX, Shiki, UI libraries, or testing frameworks unless a
   task explicitly needs them.
-- All pages share the editorial shell, navigation, and footer. Changing content
+- All pages share the shell, navigation, and footer from `@raioviajante/design`. Changing content
   lives in `lib/` where practical, separate from presentation.
 - Extract components only where reuse exists within this app.
 - `next.config.ts` sets `agentRules: false` so Next.js does not overwrite this
@@ -28,7 +28,7 @@ routes here.
 
 ## Design
 
-- Follow [docs/design.md](docs/design.md). Preserve the editorial design across
+- Follow [docs/design.md](docs/design.md). Preserve the shared design across
   the root routes and coordinate shared shell changes with the other apps.
 - The previous design export was kept locally at `reference/claude-export/`.
   It is an untracked historical reference; where a local copy exists, treat it
