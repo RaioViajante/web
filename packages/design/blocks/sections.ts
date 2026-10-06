@@ -21,7 +21,16 @@ export function rehypeNumberSections() {
         properties: { className: ["rv-num"], ariaHidden: "true" },
         children: [{ type: "text", value: sectionNumber(index) }],
       };
-      node.children.unshift(number);
+      // Keep inline code/emphasis in one flex item so the title wraps as text.
+      node.children = [
+        number,
+        {
+          type: "element",
+          tagName: "span",
+          properties: {},
+          children: node.children,
+        },
+      ];
       index += 1;
     }
   };

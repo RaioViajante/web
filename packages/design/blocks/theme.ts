@@ -12,7 +12,7 @@ export const SYNTAX = {
   function: "#8fb8d6",
   string: "#a8c791",
   number: "#de9f8c",
-  comment: "#7b818a",
+  comment: "#9aa3af",
   punct: "#8792a1",
 } as const;
 

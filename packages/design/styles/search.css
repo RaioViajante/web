@@ -178,7 +178,6 @@
   caret-color: var(--fg);
 }
 .rv-search-input:focus {
-  outline: none;
   border-bottom-color: var(--fg);
 }
 .rv-search-scope {
@@ -187,6 +186,8 @@
 }
 .rv-search-scope button,
 .rv-search-suggestions button {
+  min-height: var(--touch);
+  min-width: var(--touch);
   color: inherit;
   font: inherit;
   background: none;

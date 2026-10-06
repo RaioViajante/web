@@ -16,7 +16,11 @@ export function LabIndex() {
         title="Experiments"
         id="experiments"
         headingExtra={
-          <div className="lab-filters" aria-label="Filter experiments">
+          <div
+            className="lab-filters"
+            role="group"
+            aria-label="Filter experiments"
+          >
             {["all", "active", "done"].map((filter) => (
               <ToggleButton
                 key={filter}

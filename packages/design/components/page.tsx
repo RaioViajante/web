@@ -131,10 +131,13 @@ export function LeaderRow({
   href,
   sound = "nav",
   describedBy,
+  wrapValue = false,
   linkComponent,
 }: {
   label: ReactNode;
   value?: ReactNode;
+  /** Allow structured metadata, such as a list of tags, to wrap. */
+  wrapValue?: boolean;
   href?: string;
   sound?: string;
   /** Id of a tooltip that describes the link. */
@@ -148,7 +151,7 @@ export function LeaderRow({
       {value !== undefined ? (
         <span
           className={
-            typeof value === "string" && value.length > 24
+            wrapValue || (typeof value === "string" && value.length > 24)
               ? "rv-leader__value rv-leader__value--long"
               : "rv-leader__value"
           }

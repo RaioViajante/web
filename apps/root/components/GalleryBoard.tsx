@@ -113,6 +113,7 @@ export function GalleryBoard() {
       </button>
       <div
         className="gallery-collection"
+        role="group"
         aria-label="RaioViajante artwork collection"
         aria-hidden={!revealed}
         inert={!revealed}

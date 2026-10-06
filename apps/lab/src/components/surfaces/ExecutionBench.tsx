@@ -13,7 +13,11 @@ export function ExecutionBench() {
         where={<ActionButton data-new>new example</ActionButton>}
       >
         <BenchBand>
-          <div className="bench-states" aria-label="Execution lifecycle">
+          <div
+            className="bench-states"
+            role="group"
+            aria-label="Execution lifecycle"
+          >
             <StateMark current>QUEUED</StateMark>
             <small>start →</small>
             <StateMark>RUNNING</StateMark>

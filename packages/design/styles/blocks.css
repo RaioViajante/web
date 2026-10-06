@@ -75,7 +75,7 @@
   font: inherit;
   font-size: 12px;
   padding: 0 10px;
-  min-height: 30px;
+  min-height: var(--touch);
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.15s;
@@ -147,7 +147,7 @@
   font: inherit;
   font-size: 12.5px;
   padding: 0 14px;
-  min-height: 34px;
+  min-height: var(--touch);
   cursor: pointer;
 }
 .block__tab[aria-selected="true"] {
@@ -172,7 +172,7 @@
   background: var(--block-terminal);
 }
 .block--terminal .block__copy {
-  background: #242424;
+  background: var(--block-button);
 }
 .term-prompt {
   color: var(--code-line-number);
@@ -245,7 +245,7 @@
   gap: 6px;
   font-size: var(--size-code);
   line-height: 1.6;
-  color: #c5c9ce;
+  color: var(--block-notes);
 }
 .block__notes li {
   display: flex;
@@ -275,7 +275,7 @@
   font: inherit;
   font-size: 12.5px;
   padding: 0 14px;
-  min-height: 34px;
+  min-height: var(--touch);
   cursor: pointer;
 }
 
@@ -387,7 +387,7 @@
 }
 .table-block td {
   padding: 9px 16px 9px 0;
-  border-top: 1px solid #2c2c2c;
+  border-top: 1px solid var(--table-rule);
 }
 
 .tree-branch {
@@ -462,6 +462,10 @@
   color: var(--fg-3);
   font-size: var(--size-body);
   font-weight: var(--weight-body);
+}
+.prose > h2 > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .prose > h3 {
   margin: 35.2px 0 10.56px;

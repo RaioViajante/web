@@ -69,6 +69,7 @@ export function PostArticle({
           />
           <LeaderRow
             label="tags"
+            wrapValue
             value={
               <span className="post-tags">
                 {post.tags.map((tag) => (

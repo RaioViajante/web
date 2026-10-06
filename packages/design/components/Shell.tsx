@@ -55,7 +55,7 @@ export function NavGroup({
 
 export function SoundToggle() {
   return (
-    <div className="rv-sound">
+    <header className="rv-sound">
       <button
         type="button"
         data-sound-toggle=""
@@ -65,7 +65,7 @@ export function SoundToggle() {
       >
         SOUND <span aria-hidden="true">OFF</span>
       </button>
-    </div>
+    </header>
   );
 }
 
@@ -186,12 +186,14 @@ export function Shell({
             />
           ) : null}
         </aside>
-        <main className="rv-main" id="main">
+        <div className="rv-main">
           <div className="rv-column">
-            {children}
+            <main id="main" tabIndex={-1}>
+              {children}
+            </main>
             <Footer {...footer} />
           </div>
-        </main>
+        </div>
       </div>
     </>
   );
