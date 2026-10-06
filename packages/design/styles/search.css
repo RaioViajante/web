@@ -198,11 +198,11 @@
   text-decoration: none;
 }
 .rv-search-scope button[aria-pressed="true"] {
-  color: var(--fg-2);
+  color: color-mix(in srgb, var(--fg-2), var(--fg) 18%);
 }
 .rv-search-scope button:hover,
 .rv-search-scope button:focus-visible {
-  color: var(--fg);
+  color: color-mix(in srgb, var(--fg-2), var(--fg) 30%);
 }
 .rv-search-group {
   margin: 28px 0;
@@ -238,8 +238,8 @@
 }
 .rv-search-empty img {
   margin: 0 auto;
-  width: 120px;
-  height: auto;
+  width: 180px;
+  height: 180px;
 }
 .rv-search-suggestions {
   display: flex;
