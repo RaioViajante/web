@@ -5,7 +5,9 @@ import {
   checkManifest,
   checkRobots,
   checkRss,
+  checkSearchPage,
   checkSitemap,
+  searchPaths,
 } from "./metadata-policy.ts";
 import { siteOrigins } from "../security/headers.ts";
 
@@ -45,7 +47,12 @@ export async function auditSite({
   problems.push(...sitemap.problems);
   const locs = sitemap.entries.map((e) => e.loc);
   const paths = locs.map((loc) => new URL(loc).pathname);
-  problems.push(...checkRobots(site, files.robots, paths));
+  // The search page is not indexed and not in the sitemap, but must stay
+  // crawlable: robots.txt may not block it (or crawlers could not see noindex).
+  const search = searchPaths[site];
+  if (paths.includes(search))
+    problems.push(`app ${site} sitemap: lists ${search}, which is noindex`);
+  problems.push(...checkRobots(site, files.robots, [...paths, search]));
   problems.push(...checkManifest(site, files.manifest, themeColor));
   let rssItems;
   if (site === "dump") {
@@ -74,6 +81,12 @@ export async function auditSite({
         }),
       );
     }
+  if (html) {
+    const document = await html(search);
+    if (document === undefined)
+      problems.push(`app ${site} page ${search}: document could not be read`);
+    else problems.push(...checkSearchPage(site, document));
+  }
   return { problems, pages, entries: sitemap.entries, rssItems };
 }
 

@@ -219,6 +219,43 @@ export function checkDocument({
   return p;
 }
 
+/** Where each app serves its search page (Astro apps use trailing slashes). */
+export const searchPaths: Record<Site, string> = {
+  root: "/search",
+  dump: "/search",
+  docs: "/search/",
+  lab: "/search/",
+};
+
+/**
+ * The search page is reachable and crawlable but deliberately not indexed:
+ * `noindex, follow`, one canonical equal to the bare production URL (so `?q=`
+ * and tracking parameters never create another identity), and absent from the
+ * sitemap (checked by the caller with the sitemap entries).
+ */
+export function checkSearchPage(
+  site: Site,
+  html: string,
+  requested = searchPaths[site],
+) {
+  const p: Problems = [];
+  const at = where(site, requested);
+  const doc = parseDocument(html);
+  const robots = doc.meta.get("robots") ?? [];
+  if (robots.length !== 1)
+    p.push(`${at}: expected one robots meta tag, found ${robots.length}`);
+  else if (!/\bnoindex\b/.test(robots[0]!) || !/\bfollow\b/.test(robots[0]!))
+    p.push(
+      `${at}: robots is ${JSON.stringify(robots[0])}, expected "noindex, follow"`,
+    );
+  const want = `${siteOrigins[site]}${searchPaths[site]}`;
+  if (doc.canonicals.length !== 1 || doc.canonicals[0] !== want)
+    p.push(
+      `${at}: canonical is ${JSON.stringify(doc.canonicals)}, expected ${want}`,
+    );
+  return p;
+}
+
 /** Titles and descriptions must be unique across every checked document. */
 export function checkUniqueness(
   pages: Array<{ site: Site; path: string; html: string }>,

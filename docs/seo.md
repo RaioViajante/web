@@ -1,7 +1,7 @@
 # SEO metadata and structured data
 
-Checked against local production builds of all four apps (71 sitemap
-documents). Nothing was submitted to a search engine, and hosting redirects
+Checked against local production builds of all four apps (67 sitemap
+documents, plus the four search pages that are deliberately not in them). Nothing was submitted to a search engine, and hosting redirects
 were not touched.
 
 ## What every page has
@@ -85,8 +85,19 @@ add it; git dates and build times never do.
 
 ## Indexing decisions
 
-Search, terms and privacy pages are indexable and in the sitemap, as the
-authors had them; search keeps one canonical URL (`?q=` is never canonical).
+Terms and privacy pages are indexable and in the sitemaps.
+
+The four `/search` pages are `noindex, follow` and not in any sitemap. They
+stay reachable and crawlable (robots.txt must not block them, or crawlers could
+not see the `noindex`) and keep one canonical, the bare `/search` URL: `?q=` and
+tracking parameters never change it. Why: before a query each is a form with
+about 35 words of prompt text, near-identical on all four sites, and the results
+need typed input and client JavaScript, so there is nothing for a search engine
+to index (Google documents no policy against indexed internal search pages, but
+treats them as low value). `isSearchPath` in `packages/design/seo.ts` is the
+one place that drives the robots meta, the sitemap exclusion and, through
+`seo/metadata-policy.ts`, the checks.
+
 404 pages are `noindex` and not in sitemaps (Next marks its own 404s, Astro's
 `404.html` carries `noindex, follow`).
 
@@ -120,9 +131,10 @@ two ways. There is no list of pages: the inventory is each app's own
   It needs the apps built with `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com`
   and no sockets.
 - `pnpm seo:verify`: starts (or reuses) the four built apps and checks every
-  sitemap document over local HTTP, all 71 today, plus content types, social
-  image and icon URLs, the search canonical with a query string, missing routes
-  and the Dump RSS cross-check against each post. Exit code 2 means the apps
+  sitemap document over local HTTP, all 67 today, plus each search page (200,
+  `noindex, follow`, one bare canonical, also with `?q=` and tracking
+  parameters), content types, social image and icon URLs, missing routes and
+  the Dump RSS cross-check against each post. Exit code 2 means the apps
   could not start and nothing was verified. Phase 10 can wire it into CI.
 
 Per page it enforces: one `<title>`, meta description, canonical (absolute

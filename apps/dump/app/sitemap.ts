@@ -12,7 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/tags",
     "/terms",
     "/privacy",
-    "/search",
   ].map((path) => ({
     url: absoluteUrl(path),
   }));

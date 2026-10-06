@@ -1,4 +1,4 @@
-import { socialUrl } from "../seo";
+import { isSearchPath, socialUrl } from "../seo";
 export function SeoHead({
   origin,
   site,
@@ -20,7 +20,10 @@ export function SeoHead({
   return (
     <>
       {!noindex && <link rel="canonical" href={new URL(path, origin).href} />}
-      {noindex && <meta name="robots" content="noindex, follow" />}
+      {/* The search page is noindex but keeps its bare canonical. */}
+      {(noindex || isSearchPath(path)) && (
+        <meta name="robots" content="noindex, follow" />
+      )}
       {themeColor && <meta name="theme-color" content={themeColor} />}
       <meta property="og:site_name" content={site} />
       <meta property="og:title" content={title} />

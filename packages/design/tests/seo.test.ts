@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   isNotFoundPath,
+  isSearchPath,
   pageMetadata,
   socialKey,
   sitemapResponse,
@@ -110,5 +111,43 @@ describe("manifest", () => {
     expect(manifest.background_color).toBe("#191919");
     expect(webManifest("docs")).not.toHaveProperty("theme_color");
     expect(manifest).not.toHaveProperty("scope");
+  });
+});
+
+describe("search page", () => {
+  it("is recognised with and without a trailing slash, and nothing else", () => {
+    expect(isSearchPath("/search")).toBe(true);
+    expect(isSearchPath("/search/")).toBe(true);
+    expect(isSearchPath("/searching")).toBe(false);
+    expect(isSearchPath("/projects/search/")).toBe(false);
+  });
+
+  it("is noindex, follow in page metadata but keeps its bare canonical", () => {
+    const search = pageMetadata("https://x.example", "x", {
+      path: "/search",
+      title: "Search",
+      description: "d",
+    });
+    expect(search.robots).toEqual({ index: false, follow: true });
+    expect(search.alternates.canonical).toBe("/search");
+    const other = pageMetadata("https://x.example", "x", {
+      path: "/about",
+      title: "About",
+      description: "d",
+    });
+    expect(other).not.toHaveProperty("robots");
+  });
+
+  it("never appears in a sitemap, nor does the 404 page", async () => {
+    const xml = await sitemapResponse("https://x.example", [
+      "/",
+      "/search",
+      "/search/",
+      "/404",
+      "/about",
+    ]).text();
+    expect(xml).not.toContain("search");
+    expect(xml).not.toContain("404");
+    expect(xml).toContain("/about");
   });
 });

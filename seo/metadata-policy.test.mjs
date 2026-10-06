@@ -6,6 +6,7 @@ import {
   checkManifest,
   checkRobots,
   checkRss,
+  checkSearchPage,
   checkSitemap,
   checkUniqueness,
   expectedTypes,
@@ -223,6 +224,52 @@ test("robots rules", () => {
       "User-agent: *\nDisallow: /\nSitemap: https://docs.raioviajante.com/sitemap.xml",
     ),
     /indexing is not allowed/,
+  );
+});
+
+test("the search page is noindex, follow, with one bare canonical", () => {
+  const page = (robots, canonical) =>
+    `<html><head>${robots}${canonical}</head></html>`;
+  const good = page(
+    '<meta name="robots" content="noindex, follow"/>',
+    '<link rel="canonical" href="https://docs.raioviajante.com/search/"/>',
+  );
+  assert.deepEqual(checkSearchPage("docs", good), []);
+  const bad = (html, requested) =>
+    checkSearchPage("docs", html, requested).join("\n");
+  assert.match(
+    bad(good.replace("noindex, follow", "index, follow")),
+    /expected "noindex, follow"/,
+  );
+  assert.match(
+    bad(good.replace("noindex, follow", "noindex")),
+    /expected "noindex, follow"/,
+  );
+  assert.match(
+    bad(good.replace(/<meta[^>]*>/, "")),
+    /expected one robots meta tag, found 0/,
+  );
+  assert.match(
+    bad(good.replace("/search/", "/search/?q=a")),
+    /canonical is \["https:\/\/docs\.raioviajante\.com\/search\/\?q=a"\]/,
+  );
+  assert.match(
+    bad(good.replace(/<link[^>]*>/, ""), "/search/?q=a"),
+    /page \/search\/\?q=a: canonical is \[\]/,
+  );
+});
+
+test("a sitemap that lists search is rejected by the audit rules, not the sitemap rules", () => {
+  // The sitemap shape itself is valid; auditSite adds "lists /search, which is noindex".
+  assert.deepEqual(
+    checkSitemap(
+      "docs",
+      sitemap([
+        ["https://docs.raioviajante.com/"],
+        ["https://docs.raioviajante.com/search/"],
+      ]),
+    ).problems,
+    [],
   );
 });
 

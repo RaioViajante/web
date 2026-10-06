@@ -3,7 +3,12 @@ import { fileURLToPath } from "node:url";
 import { siteOrigins } from "../security/headers.ts";
 import { ports, startServers } from "../security/local-servers.mjs";
 import { auditSite, expectedThemeColor } from "./audit.mjs";
-import { checkUniqueness, parseDocument } from "./metadata-policy.ts";
+import {
+  checkSearchPage,
+  checkUniqueness,
+  parseDocument,
+  searchPaths,
+} from "./metadata-policy.ts";
 
 // Runtime SEO verification of the four built apps over local HTTP. Every
 // document comes from the app's own sitemap, so this covers the dynamically
@@ -17,12 +22,6 @@ const localFor = (url) => {
   const { origin, pathname, search } = new URL(url);
   const site = sites.find((s) => siteOrigins[s] === origin);
   return site ? local(site, pathname + search) : undefined;
-};
-const searchPath = {
-  root: "/search",
-  dump: "/search",
-  docs: "/search/",
-  lab: "/search/",
 };
 const problems = [];
 const fail = (message) => problems.push(message);
@@ -112,22 +111,19 @@ for (const site of sites) {
       rel: "manifest icon",
     });
 
-  // Search: one canonical, whatever the query.
-  const search = searchPath[site];
-  const { text: searched } = await get(
-    site,
-    `${search}?q=seo%20check&utm_source=x`,
-  );
-  const canonical = parseDocument(searched).canonicals;
-  if (
-    canonical.length !== 1 ||
-    canonical[0] !== `${siteOrigins[site]}${search}`
-  )
-    fail(
-      `app ${site} page ${search}?q=…: canonical is ${JSON.stringify(canonical)}, expected ${siteOrigins[site]}${search}`,
-    );
-  if (!result.entries.some((e) => e.loc === `${siteOrigins[site]}${search}`))
-    fail(`app ${site} sitemap: ${search} is missing`);
+  // Search: not in the sitemap (audited above), but explicitly visited: 200,
+  // noindex/follow and one bare canonical, whatever the query string.
+  const search = searchPaths[site];
+  for (const query of [
+    "",
+    "?q=seo%20check",
+    "?q=a&utm_source=x&utm_campaign=y",
+  ]) {
+    const { response, text: searched } = await get(site, search + query);
+    if (response.status !== 200)
+      fail(`app ${site} ${search}${query}: HTTP ${response.status}`);
+    problems.push(...checkSearchPage(site, searched, search + query));
+  }
 
   // Missing routes: 404, noindex, no canonical, not in the sitemap.
   for (const path of site === "dump"
