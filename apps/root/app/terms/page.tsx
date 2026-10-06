@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LegalPage } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
 
@@ -14,10 +15,6 @@ export default function Terms() {
         inShort={[
           { label: "accounts", value: "none" },
           { label: "purchases", value: "none" },
-          {
-            label: "text and artwork",
-            value: "[LICENSE OR ALL RIGHTS RESERVED]",
-          },
           { label: "code", value: "license of each repository" },
         ]}
         sections={[
@@ -59,8 +56,8 @@ export default function Terms() {
               <p>
                 Dump, docs, lab, GitHub and other linked destinations are
                 separate websites. Review their own information when you visit
-                them. Our <a href="/privacy">Privacy Policy</a> describes data
-                handling on this root site.
+                them. Our <Link href="/privacy">Privacy Policy</Link> describes
+                data handling on this root site.
               </p>
             ),
           },

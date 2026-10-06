@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   IndexHeader,
   LeaderRow,
@@ -48,6 +49,7 @@ export default async function Home() {
       <Section number="00.2" title="Latest writing" id="writing-heading" index>
         {posts.map((post) => (
           <LeaderRow
+            linkComponent={Link}
             key={post.url}
             label={post.title}
             value={post.date}
@@ -62,7 +64,12 @@ export default async function Home() {
       </Section>
 
       <Section number="00.3" title="Other links" id="other-links-heading" index>
-        <LeaderRow label="Setup" value="gear" href="/setup" />
+        <LeaderRow
+          linkComponent={Link}
+          label="Setup"
+          value="gear"
+          href="/setup"
+        />
       </Section>
     </RootShell>
   );

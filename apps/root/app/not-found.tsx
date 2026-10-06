@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { NotFoundPage } from "@raioviajante/design/components";
 import { RootShell } from "../components/RootShell";
 
@@ -9,6 +10,7 @@ export default function NotFound() {
     <RootShell>
       <NotFoundPage
         site="root"
+        linkComponent={Link}
         line="this page moved, never existed, or I haven't built it yet."
         tryInstead={[
           { label: "raioviajante.com", value: "start over", href: "/" },

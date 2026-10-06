@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   LeaderRow,
   PageHeader,
@@ -23,6 +24,7 @@ export default function Setup() {
         ) : (
           gear.map((item) => (
             <LeaderRow
+              linkComponent={Link}
               key={item.name}
               label={item.name}
               value={item.category}

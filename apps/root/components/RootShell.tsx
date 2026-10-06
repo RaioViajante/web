@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { Shell, type NavItem } from "@raioviajante/design/components";
 import { SearchNavItem } from "@raioviajante/design/search";
@@ -22,10 +23,15 @@ export function RootShell({
   return (
     <Shell
       site="root"
+      linkComponent={Link}
       pages={pages}
       currentPage={current}
       pagesExtra={
-        <SearchNavItem number="06." current={current === "/search"} />
+        <SearchNavItem
+          number="06."
+          current={current === "/search"}
+          linkComponent={Link}
+        />
       }
     >
       {children}

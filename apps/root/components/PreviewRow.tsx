@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LeaderRow } from "@raioviajante/design/components";
 
 /** A leader row that shows a short description on hover or focus. */
@@ -18,7 +19,13 @@ export function PreviewRow({
 }) {
   return (
     <div className="preview-row">
-      <LeaderRow label={label} value={note} href={href} describedBy={id} />
+      <LeaderRow
+        label={label}
+        value={note}
+        href={href}
+        describedBy={id}
+        linkComponent={Link}
+      />
       <div className="row-preview" id={id} role="tooltip">
         <p>{description}</p>
         {meta ? <p className="row-preview-meta">{meta}</p> : null}

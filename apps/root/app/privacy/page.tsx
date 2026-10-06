@@ -12,10 +12,9 @@ export default function Privacy() {
         title="Privacy Policy"
         lastUpdated="October 4, 2026"
         inShort={[
-          { label: "accounts", value: "none" },
+          { label: "registration", value: "none" },
           { label: "email", value: "only what you send" },
-          { label: "sound preference", value: "stored in your browser" },
-          { label: "tracking", value: "none [CONFIRM]" },
+          { label: "sound preference", value: "saved in a cookie" },
         ]}
         sections={[
           {
@@ -39,9 +38,11 @@ export default function Privacy() {
                   your name, email address and message.
                 </p>
                 <p>
-                  The sound switch stores your on or off preference in this
-                  browser. The home page requests the public RSS feed from
-                  dump.raioviajante.com on the server to display recent posts.
+                  Your sound preference is saved in a small cookie on
+                  .raioviajante.com, so every raioviajante site remembers it. It
+                  is not used for tracking. The home page requests the public
+                  RSS feed from dump.raioviajante.com on the server to display
+                  recent posts.
                 </p>
               </>
             ),

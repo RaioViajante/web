@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   LeaderRow,
   PageHeader,
@@ -27,6 +28,7 @@ export default function Projects() {
           return (
             <article className="project-entry" key={project.name}>
               <LeaderRow
+                linkComponent={Link}
                 label={project.name}
                 value={project.status}
                 href={project.href}

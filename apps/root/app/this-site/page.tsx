@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageHeader, Section } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
 
@@ -38,9 +39,9 @@ export default function ThisSite() {
             GitHub
           </a>
           . For information about using the site&apos;s text or artwork, see the{" "}
-          <a href="/terms" data-sound="nav">
+          <Link href="/terms" data-sound="nav">
             Terms of Use
-          </a>
+          </Link>
           .
         </p>
       </Section>
