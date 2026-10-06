@@ -42,9 +42,10 @@ outside what is listed here.
 - Deleting: the visitor's browser settings, or expiry after one year from the
   last change.
 - Legacy: earlier versions of root and dump stored the choice under the same
-  key in `localStorage`. If that value exists it is copied into the cookie once
-  and removed. It exists only for visitors who chose before, so this is not a
-  write caused by merely visiting.
+  key in `localStorage`. That value is only read, on that one origin, and only
+  when no cookie exists; reading never writes a cookie or changes it. The next
+  time the visitor switches sound, the cookie is written and the legacy value
+  is removed. Until then it is not shared with other subdomains.
 
 ### Theme and other preferences
 
@@ -72,12 +73,14 @@ RaioViajante sites; those are first-party (same owner) origins.
 ### Giscus on dump articles
 
 `apps/dump/components/Comments.tsx`. The article HTML contains a local status
-line and no giscus script, link hint or frame. The script is inserted when the
-comments section comes within 200px of the viewport (`IntersectionObserver`),
-at most once. Without `IntersectionObserver` the visitor presses "Load
-comments". Giscus configuration is unchanged.
+line and no giscus script, link hint or frame, so nothing is contacted by the
+initial HTML. The script is inserted by JavaScript when the comments section
+comes within 200px of the viewport (`IntersectionObserver`), at most once. On a
+short article that can happen as soon as the page opens, with no scrolling or
+click. Where `IntersectionObserver` does not exist, nothing loads until the
+visitor presses "Load comments". Giscus configuration is unchanged.
 
-Observed in the local Firefox run, opening an article: only first-party
+Observed in the local Firefox run, opening a long article: only first-party
 requests. After scrolling to the comments: `https://giscus.app/client.js`,
 `default.css`, the `en/widget` frame and `api/discussions` requests, the
 first-party `/giscus.css` theme, and

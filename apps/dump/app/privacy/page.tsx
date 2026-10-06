@@ -43,13 +43,16 @@ export default function Privacy() {
             title: "Comments and feeds",
             body: (
               <p>
-                Comments go through giscus to GitHub Discussions. They load only
-                when you scroll to the comments section or ask for them; until
-                then this page does not contact giscus or GitHub. Once they
-                load, your browser connects to giscus.app and GitHub. Signing in
-                and posting happen with GitHub, under GitHub&apos;s privacy
-                policy; dump never sees your password. The RSS feed is a plain
-                file — feed readers request it like any page.
+                Comments go through giscus to GitHub Discussions. They load when
+                the comments section comes near the screen as you scroll (on a
+                short article, that can be as soon as the page opens), or when
+                you press Load comments in a browser that cannot detect
+                scrolling. Before then this page does not contact giscus or
+                GitHub. Once they load, your browser connects to giscus.app and
+                GitHub. Signing in and posting happen with GitHub, under
+                GitHub&apos;s privacy policy; dump never sees your password. The
+                RSS feed is a plain file — feed readers request it like any
+                page.
               </p>
             ),
           },
