@@ -1,52 +1,49 @@
-<p align="center">
-  <img src="packages/design/assets/stickers/sitting.png" alt="RaioViajante sitting" width="220">
-</p>
+<img align="right" src="packages/design/assets/stickers/sitting.png" alt="RaioViajante" width="190">
 
-<h1 align="center">raioviajante</h1>
+my corner of the internet.<br>
+four small sites, one design system.
 
-<p align="center">curious enough to build it myself.</p>
+<pre>
+00. <a href="https://raioviajante.com">index</a> ···················· who, what, where
+01. <a href="https://dump.raioviajante.com">dump</a> ····················· writing
+02. <a href="https://docs.raioviajante.com">docs</a> ····················· documentation
+03. <a href="https://lab.raioviajante.com">lab</a> ······················ experiments, things may break
+</pre>
 
----
+<br clear="right">
 
-The home of RaioViajante on the web: four small sites, one design system.
+#### what's inside
 
-| site | what it is |
-|---|---|
-| [raioviajante.com](https://raioviajante.com) | the index — who, what, where |
-| [dump](https://dump.raioviajante.com) | writing — notes from building things |
-| [docs](https://docs.raioviajante.com) | documentation for the projects |
-| [lab](https://lab.raioviajante.com) | experiments you can poke at — things may break |
+```
+apps/              one folder per site
+packages/design/   everything shared, in one place
+docs/              the long version of everything
+```
 
-## Structure
+#### run it
 
-    apps/              one folder per site
-    packages/design/   everything shared: tokens, components, sound, search, artwork
-    docs/              design system, blocks, deployment
+```
+pnpm install
+pnpm --filter ./apps/<site> dev
+pnpm validate
+```
 
-Anything used by more than one site lives in `packages/design`, and only there.
+#### read next
 
-## Running it
+<pre>
+<a href="docs/design-system.md">design-system.md</a> ············· how it looks and sounds
+<a href="docs/blocks.md">blocks.md</a> ···················· code and content blocks
+<a href="docs/deployment.md">deployment.md</a> ················ how it ships
+<a href="AGENTS.md">AGENTS.md</a> ···················· rules for whoever touches the code
+</pre>
 
-    pnpm install
-    pnpm --filter ./apps/<site> dev
-    pnpm validate      # format, lint, typecheck, tests and builds
+#### license
 
-## Read next
+<pre>
+code ························· <a href="LICENSE">MIT</a>
+docs ························· <a href="apps/docs/src/content/docs/LICENSE">CC BY 4.0</a>
+posts ························ <a href="apps/dump/content/posts/LICENSE">all rights reserved</a>
+artwork + character ·········· <a href="packages/design/assets/LICENSE">all rights reserved</a>
+</pre>
 
-- [`docs/design-system.md`](docs/design-system.md) — how everything looks and sounds
-- [`docs/blocks.md`](docs/blocks.md) — code and content blocks
-- [`docs/deployment.md`](docs/deployment.md) — how the sites ship
-- [`AGENTS.md`](AGENTS.md) — rules for anyone (or anything) changing the code
-
-## License
-
-| part | license |
-|---|---|
-| code | [MIT](LICENSE) |
-| docs content | [CC BY 4.0](apps/docs/src/content/docs/LICENSE) |
-| dump posts | [all rights reserved](apps/dump/content/posts/LICENSE) |
-| artwork, character and name | [all rights reserved](packages/design/assets/LICENSE) |
-
-## Contact
-
-mail@raioviajante.com
+<p align="center"><sub>best viewed with the sound on · <a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a></sub></p>
