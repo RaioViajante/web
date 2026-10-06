@@ -48,12 +48,12 @@ export function ArchivePostList({ posts }: { posts: Post[] }) {
                   <li key={post.slug}>
                     <LeaderRow
                       label={
-                        <>
+                        <span className="archive-label">
                           <time className="archive-date" dateTime={post.date}>
                             {formatArchiveDate(post.date)}
                           </time>
-                          {post.title}
-                        </>
+                          <span>{post.title}</span>
+                        </span>
                       }
                       value={post.tags[0]}
                       href={`/posts/${post.slug}`}

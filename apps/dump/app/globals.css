@@ -82,12 +82,18 @@ html {
 
 .archive-label {
   display: flex;
-  gap: 16px;
+  gap: 28px;
 }
 
 .archive-date {
-  flex: 0 0 48px;
+  flex: 0 0 5ch; /* "09-27" exactly, so every title lines up */
   color: var(--fg-3);
+}
+
+@media (max-width: 760px) {
+  .archive-label {
+    gap: 16px;
+  }
 }
 
 /* tags */
