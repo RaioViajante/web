@@ -133,7 +133,15 @@ export function LeaderRow({
       <span>{label}</span>
       <span className="rv-leader__dots" aria-hidden="true" />
       {value !== undefined ? (
-        <span className="rv-leader__value">{value}</span>
+        <span
+          className={
+            typeof value === "string" && value.length > 24
+              ? "rv-leader__value rv-leader__value--long"
+              : "rv-leader__value"
+          }
+        >
+          {value}
+        </span>
       ) : null}
     </>
   );

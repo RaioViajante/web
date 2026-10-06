@@ -14,6 +14,7 @@
     "./search.css": "./styles/search.css",
     "./assets/*": "./assets/*",
     "./components": "./components/index.ts",
+    "./art": "./components/art.tsx",
     "./search": "./components/search.tsx",
     "./search-react": "./search-react.tsx",
     "./search-client": "./search/client.ts",

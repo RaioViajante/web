@@ -220,6 +220,10 @@ a:hover {
   color: var(--fg-2);
   font-size: var(--size-small);
   text-align: right;
+  white-space: nowrap;
+}
+.rv-leader__value--long {
+  white-space: normal;
 }
 
 /* ---------- prose parts ---------- */
