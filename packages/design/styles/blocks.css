@@ -524,3 +524,14 @@
 .prose ol.steps > li > * + * {
   margin-top: 8px;
 }
+/* A step with a code block: the block starts on its own line under the text. */
+.prose ol.steps > li:has(> .block) {
+  flex-wrap: wrap;
+}
+.prose ol.steps > li:has(> .block) > p {
+  flex: 1 1 0;
+}
+.prose ol.steps > li > .block {
+  flex-basis: calc(100% - 26px - 17.6px);
+  margin-left: calc(26px + 17.6px);
+}
