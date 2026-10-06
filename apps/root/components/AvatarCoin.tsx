@@ -1,20 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { AVATAR_FRAME_SIZE, avatarFrames } from "@raioviajante/design/avatar";
 import { useEffect, useState } from "react";
 
-const frames = [
-  { src: "/art/avatar/frame-01.webp", duration: 250 },
-  { src: "/art/avatar/frame-02.webp", duration: 150 },
-  { src: "/art/avatar/frame-03.webp", duration: 150 },
-  { src: "/art/avatar/frame-04.webp", duration: 300 },
-  { src: "/art/avatar/frame-05.webp", duration: 200 },
-  { src: "/art/avatar/frame-06.webp", duration: 300 },
-  { src: "/art/avatar/frame-07.webp", duration: 400 },
-  { src: "/art/avatar/frame-08.webp", duration: 400 },
-  { src: "/art/avatar/frame-09.webp", duration: 250 },
-  { src: "/art/avatar/frame-10.webp", duration: 600 },
-] as const;
+const durations = [250, 150, 150, 300, 200, 300, 400, 400, 250, 600] as const;
+const frames = avatarFrames.map((src, index) => ({
+  src,
+  duration: durations[index],
+}));
 
 const centeredFrame = 3;
 
@@ -115,9 +109,9 @@ export function AvatarCoin() {
       <Image
         src={frames[frameIndex].src}
         alt=""
-        width={432}
-        height={432}
-        className="home-avatar"
+        width={AVATAR_FRAME_SIZE}
+        height={AVATAR_FRAME_SIZE}
+        className="rv-avatar"
         priority
         unoptimized
         onAnimationEnd={() => setFlipping(false)}

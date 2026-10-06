@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Noto_Sans_Mono } from "next/font/google";
-import { SiteFooter } from "../components/SiteFooter";
-import { SiteHeader } from "../components/SiteHeader";
-import { SiteNavigation } from "../components/SiteNavigation";
-import { SearchBehavior } from "@raioviajante/design/search-react";
-import "@raioviajante/design/editorial.css";
-import "@raioviajante/design/search.css";
+import { Behavior } from "@raioviajante/design/behavior-react";
+import "@raioviajante/design/styles.css";
 import "./globals.css";
 
 const mono = Noto_Sans_Mono({
@@ -39,19 +35,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={mono.variable}>
-      <body className="rv-shell">
-        <a className="skip-link" href="#content">
-          Skip to content
-        </a>
-        <SiteHeader />
-        <div className="rv-frame rv-layout">
-          <SiteNavigation />
-          <main id="content" className="rv-content">
-            {children}
-          </main>
-        </div>
-        <SiteFooter />
-        <SearchBehavior />
+      <body>
+        {children}
+        <Behavior />
       </body>
     </html>
   );

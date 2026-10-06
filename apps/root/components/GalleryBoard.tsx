@@ -2,70 +2,54 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { art } from "@raioviajante/design/art";
+import { gallery } from "@raioviajante/design/gallery";
 
 const artworks = [
   {
     id: "castle",
-    src: "/art/gallery/moonlit-castle.webp",
+    image: gallery.graveyardRun,
     alt: "RaioViajante running from a moonlit castle",
-    width: 1672,
-    height: 941,
   },
   {
     id: "sunset",
-    src: "/art/gallery/ukulele-sunset.webp",
+    image: gallery.sunsetGuitar,
     alt: "RaioViajante playing ukulele beside the sea at sunset",
-    width: 1672,
-    height: 941,
   },
   {
     id: "portrait",
-    src: "/art/gallery/purple-portrait.webp",
+    image: gallery.purplePortrait,
     alt: "A thoughtful purple portrait of the RaioViajante character",
-    width: 941,
-    height: 1672,
   },
   {
     id: "cats",
-    src: "/art/gallery/playful-cats.webp",
+    image: gallery.blackCats,
     alt: "Three playful black cats against a purple background",
-    width: 1536,
-    height: 1024,
   },
   {
     id: "calves",
-    src: "/art/gallery/playful-calves.webp",
+    image: gallery.calvesPlaying,
     alt: "Two playful calves in motion",
-    width: 1448,
-    height: 1086,
   },
   {
     id: "calf",
-    src: "/art/gallery/calf-portrait.webp",
+    image: gallery.cowMuhh,
     alt: "A small calf sitting against a purple background",
-    width: 1536,
-    height: 1024,
   },
   {
     id: "mirror",
-    src: "/art/gallery/mirror-reflection.webp",
+    image: gallery.mirrorDonkey,
     alt: "RaioViajante looking into a mirror with a goofy reflection",
-    width: 1448,
-    height: 1086,
   },
   {
     id: "lab",
-    src: "/art/gallery/neon-lab.webp",
+    image: gallery.laboratory,
     alt: "RaioViajante celebrating in a neon code lab",
-    width: 1672,
-    height: 941,
   },
   {
     id: "hospital",
-    src: "/art/gallery/hospital-monitor.webp",
+    image: gallery.hospitalBed,
     alt: "RaioViajante resting in a hospital bed beside a binary monitor",
-    width: 1672,
-    height: 941,
   },
 ] as const;
 
@@ -79,7 +63,7 @@ function Artwork({
   return (
     <a
       className={`gallery-tile gallery-tile--${artwork.id}`}
-      href={artwork.src}
+      href={artwork.image.src}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`Open artwork: ${artwork.alt}`}
@@ -87,10 +71,10 @@ function Artwork({
       style={{ animationDelay: `${order * 105}ms` }}
     >
       <Image
-        src={artwork.src}
+        src={artwork.image.src}
         alt={artwork.alt}
-        width={artwork.width}
-        height={artwork.height}
+        width={artwork.image.width}
+        height={artwork.image.height}
         sizes="(max-width: 760px) 60vw, 420px"
         loading={order < 5 ? "eager" : "lazy"}
       />
@@ -115,10 +99,10 @@ export function GalleryBoard() {
         }}
       >
         <Image
-          src="/art/gallery/work-of-art.webp"
+          src={art.workOfArt.src}
           alt=""
-          width={941}
-          height={1672}
+          width={art.workOfArt.width}
+          height={art.workOfArt.height}
           priority
         />
       </button>

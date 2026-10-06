@@ -1,9 +1,12 @@
-import Link from "next/link";
+import {
+  IndexHeader,
+  LeaderRow,
+  Section,
+} from "@raioviajante/design/components";
 import { AvatarCoin } from "../components/AvatarCoin";
-import { ProjectPreviewRow } from "../components/ProjectPreviewRow";
 import { PreviewRow } from "../components/PreviewRow";
-import { LeaderRow } from "../components/LeaderRow";
-import { SectionHeading } from "../components/SectionHeading";
+import { ProjectPreviewRow } from "../components/ProjectPreviewRow";
+import { RootShell } from "../components/RootShell";
 import { primaryLinks } from "../lib/links";
 import { projects } from "../lib/projects";
 import { getRecentPosts } from "../lib/writing";
@@ -14,15 +17,14 @@ export default async function Home() {
   const posts = await getRecentPosts();
 
   return (
-    <>
-      <div className="rv-hero">
-        <AvatarCoin />
-        <h1>RaioViajante</h1>
-        <p className="rv-dek">curious enough to build it myself.</p>
-      </div>
+    <RootShell current="/">
+      <IndexHeader
+        name="RaioViajante"
+        line="curious enough to build it myself."
+        avatar={<AvatarCoin />}
+      />
 
-      <section className="rv-section" aria-labelledby="links-heading">
-        <SectionHeading id="links-heading" number="00." title="Primary links" />
+      <Section number="00." title="Primary links" id="links-heading" index>
         {primaryLinks.map((link) => (
           <PreviewRow
             key={link.href}
@@ -33,28 +35,23 @@ export default async function Home() {
             description={link.description}
           />
         ))}
-      </section>
+      </Section>
 
-      <section className="rv-section" aria-labelledby="projects-heading">
-        <SectionHeading id="projects-heading" number="00.1" title="Projects" />
+      <Section number="00.1" title="Projects" id="projects-heading" index>
         {projects
           .filter((project) => project.name !== "Dump")
           .map((project) => (
             <ProjectPreviewRow key={project.name} project={project} />
           ))}
-      </section>
+      </Section>
 
-      <section className="rv-section" aria-labelledby="writing-heading">
-        <SectionHeading
-          id="writing-heading"
-          number="00.2"
-          title="Latest writing"
-        />
+      <Section number="00.2" title="Latest writing" id="writing-heading" index>
         {posts.map((post) => (
           <LeaderRow
             key={post.url}
-            name={<a href={post.url}>{post.title}</a>}
-            note={post.date}
+            label={post.title}
+            value={post.date}
+            href={post.url}
           />
         ))}
         <p className="home-feed-note">
@@ -62,16 +59,11 @@ export default async function Home() {
             from dump.raioviajante.com
           </a>
         </p>
-      </section>
+      </Section>
 
-      <section className="rv-section" aria-labelledby="other-links-heading">
-        <SectionHeading
-          id="other-links-heading"
-          number="00.3"
-          title="Other links"
-        />
-        <LeaderRow name={<Link href="/setup">Setup</Link>} note="gear" />
-      </section>
-    </>
+      <Section number="00.3" title="Other links" id="other-links-heading" index>
+        <LeaderRow label="Setup" value="gear" href="/setup" />
+      </Section>
+    </RootShell>
   );
 }
