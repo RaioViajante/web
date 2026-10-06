@@ -198,10 +198,10 @@
   text-decoration: none;
 }
 .rv-search-scope button[aria-pressed="true"] {
-  color: color-mix(in srgb, var(--fg-2), var(--fg) 18%);
+  color: color-mix(in srgb, var(--fg-2), var(--fg) 55%);
 }
-.rv-search-scope button:hover,
-.rv-search-scope button:focus-visible {
+.rv-search-scope button[aria-pressed="false"]:hover,
+.rv-search-scope button[aria-pressed="false"]:focus-visible {
   color: color-mix(in srgb, var(--fg-2), var(--fg) 30%);
 }
 .rv-search-group {
