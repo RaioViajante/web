@@ -51,11 +51,11 @@ any page-level type for search, legal and archive pages.
   checks accept exactly that pairing. The RSS feed keeps the publication date.
   The image is the post's generated social card.
 - Docs `dateModified` and sitemap `lastmod` use only an explicit `lastUpdated`
-  frontmatter date. No docs page has one yet, so neither is emitted. The page's
-  visible "last updated" line may still fall back to the last git commit, but
-  that is not a content date for search engines: today it is a design-system
-  migration commit, not an edit of the documentation. Docs have no publication
-  date, so none is claimed.
+  frontmatter date. No docs page has one yet, so neither is emitted. The
+  visible "last updated" line follows the same rule (explicit `lastUpdated`
+  only): git commit dates were dropped because the only ones available were a
+  design-system migration commit, not an edit of the documentation. Docs have
+  no publication date, so none is claimed.
 - Authors: dump posts and the root and dump sites name the shared person (dump
   states `site.author`; root is the person's own home). Docs and Lab do not: no
   page says who writes them. The docs content `LICENSE` names `RaioViajante` as

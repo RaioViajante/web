@@ -117,11 +117,11 @@ Environment variables cannot be declared in `vercel.json`, so they live in
 the dashboard (see the checklist). dump uses `NEXT_PUBLIC_SITE_URL` in the
 Production environment to set its canonical origin (see
 [development](development.md#environment-variables)); without it dump falls
-back to `VERCEL_PROJECT_PRODUCTION_URL`. docs uses `VERCEL_DEEP_CLONE=true` so
-git-based last-updated dates remain available. Explicit
-`lastUpdated: "YYYY-MM-DD"` frontmatter takes precedence; dates are omitted
-when neither source is available. Neither setting has been applied or
-verified by the migration agent. Root and lab do not use custom environment
+back to `VERCEL_PROJECT_PRODUCTION_URL`. docs no longer needs
+`VERCEL_DEEP_CLONE`: its "last updated" dates come only from explicit
+`lastUpdated: "YYYY-MM-DD"` frontmatter, never from git history, and are
+omitted without it. The dump setting has not been applied or verified by the
+migration agent. Root and lab do not use custom environment
 variables.
 
 ## Owner checklist (Vercel dashboard)
@@ -151,10 +151,9 @@ For every project (`raioviajante.com`, `dump`, `docs`, `lab`):
 
 Per project:
 
-6. **docs: `VERCEL_DEEP_CLONE=true`.** `docs` → Settings → Environment
-   Variables → add `VERCEL_DEEP_CLONE` = `true` for Production and Preview.
-   Without it Vercel's shallow clone hides git history and the last-updated
-   dates are omitted.
+6. **docs: `VERCEL_DEEP_CLONE`.** No longer required. Earlier versions read git
+   history for a last-updated date; docs now uses only explicit `lastUpdated`
+   frontmatter. If the variable is already set it is harmless and can stay.
 7. **dump: `NEXT_PUBLIC_SITE_URL`.** `dump` → Settings → Environment
    Variables → keep `NEXT_PUBLIC_SITE_URL` = `https://dump.raioviajante.com`
    for Production (Preview may be left unset).

@@ -31,14 +31,13 @@ toggle remain.
 
 - A page needs the frontmatter in `src/content.config.ts`; `order` decides the
   sidebar, previous/next and home order.
-- A page may set `lastUpdated: "2026-10-06"` in its frontmatter (an ISO calendar
-  date, `YYYY-MM-DD`). Use the date of a real editorial update. This explicit
-  date takes priority over git. Otherwise, "Last updated" uses the last commit
-  that touched the page's file, read at build time. The line is omitted when
-  neither exists, including when git history is unavailable or shallow.
-  Set `VERCEL_DEEP_CLONE=true` on the docs Vercel project to make git fallback
-  dates available in production. No version or commit hash is shown until the
-  project publishes versions.
+- A page may set `lastUpdated` in its frontmatter (an ISO calendar date,
+  `YYYY-MM-DD`) when the documentation itself was really edited on that day.
+  That explicit date is the only source of the visible "last updated" line, of
+  the structured-data `dateModified` and of the sitemap `lastmod`. Without it
+  none of them appears: git commit dates are never used, because a commit can
+  be a design or tooling change rather than an edit of the page. No version or
+  commit hash is shown until the project publishes versions.
 - No placeholder renders on a public page. Pages that need a fact the
   repository does not have leave it out.
 
