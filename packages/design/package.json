@@ -64,7 +64,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "playground": "vite playground --open"
   },
   "peerDependencies": {
     "react": "^19.0.0",
