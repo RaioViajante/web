@@ -779,6 +779,18 @@ Intentional differences from the design references (root compared with
 - The gallery screenshot differs only because the reference was captured
   after opening the reveal.
 
+### Owner follow-up after Phase 6 (done)
+
+- New favicon from the handoff (`art-concepts/favicon.png`, copied to
+  `packages/design/assets/icons/source.png`). `scripts/icons.mjs` generates the
+  ICO, 512/192 PNGs, the iOS icon and an Android maskable icon, and copies them
+  to each app (`scripts/icon-copies.mjs`; `tests/icons.test.ts` checks the
+  copies). Every site has a web manifest from the shared `webManifest`; Astro
+  icon links moved to `?v=4`. Root's `public/icons/icon-192.png` moved to
+  `public/icon-192.png`.
+- The empty-search suggestions are a `TRY sweep · orbit · design · lab` row
+  styled like the scope selector, without underlines.
+
 ### Checks run (Phases 5 and 6)
 
 - `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` under
