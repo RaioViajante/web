@@ -85,17 +85,39 @@ describe("static pages keep canonical and RSS together", () => {
   });
 });
 
-describe("websiteJsonLd", () => {
-  it("describes the site from real site.ts data, on the canonical origin", async () => {
-    const { websiteJsonLd } = await import("@/lib/structured-data");
-    expect(websiteJsonLd()).toEqual({
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: "dump",
-      description:
-        "Computer science notes, projects, devlogs, and technology writing by RaioViajante.",
-      url: PRODUCTION_ORIGIN,
-    });
+const PERSON = {
+  "@type": "Person",
+  "@id": "https://raioviajante.com/#person",
+  name: "RaioViajante",
+  url: "https://raioviajante.com/",
+};
+
+describe("homeJsonLd", () => {
+  it("describes the WebSite and its Blog, both by the shared person", async () => {
+    const { homeJsonLd } = await import("@/lib/structured-data");
+    expect(homeJsonLd()).toEqual([
+      {
+        "@type": "WebSite",
+        "@id": `${PRODUCTION_ORIGIN}/#website`,
+        name: "dump",
+        description:
+          "Computer science notes, projects, devlogs, and technology writing by RaioViajante.",
+        url: `${PRODUCTION_ORIGIN}/`,
+        inLanguage: "en",
+        author: PERSON,
+      },
+      {
+        "@type": "Blog",
+        "@id": `${PRODUCTION_ORIGIN}/#blog`,
+        name: "dump",
+        description:
+          "Computer science notes, projects, devlogs, and technology writing by RaioViajante.",
+        url: `${PRODUCTION_ORIGIN}/`,
+        inLanguage: "en",
+        author: PERSON,
+        isPartOf: { "@id": `${PRODUCTION_ORIGIN}/#website` },
+      },
+    ]);
   });
 });
 
@@ -105,20 +127,24 @@ describe("blogPostingJsonLd", () => {
     title: "Example Post",
     description: "An example description.",
     date: "2026-01-15",
-    tags: ["osdev"],
+    tags: ["osdev", "x86"],
     draft: false,
   };
 
   it("derives BlogPosting from real post and site data only", async () => {
     const { blogPostingJsonLd } = await import("@/lib/structured-data");
+    const url = `${PRODUCTION_ORIGIN}/posts/example-post`;
     expect(blogPostingJsonLd(post)).toEqual({
-      "@context": "https://schema.org",
       "@type": "BlogPosting",
       headline: "Example Post",
       description: "An example description.",
       datePublished: "2026-01-15",
-      url: `${PRODUCTION_ORIGIN}/posts/example-post`,
-      author: { "@type": "Person", name: "RaioViajante" },
+      url,
+      mainEntityOfPage: { "@type": "WebPage", "@id": url },
+      author: PERSON,
+      inLanguage: "en",
+      isPartOf: { "@id": `${PRODUCTION_ORIGIN}/#blog` },
+      keywords: "osdev, x86",
       image: `${PRODUCTION_ORIGIN}/og/posts/example-post.png`,
     });
   });
@@ -130,22 +156,12 @@ describe("blogPostingJsonLd", () => {
     expect(data).not.toHaveProperty("publisher");
     expect(data).not.toHaveProperty("breadcrumb");
   });
-});
 
-describe("jsonLdScript", () => {
-  it("serializes to valid, parseable JSON", async () => {
-    const { jsonLdScript } = await import("@/lib/structured-data");
-    expect(JSON.parse(jsonLdScript({ a: 1 }))).toEqual({ a: 1 });
-  });
-
-  it("escapes '<' so an embedded value can't close the surrounding script tag", async () => {
-    const { jsonLdScript } = await import("@/lib/structured-data");
-    const dangerous = { headline: "</script><script>evil()</script>" };
-
-    const script = jsonLdScript(dangerous);
-
-    expect(script).not.toContain("</script>");
-    expect(JSON.parse(script.replaceAll("\\u003c", "<"))).toEqual(dangerous);
+  it("omits keywords when a post has no tags", async () => {
+    const { blogPostingJsonLd } = await import("@/lib/structured-data");
+    expect(blogPostingJsonLd({ ...post, tags: [] })).not.toHaveProperty(
+      "keywords",
+    );
   });
 });
 

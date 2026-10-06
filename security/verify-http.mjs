@@ -82,6 +82,8 @@ for (const [site, port] of Object.entries(ports)) {
     } else assert.equal(nonce, undefined);
     assert.equal(csp, contentSecurityPolicy(site, nonce));
     for (const [, attributes] of html.matchAll(/<script\b([^>]*)>/g)) {
+      // JSON-LD is data, not executed, so the CSP does not govern it.
+      if (/\btype="application\/ld\+json"/.test(attributes)) continue;
       if (nonce)
         assert.ok(
           attributes.includes(`nonce="${nonce}"`),

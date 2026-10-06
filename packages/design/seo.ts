@@ -52,9 +52,21 @@ const xml = (value: string) =>
       })[char]!,
   );
 
-export function sitemapResponse(origin: string, paths: string[]) {
+export interface SitemapEntry {
+  path: string;
+  /** Only a real content date (`YYYY-MM-DD`); never a build time. */
+  lastmod?: string;
+}
+
+export function sitemapResponse(
+  origin: string,
+  entries: Array<string | SitemapEntry>,
+) {
+  const urls = entries.map((entry) =>
+    typeof entry === "string" ? { path: entry } : entry,
+  );
   return new Response(
-    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${paths.map((path) => `<url><loc>${xml(new URL(path, origin).href)}</loc></url>`).join("")}</urlset>`,
+    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(({ path, lastmod }) => `<url><loc>${xml(new URL(path, origin).href)}</loc>${lastmod ? `<lastmod>${xml(lastmod)}</lastmod>` : ""}</url>`).join("")}</urlset>`,
     { headers: { "Content-Type": "application/xml; charset=utf-8" } },
   );
 }
@@ -102,4 +114,76 @@ export function webManifest(name: string) {
       },
     ],
   };
+}
+
+/**
+ * The one public identity of the person behind the sites. Only facts the
+ * sites already publish: the handle used as the author name everywhere, the
+ * home page, and the GitHub profile linked from the home pages.
+ */
+export const identity = {
+  name: "RaioViajante",
+  url: "https://raioviajante.com/",
+  id: "https://raioviajante.com/#person",
+  github: "https://github.com/RaioViajante",
+} as const;
+
+/** A reference every page can embed; Google does not follow `@id` across documents. */
+export function personRef() {
+  return {
+    "@type": "Person" as const,
+    "@id": identity.id,
+    name: identity.name,
+    url: identity.url,
+  };
+}
+
+/** The full Person node, published once on the root home page. */
+export function personJsonLd() {
+  return { ...personRef(), sameAs: [identity.github] };
+}
+
+export function websiteId(origin: string) {
+  return new URL("/#website", origin).href;
+}
+
+export function websiteJsonLd(
+  origin: string,
+  name: string,
+  description: string,
+) {
+  return {
+    "@type": "WebSite" as const,
+    "@id": websiteId(origin),
+    name,
+    description,
+    url: new URL("/", origin).href,
+    inLanguage: "en",
+    author: personRef(),
+  };
+}
+
+/** Breadcrumb items are real pages, in navigation order, as `[name, path]`. */
+export function breadcrumbJsonLd(
+  origin: string,
+  items: Array<[string, string]>,
+) {
+  return {
+    "@type": "BreadcrumbList" as const,
+    itemListElement: items.map(([name, path], index) => ({
+      "@type": "ListItem" as const,
+      position: index + 1,
+      name,
+      item: new URL(path, origin).href,
+    })),
+  };
+}
+
+/** One `<script type="application/ld+json">` body for the given nodes. */
+export function jsonLdScript(...nodes: object[]) {
+  // `<` is escaped so a value can never close the surrounding script element.
+  return JSON.stringify({
+    "@context": "https://schema.org",
+    "@graph": nodes,
+  }).replace(/</g, "\\u003c");
 }

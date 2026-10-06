@@ -5,6 +5,6 @@ export async function GET() {
 		origin,
 		(await getSeoPages())
 			.filter((page) => !isNotFoundPath(page.path))
-			.map((page) => page.path),
+			.map(({ path, lastmod }) => ({ path, lastmod })),
 	);
 }

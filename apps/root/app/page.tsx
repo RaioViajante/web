@@ -1,4 +1,10 @@
-import { metadataFor } from "../lib/seo";
+import { headers } from "next/headers";
+import {
+  jsonLdScript,
+  personJsonLd,
+  websiteJsonLd,
+} from "@raioviajante/design/seo";
+import { metadataFor, origin, pages } from "../lib/seo";
 import Link from "next/link";
 import {
   IndexHeader,
@@ -19,9 +25,20 @@ export const revalidate = 60;
 
 export default async function Home() {
   const posts = await getRecentPosts();
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <RootShell current="/">
+      <script
+        nonce={nonce}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdScript(
+            personJsonLd(),
+            websiteJsonLd(origin, "raioviajante", pages[0]!.description),
+          ),
+        }}
+      />
       <IndexHeader
         name="RaioViajante"
         line="curious enough to build it myself."
@@ -35,6 +52,7 @@ export default async function Home() {
             id={`primary-link-${link.category}`}
             label={link.label}
             href={link.href}
+            rel={link.rel}
             note={link.category}
             description={link.description}
           />

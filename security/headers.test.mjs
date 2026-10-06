@@ -52,12 +52,21 @@ for (const site of ["docs", "lab"]) {
     )) {
       const html = await readFile(file, "utf8");
       pages++;
-      for (const [, attributes] of html.matchAll(/<script\b([^>]*)>/g))
+      for (const [, attributes, body] of html.matchAll(
+        /<script\b([^>]*)>([\s\S]*?)<\/script>/g,
+      )) {
+        // A JSON-LD block is data the browser never executes, so the CSP does
+        // not govern it; it must still be well-formed JSON.
+        if (/\btype="application\/ld\+json"/.test(attributes)) {
+          assert.doesNotThrow(() => JSON.parse(body), `${file}: JSON-LD`);
+          continue;
+        }
         assert.match(
           attributes,
           /\bsrc="\/_astro\/[^" ]+\.js"/,
           `${file}: inline/external script`,
         );
+      }
       assert.doesNotMatch(
         html,
         /<style\b|\son\w+=|<astro-island\b|http-equiv="content-security-policy"/i,

@@ -133,6 +133,7 @@ export function LeaderRow({
   describedBy,
   wrapValue = false,
   linkComponent,
+  rel,
 }: {
   label: ReactNode;
   value?: ReactNode;
@@ -143,6 +144,8 @@ export function LeaderRow({
   /** Id of a tooltip that describes the link. */
   describedBy?: string;
   linkComponent?: LinkComponent;
+  /** Link relation, for example `me` on a profile of the site's owner. */
+  rel?: string;
 }) {
   const content = (
     <>
@@ -168,6 +171,7 @@ export function LeaderRow({
       href={href}
       data-sound={sound}
       aria-describedby={describedBy}
+      rel={rel}
     >
       {content}
     </SiteLink>

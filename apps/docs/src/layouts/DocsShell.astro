@@ -1,6 +1,7 @@
 ---
 import { isNotFoundPath } from "@raioviajante/design/seo";
 import { SeoHead } from "@raioviajante/design/seo-head";
+import { jsonLdScript } from "@raioviajante/design/seo";
 import fontUrl from "@raioviajante/design/fonts/NotoSansMono-Latin-Variable.woff2?url";
 import "@raioviajante/design/fonts.css";
 import "@raioviajante/design/styles.css";
@@ -18,9 +19,11 @@ interface Props {
 	toc?: NavItem[];
 	/** The home page uses its own, full-site title. */
 	fullTitle?: boolean;
+	/** Structured data nodes for this page. */
+	jsonLd?: object[];
 }
 
-const { title, description, current, toc, fullTitle = false } = Astro.props;
+const { title, description, current, toc, fullTitle = false, jsonLd } = Astro.props;
 const pageTitle = fullTitle ? title : `${title} — docs`;
 const items = await navItems();
 const number = await searchNumber();
@@ -39,6 +42,7 @@ const number = await searchNumber();
 			description={description}
 			noindex={isNotFoundPath(Astro.url.pathname)}
 		/>
+		{jsonLd && <script is:inline type="application/ld+json" set:html={jsonLdScript(...jsonLd)} />}
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>{pageTitle}</title>
 		<meta name="description" content={description} />

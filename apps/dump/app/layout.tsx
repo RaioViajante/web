@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
 import { alternatesFor, site } from "@/lib/site";
-import { jsonLdScript, websiteJsonLd } from "@/lib/structured-data";
 import { Behavior } from "@raioviajante/design/behavior-react";
 
 import "@raioviajante/design/styles.css";
@@ -53,16 +52,9 @@ export default async function RootLayout({
   children: ReactNode;
 }) {
   // Reading the request opts HTML into dynamic rendering for per-request CSP.
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  await headers();
   return (
     <html lang={site.locale} className={mono.variable}>
-      <head>
-        <script
-          nonce={nonce}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
-        />
-      </head>
       <body>
         {children}
         <Behavior />
