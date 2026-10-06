@@ -20,7 +20,8 @@ src/
  tests/            Node unit tests for classifier and lifecycle rules
 ```
 
-`BaseLayout.astro` owns metadata and font loading. `LabFrame` configures the
+`BaseLayout.astro` owns metadata (the shared `SeoHead`, fed by `src/lib/seo.ts`,
+which also lists the pages for `/og/` cards and `sitemap.xml`) and font loading. `LabFrame` configures the
 package's shell, navigation and footer. Shared behavior handles search, sound,
 avatar animation and block interactions. No copied shared markup, assets or
 styles live in lab. Every experiment stays inside the shared content column;

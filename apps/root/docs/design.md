@@ -12,7 +12,9 @@ script once. Each page renders `components/RootShell.tsx`, which configures the
 shared `Shell` (sidebar, sound toggle, 740px column, footer) with root's pages
 and the search menu item. Page parts (`IndexHeader`, `PageHeader`, `Section`,
 `LeaderRow`), the `Quote` block, `LegalPage` and `NotFoundPage` also come from
-the package. Navigation between pages is by full page load.
+the package. Internal links use `next/link` for client-side navigation, without
+prefetching. `lib/seo.ts` lists every page's title and description; it feeds
+page metadata, the social cards under `/og/`, `sitemap.xml` and `robots.txt`.
 
 Root keeps only what is its own, in `app/globals.css` and `components/`: the
 avatar flip (`AvatarCoin`), the hover descriptions on home rows (`PreviewRow`),

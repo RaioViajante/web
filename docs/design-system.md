@@ -1,6 +1,6 @@
 # raioviajante design system
 
-> Imported from the design handoff (`raioviajante-design/`, local only). Differences from the original are limited to the image locations, the resolved `[CHECK]` values, and the sound notes. Sections the repo has not implemented yet are tracked in [design-migration-plan.md](design-migration-plan.md).
+> The implemented shared system for all four sites. Historical design decisions and unresolved facts are recorded in [design-migration-plan.md](design-migration-plan.md).
 
 One visual identity for four sites with four different jobs.
 
@@ -21,11 +21,11 @@ Everything below that appears on more than one page or site is **one shared impl
 
 | shared piece                                        | used by          | pass in                                                 |
 | --------------------------------------------------- | ---------------- | ------------------------------------------------------- |
-| `tokens.css` (or a shared ui package)               | all four sites   | —                                                       |
+| `styles/tokens.css`                                 | all four sites   | —                                                       |
 | Shell: sidebar + sound toggle + column + footer     | every page       | site, PAGES items, active item, optional "on this page" |
 | Sound player + preference                           | every page       | `data-sound` on elements                                |
 | Search menu item ("Ask RaioViajante")               | every sidebar    | number, shortcut label                                  |
-| Search page                                         | dump, docs, lab  | the site's question, index scope                        |
+| Search page                                         | all four sites   | the site's question, index scope                        |
 | Index header (avatar, name, line)                   | every index page | name, line                                              |
 | Section heading `01.1 Title`                        | everywhere       | number, title                                           |
 | Dotted leader row                                   | everywhere       | label, value, href                                      |
@@ -39,10 +39,10 @@ Everything below that appears on more than one page or site is **one shared impl
 
 | file                                            | where                                                                         |
 | ----------------------------------------------- | ----------------------------------------------------------------------------- |
-| `character/avatar.png`                          | index headers (112px)                                                         |
+| `character/avatar.png`                          | index headers and social cards                                                |
 | `search/search-character.png`                   | search page, full pose next to the bubble (150px)                             |
 | `search/head/static.png`                        | search menu item (30px) and "ask RaioViajante" rows (34px) — never below 28px |
-| `character/avatar-frames/frame-01…10.png`       | the root avatar animation (224px, shown at 112px), via `components/avatar.ts` |
+| `character/avatar-frames/frame-01…10.png`       | index avatar animation (224px, shown at 112px), via `components/avatar.ts`    |
 | `search/not-found.png`                          | empty search (180px)                                                          |
 | `stickers/work-of-art.png`                      | root gallery                                                                  |
 | `stickers/not-found.png` ("404 page not found") | every 404                                                                     |
@@ -73,10 +73,10 @@ All tokens live in `packages/design/styles/tokens.css`. The two `[CHECK]` values
 | `--line`        | `rgba(215, 223, 234, 0.3)` | rules, frames (root)                            |
 | `--dots`        | `rgba(215, 223, 234, 0.3)` | dotted leaders (root rule)                      |
 | `--rule-note`   | `#555555`                  | quotes, NOTE                                    |
-| `--code-bg`     | `#202020`                  | code blocks, benches                            |
-| `--code-inline` | `#262626`                  | inline code                                     |
+| `--block`       | `#212121`                  | code blocks, benches                            |
+| `--block-inner` | `#262626`                  | inline code                                     |
 
-Syntax: keyword `#d8bd84` · type `#bfa6d9` · function `#8fb8d6` · string `#a8c791` · number `#de9f8c` · comment `#7b818a` italic · punctuation `--fg-2`.
+Syntax: keyword `#d8bd84` · type `#bfa6d9` · function `#8fb8d6` · string `#a8c791` · number `#de9f8c` · comment `#9aa3af` italic · punctuation `--fg-2`.
 
 ## 3. Typography
 
@@ -130,10 +130,10 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 
 ### docs
 
-- Home: large search, projects with status, raioviajante standards, "reading these docs" (status meanings).
-- Three columns: left tree nav, content, "on this page".
-- Guide pages: breadcrumb label, status in meta, steps, tables, callouts, platform tabs, file trees, **try it and read more**, last updated + edit on GitHub.
-- Reference pages: synopsis, commands, behavior matrix, arguments, output fields, exit codes, changelog, version selector.
+- Home: animated avatar, projects with status and raioviajante standards. Search is only in the sidebar.
+- Two columns: sidebar (pages and "on this page") and content.
+- Guide pages: breadcrumb label, status, steps, tables, callouts, **try it and read more**, last updated and edit on GitHub. Last updated prefers explicit ISO-date frontmatter, then full git history, and is omitted when unavailable.
+- Reference pages render verified commands and behavior. Unknown versions, exit codes and changelogs are omitted. Tabs and file trees are shared capabilities, used only where content needs them.
 - Search: numbered sidebar item `03. search  /`, the only search entry point (the docs home has no search line of its own). It opens a full search page (no icon, no box, no key chips): caps label, plain input, results as numbered leader rows, selected result marked with the sidebar rule. Finds docs sections and dump posts from one shared index. Shortcut `/` on every site.
 - **Design language** page rewritten for this system (the old one described a purple accent and serif prose).
 - Callout and code styles: see `blocks/` (soft direction) — same rules on docs.
@@ -152,7 +152,7 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 
 ## 5b. Sound
 
-Sound is part of the identity. Every site loads the **same sound files and the same preference** as raioviajante.com.
+Sound is part of the identity. Every site uses the same Web Audio synthesis and cookie preference as raioviajante.com.
 
 | event               | where                               | sound                                         |
 | ------------------- | ----------------------------------- | --------------------------------------------- |
@@ -172,21 +172,49 @@ Rules: never play on page load; one preference across subdomains (localStorage i
 
 ## 6. Interactive behavior (lab)
 
-The static HTML in this bundle is a snapshot of the initial state. The working logic is in `source/lab/*.dc.html` (the `renderVals()` class at the bottom of each file).
+Static React renders the initial state; plain TypeScript Astro scripts run the benches. Pure logic and pinned provenance live in `apps/lab/src/lib` and `apps/lab/src/data`.
 
-- **001 filename classifier** — directory + filenames (one per line) → suffix, category, destination, counts. Suffix mirrors Python `Path.suffix`: last dot, ignored at index 0 and at the end, lowercased. Categories are the ones on the docs Sweep page.
-- **002 execution states** — actions start / succeed / fail / cancel. Rejected actions log `rejected: <action> from <STATE>` and change nothing. Times from the browser clock. "new example" resets.
-- **003 boot sector** — five sections, source + note per section, previous/next, progress `n / 5`.
+- **001 filename classifier** — directory + filenames (one per line) → suffix, category, destination, counts. Suffix mirrors Python 3.14 POSIX `Path.suffix`, lowercased for matching; `.hidden` has none and `image.` has suffix `.`. Spaces are preserved. Categories are the ones on the docs Sweep page.
+- **002 execution states** — actions start / succeed / fail / cancel. Rejected actions log `rejected: <action> from <STATE>` and change nothing. Rules are verified against Orbit `cd97666`, including Java blank-message and signed integer rules. Times come from the browser clock. "new example" resets.
+- **003 boot sector** — five sections verified against x86-os-experiment `e966889`, source and notes, previous/next, progress `n / 5`. It does not emulate a machine.
 
-Implementation: Shiki with a custom theme mapped to the syntax tokens (`packages/design/blocks/`), a build-time static search index per site merged client-side for "everywhere" (planned, Phase 3), and `@raioviajante/design` imported by all four apps.
+Implementation: Shiki with a custom theme mapped to the syntax tokens (`packages/design/blocks/`), a build-time static search index per site merged client-side for "everywhere" (implemented), and `@raioviajante/design` imported by all four apps.
 
 ## 7. To verify before shipping
 
 - `[CHECK]` values in `tokens.css`: resolved (see section 2).
-- **Orbit rules** assumed in 002: start from QUEUED; succeed and fail from RUNNING; cancel from QUEUED or RUNNING.
-- **Boot sector** sections 2–5: code reconstructed from the dump post; notes are `[NOTE FROM LEARNING NOTES]` placeholders. Replace with revision e966889.
+- Orbit rules are verified: start from QUEUED; succeed/fail from RUNNING; cancel from QUEUED/RUNNING.
+- Boot source and notes are verified at `e966889`; the original `[NOTE FROM LEARNING NOTES]` placeholders are not published.
 - Placeholders: `[VERSION]`, `[DATE]`, `[REVISION]`, `[COMMIT]`, exit codes, changelog entries, install commands.
-- Series on dump (jobs-mcp, orbit, sweep) and reading times are illustrative.
+- Dump series derive from real posts; reading time is computed at 220 words per minute.
 
 - Legal pages: every `[CONFIRM]` and placeholder (license, host, analytics, retention, governing law). This is a template, not legal advice — have it reviewed.
 - Artwork: done. The shared package ships the original artwork.
+
+## 8. Metadata, accessibility and delivery
+
+Every indexable page has its own title, description, canonical URL and 1200×630
+PNG for Open Graph and Twitter. `seo.ts` owns URL and metadata conventions;
+`social-image.tsx` owns the shared avatar/site/title composition and reads token
+colors at build time. Apps own their route inventories. Sitemaps include search
+and legal pages but exclude 404 and image endpoints; robots points at the
+canonical sitemap. Dump keeps RSS. No publication or modification date is invented.
+
+The local Noto Sans Mono variable Latin WOFF2 is preloaded by each app, with
+optional font display to prevent a late font swap. Next uses `next/font/local`;
+Astro uses `fonts.css`. Static TTF weights and their OFL license live in
+`packages/design/fonts` for social rendering. Images reserve dimensions and
+load lazily below the fold. No React runtime hydrates Astro pages.
+
+Landmarks are the banner (sound toggle), the sidebar with its navigation, one
+main and the footer. Buttons, tabs, toggles, inputs and search controls have a
+44px target. Link lists (sidebar, leader rows, footer) keep their compact
+rhythm and meet the WCAG 2.2 24px target spacing; inline prose links retain
+text flow. Regions that scroll sideways (wide tables, long code lines) become
+focusable, labelled regions only while they overflow (`scroll-regions.ts`). Keyboard focus uses
+the shared outline, search and lab use live feedback, and all animation stops
+under reduced motion. Code comments and line numbers use `#9aa3af`; highlighted
+lines use `#2a2a2a` to preserve at least 4.5:1 text contrast. Incidental sounds
+are suppressed under reduced motion; explicit action confirmation remains.
+
+Empty search results use `search/not-found.png`.

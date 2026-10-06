@@ -14,7 +14,9 @@ toggle remain.
   (`src/components/DocsFrame.tsx`, rendered statically) and the shared
   behavior script. Styles come from `@raioviajante/design/styles.css` and
   `src/styles/docs.css`, which holds only docs' own pieces. Noto Sans Mono is
-  self-hosted through `@fontsource-variable/noto-sans-mono`.
+  self-hosted through the shared `fonts.css` and preloaded Latin WOFF2.
+- Metadata comes from the shared `SeoHead` in `DocsShell.astro`; `src/lib/seo.ts`
+  lists the pages for the `/og/` cards and `sitemap.xml`.
 - Two columns, like every site. "On this page" sits in the sidebar under
   PAGES; there is no right column. A page that belongs under another (the
   Sweep CLI reference) is a `sub` item: `01.1 cli reference`.

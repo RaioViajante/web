@@ -39,7 +39,7 @@ The check fails open: a missing, malformed, or unresolvable previous SHA, or a
 
 All four apps consume `@raioviajante/design`, so their Ignored Build Step must
 watch `../../packages/design`. Root and lab already do. The owner still needs
-to apply the command below to dump and docs in Vercel before deploying Phase 3.
+to apply the command below to dump and docs in Vercel before deploying the migration.
 It uses a shorter, equivalent form so that it stays
 within Vercel's 256-character limit for this setting:
 
@@ -59,7 +59,11 @@ The paths cover:
 
 dump uses `NEXT_PUBLIC_SITE_URL` in the Production environment to set its
 canonical origin (see [development](development.md#environment-variables)).
-The other apps do not use custom environment variables.
+Set `VERCEL_DEEP_CLONE=true` on the docs project so git-based last-updated
+dates remain available. Explicit `lastUpdated: "YYYY-MM-DD"` frontmatter takes
+precedence; dates are omitted when neither source is available. This setting
+has not been applied or verified by the migration agent. Root and lab do not
+use custom environment variables.
 
 ## Shared packages
 
@@ -70,3 +74,11 @@ changes only `packages/design` will rebuild all four apps.
 Before another app starts consuming a shared package, add that package's path
 to the app's Ignored Build Step first, so a shared change can never skip one of
 its consumers.
+
+## Metadata build assets
+
+Social PNGs are generated at build time using shared fonts, artwork and tokens.
+Keep "Include files outside the Root Directory" enabled for all projects.
+There is no external image service or new secret. After deploying, verify each
+site’s sitemap, robots, social images, host 404 and cross-origin search index.
+No deployment is implied by local validation.

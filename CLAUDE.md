@@ -1,72 +1,103 @@
-@AGENTS.md
+# AGENTS.md
 
-## Claude Code
+Instructions for RaioViajante/web. App `AGENTS.md` files add local rules;
+explicit task instructions take precedence. `CLAUDE.md` mirrors this file.
 
-- Identify the target app under `apps/` before modifying files. Its own
-  `CLAUDE.md`, when present, imports that app's `AGENTS.md`; read those
-  instructions before changing anything there.
-- Inspect the relevant source and documentation before making changes.
-- Validate as described in `AGENTS.md` before committing.
-- Never push without explicit authorization.
-- Architecture: `docs/architecture.md`. Development workflow: `docs/development.md`.
+## Repository
 
-## Design system migration
+| Path              | Package                | Purpose                             |
+| ----------------- | ---------------------- | ----------------------------------- |
+| `apps/root`       | `@raioviajante/root`   | Personal home and ecosystem index   |
+| `apps/dump`       | `@raioviajante/dump`   | Technical writing                   |
+| `apps/docs`       | `@raioviajante/docs`   | Curated technical documentation     |
+| `apps/lab`        | `@raioviajante/lab`    | Interactive experiments             |
+| `packages/design` | `@raioviajante/design` | Shared design, behavior and artwork |
 
-Applies to the work tracked in `docs/design-migration-plan.md` (branch
-`feat/design-migration`). Read that file first: it holds the full spec, the
-status of each phase, and exact instructions for the next session. Rules and
-tokens: `docs/design-system.md`. Blocks: `docs/blocks.md`.
+- Apps deploy independently and never import one another. Packages never import
+  apps. Repository docs live in `docs/`; app maintenance docs in `apps/*/docs/`.
+- Use English for repository content, identifiers, comments, commits and GitHub
+  metadata. Do not rewrite unrelated existing content just to enforce this.
+- Inspect relevant code and docs before editing. Preserve unrelated owner edits.
+- pnpm 12.8.1 only, Node 24 from `.nvmrc`. One workspace and root lockfile;
+  change the lockfile only through pnpm. Prefer named filters from the root.
+- Scope dependency changes to the task. Do not unify intentional version
+  differences. Packages with install scripts need workspace `allowBuilds` entries.
 
-Working rules for every agent:
+## Shared design
 
-- Work on `feat/design-migration`. Do not create another branch.
-- `raioviajante-design/` is the local design handoff. It is not part of the
-  repository: never commit it, never delete it, never link to it from
-  committed files. Copy what the repo needs (artwork into
-  `packages/design/assets`, docs into `docs/`).
-- Stage files explicitly. Never run `git add -A` or `git add .`.
-- Commit after each coherent, validated step. Never push, amend, rebase shared
-  commits, or force-push.
-- Keep every `[CONFIRM]`, `[DATE]`, `[VERSION]`, `[COMMIT]`, `[REVISION]` and
-  similar placeholder. Never invent facts to fill one.
+Read `docs/design-system.md` and `docs/blocks.md` for the implemented contract.
 
-Design rules:
+- Every repeated component, style, behavior, sound and artwork has one
+  implementation in `packages/design`. Apps own routes, content and unique
+  interactions. Play does not automatically inherit this system.
+- All four apps load `@raioviajante/design/styles.css`. Colors come from
+  `styles/tokens.css`; literals belong only there and in the tested Shiki mirror.
+  Page chrome is gray; color belongs inside code and lab output.
+- One typeface: self-hosted Noto Sans Mono, preloaded by each app. Social cards
+  use the shared renderer and token colors. Never copy a renderer into an app.
+- Use words for status, warnings and controls. No decorative icons, gradients,
+  glow, colored badges, emoji, bento grids or second typeface. Preserve the
+  documented root gallery effects; do not add shadows elsewhere.
+- Artwork lives once in `packages/design/assets`, with its all-rights-reserved
+  license. Use `Art`/gallery static imports, meaningful alt text (empty for
+  decorative images), explicit dimensions and lazy loading below the fold.
+- The avatar belongs on index headers and social cards; the search character
+  belongs on search, the 404 sticker on 404, and the empty-search sticker on
+  empty results. Search heads are at least 28px. Other placements need a task.
+- Soft blocks use the shared markup and build-time custom Shiki theme.
+- Next.js renders shared React on the server. Astro uses `@astrojs/react`
+  statically: no `client:*` or browser React. Shared `behavior` handles common
+  interactions; lab benches use small plain TypeScript Astro scripts.
+- Web Audio synthesis lives in `packages/design/sound`; no audio files or sound
+  on load. Use `data-sound` / `playSound`, one `rv-sound` cookie on
+  `.raioviajante.com`, and respect reduced motion.
+- Keep one h1, semantic landmarks, visible keyboard focus, 44px standalone
+  controls, 4.5:1 text contrast and live feedback. Inline prose links retain
+  natural text flow. Outcomes must remain clear without color or sound.
+- Never publish placeholders or invent dates, versions, permissions or legal
+  facts. Omit unknown facts and record them in the report. Preserve source
+  placeholders in historical briefs. Document implemented and planned work honestly.
 
-- **Shared only.** Anything that appears on more than one page or site is one
-  implementation in `packages/design` (components, styles, sound, blocks,
-  artwork). Apps import it; never copy markup, CSS, scripts, or images into an
-  app. App-specific pieces stay in the app.
-- **No hardcoded colors.** Use the tokens in `packages/design/styles/tokens.css`
-  (`var(--fg)`, `var(--block)`, `--syn-*`). Literal color values belong only in
-  `tokens.css` and the Shiki theme, which mirrors `--syn-*` (a test checks it).
-  The page is gray; color appears only inside code and lab bench output.
-- **No icons where a word works.** Status is a word, warnings escalate by rule
-  weight, selection is an underline or a 1px left rule. Never: gradients, glow,
-  shadows, bento grids, colored badges, emoji, a second typeface, an accent
-  color for links.
-- **One typeface:** Noto Sans Mono. Each app loads its own font files.
-- **No duplicated assets.** Artwork lives only in `packages/design/assets`, is
-  exported at the sizes it is displayed, and is used through `Art`/`gallery`
-  (static imports). Images need explicit width and height; lazy-load below the
-  fold.
-- New artwork goes in `packages/design/assets` and is covered by its
-  all-rights-reserved LICENSE.
-- **Sound.** Sounds are synthesized with Web Audio in `packages/design/sound`;
-  there are no audio files. Mark elements with `data-sound`, or call
-  `playSound(kind)`. Never play on page load. One preference: the `rv-sound`
-  cookie on `.raioviajante.com`. Respect reduced motion.
-- **Character.** The avatar belongs to index headers (112px), the search
-  character to the search page, the "404" sticker to every 404, the
-  "work of art" sticker to empty search. The search head is never smaller than
-  28px. Do not add the character anywhere else without being asked.
-- **Soft blocks.** Code, terminals, diffs, callouts, tables and figures use the
-  markup in `docs/blocks.md`, built by `packages/design/blocks`. Code is
-  highlighted at build time with the shared theme; no stock Shiki theme.
-- **Frameworks.** Shared components are React. Next.js apps render them as
-  server components; Astro apps render them statically through
-  `@astrojs/react` (no hydration). Interactivity comes from the shared
-  `behavior` script and `data-*` attributes, not per-app React state.
-- **Packages and deploys.** Every consumer of `@raioviajante/design` must have
-  `../../packages/design` in its Vercel Ignored Build Step. Phase 3 adds docs
-  as a consumer; the owner must apply the documented setting for dump and docs
-  before deploying it.
+## Migration sessions
+
+Read the full brief, Status and next-session instructions in
+`docs/design-migration-plan.md`. Work on `feat/design-migration`; do not create
+another branch. The local design handoff is ignored and owner-managed: never
+stage, delete or modify it. Copy required artwork into the shared package.
+Stage explicit files/hunks; never `git add -A` or `git add .`.
+Commit coherent validated steps; never push, amend, rebase shared commits or
+force-push during migration. Preserve uncommitted playground edits.
+
+## Validation and Git
+
+| App  | Scripts with `pnpm --filter @raioviajante/<app>`     |
+| ---- | ---------------------------------------------------- |
+| root | `format:check`, `lint`, `typecheck`, `build`         |
+| dump | `format:check`, `lint`, `typecheck`, `test`, `build` |
+| docs | `typecheck`, `build`                                 |
+| lab  | `format:check`, `lint`, `typecheck`, `test`, `build` |
+
+Docs has no lint, format or test scripts. Shared/workspace changes require:
+
+```sh
+NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate
+```
+
+For UI changes, check desktop/mobile, keyboard, focus, overflow and relevant
+interactions. Report only checks actually run. Use Conventional Commits in
+English; review staged diffs and commit meaningful validated progress.
+Never push without explicit authorization or rewrite imported history/tags
+(`import/root`, `import/dump`, `import/docs`, `import/lab`).
+
+## Production and generated files
+
+- See `docs/deployment.md`: four Vercel projects, Root Directory `apps/<app>`.
+  Settings, domains, environment and Ignored Build Steps are infrastructure;
+  change them only when explicitly requested. Do not claim an unverified rollout.
+- Every consumer must watch `../../packages/design` in its Ignored Build Step.
+  Dump/docs owner confirmation remains in the deployment docs. Docs should set
+  `VERCEL_DEEP_CLONE=true`; dump uses public `NEXT_PUBLIC_SITE_URL`.
+- Never edit generated `node_modules/`, `.next/`, `dist/`, `.astro/`, coverage,
+  `*.tsbuildinfo` or framework-generated `next-env.d.ts` by hand.
+- Root/docs/lab have app rules. Dump's framework-generated `AGENTS.md` and
+  `CLAUDE.md` remain intentionally gitignored.

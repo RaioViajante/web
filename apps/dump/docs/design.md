@@ -6,9 +6,11 @@ page renders `components/DumpShell.tsx`, which configures the shared `Shell`
 (sidebar, sound toggle, 740px column, footer) with dump's pages (posts,
 archive, tags) and the search item. A post counts as "posts" in the sidebar and
 adds its sections to "on this page". Navigation uses `next/link` through the
-shared `linkComponent` prop. The static pages in `raioviajante-design/dump` are
-the local visual reference; the root site's values, now in the shared tokens,
-take precedence where they differ.
+shared `linkComponent` prop, without prefetching. The design handoff's static
+pages were the visual reference during the migration; the root site's values,
+now in the shared tokens, took precedence where they differed. `lib/seo.ts`
+lists every page's title and description for metadata, the social cards under
+`/og/` and the sitemap; RSS stays at `/rss.xml`.
 
 `app/globals.css` holds only what is dump's own: the featured post, the month
 lists, the archive date column, the tag grid, the reading progress bar and the

@@ -2,14 +2,13 @@
 
 The soft blocks shared by dump, docs and lab. They live in `packages/design`:
 styles in `styles/blocks.css`, markup and highlighting in `blocks/`, behavior in
-`blocks/client.ts`, React components in `components/blocks.tsx`. The visual
-reference (`blocks-demo.html`) is in the local design handoff.
+`blocks/client.ts`, React components in `components/blocks.tsx`. This file is the maintained markup and behavior contract.
 
-## What changes compared to the current implementation
+## Appearance
 
 - No border and no header bar on code blocks. The block is a soft surface: `#212121`, `border-radius: 10px`.
 - File name and language move **above** the block, outside it (`.block__meta`).
-- Copy button floats in the top-right corner and appears on hover (always visible on touch screens).
+- Copy button floats in the top-right corner and appears on hover or keyboard focus (always visible on touch screens). Copy, tabs and expand controls have a 44px minimum target.
 - Code is tighter: `13.5px / line-height 1.6` (was 1.75). Padding `18px 20px`.
 - Line numbers are **off by default**; turn them on only when the post refers to specific lines.
 - Same soft surface for callouts, tables, figures and file trees. Only the "careful" and "warning" callouts have an outline ("deprecated" is dotted).
@@ -34,7 +33,7 @@ Every source line is one `<span class="line">` inside `<pre><code>`, with **no n
 | block                 | class                                                                                                  | notes                                                      |
 | --------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
 | code                  | `.block`                                                                                               | meta row optional (omit for short snippets)                |
-| numbered + highlights | `.block--numbered`, `.line.is-hl`, `data-n`                                                            | highlighted lines: band `#2b2b2b`, bright number           |
+| numbered + highlights | `.block--numbered`, `.line.is-hl`, `data-n`                                                            | highlighted lines: band `--code-highlight`, bright number  |
 | several files         | `.block--tabs`, `.block__tab[aria-selected]`, `[role=tabpanel]`                                        | tabs inside the surface                                    |
 | terminal              | `.block--terminal`, `.term-prompt` `.term-cmd` `.term-out` `.term-ok`                                  | darker surface `#161616`; copy takes only `.term-cmd`      |
 | diff                  | `.block--diff`, `.line.add`, `.line.del`, `.diff-count`                                                | +/− drawn by CSS                                           |
@@ -131,7 +130,7 @@ project/
 - **tabs** — switches `aria-selected` and the matching `hidden` panel; arrow keys, Home and End move between tabs.
 - **show all / show less** — toggles `.is-collapsed`, updates the label and `aria-expanded`.
 
-## Done when (per app)
+## Regression checklist
 
 - [ ] No code block on the app has a border or a header bar.
 - [ ] Code line height is 1.6 and blocks have a 10px radius.
