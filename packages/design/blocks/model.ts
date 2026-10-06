@@ -157,6 +157,7 @@ export async function createBlockModel(input: BlockInput): Promise<BlockModel> {
 /** Joins adjacent panels into one tabbed block. */
 export function mergeIntoTabs(models: BlockModel[]): BlockModel {
   const [first] = models;
+  if (!first) throw new Error("mergeIntoTabs needs at least one block");
   return {
     ...first,
     panels: models.flatMap((model) => model.panels),

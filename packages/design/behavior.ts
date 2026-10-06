@@ -7,6 +7,7 @@
  */
 import { attachBlocks } from "./blocks/client";
 import { initSound } from "./sound/init";
+import { attachScroll } from "./scroll";
 import { attachSearch } from "./search/client";
 
 function fillRequestedPath() {
@@ -19,7 +20,7 @@ function fillRequestedPath() {
 }
 
 export function startBehavior() {
-  const stops = [initSound(), attachBlocks(), attachSearch()];
+  const stops = [initSound(), attachBlocks(), attachSearch(), attachScroll()];
   fillRequestedPath();
   // Client-side navigation swaps the page without reloading the script.
   const observer = new MutationObserver(fillRequestedPath);

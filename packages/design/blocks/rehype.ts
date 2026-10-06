@@ -187,6 +187,7 @@ export function rehypeSoftBlocks() {
         pending.models.length > 1
           ? mergeIntoTabs(pending.models)
           : pending.models[0];
+      if (!model) return;
       replacements.push({
         parent: pending.parent,
         start: pending.first,

@@ -21,7 +21,14 @@ export function parseHighlightRanges(spec: string) {
   const lines = new Set<number>();
   for (const part of spec.split(",")) {
     const [from, to = from] = part.trim().split("-").map(Number);
-    if (!Number.isInteger(from) || !Number.isInteger(to) || from < 1) continue;
+    if (
+      from === undefined ||
+      to === undefined ||
+      !Number.isInteger(from) ||
+      !Number.isInteger(to) ||
+      from < 1
+    )
+      continue;
     for (let line = from; line <= to && line - from < 1000; line++)
       lines.add(line);
   }

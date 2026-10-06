@@ -24,8 +24,8 @@ export function LegalPage({
   title: "Terms of Use" | "Privacy Policy";
   inShort: { label: string; value: ReactNode }[];
   sections: LegalSection[];
-  /** Keep the `[DATE]` placeholder until the date is confirmed. */
-  lastUpdated: string;
+  /** Omit until the date is known; nothing renders in its place. */
+  lastUpdated?: string;
 }) {
   const host = siteById(site).label;
   return (
@@ -34,7 +34,10 @@ export function LegalPage({
         label="LEGAL"
         title={title}
         line={`${host} · the short version first`}
-        meta={[`last updated ${lastUpdated}`, "applies to this site"]}
+        meta={[
+          ...(lastUpdated ? [`last updated ${lastUpdated}`] : []),
+          "applies to this site",
+        ]}
       />
       <Section number="00." title="In short">
         {inShort.map((row) => (

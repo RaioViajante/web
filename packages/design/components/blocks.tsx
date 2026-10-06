@@ -27,7 +27,7 @@ export async function highlightBlock(
   ...inputs: [BlockInput, ...BlockInput[]]
 ): Promise<BlockModel> {
   const models = await Promise.all(inputs.map(createBlockModel));
-  return models.length > 1 ? mergeIntoTabs(models) : models[0];
+  return models.length > 1 ? mergeIntoTabs(models) : models[0]!;
 }
 
 /** Code, tabs, terminal, diff, annotated code or file tree, from a model. */

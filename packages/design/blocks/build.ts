@@ -72,6 +72,7 @@ export function blockId(model: BlockModel) {
 
 function metaNode(model: BlockModel): Element | null {
   const [first] = model.panels;
+  if (!first) return null;
   const tabs = model.panels.length > 1;
   const right: ElementContent[] = [];
   if (model.variant === "diff") {
@@ -159,7 +160,8 @@ export function buildBlock(model: BlockModel): Element {
       ),
     );
   } else {
-    body.push(copy, preNode(model.panels[0], model));
+    const [onlyPanel] = model.panels;
+    if (onlyPanel) body.push(copy, preNode(onlyPanel, model));
     if (model.notes.length)
       body.push(
         h(

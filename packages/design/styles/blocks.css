@@ -442,3 +442,52 @@
 .tok-punct {
   color: var(--syn-punct);
 }
+
+/* ---------- prose flow (posts, docs pages) ---------- */
+.prose > h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 13.2px;
+  margin: 64.24px 0 15.84px; /* section padding 22 + section gap 42.24 */
+  font-size: var(--size-section);
+  font-weight: var(--weight-heading);
+  line-height: 1.82;
+  scroll-margin-top: 24px;
+}
+.prose > h2:first-child {
+  margin-top: 22px;
+}
+.prose > h2 .rv-num {
+  flex: 0 0 52.8px;
+  color: var(--fg-3);
+  font-size: var(--size-body);
+  font-weight: var(--weight-body);
+}
+.prose > h3 {
+  margin: 35.2px 0 10.56px;
+  font-size: var(--size-body);
+  font-weight: var(--weight-heading);
+  scroll-margin-top: 24px;
+}
+.prose p,
+.prose ul,
+.prose ol {
+  margin: 0 0 17.6px;
+}
+.prose ul,
+.prose ol {
+  padding-left: 26.4px;
+}
+.prose li + li {
+  margin-top: 7px;
+}
+.prose a {
+  text-decoration: underline;
+  text-decoration-color: var(--fg-3);
+  text-underline-offset: 3.52px;
+}
+.prose hr {
+  margin: 42.24px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
