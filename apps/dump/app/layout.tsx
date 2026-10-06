@@ -8,8 +8,10 @@ import { PrimaryNavigation } from "@/components/PrimaryNavigation";
 import { getPublishedPosts } from "@/lib/posts";
 import { alternatesFor, site } from "@/lib/site";
 import { jsonLdScript, websiteJsonLd } from "@/lib/structured-data";
+import { SearchBehavior } from "@raioviajante/design/search-react";
 
 import "@raioviajante/design/editorial.css";
+import "@raioviajante/design/search.css";
 import "./globals.css";
 
 const mono = Noto_Sans_Mono({
@@ -80,6 +82,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </main>
         </div>
         <SiteFooter />
+        <SearchBehavior />
       </body>
     </html>
   );

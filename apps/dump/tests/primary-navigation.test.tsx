@@ -17,7 +17,11 @@ describe("<PrimaryNavigation />", () => {
     expect(
       screen.queryByRole("link", { name: /uses/i }),
     ).not.toBeInTheDocument();
-    expect(screen.getAllByRole("link")).toHaveLength(3);
+    expect(screen.getAllByRole("link")).toHaveLength(4);
+    expect(screen.getByRole("link", { name: /search/i })).toHaveAttribute(
+      "href",
+      "/search",
+    );
   });
 
   it("marks posts as current on the homepage", () => {

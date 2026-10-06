@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PostSearch } from "@/components/PostSearch";
+import { SearchNavItem } from "@raioviajante/design/search";
 
 type SearchPost = {
   slug: string;
@@ -17,7 +17,11 @@ const pages = [
   { href: "/tags", label: "tags" },
 ];
 
-export function PrimaryNavigation({ posts = [] }: { posts?: SearchPost[] }) {
+export function PrimaryNavigation({
+  posts: _posts = [],
+}: {
+  posts?: SearchPost[];
+}) {
   const pathname = usePathname();
 
   return (
@@ -43,7 +47,7 @@ export function PrimaryNavigation({ posts = [] }: { posts?: SearchPost[] }) {
           );
         })}
       </ol>
-      <PostSearch posts={posts} />
+      <SearchNavItem number="03." current={pathname === "/search"} />
       <div id="post-toc-slot" />
     </nav>
   );
