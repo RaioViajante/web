@@ -420,10 +420,15 @@ the two throwaway builds.
   passed after the search changes: package and app format, lint, typecheck,
   35 package tests, 122 dump tests, and production builds for all four apps.
   The builds emitted `/search` and `/search-index.json` for all four apps.
+- Phase 3 browser smoke test: Firefox on local servers confirmed results on
+  root, dump, docs, and lab; the "everywhere" scope merged all four indexes
+  and kept result links local; ArrowDown and Enter opened the selected dump
+  result; ⌘K, Ctrl+K, and `/` opened search; `/` stayed in the query while
+  typing; Esc cleared it; and the empty state showed the sticker and chips.
+  This test found and fixed local index lookup and Astro trailing-slash routes.
 - Throwaway pages (not committed): a root page and a lab page rendered `Shell`, `IndexHeader`, `CodeBlock`, `Callout`, `NotFoundPage` and the behavior script; both builds passed and emitted only the artwork they use.
-- Not run in Phase 3: browser screenshots, axe, and manual keyboard checks. The
-  sound voices have not been listened to. Phase 6 owns the full visual and
-  accessibility pass.
+- Not run in Phase 3: browser screenshots and axe. The sound voices have not
+  been listened to. Phase 6 owns the full visual and accessibility pass.
 
 ---
 
