@@ -62,52 +62,22 @@ package's `exports`, never by a relative path into `packages/`.
 
 ## Shared design policy
 
-root, dump, docs, and lab share the broader RaioViajante visual identity. Each
-app implements that identity itself; shared implementation is extracted only
-where there is genuine reuse.
+All four apps consume the shared design system in `@raioviajante/design`.
+The package contains tokens and styles, artwork, Web Audio sound, static React
+components, soft-block highlighting and markup, and browser behavior. Every
+shared piece has one implementation. Apps own their font loading, routes,
+content and experiment-specific behavior.
 
-`@raioviajante/design` is a private package of shared CSS and browser audio
-with no build step. It exports `./tokens.css`, which defines five dark color
-primitives:
+Next.js apps render the components on the server; Astro apps render through
+`@astrojs/react` at build time with no hydration. Shared `behavior` handles
+sound, search, avatar animation and block controls. Lab enhances its benches
+with small plain TypeScript Astro scripts and shares pure logic with Node tests.
 
-- `--rv-color-bg`
-- `--rv-color-fg`
-- `--rv-color-accent`
-- `--rv-color-muted`
-- `--rv-color-hairline`
-
-It also exports `./editorial-tokens.css`, the framework-neutral specification
-for the root site's current editorial colors, Noto Sans Mono typography,
-layout measures, and interaction timing. `./editorial.css` imports those tokens
-and provides structural selectors for the top line, navigation, content grid,
-sections, rows, and footer. Dump consumes the editorial shell and
-shared sound behavior; root has moved to the new design system. Lab consumes the color primitives. Docs has not
-adopted the package yet. Apps supply their own font loading, routes, and page
-content.
-
-An app using the color primitives keeps its own variable names and points them
-at the primitives:
-
-```text
-app CSS ──▶ app semantic aliases (e.g. --bg) ──▶ --rv-color-* primitives
-```
-
-Apps that have not adopted the editorial shell retain their own selectors,
-typography, and layout behavior.
-
-| App  | Consumes `@raioviajante/design` |
-| ---- | ------------------------------- |
-| root | yes                             |
-| lab  | yes                             |
-| dump | yes                             |
-| docs | no                              |
-
-The package also contains the design system that is replacing the editorial
-and color-primitive entries above: `styles/`, `assets/`, `sound/`, `blocks/`,
-`components/`, and `behavior`. These are built and tested in the package. Root
-consumes them; the other apps do not yet. The migration, with its status and the remaining
-phases, is tracked in [design-migration-plan](design-migration-plan.md); the
-rules are in [design-system](design-system.md) and [blocks](blocks.md).
+`styles.css` replaces the legacy color primitives and editorial shell entries.
+Those old exports remain until Phase 6 verifies and removes obsolete code. No
+app loads both style systems. Migration status and remaining work are tracked
+in [design-migration-plan](design-migration-plan.md); rules are in
+[design-system](design-system.md) and [blocks](blocks.md).
 
 Each consumer documents its own mapping: see root's
 [design notes](../apps/root/docs/design.md) and lab's

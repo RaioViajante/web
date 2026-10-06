@@ -362,7 +362,7 @@ Branch `feat/design-migration`. Nothing is pushed.
 | 1. Shared home         | done        | styles, assets, sound                                                                       |
 | 2. Shared components   | done        | components, blocks, sound, behavior, templates; no app consumes them yet                    |
 | 3. Search              | done        | shared menu/page/behavior, four static indexes and routes; pending Vercel settings          |
-| 4. Migrate each site   | partly      | root (4a), dump (4b) and docs (4c) done; lab not started                                    |
+| 4. Migrate each site   | done        | root (4a), dump (4b), docs (4c) and lab (4d) done                                           |
 | 5. Features to finish  | partly      | `AGENTS.md` / `CLAUDE.md` rules are written; SEO, accessibility and performance work remain |
 | 6. Verify and clean up | not started |                                                                                             |
 
@@ -586,8 +586,152 @@ small cookie on .raioviajante.com" (the "Last updated" date was not changed).
   `Footer`, `docs/design-system.md` updated).
 - Contact quote on root: already done in `d8ea6de`.
 
+### Docs date follow-up and Phase 4d: lab (done)
+
+- Docs accepts optional `lastUpdated: "YYYY-MM-DD"` frontmatter, validated as an
+  ISO calendar date. It wins over git; full git history is the fallback. No date
+  element renders without either. Paths: `apps/docs/src/content.config.ts`,
+  `src/lib/docs.ts`, `src/pages/[...slug].astro`; documented in
+  `apps/docs/docs/design.md`. The owner should set `VERCEL_DEEP_CLONE=true` on
+  the docs Vercel project. No production setting was changed.
+- Lab uses `BaseLayout.astro`, `LabFrame.tsx`, the shared shell, search, footer,
+  tokens, behavior and self-hosted Noto Sans Mono. `LabIndex.tsx` uses the
+  animated avatar, all/active/done filters, fidelity and notebook. Notebook is
+  `/#notebook`, not a new route. Permanent IDs and the real 2026-09-13
+  publication dates are preserved. Search metadata now includes project and
+  fidelity; its body retains descriptions, purpose and provenance.
+- `ExperimentLayout.astro` and `ExperimentParts.tsx` render the shared header,
+  Question, Bench, Fidelity, Related and ascending-ID previous/next. Shared
+  `LabBench`, `BenchBand`, `StateMark`, `ActionButton`, `ToggleButton`,
+  `TableBlock`, `CodeBlock` and `Callout` supply the surfaces. Browser logic is
+  small plain TypeScript in the three Astro surface scripts; React renders
+  statically, with zero hydrated islands and no browser React runtime loaded.
+- Filename: directory, filenames, live suffix/category/destination/counts,
+  samples and reset. The category sets match the existing Sweep guide. The
+  existing Python 3.14 POSIX suffix helper is retained. Differences from the
+  design logic: `image.` has suffix `.` (still Other); filename spaces are
+  preserved; multiple leading dots and POSIX path normalization follow Python.
+  The design discarded trailing dots and trimmed filenames. Tests cover the
+  requested five cases and further path/dot/space cases.
+- Orbit: verified read-only against `Execution.java` and `ExecutionTest.java`
+  at `cd97666` in the local source repository. All state guards match the
+  reference: start from QUEUED, succeed/fail from RUNNING, cancel from either.
+  Differences: real `fail` rejects blank error messages using Java whitespace
+  rules; the design accepted them and substituted `(empty)`. The browser
+  accepts only signed Java integers rather than coercing invalid/empty input
+  to zero as the design did. Neither success nor failure restricts the value
+  of a valid integer exit code. Rejected actions preserve every field and
+  log `rejected: <action> from <STATE>`. Browser timestamps retain ISO precision.
+  New example resets state, inputs and history. Orbit's source link stays
+  omitted because its public availability is not established.
+- Boot: existing lab excerpts were already real. Verified all five against
+  `src/main.asm` and `docs/01-boot-sector.md` at `e966889` in the local source
+  repository. `src/data/boot-sector.ts` retains them; no reconstructed source
+  was imported. Initialization includes `mov si`, `call puts`, `hlt` and the
+  halt loop; printing includes `mov bh, 0x00`; the ending is the actual
+  `times 510 - ($ - $$) db 0` and `dw 0xAA55`. Comments are omitted, section
+  order groups by purpose, and blank lines are retained. Five selectable
+  sections, source/notes, previous/next, live progress, keyboard arrows/Home/End
+  and shared copy controls replace disclosures. The result is attributed to
+  the notes; no assembly, boot or QEMU execution was performed here.
+- All bench action outcomes use the shared success/reject sounds, words and
+  solid/dotted controls. Rejected controls stay clickable and keyboard
+  reachable. Live regions report classification, lifecycle feedback and boot
+  selection/boundaries. No sound plays on page load.
+- Terms, Privacy and the host `404.html` use shared templates. The unknown
+  values below are omitted, not filled. The 404 requested path is supplied at
+  runtime, and an unknown preview route returns HTTP 404 with this page.
+- Shared additions: configurable section heading controls and search label,
+  general bench layout helpers, keyboard input focus and visually hidden live
+  text. Long leader values now shrink on narrow pages while metadata labels
+  keep whole words. Soft-block spacing remains shared.
+- Removed local duplicates: `apps/lab/src/components/Header.astro`,
+  `Footer.astro`, `src/styles/global.css`; old layout/surface styles were
+  replaced in place. The unused wide-layout field was removed; all three
+  experiments use the shared column. No artwork was copied, renamed or
+  deleted in this phase. The local handoff and committed playground are
+  untouched.
+- Updated `apps/lab/AGENTS.md`, lab's design/architecture/content/development
+  docs, its README and repository `docs/architecture.md` to describe the final
+  implementation. Lab now exposes a `test` script using Node's built-in runner.
+
+Reference differences retained deliberately:
+
+- The established shared root tokens, type sizes, spacing, animated avatar,
+  mobile sound-first order, two-column PAGES list and mobile stacked pager take
+  precedence over the older static snapshots. At desktop width the long
+  filename-classifier sidebar label wraps. Legal/404 host labels and search
+  layout follow the shared templates. No per-app shell overrides were added.
+- Execution's transition table stays with Bench, keeping Fidelity/Related at
+  03/04 on every experiment. The reference used a separate Transition rules
+  section and 04/05 for Fidelity/Related on that page.
+- Controls retain the shared 44px minimum instead of the reference's smaller
+  reset/sample controls. The classifier has an explicit try action as well as
+  live updates. Wide result tables scroll inside their bench on mobile.
+- Source revisions, publication dates and notes use existing verified facts.
+  Placeholder facts in the reference are omitted, as required for public pages.
+
+Unknown facts omitted from lab's public pages (still unresolved in the handoff):
+
+- `[DATE]`: legal last-updated dates.
+- `[LICENSE OR ALL RIGHTS RESERVED]`, `[LICENSE FOR SNIPPETS]`: general text
+  and snippet licensing claims. Repository-specific source licenses are named
+  only as such; no blanket permission is invented.
+- `[CONFIRM]`: quoting permission, artwork reuse permission and governing law.
+- `[NONE OR TOOL]` / tracking `[CONFIRM]`: analytics or blanket tracking claims.
+- `[RETENTION]`: host log retention.
+- `[HOSTING PROVIDER]` is resolved from repository deployment docs (Vercel).
+  Cookie storage and `[CONFIRM PER EXPERIMENT]` are resolved by the implemented
+  shared preference and browser-only experiment code; Google Fonts is removed.
+- Classifier `[DATE]` / `[REVISION]` and boot note placeholders are resolved
+  from existing publication/provenance records and verified source. Nothing
+  unknown was substituted. The handoff originals remain untouched.
+
+Current relevant tree:
+
+```text
+packages/design/
+  components/       shared shell, parts, blocks, lab, templates, search, avatar
+  styles/           tokens, base (bench helpers), blocks, search
+  sound/ blocks/ search/ assets/ behavior.ts
+apps/lab/
+  src/components/   LabFrame, LabIndex, ExperimentParts, LegalPages, LabNotFound
+    surfaces/       three static React benches + three Astro browser scripts
+  src/data/         experiments.ts, boot-sector.ts
+  src/layouts/      BaseLayout.astro, ExperimentLayout.astro
+  src/lib/          classifier, execution rules, title convention
+  src/pages/        index, experiments/[slug], search, search-index, legal, 404
+  src/styles/       lab.css (lab-specific arrangements only)
+  tests/            filename and lifecycle unit tests
+apps/docs/           explicit date schema, date resolver and conditional footer
+```
+
 ### Checks run
 
+- Docs follow-up and Phase 4d: under Node 24.20.0 and pnpm 12.8.1,
+  `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` passed:
+  format checks, lint, typechecks, 50 design tests, 102 dump tests, 42 lab tests
+  and production builds for all four apps. Docs' separate `typecheck` and
+  `build` also passed. Six isolated date-resolver cases passed: explicit
+  frontmatter, full git fallback, shallow clone, untracked page, missing path
+  and unavailable git. An existing Node module-type warning did not fail checks.
+- Phase 4d browser pass: Chromium screenshots and reference comparisons for
+  all eight lab pages at 1440px and 390px. No horizontal overflow, missing
+  visible images, console errors, rendered placeholders or hydrated islands.
+  Every experiment was exercised with mouse and keyboard separately at both
+  widths, including all 20 lifecycle state/action pairs per run (80 total),
+  rejected-field immutability, integer/blank-message guards, filename edge
+  cases and injected text, filters, all five boot sections and both boundaries,
+  code copying, search shortcuts/navigation and the unknown-path host 404.
+  Shared success/reject events and sound-cookie persistence passed. Everywhere
+  search used the real locally built indexes through intercepted cross-origin
+  requests; this does not verify production endpoints. axe, full contrast
+  auditing and listening to sound voices remain Phase 6 work. No boot/QEMU
+  execution or production deployment was performed.
+- This session's implementation commits: `278cdff` docs dates; `bd705ed`
+  pinned classifier/lifecycle tests; `b1e1193` shared bench/page helpers;
+  `3e91107` lab migration. A separate documentation commit records this report
+  and the Phase 5/6 handoff. Nothing was pushed.
 - Phase 2: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
   passed for every app and `packages/design` before Phase 3.
 - Phase 3: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
@@ -617,72 +761,94 @@ small cookie on .raioviajante.com" (the "Last updated" date was not changed).
 
 ## 4. Next session
 
-Phases 4a (root), 4b (dump) and 4c (docs) are complete. Do **Phase 4d: lab**
-only. Do not start Phase 5 or 6.
+Phases 0–4 and the docs date follow-up are complete. **Do Phase 5 next.**
+Do not redo the lab migration. Phase 6 follows Phase 5 in a subsequent session
+unless the owner explicitly requests both. No code has been pushed.
 
-### Before you start
+### Before either session
 
-1. Work on `feat/design-migration`. `git status` and `git log --oneline -15`.
-   Preserve uncommitted work (the owner's edits to
-   `packages/design/{.prettierignore,package.json,tsconfig.json}` and
-   `packages/design/playground/`: stage only your own hunks with
-   `git diff -U3 <file>`, keep your hunk, `git apply --cached`). Use
-   `git add <paths>` only after `git restore --staged` on anything unrelated,
-   because earlier `git rm` calls end up in the next commit.
-2. Read `AGENTS.md`, `docs/design-system.md`, `docs/blocks.md`,
-   `apps/docs/docs/design.md` (the closest example: Astro, shared React
-   rendered statically) and `apps/lab/AGENTS.md`.
-3. Lab is Astro. Its index header uses the animated `AvatarCoin` like root, dump and docs (`@raioviajante/design/avatar-coin`). Follow the docs pattern: a layout that renders a React
-   `*Frame.tsx` around the shared `Shell` (`.astro` files cannot pass JSX in
-   props), `styles.css`, a `<script>` calling `startBehavior()`, the font from
-   `@fontsource-variable/noto-sans-mono` (family `"Noto Sans Mono Variable"`),
-   `trailingSlash` is `always` (so pass `href="/search/"` to the search item).
-   Drop `@raioviajante/design/tokens.css` and every local color, the
-   IBM Plex / Source Serif fonts and the old header, footer and `global.css`.
-4. Compare with `raioviajante-design/lab/` (index, three experiments, search,
-   terms, privacy, 404) at 1440px and 390px with Playwright installed outside
-   the repo; the old lab can be run from `git worktree add <dir> <commit>` with
-   `cp -Rc node_modules` (see how the root was compared).
-5. Pages: experiments index (filter all/active/done, fidelity explained,
-   notebook), the three experiments with `LabBench`, `BenchBand`, `StateMark`,
-   `ActionButton`, search, terms, privacy, 404, as in the Phase 4d list below.
-   Experiments keep 001–003 and `aria-live` results; accepted actions call
-   `playSound("success")`, rejected ones `playSound("reject")`.
-6. Lab logic: compare `src/lib/filename-classifier.ts` and
-   `src/lib/execution-states.ts` with `source/lab/*.dc.html` and report any
-   difference; boot sector: replace the reconstructed code and notes with
-   revision `e966889` only if that source is available in the repository or
-   handoff, otherwise keep what exists and say so. No placeholder may render on
-   a public page: leave out what is unknown and list it.
-7. Validate: `pnpm --filter @raioviajante/lab format:check lint typecheck build`,
-   then `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`.
-8. The owner must still add `../../packages/design` to the Vercel Ignored Build
-   Step of dump and docs (D10). Stage files explicitly; one logical step per
-   commit.
+1. Stay on `feat/design-migration`; read `git status --short --branch` and
+   `git log --oneline -20`. Preserve any uncommitted playground or owner edits.
+   Activate Node 24.20.0 from `.nvmrc` and pnpm 12.8.1.
+2. Read this file's brief, decisions, Status and handoff; root `AGENTS.md`, each
+   affected app's `AGENTS.md`, `docs/design-system.md`, `docs/blocks.md`, and
+   the affected app's design/development docs.
+3. Shared-only implementations, no color literals, no browser React on Astro,
+   no copied artwork or invented facts. Stage explicit files/hunks, review the
+   staged diff and commit each validated logical step. Never push, amend,
+   rebase shared commits or delete the local design handoff.
+4. Production settings are owner work: docs needs `VERCEL_DEEP_CLONE=true`;
+   dump and docs need Ignored Build Steps watching `../../packages/design`
+   (see `docs/deployment.md`). Do not change settings or claim deployment
+   without explicit owner authorization and actual evidence.
 
-### Phase 4d: lab (`apps/lab`, Astro)
+### Phase 5 — finish ecosystem features
 
-1. The React dependencies, `react()` integration, and `apps/lab/AGENTS.md`
-   clarification were completed in Phase 3. Update `apps/lab/docs/design.md`
-   for the new shell during the lab migration.
-2. Replace `src/layouts`, `Header.astro`, `Footer.astro` and `src/styles/global.css` with the shared `Shell`, `styles.css` and the `behavior` script. Switch off the old `@raioviajante/design/tokens.css` import.
-3. Pages: experiments index (filter all/active/done, fidelity explained, notebook), the three experiments with `LabBench`, `BenchBand`, `StateMark`, `ActionButton`, terms, privacy, `404.astro`.
-4. Experiments use the existing logic modules (`src/lib/filename-classifier.ts`, `src/lib/execution-states.ts`) and the handoff logic in `source/lab/*.dc.html` (`class Component`, `renderVals()`):
-   - 001 filename classifier: suffix mirrors Python `Path.suffix` (last dot, ignored at index 0 and at the end, lowercased); categories are those on the docs Sweep page. Compare with `src/lib/filename-classifier.ts` and report differences.
-   - 002 execution states: actions start/succeed/fail/cancel; rejected actions log `rejected: <action> from <STATE>` and change nothing; times from the browser clock; "new example" resets. Verify the rules against the Orbit source (assumed: start from QUEUED; succeed and fail from RUNNING; cancel from QUEUED or RUNNING) and report differences.
-   - 003 boot sector: five sections, source and note each, previous/next, progress `n / 5`. Replace the reconstructed code and notes with revision `e966889`; keep `[NOTE FROM LEARNING NOTES]` where there is no real note.
-   - Accepted actions call `playSound("success")`, rejected ones `playSound("reject")`; results live in an `aria-live` region.
-5. Keep the existing `/search` page, menu item, and build-time index working
-   after the lab shell and experiment changes; keep numbers 001–003.
-6. Validate: `pnpm --filter @raioviajante/lab format:check lint typecheck build`.
+1. Audit root/app `AGENTS.md` and `CLAUDE.md` for stale pre-migration wording.
+   Update them consistently with the actual shared shell, tokens, blocks,
+   artwork, sound and framework rules. Lab's final approach is already recorded;
+   `apps/lab/CLAUDE.md` delegates to its `AGENTS.md`.
+2. Inventory every route and current metadata. Complete titles, descriptions,
+   canonical URLs, Open Graph metadata and brand-style OG images on all four
+   apps. Use shared implementation for any repeated artwork/composition;
+   keep framework-specific route generation in each app. Preserve dump RSS;
+   complete sitemaps including search/legal and real public content, excluding
+   404 pages. Verify canonical slash conventions and host 404 behavior.
+3. Audit accessibility across every route: landmarks and heading order, named
+   controls, focus-visible, 44px touch targets, 4.5:1 text contrast, search/live
+   regions, bench state marks, and outcomes conveyed without color or sound.
+   Basic lab keyboard/live feedback is done; it is not a complete axe/contrast
+   audit. Pay particular attention to the intentionally clickable dotted
+   controls and their accessibility semantics. Change shared tokens/components
+   when a fix is shared; check all consumers after doing so.
+4. Audit performance: image dimensions and lazy loading, font preload/self
+   hosting, layout shift, per-page JavaScript and actual network requests.
+   Astro has zero hydrated islands. Its renderer emits a React client asset
+   even for static pages; verify that unused emitted assets are not loaded.
+   Bench scripts are about 1–3 KB each before compression, in addition to
+   shared behavior/sound. Preserve minimal page scripts.
+5. Keep unresolved legal facts out of public pages. No new source link for
+   Orbit without verifying public access. Do not invent dates, licenses,
+   retention, versions or deployment status. The original placeholders in the
+   brief/handoff remain records, not publication content.
+6. Run each affected app's prescribed checks. For shared/workspace changes run
+   `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` from the
+   root under Node 24. Lab's 42 Node tests run as part of this command.
+7. Commit validated steps; update Status and leave the exact Phase 6 handoff.
+   Report what was checked, remaining unknown facts and infrastructure work;
+   stop before Phase 6 unless authorized to proceed.
 
-### Phase 4e: cross-cutting
+### Phase 6 — verify everything, then clean up
 
-- Each app's host 404: Next.js `not-found.tsx` (root, dump); Astro `src/pages/404.astro` (docs, lab). Confirm each builds a `404.html` / not-found response that Vercel serves.
-- Update `docs/architecture.md` and each app's `docs/design.md` so they describe what is implemented, not what is planned.
-- Update `docs/deployment.md` when the owner confirms the dump and docs Ignored
-  Build Steps were applied in Vercel.
-
-### Report back
-
-List every `[CONFIRM]`, `[DATE]`, `[VERSION]`, `[COMMIT]` and similar placeholder left in the apps, every difference from the reference pages and why, and the open questions: D1 (what the search head animates), D4 (root colors), the root search line, and whether the new sound voices are acceptable.
+1. Start from completed Phase 5 and a documented worktree state. Run the full
+   repo validation above and fix every failure without rewriting content or
+   unrelated owner changes.
+2. Use Playwright outside the repo to capture every public route at 1440px and
+   390px (include real post/tag/doc routes and unknown-path host 404s). Open
+   the read-only local reference HTML and compare. Preserve the intentional
+   differences recorded in Status; do not undo the established root tokens or
+   replace real experiment source with reconstructed examples.
+3. Run axe on every page, check contrast and image/font layout shift, inspect
+   missing assets and console/network errors. Exercise reduced motion and
+   sound off/on. Audition the synthesized success/reject/new sound voices;
+   prior sessions have not listened to them.
+4. Keyboard test every site: Meta/Ctrl+K, `/` (ignored in inputs), arrows,
+   Enter, Escape, tabs, code copy and all lab controls. Recheck all 20 lifecycle
+   state/action pairs and rejected-field immutability; test Python 3.14 suffix
+   edge cases, long/injected text, boot sections and both boundaries.
+   Everywhere search should use real locally built indexes during offline
+   checks; distinguish those checks from live endpoint verification.
+5. Only after these checks pass, inventory obsolete exports/assets/styles with
+   `rg`. Prove absence of real consumers before removing legacy design entries
+   (`tokens.css`, `editorial-tokens.css`, `editorial.css`, `editorial-sound.ts`)
+   or other dead migration code. Preserve all artwork still used by gallery,
+   templates or playground. The design-system/block docs already live in
+   `docs/`; maintain them there. Never delete or stage the local handoff.
+6. Put cleanup in its own final `chore:` commit, using explicit staging, then
+   rerun checks justified by those removals. Do not remove imported tags, rewrite
+   history or push.
+7. Update Status and report final trees, copied/renamed artwork (including the
+   prior artwork map), deleted paths, unresolved facts, deliberate visual/source
+   differences, exact validation/browser/axe results and commit list. The local
+   handoff is owner-managed; it is safe to remove only after the reference
+   comparison and final migration checks are complete.
