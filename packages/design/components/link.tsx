@@ -5,7 +5,7 @@ import type { AnchorHTMLAttributes, ComponentType } from "react";
  * `next/link` on Next.js apps, nothing (plain anchors) on Astro apps.
  */
 export type LinkComponent = ComponentType<
-  AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
+  AnchorHTMLAttributes<HTMLAnchorElement> & { href: string; prefetch?: false }
 >;
 
 /** A path on this site, as opposed to another site or a `mailto:`. */
@@ -26,7 +26,7 @@ export function SiteLink({
   linkComponent?: LinkComponent;
 }) {
   return Link && isInternal(href) ? (
-    <Link href={href} {...props} />
+    <Link href={href} prefetch={false} {...props} />
   ) : (
     <a href={href} {...props} />
   );

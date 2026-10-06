@@ -94,7 +94,6 @@ export function NotFoundPage({
           alt="RaioViajante shrugging, surrounded by question marks, under a sign that reads 404 page not found"
           width={300}
           className="rv-404-art"
-          priority
         />
       </PageHeader>
       <div className="block rv-requested">
