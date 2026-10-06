@@ -1,10 +1,62 @@
 import { Fragment } from "react";
 import { Art, art } from "./art";
 import { SiteLink, type LinkComponent } from "./link";
-import type { SiteId } from "./sites";
+import { SITES, type SiteId } from "./sites";
 
-/** Searches that always find something, offered when nothing matched. */
-const SUGGESTIONS = ["sweep", "orbit", "design", "lab"] as const;
+/** Searches that find something on each site, offered when nothing matched. */
+const SUGGESTIONS: Record<SiteId, readonly string[]> = {
+  root: ["projects", "setup", "about", "gallery"],
+  dump: ["orbit", "assembly", "language", "scheduler"],
+  docs: ["sweep", "cli", "tokens", "commits"],
+  lab: ["classifier", "boot", "execution"],
+};
+/** One term that only the site's own index has, used by "everywhere". */
+const SIGNATURE: Record<SiteId, string> = {
+  root: "setup",
+  dump: "assembly",
+  docs: "cli",
+  lab: "classifier",
+};
+
+/** "try a, b or c." with each term as a button that fills the query. */
+function Suggestions({
+  scope,
+  terms,
+  hidden = false,
+}: {
+  scope: "site" | "everywhere";
+  terms: readonly string[];
+  hidden?: boolean;
+}) {
+  return (
+    <p
+      className="rv-search-suggestions"
+      data-search-suggestions={scope}
+      hidden={hidden}
+    >
+      try{" "}
+      {terms.map((term, index) => {
+        const last = index === terms.length - 1;
+        // Punctuation stays on the word's line; lines break only at spaces.
+        return (
+          <Fragment key={term}>
+            <span className="rv-search-suggestion">
+              <button
+                type="button"
+                data-search-suggestion={term}
+                data-sound="tab"
+              >
+                {term}
+              </button>
+              {last ? "." : index < terms.length - 2 ? "," : ""}
+            </span>
+            {last ? "" : index === terms.length - 2 ? " or " : " "}
+          </Fragment>
+        );
+      })}
+    </p>
+  );
+}
 
 export interface SearchEntry {
   site: SiteId;
@@ -129,25 +181,14 @@ export function SearchPage({ site }: { site: SiteId }) {
           height={180}
         />
         <p>maybe I haven&apos;t built it yet.</p>
-        <p className="rv-search-suggestions">
-          try{" "}
-          {SUGGESTIONS.map((term, index) => (
-            <Fragment key={term}>
-              <button
-                type="button"
-                data-search-suggestion={term}
-                data-sound="tab"
-              >
-                {term}
-              </button>
-              {index < SUGGESTIONS.length - 2
-                ? ", "
-                : index === SUGGESTIONS.length - 2
-                  ? " or "
-                  : "."}
-            </Fragment>
-          ))}
-        </p>
+        <Suggestions scope="site" terms={SUGGESTIONS[site]} />
+        <Suggestions
+          scope="everywhere"
+          terms={SITES.filter((other) => other.id !== site).map(
+            (other) => SIGNATURE[other.id],
+          )}
+          hidden
+        />
       </div>
     </section>
   );

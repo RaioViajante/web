@@ -788,9 +788,12 @@ Intentional differences from the design references (root compared with
   copies). Every site has a web manifest from the shared `webManifest`; Astro
   icon links moved to `?v=4`. Root's `public/icons/icon-192.png` moved to
   `public/icon-192.png`.
-- The empty-search suggestions became a sentence in the character's voice,
-  "try sweep, orbit, design or lab.", with the words as bright, heavier
-  buttons and no underlines. The previous `TRY · …` row is `20c8649`.
+- The empty-search suggestions became a quiet sentence in the character's
+  voice ("try …"), with words that light up only on hover or focus. "this
+  site" suggests the site's own terms and "everywhere" the other sites'
+  signature terms; every term was checked to return results. The previous
+  `TRY · …` row is `20c8649`. Result rows now use `aria-current` instead of
+  `aria-selected`, which links do not allow (axe `aria-allowed-attr`).
 
 ### Checks run (Phases 5 and 6)
 

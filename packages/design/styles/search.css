@@ -221,7 +221,7 @@
   text-decoration: none;
 }
 .rv-result:hover,
-.rv-result[aria-selected="true"] {
+.rv-result[aria-current="true"] {
   color: var(--fg);
   border-left-color: var(--fg);
 }
@@ -252,14 +252,17 @@
   width: 180px;
   height: 180px;
 }
-/* Suggestions continue the character's sentence. The words are brighter and
-   heavier than the text around them, so they read as choices without relying
-   on color; hover and focus light them up like a pressed row. */
+/* Suggestions continue the character's sentence, quietly: the words share
+   its color and differ only in weight until hover or focus lights them up
+   like a pressed row. */
 .rv-search-suggestions {
   margin-top: 6px;
   color: var(--fg-2);
   font-size: var(--size-small);
   text-wrap: balance;
+}
+.rv-search-suggestion {
+  white-space: nowrap;
 }
 .rv-search-suggestions button {
   display: inline;
@@ -268,7 +271,7 @@
   border: 0;
   border-radius: 3px;
   background: none;
-  color: var(--inline-link);
+  color: inherit;
   font: inherit;
   font-weight: var(--weight-heading);
   cursor: pointer;
