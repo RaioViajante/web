@@ -7,21 +7,26 @@ export function IndexHeader({
   name,
   line,
   meta,
+  avatar,
 }: {
   name: string;
   line: string;
   meta?: ReactNode;
+  /** Replaces the static avatar, for a site that animates it. Use `.rv-avatar`. */
+  avatar?: ReactNode;
 }) {
   return (
     <header className="rv-header rv-header--index">
-      <Art
-        name="avatar"
-        alt="RaioViajante"
-        width={112}
-        height={112}
-        className="rv-avatar"
-        priority
-      />
+      {avatar ?? (
+        <Art
+          name="avatar"
+          alt="RaioViajante"
+          width={112}
+          height={112}
+          className="rv-avatar"
+          priority
+        />
+      )}
       <h1>{name}</h1>
       <p>{line}</p>
       {meta}
@@ -114,11 +119,14 @@ export function LeaderRow({
   value,
   href,
   sound = "nav",
+  describedBy,
 }: {
   label: ReactNode;
   value?: ReactNode;
   href?: string;
   sound?: string;
+  /** Id of a tooltip that describes the link. */
+  describedBy?: string;
 }) {
   const content = (
     <>
@@ -130,7 +138,12 @@ export function LeaderRow({
     </>
   );
   return href ? (
-    <a className="rv-leader" href={href} data-sound={sound}>
+    <a
+      className="rv-leader"
+      href={href}
+      data-sound={sound}
+      aria-describedby={describedBy}
+    >
       {content}
     </a>
   ) : (

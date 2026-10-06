@@ -42,7 +42,7 @@ Everything below that appears on more than one page or site is **one shared impl
 | `character/avatar.png`                          | index headers (112px)                                                         |
 | `search/search-character.png`                   | search page, full pose next to the bubble (150px)                             |
 | `search/head/static.png`                        | search menu item (30px) and "ask RaioViajante" rows (34px) — never below 28px |
-| `character/avatar-frames/frame-01…10.png`       | reserved for the root avatar animation                                        |
+| `character/avatar-frames/frame-01…10.png`       | the root avatar animation (224px, shown at 112px), via `components/avatar.ts` |
 | `search/not-found.png`                          | empty search (180px)                                                          |
 | `stickers/work-of-art.png`                      | root gallery                                                                  |
 | `stickers/not-found.png` ("404 page not found") | every 404                                                                     |

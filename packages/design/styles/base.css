@@ -232,6 +232,24 @@ kbd {
   padding: 0 6px;
 }
 
+/* dash list: short plain lists in prose */
+.rv-dash-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rv-dash-list li {
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 8px;
+}
+.rv-dash-list li::before {
+  position: absolute;
+  left: 0;
+  color: var(--fg-3);
+  content: "-";
+}
+
 /* prev / next: label above title, no box */
 .rv-pager {
   display: grid;

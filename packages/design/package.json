@@ -21,7 +21,8 @@
     "./sound": "./sound/index.ts",
     "./behavior": "./behavior.ts",
     "./behavior-react": "./behavior-react.tsx",
-    "./gallery": "./components/gallery.ts"
+    "./gallery": "./components/gallery.ts",
+    "./avatar": "./components/avatar.ts"
   },
   "dependencies": {
     "hast-util-to-html": "^9.0.5",
