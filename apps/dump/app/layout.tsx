@@ -1,41 +1,20 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { alternatesFor, site } from "@/lib/site";
 import { jsonLdScript, websiteJsonLd } from "@/lib/structured-data";
+import { Behavior } from "@raioviajante/design/behavior-react";
 
+import "@raioviajante/design/styles.css";
 import "./globals.css";
 
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  variable: "--font-source-serif",
+const mono = localFont({
+  src: "../../../packages/design/fonts/NotoSansMono-Latin-Variable.woff2",
+  weight: "100 900",
+  display: "optional",
+  variable: "--font-mono",
 });
-
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-ibm-plex-mono",
-  weight: ["400", "500"],
-});
-
-const themeScript = `
-(function(){
-  var theme = "light";
-  var stored;
-  try {
-    stored = localStorage.getItem("dump-theme");
-  } catch (error) {}
-  if (stored === "light" || stored === "dark") {
-    theme = stored;
-  } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    theme = "dark";
-  }
-  document.documentElement.setAttribute("data-theme", theme);
-})();`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -69,28 +48,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang={site.locale}
-      className={`${sourceSerif.variable} ${ibmPlexMono.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang={site.locale} className={mono.variable}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
         />
       </head>
       <body>
-        <a href="#content" className="skip-link">
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="content" tabIndex={-1}>
-          {children}
-        </main>
-        <SiteFooter />
-        <ThemeToggle />
+        {children}
+        <Behavior />
       </body>
     </html>
   );

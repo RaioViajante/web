@@ -8,8 +8,14 @@ internet. It is not intended to be a portfolio, résumé, or sales landing page.
 Internal routes:
 
 - `/` — home
+- `/setup` — personal gear
+- `/about` — personal introduction
 - `/projects` — projects
-- `/now` — current activities
+- `/contact` — contact email and message guidance
+- `/gallery` — animated collection of original character art
+- `/this-site` — notes on the site and its source code
+- `/privacy` — privacy information for the root site
+- `/terms` — terms of use for the root site
 
 Related independent websites:
 
@@ -21,8 +27,8 @@ These external websites must not become local routes.
 
 ## Status and stack
 
-The approved interface is implemented across `/`, `/projects`, and `/now`,
-sharing a common layout, header, and footer. The stack is Next.js (App
+The shared design system is implemented across all root routes,
+sharing a common layout, navigation, and footer. The stack is Next.js (App
 Router), React, TypeScript, pnpm, ESLint, and Prettier, ready to deploy to
 Vercel at https://raioviajante.com. See [deployment](docs/deployment.md) for
 details.
@@ -41,11 +47,10 @@ and production commands.
 
 ## Visual reference
 
-The approved Claude Design reference is identified in the project brief as
-`/refence/claude-export/` and was kept locally at `reference/claude-export/`.
-It is not tracked in Git and is not part of the monorepo checkout. Where it is
-available, it is read-only visual reference material: do not modify, move,
-rename, delete, or build inside it.
+The current editorial design is inspired by [bero.land](https://bero.land).
+The original character, site content, and responsive implementation belong to
+RaioViajante. The older Claude Design reference remains locally in the
+untracked `reference/claude-export/` directory as historical material.
 
 ## Documentation
 

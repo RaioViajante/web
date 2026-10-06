@@ -1,49 +1,22 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
-import { PageContainer } from "../components/PageContainer";
-import { SiteHeader } from "../components/SiteHeader";
-import { SiteFooter } from "../components/SiteFooter";
-import { ThemeToggle } from "../components/ThemeToggle";
-import "@raioviajante/design/tokens.css";
+import localFont from "next/font/local";
+import { Behavior } from "@raioviajante/design/behavior-react";
+import "@raioviajante/design/styles.css";
 import "./globals.css";
 
-const mono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
+const mono = localFont({
+  src: "../../../packages/design/fonts/NotoSansMono-Latin-Variable.woff2",
+  weight: "100 900",
+  display: "optional",
   variable: "--font-mono",
 });
-
-const serif = Source_Serif_4({
-  subsets: ["latin"],
-  weight: "variable",
-  axes: ["opsz"],
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-serif",
-});
-
-const themeScript = `
-(function(){
-  var theme = "light";
-  var stored;
-  try {
-    stored = localStorage.getItem("raioviajante-theme");
-  } catch (error) {}
-  if (stored === "light" || stored === "dark") {
-    theme = stored;
-  } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    theme = "dark";
-  }
-  document.documentElement.setAttribute("data-theme", theme);
-})();`;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://raioviajante.com"),
   title: {
     default: "raioviajante",
-    template: "%s · raioviajante",
+    template: "%s — raioviajante",
   },
   description: "curious enough to build it myself.",
   openGraph: {
@@ -62,21 +35,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${mono.variable} ${serif.variable}`}
-      suppressHydrationWarning
-    >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
+    <html lang="en" className={mono.variable}>
       <body>
-        <SiteHeader />
-        <PageContainer as="main" className="site-main">
-          {children}
-        </PageContainer>
-        <SiteFooter />
-        <ThemeToggle />
+        {children}
+        <Behavior />
       </body>
     </html>
   );

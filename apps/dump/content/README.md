@@ -51,8 +51,11 @@ production returns 404 until you set `draft: false`.
 ## Markdown support
 
 Standard Markdown plus GitHub-flavored tables and strikethrough, automatic
-heading IDs, and build-time syntax highlighting for fenced code blocks. React
-components can be imported directly into an `.mdx` file when needed.
+heading IDs, and build-time syntax highlighting for fenced code blocks.
+Fences accept the soft-block options (`title="…"`, `showLineNumbers`,
+`{8-9}`, `terminal`, `group`), and `:::note`-style callouts work; see
+[`docs/blocks.md`](../../../docs/blocks.md). Posts are plain Markdown plus
+these blocks: they are compiled without a components map.
 
 ## License
 
@@ -62,7 +65,6 @@ the root [`LICENSE`](../LICENSE).
 
 ## If this directory is ever empty
 
-The bundler needs at least one `.mdx` file here to compile the post route. If
-every post is ever removed, add a placeholder file (filename starting with
-`_` or `.` so `isPostFile()` in `lib/posts.ts` excludes it from listings)
-until a real one exists again.
+Posts are read from disk at build time, so an empty directory builds an empty
+site. A placeholder file whose name starts with `_` or `.` is ignored by
+`isPostFile()` in `lib/posts.ts`.

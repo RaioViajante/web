@@ -33,12 +33,12 @@ another site as a local route.
 
 ## Frameworks
 
-| App  | Framework                     |
-| ---- | ----------------------------- |
-| root | Next.js (App Router)          |
-| dump | Next.js (App Router) with MDX |
-| docs | Astro with Starlight          |
-| lab  | Astro                         |
+| App  | Framework                        |
+| ---- | -------------------------------- |
+| root | Next.js (App Router)             |
+| dump | Next.js (App Router) with MDX    |
+| docs | Astro (plain content collection) |
+| lab  | Astro                            |
 
 The split follows what each site needs. There is no goal of converging on one
 framework.
@@ -54,7 +54,7 @@ packages/* never depend on apps/*
 
 ```text
 packages/
-└── design/    @raioviajante/design — shared color tokens
+└── design/    @raioviajante/design — design system: tokens, styles, artwork, sound, blocks, components
 ```
 
 An app depends on a package through `workspace:*` and imports it through the
@@ -62,36 +62,22 @@ package's `exports`, never by a relative path into `packages/`.
 
 ## Shared design policy
 
-root, dump, docs, and lab share the broader RaioViajante visual identity. Each
-app implements that identity itself; shared implementation is extracted only
-where there is genuine reuse.
+All four apps consume the shared design system in `@raioviajante/design`.
+The package contains tokens and styles, artwork, Web Audio sound, static React
+components, soft-block highlighting and markup, and browser behavior. Every
+shared piece has one implementation. Apps own their font loading, routes,
+content and experiment-specific behavior.
 
-`@raioviajante/design` is a private, framework-neutral package of static CSS
-with no build step. It exports `./tokens.css`, which defines five color
-primitives for the light and dark themes:
+Next.js apps render the components on the server; Astro apps render through
+`@astrojs/react` at build time with no hydration. Shared `behavior` handles
+sound, search, avatar animation and block controls. Lab enhances its benches
+with small plain TypeScript Astro scripts and shares pure logic with Node tests.
 
-- `--rv-color-bg`
-- `--rv-color-fg`
-- `--rv-color-accent`
-- `--rv-color-muted`
-- `--rv-color-hairline`
-
-The package contains no components, typography, layout, or theme behavior. A
-consuming app keeps its own variable names and points them at the primitives:
-
-```text
-app CSS ──▶ app semantic aliases (e.g. --bg) ──▶ --rv-color-* primitives
-```
-
-App-specific tokens, selectors, focus and selection rules, theme bootstrap,
-typography, layout, width, and gutter stay in each app.
-
-| App  | Consumes `@raioviajante/design` |
-| ---- | ------------------------------- |
-| root | yes                             |
-| lab  | yes                             |
-| dump | no                              |
-| docs | no                              |
+`styles.css` replaces the legacy color primitives and editorial shell entries.
+Those old exports remain until Phase 6 verifies and removes obsolete code. No
+app loads both style systems. Migration status and remaining work are tracked
+in [design-migration-plan](design-migration-plan.md); rules are in
+[design-system](design-system.md) and [blocks](blocks.md).
 
 Each consumer documents its own mapping: see root's
 [design notes](../apps/root/docs/design.md) and lab's

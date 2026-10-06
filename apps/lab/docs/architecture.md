@@ -1,48 +1,35 @@
 # Architecture
 
-## The RaioViajante ecosystem
+Lab is the experiments app in the RaioViajante monorepo. Each app has its own
+deployment; shared code belongs in packages, never in another app.
 
-RaioViajante's internet presence is split across separate subdomains, each its own app in the `RaioViajante/web` monorepo and its own deployment:
-
-- **`raioviajante.com`** — identity / personal index
-- **`dump.raioviajante.com`** — writing and thoughts
-- **`docs.raioviajante.com`** — stable public technical documentation
-- **`lab.raioviajante.com`** — experiments (this app)
-
-## Role of this site
-
-`lab.raioviajante.com` hosts experiments, prototypes, and technical curiosities that haven't decided what they are yet. Core rule: **the shell is consistent, the experiments are allowed to misbehave.** The global shell — header, footer, theme selector, canonical content width — stays disciplined and unmistakably RaioViajante across every route. An individual experiment page may introduce a specialized interactive surface inside its own content area, but experiments do not get permission to redesign the site around themselves.
-
-## Stack
-
-Astro (static-first, no server runtime needed), TypeScript, pnpm. No React, Vue, Svelte, or other UI framework — plain Astro components and, where an experiment needs interactivity, small inline/vanilla `<script>` progressive enhancement.
-
-## Structure
+Astro builds static pages. React is a build-time renderer for the shared design
+components and app-specific compositions; there is no React hydration. Small
+plain TypeScript Astro scripts enhance experiments and the index filter.
 
 ```text
 src/
-  components/    shared shell pieces (Header, Footer, ThemeToggle)
-                 and per-experiment surfaces (FilenameClassifier, ExecutionStates, BootSector)
-  data/          experiments.ts — centralized experiment content model
-  layouts/       BaseLayout.astro (site shell), ExperimentLayout.astro
-  pages/
-    index.astro                     the lab index ("/")
-    experiments/[slug].astro        experiment page shell, one route per
-                                     experiment via getStaticPaths
-  styles/        global.css — lab's token aliases and own tokens, typography,
-                 base elements (shared colors come from @raioviajante/design)
+  components/     LabFrame, LabIndex, experiment page parts and legal content
+    surfaces/     static React bench markup and Astro browser scripts
+  data/           experiments.ts and verified boot-sector source excerpts
+  layouts/        BaseLayout.astro, ExperimentLayout.astro
+  lib/            pure filename and execution logic, title convention
+  pages/          index, search, search-index.json, terms, privacy, 404
+    experiments/  [slug].astro — three static experiment routes
+  styles/         lab.css — index and experiment-specific layout
+ tests/            Node unit tests for classifier and lifecycle rules
 ```
 
-## Routing
+`BaseLayout.astro` owns metadata (the shared `SeoHead`, fed by `src/lib/seo.ts`,
+which also lists the pages for `/og/` cards and `sitemap.xml`) and font loading. `LabFrame` configures the
+package's shell, navigation and footer. Shared behavior handles search, sound,
+avatar animation and block interactions. No copied shared markup, assets or
+styles live in lab. Every experiment stays inside the shared content column;
+wide code and classification output scroll within their blocks.
 
-Experiment routes are generated statically from `src/data/experiments.ts` through a single dynamic route (`src/pages/experiments/[slug].astro`), producing clean paths like `/experiments/filename-classifier/`. There is no per-experiment route file — adding an experiment means adding a data record and, if it needs a bespoke visual surface, a small Astro component referenced from that record.
-
-The classifier and execution surfaces share small pure TypeScript functions with their browser scripts under `src/lib/`. They reproduce referenced project behavior locally, without a server or sibling-repository build dependency. Boot source inspection uses native `details` / `summary` elements and works without JavaScript. Source metadata is optional; the layout omits its row when absent.
-
-## Canonical vs. wide experiment layout
-
-Every primary surface (header, homepage, experiment metadata, prose, and by default the experiment surface itself) shares one canonical column: 680px of actual content (`--content-width`), with the `clamp(1rem, 4vw, 1.25rem)` gutter (`--gutter`) outside it, so a container is at most the content width plus two gutters wide. An experiment's data record carries an explicit `layout` field (`"canonical"` by default, `"wide"` opt-in) so a future experiment that genuinely needs more horizontal space (a waveform editor, a node graph, a large canvas) can request a breakout without making width-expansion the default behavior for every experiment. See [`design.md`](design.md) for the visual rationale.
-
-## Theme system
-
-The theme selector and persistence strategy are ported from the real implementations in the sibling `raioviajante.com` and `dump` repositories (not reinvented). The shared color primitives come from `@raioviajante/design`, aliased to lab's own variable names — see [`design.md`](design.md) for specifics.
+Experiment IDs, status, fidelity, provenance and publication dates come from
+`src/data/experiments.ts`. The dynamic route statically renders each surface.
+The classifier and execution functions are shared by the browser and Node tests.
+Boot models are highlighted at build time and its five panels switch locally.
+No server, database, CMS, sibling build dependency or experiment persistence is
+needed. Search uses the shared static JSON index and client-side filtering.

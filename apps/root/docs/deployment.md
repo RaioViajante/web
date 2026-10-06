@@ -12,9 +12,9 @@ the Vercel project's Root Directory. The shared production topology, build
 settings, and Ignored Build Step are documented in the repository-level
 [deployment guide](../../../docs/deployment.md).
 
-Vercel detects the Next.js App Router project automatically. No `vercel.json`
-or other Vercel-specific configuration is required; keep it that way unless a
-real need appears.
+Vercel detects the Next.js App Router project automatically. `vercel.json`
+only pins the framework and the Ignored Build Step; keep it that small unless
+a real need appears.
 
 ## Related deployments
 

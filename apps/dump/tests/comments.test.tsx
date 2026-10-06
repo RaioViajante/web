@@ -1,4 +1,4 @@
-import { act, render, waitFor } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 
 import { Comments } from "@/components/Comments";
 
@@ -39,10 +39,9 @@ describe("<Comments />", () => {
     document.documentElement.dataset.theme = "light";
   });
 
-  it("renders the quiet rule and container immediately, without loading giscus", () => {
+  it("renders the container immediately, without loading giscus", () => {
     const { container } = render(<Comments />);
 
-    expect(container.querySelector("hr.comments-rule")).toBeInTheDocument();
     expect(container.querySelector("div.comments")).toBeInTheDocument();
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
   });
@@ -85,49 +84,12 @@ describe("<Comments />", () => {
     expect(script).toHaveAttribute("data-emit-metadata", "0");
   });
 
-  it("selects the borderless light giscus theme when the site is in light mode", () => {
-    document.documentElement.dataset.theme = "light";
+  it("loads the custom editorial theme", () => {
     render(<Comments />);
     intersectFirst();
-
     expect(document.querySelector(SCRIPT_SELECTOR)).toHaveAttribute(
       "data-theme",
-      "noborder_light",
+      `${window.location.origin}/giscus.css`,
     );
-  });
-
-  it("selects the borderless dark giscus theme when the site is in dark mode", () => {
-    document.documentElement.dataset.theme = "dark";
-    render(<Comments />);
-    intersectFirst();
-
-    expect(document.querySelector(SCRIPT_SELECTOR)).toHaveAttribute(
-      "data-theme",
-      "noborder_dark",
-    );
-  });
-
-  it("sends the official setConfig message to the mounted iframe on a live theme change", async () => {
-    document.documentElement.dataset.theme = "light";
-    render(<Comments />);
-    intersectFirst();
-
-    const iframe = document.createElement("iframe");
-    iframe.className = "giscus-frame";
-    document.body.appendChild(iframe);
-    const postMessage = jest.spyOn(iframe.contentWindow!, "postMessage");
-
-    act(() => {
-      document.documentElement.dataset.theme = "dark";
-    });
-
-    await waitFor(() => {
-      expect(postMessage).toHaveBeenCalledWith(
-        { giscus: { setConfig: { theme: "noborder_dark" } } },
-        "https://giscus.app",
-      );
-    });
-
-    document.body.removeChild(iframe);
   });
 });

@@ -1,0 +1,123 @@
+/* Lab owns its experiment index and interactive surfaces; the shell is shared. */
+:root {
+  --font: "Noto Sans Mono Variable", "Noto Sans Mono", monospace;
+}
+.lab-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.lab-filters {
+  margin-bottom: 14px;
+}
+.lab-entry {
+  padding: 12px 0 16px;
+}
+.lab-entry p,
+.lab-entry__meta {
+  margin: 6px 0 0 50px;
+  color: var(--fg-2);
+  font-size: 14px;
+}
+.lab-entry__meta {
+  font-size: 12.5px;
+}
+.lab-id {
+  display: inline-block;
+  width: 50px;
+  color: var(--fg-3);
+  font-size: 13px;
+}
+.lab-date {
+  margin-right: 16px;
+  color: var(--fg-3);
+  font-size: 13px;
+}
+
+.classifier-output {
+  overflow-x: auto;
+}
+[data-classifier] .bench-inputs {
+  grid-template-columns: minmax(0, 1fr);
+}
+.classifier-output .table-block {
+  margin: 0;
+  padding: 0;
+}
+.classifier-output table {
+  min-width: 600px;
+}
+.classifier-output th,
+.classifier-output td {
+  overflow-wrap: anywhere;
+  max-width: 240px;
+}
+.classifier-output tbody th {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  color: var(--syn-string);
+}
+.transition-rules {
+  margin-top: 28px;
+}
+.classifier-counts {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--fg-2);
+}
+.boot-explorer {
+  display: flex;
+  flex-wrap: wrap;
+}
+.boot-select {
+  flex: 0 1 210px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--block-hairline);
+  padding: 8px 0;
+}
+.boot-select .rv-toggle {
+  text-align: left;
+  border-bottom: 0;
+  border-left: 1px solid transparent;
+  padding: 8px 16px;
+}
+.boot-select .rv-toggle[aria-pressed="true"] {
+  border-left-color: var(--fg);
+  background: var(--code-inline);
+}
+.boot-content {
+  flex: 999 1 320px;
+  min-width: 0;
+}
+.boot-panel .block {
+  margin: 0;
+}
+.boot-panel .block__body {
+  border-radius: 0;
+  background: transparent;
+}
+.boot-panel .block__meta {
+  padding: 8px 16px 0;
+}
+.boot-panel .callout {
+  margin: 16px;
+}
+.boot-pager {
+  display: flex;
+  justify-content: space-between;
+}
+.transition-rules .is-available {
+  color: var(--fg);
+}
+.transition-rules tbody tr {
+  color: var(--fg-3);
+}
+@media (max-width: 600px) {
+  .lab-date {
+    display: block;
+  }
+}

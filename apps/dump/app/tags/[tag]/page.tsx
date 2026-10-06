@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { PageHeader } from "@raioviajante/design/parts";
 
+import { DumpShell } from "@/components/DumpShell";
 import { TagPostList, tagHref } from "@/components/TagViews";
 import { getAllTags, getPostsByTag } from "@/lib/posts";
-import { alternatesFor } from "@/lib/site";
+import { metadataFor } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -19,11 +21,11 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { tag } = await params;
-  return {
+  return metadataFor({
+    path: tagHref(tag),
     title: `Posts tagged "${tag}"`,
-    description: `Posts tagged "${tag}".`,
-    alternates: alternatesFor(tagHref(tag)),
-  };
+    description: `Technical writing and project notes tagged "${tag}" on dump.`,
+  });
 }
 
 export default async function TagPage({ params }: PageProps) {
@@ -32,9 +34,13 @@ export default async function TagPage({ params }: PageProps) {
   if (posts.length === 0) notFound();
 
   return (
-    <div className="tag-page">
-      <h1 className="tag-page-heading">tag: {tag}</h1>
+    <DumpShell current="/tags">
+      <PageHeader
+        label="Tag"
+        title={tag}
+        line={`${posts.length} ${posts.length === 1 ? "post" : "posts"}`}
+      />
       <TagPostList posts={posts} />
-    </div>
+    </DumpShell>
   );
 }

@@ -1,6 +1,7 @@
 {
   "name": "@raioviajante/web",
   "private": true,
+  "license": "MIT",
   "packageManager": "pnpm@12.8.1",
   "engines": {
     "node": "24.x"

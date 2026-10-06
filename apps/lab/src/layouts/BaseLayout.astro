@@ -1,20 +1,22 @@
 ---
-import "@raioviajante/design/tokens.css";
-import "../styles/global.css";
-import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
-import ThemeToggle from "../components/ThemeToggle.astro";
-import { THEME_STORAGE_KEY } from "../lib/theme";
+import { isNotFoundPath } from "@raioviajante/design/seo";
+import { SeoHead } from "@raioviajante/design/seo-head";
+import fontUrl from "@raioviajante/design/fonts/NotoSansMono-Latin-Variable.woff2?url";
+import "@raioviajante/design/fonts.css";
+import "@raioviajante/design/styles.css";
+import "../styles/lab.css";
+import { LabFrame } from "../components/LabFrame";
 import { formatTitle } from "../lib/site";
-
 interface Props {
   pageTitle?: string;
   description?: string;
+  current?: string;
 }
-
-const { pageTitle, description = "lab.raioviajante.com — things may break." } =
-  Astro.props;
-
+const {
+  pageTitle,
+  description = "lab.raioviajante.com — things may break.",
+  current = Astro.url.pathname,
+} = Astro.props;
 const title = formatTitle(pageTitle);
 ---
 
@@ -22,46 +24,40 @@ const title = formatTitle(pageTitle);
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="generator" content={Astro.generator} />
-    <meta name="description" content={description} />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="preload"
+      href={fontUrl}
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
-
+    <SeoHead
+      origin={Astro.site!.href}
+      site="lab"
+      path={Astro.url.pathname}
+      title={title}
+      description={description}
+      noindex={isNotFoundPath(Astro.url.pathname)}
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.ico?v=4" sizes="any" />
+    <link rel="icon" type="image/png" href="/icon.png?v=4" sizes="512x512" />
+    <link
+      rel="apple-touch-icon"
+      href="/apple-touch-icon.png?v=4"
+      sizes="180x180"
+    />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <title>{title}</title>
-
-    <script is:inline define:vars={{ THEME_STORAGE_KEY }}>
-      (function () {
-        let stored = null;
-        try {
-          stored = localStorage.getItem(THEME_STORAGE_KEY);
-        } catch {
-          // Storage can be unavailable (private browsing, disabled cookies);
-          // the theme still falls back to prefers-color-scheme below.
-        }
-        const prefersDark =
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const theme =
-          stored === "light" || stored === "dark"
-            ? stored
-            : prefersDark
-              ? "dark"
-              : "light";
-        document.documentElement.setAttribute("data-theme", theme);
-      })();
-    </script>
   </head>
   <body>
-    <Header />
-    <slot />
-    <Footer />
-    <ThemeToggle />
+    <LabFrame current={current}>
+      <slot />
+    </LabFrame>
+    <script>
+      import { startBehavior } from "@raioviajante/design/behavior";
+      startBehavior();
+    </script>
   </body>
 </html>

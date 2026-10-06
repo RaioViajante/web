@@ -1,133 +1,68 @@
 ---
-import { classifyFilename } from "../../lib/filename-classifier";
-const examples = ["photo.png", "invoice.pdf", "backup.zip", "notes.txt"];
+import { ClassifierBench } from "./ClassifierBench";
 ---
 
-<div class="classifier" data-classifier>
-  <label class="section-label" for="filenames">
-    filenames/
-  </label>
-  <p id="filename-help">
-    One filename per line. Results use the lowercased final suffix.
-  </p>
-  <textarea
-    id="filenames"
-    rows="4"
-    spellcheck="false"
-    aria-describedby="filename-help"
-  >{examples.join("\n")}</textarea>
-  <table>
-    <caption class="section-label">classification/</caption>
-    <thead>
-      <tr>
-        <th scope="col">filename</th>
-        <th scope="col">suffix</th>
-        <th scope="col">category</th>
-      </tr>
-    </thead>
-    <tbody>
-      {examples.map(classifyFilename).map(({ filename, suffix, category }) => (
-        <tr>
-          <th scope="row">{filename}</th>
-          <td>{suffix || "—"}</td>
-          <td>{category}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-  <p class="feedback" role="status" aria-live="polite" data-summary>
-    4 filenames classified.
-  </p>
-  <noscript>
-    The examples above are precomputed. Enable JavaScript to classify other
-    filenames.
-  </noscript>
-</div>
-
-<style>
-  .classifier {
-    border: 1px solid var(--border);
-    padding: 1rem;
-  }
-  label {
-    display: block;
-  }
-  p {
-    margin: 0.4rem 0 0.75rem;
-    color: var(--muted);
-  }
-  textarea {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    resize: vertical;
-    border: 1px solid var(--field-border);
-    border-radius: 0;
-    padding: 0.65rem;
-    background: var(--bg);
-    color: var(--fg);
-    font: 0.85rem/1.6 var(--font-mono);
-  }
-  table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    margin-top: 1.25rem;
-    font: 0.75rem/1.6 var(--font-mono);
-  }
-  caption {
-    text-align: left;
-    margin-bottom: 0.5rem;
-  }
-  table :global(th),
-  table :global(td) {
-    text-align: left;
-    vertical-align: top;
-    padding: 0.5rem 0.35rem 0.5rem 0;
-    border-bottom: 1px solid var(--border);
-    overflow-wrap: anywhere;
-    font-weight: 400;
-  }
-  table :global(th:first-child) {
-    width: 45%;
-  }
-  table :global(th:nth-child(2)) {
-    width: 20%;
-  }
-  thead {
-    color: var(--muted);
-  }
-  .feedback {
-    margin: 0.75rem 0 0;
-    font-size: 0.9rem;
-  }
-</style>
-
+<ClassifierBench />
 <script>
   import { classifyFilename } from "../../lib/filename-classifier";
-  const container = document.querySelector<HTMLElement>("[data-classifier]");
-  const input = container?.querySelector<HTMLTextAreaElement>("textarea");
-  const body = container?.querySelector("tbody");
-  const summary = container?.querySelector("[data-summary]");
-  input?.addEventListener("input", () => {
-    if (!body || !summary) return;
-    // Preserve filename spaces; only empty lines are omitted.
-    const results = input.value
+  import { playSound } from "@raioviajante/design/sound";
+  const container = document.querySelector<HTMLElement>("[data-classifier]")!;
+  const names = container.querySelector<HTMLTextAreaElement>("#filenames")!;
+  const directory = container.querySelector<HTMLInputElement>("#directory")!;
+  const body = container.querySelector("tbody")!;
+  const summary = container.querySelector("[data-summary]")!;
+  const initial = names.value;
+  function render(sound = false) {
+    const results = names.value
       .split(/\r?\n/)
-      .filter((line) => line.length > 0)
+      .filter((name) => name.length > 0)
       .map(classifyFilename);
+    const counts = { Images: 0, Documents: 0, Archives: 0, Other: 0 };
+    const dir = directory.value.replace(/\/+$/, "");
     body.replaceChildren(
-      ...results.map(({ filename, suffix, category }) => {
-        const row = document.createElement("tr");
-        [filename, suffix || "—", category].forEach((value, index) => {
+      ...results.map((row) => {
+        counts[row.category as keyof typeof counts]++;
+        const tr = document.createElement("tr");
+        [
+          row.filename,
+          row.suffix || "(none)",
+          row.category,
+          `${dir}/${row.category}/${row.filename}`,
+        ].forEach((value, index) => {
           const cell = document.createElement(index === 0 ? "th" : "td");
           if (index === 0) cell.setAttribute("scope", "row");
+          cell.className = ["tok-string", "tok-number", "tok-type", ""][index];
           cell.textContent = value;
-          row.append(cell);
+          tr.append(cell);
         });
-        return row;
+        return tr;
       }),
     );
-    summary.textContent = `${results.length} ${results.length === 1 ? "filename" : "filenames"} classified.`;
+    summary.textContent = `${results.length} ${results.length === 1 ? "file" : "files"} classified · ${Object.entries(
+      counts,
+    )
+      .map(([category, count]) => `${category} ${count}`)
+      .join(" · ")}`;
+    if (sound) playSound("success");
+  }
+  [names, directory].forEach((input) => {
+    input.addEventListener("input", () => render());
+    input.addEventListener("change", () => playSound("success"));
   });
+  container
+    .querySelector("[data-classify]")!
+    .addEventListener("click", () => render(true));
+  container.querySelector("[data-reset]")!.addEventListener("click", () => {
+    names.value = initial;
+    directory.value = "~/Downloads";
+    render(true);
+  });
+  container
+    .querySelectorAll<HTMLButtonElement>("[data-sample]")
+    .forEach((button) =>
+      button.addEventListener("click", () => {
+        names.value += `${names.value && !names.value.endsWith("\n") ? "\n" : ""}${button.dataset.sample}`;
+        render(true);
+      }),
+    );
 </script>

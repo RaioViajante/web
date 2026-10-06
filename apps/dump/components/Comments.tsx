@@ -10,17 +10,6 @@ const REPO_ID = "R_kgDOUu8oYA";
 const CATEGORY = "Comments";
 const CATEGORY_ID = "DIC_kwDOUu8oYM4DGx0J";
 
-// Borderless variants read closest to the editorial palette: no boxed card,
-// just text and rules matching the surrounding article.
-const LIGHT_THEME = "noborder_light";
-const DARK_THEME = "noborder_dark";
-
-function currentGiscusTheme(): string {
-  return document.documentElement.dataset.theme === "dark"
-    ? DARK_THEME
-    : LIGHT_THEME;
-}
-
 function loadGiscus(container: HTMLDivElement) {
   const script = document.createElement("script");
   script.src = "https://giscus.app/client.js";
@@ -34,7 +23,7 @@ function loadGiscus(container: HTMLDivElement) {
   script.setAttribute("data-strict", "1");
   script.setAttribute("data-reactions-enabled", "0");
   script.setAttribute("data-emit-metadata", "0");
-  script.setAttribute("data-theme", currentGiscusTheme());
+  script.setAttribute("data-theme", `${window.location.origin}/giscus.css`);
   script.setAttribute("data-lang", "en");
 
   container.appendChild(script);
@@ -43,8 +32,7 @@ function loadGiscus(container: HTMLDivElement) {
 /**
  * Article comments, backed by giscus (GitHub Discussions). Isolated client
  * boundary: mounted only from `PostArticle`, deferred until scrolled near,
- * and kept in sync with the site's light/dark theme via the official
- * `setConfig` postMessage. Everything else on the article page stays
+ * with a custom editorial theme. Everything else on the article page stays
  * server-rendered.
  */
 export function Comments() {
@@ -80,32 +68,5 @@ export function Comments() {
     };
   }, []);
 
-  // Live theme sync: forward the site's data-theme changes to the giscus
-  // iframe, once mounted, via its official setConfig message. No-op until
-  // the iframe exists, so this is safe to observe from mount.
-  useEffect(() => {
-    function sendTheme() {
-      const iframe = document.querySelector<HTMLIFrameElement>(
-        "iframe.giscus-frame",
-      );
-      iframe?.contentWindow?.postMessage(
-        { giscus: { setConfig: { theme: currentGiscusTheme() } } },
-        "https://giscus.app",
-      );
-    }
-
-    const observer = new MutationObserver(sendTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <>
-      <hr className="comments-rule" />
-      <div ref={containerRef} className="comments" />
-    </>
-  );
+  return <div ref={containerRef} className="comments" />;
 }

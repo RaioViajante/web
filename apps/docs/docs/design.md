@@ -1,44 +1,48 @@
 # Design
 
-## Shared RaioViajante visual identity
+docs.raioviajante.com uses the shared design system in `@raioviajante/design`
+(tokens in `docs/design-system.md` at the repository root). It no longer has a
+visual language of its own: no purple accent, no serif prose font and no theme
+toggle remain.
 
-docs.raioviajante.com is part of the RaioViajante ecosystem and should clearly belong to the same visual identity as the rest of it:
+## Structure
 
-- **Background:** `#18161b`
-- **Foreground:** `#ece7e0`
-- **Accent:** `#c3b3e0`
-- **IBM Plex Mono** for system-like UI, paths, labels, metadata, and code-adjacent elements
-- **Source Serif 4** for prose / editorial voice
-- Restrained use of purple (the accent is a highlight, not a theme)
-- Generous whitespace
-- Typography-driven hierarchy (structure communicated through type, not decoration)
-- GitHub icon-only treatment (no text-labeled social buttons)
-- Understated interactions (subtle, not showy)
+- `astro.config.mjs` sets the Markdown pipeline: `remark-directive`, the shared
+  `remarkSoftCallouts`, the shared `rehypeNumberSections`, `rehypeSteps` and
+  `rehypeSoftBlocks`. Code is highlighted at build time with the shared theme.
+- `src/layouts/DocsShell.astro` is the one layout: head, the shared shell
+  (`src/components/DocsFrame.tsx`, rendered statically) and the shared
+  behavior script. Styles come from `@raioviajante/design/styles.css` and
+  `src/styles/docs.css`, which holds only docs' own pieces. Noto Sans Mono is
+  self-hosted through the shared `fonts.css` and preloaded Latin WOFF2.
+- Metadata comes from the shared `SeoHead` in `DocsShell.astro`; `src/lib/seo.ts`
+  lists the pages for the `/og/` cards and `sitemap.xml`.
+- Two columns, like every site. "On this page" sits in the sidebar under
+  PAGES; there is no right column. A page that belongs under another (the
+  Sweep CLI reference) is a `sub` item: `01.1 cli reference`.
+- `src/pages/[...slug].astro` renders every documentation page: breadcrumb
+  label, status word and meta row, numbered sections, steps, tables, callouts,
+  "last updated" and "edit this page on GitHub", and previous/next. The
+  homepage, search, Terms, Privacy and the 404 are their own pages.
+- Starlight was removed. Pagefind went with it: search is the shared
+  client-side search over `/search-index.json`.
 
-## Adapting the identity for documentation
+## Content rules
 
-docs.raioviajante.com uses the shared 680px content measure for its reading column, while its Starlight rails and surrounding layout serve documentation-specific needs:
-
-- a navigation sidebar
-- code blocks
-- tables
-- multi-level headings
-- search
-- a table of contents
-
-The layout should give these elements the space they need while keeping the same colors, typography, and restrained tone as the rest of the identity. Adapting the identity to this use case is expected; abandoning it is not.
+- A page needs the frontmatter in `src/content.config.ts`; `order` decides the
+  sidebar, previous/next and home order.
+- A page may set `lastUpdated: "2026-10-06"` in its frontmatter (an ISO calendar
+  date, `YYYY-MM-DD`). Use the date of a real editorial update. This explicit
+  date takes priority over git. Otherwise, "Last updated" uses the last commit
+  that touched the page's file, read at build time. The line is omitted when
+  neither exists, including when git history is unavailable or shallow.
+  Set `VERCEL_DEEP_CLONE=true` on the docs Vercel project to make git fallback
+  dates available in production. No version or commit hash is shown until the
+  project publishes versions.
+- No placeholder renders on a public page. Pages that need a fact the
+  repository does not have leave it out.
 
 ## Explicitly avoid
 
-- Generic documentation-SaaS aesthetics
-- Excessive cards
-- Bento grids
-- Glassmorphism
-- Glowing gradients
-- Decorative blobs
-- Unnecessary animations
-- Giant marketing hero sections
-
-## Status
-
-The approved visual system is implemented in the Astro/Starlight application. The current site includes the shared colors and typography, custom header and footer treatment, theme toggle, flat sidebar, canonical 680px reading column, and responsive article rails described above.
+Generic documentation-SaaS aesthetics, cards, bento grids, glassmorphism,
+gradients, glow, decorative blobs, unnecessary animation, marketing heroes.

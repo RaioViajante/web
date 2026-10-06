@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 
 import { PostArticle } from "@/components/PostArticle";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
-import { alternatesFor } from "@/lib/site";
+import { renderPost } from "@/lib/render-post";
+import { metadataFor } from "@/lib/seo";
 import { blogPostingJsonLd, jsonLdScript } from "@/lib/structured-data";
 
 export const dynamicParams = false;
@@ -23,15 +24,16 @@ export async function generateMetadata({
   const post = getPostBySlug(slug);
   if (!post) return {};
 
-  return {
+  const metadata = metadataFor({
+    path: `/posts/${post.slug}`,
     title: post.title,
     description: post.description,
-    alternates: alternatesFor(`/posts/${post.slug}`),
+  });
+  return {
+    ...metadata,
     openGraph: {
+      ...metadata.openGraph,
       type: "article",
-      title: post.title,
-      description: post.description,
-      url: `/posts/${post.slug}`,
       publishedTime: new Date(`${post.date}T00:00:00Z`).toISOString(),
       tags: post.tags,
     },
@@ -43,7 +45,7 @@ export default async function PostPage({ params }: PageProps) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  const { default: Content } = await import(`@/content/posts/${slug}.mdx`);
+  const Content = await renderPost(slug);
 
   return (
     <>

@@ -1,0 +1,9 @@
+---
+import { notFoundSeo } from "@raioviajante/design/seo";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { LabNotFound } from "../components/LabNotFound";
+---
+
+<BaseLayout pageTitle={notFoundSeo.title} description="I looked everywhere.">
+  <LabNotFound />
+</BaseLayout>

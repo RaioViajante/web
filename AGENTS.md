@@ -1,137 +1,105 @@
 # AGENTS.md
 
-Repository-wide instructions for coding agents working in RaioViajante/web.
-
-Precedence:
-
-1. This file applies everywhere in the repository.
-2. An app's own `AGENTS.md` adds app-specific instructions.
-3. Explicit instructions from the user for a task override these defaults.
+Instructions for RaioViajante/web. App `AGENTS.md` files add local rules;
+explicit task instructions take precedence. `CLAUDE.md` mirrors this file.
 
 ## Repository
 
-| Path              | Package                | Role                            |
-| ----------------- | ---------------------- | ------------------------------- |
-| `apps/root`       | `@raioviajante/root`   | personal home, ecosystem index  |
-| `apps/dump`       | `@raioviajante/dump`   | personal technical writing      |
-| `apps/docs`       | `@raioviajante/docs`   | curated technical documentation |
-| `apps/lab`        | `@raioviajante/lab`    | interactive experiments         |
-| `packages/design` | `@raioviajante/design` | shared color tokens (CSS)       |
+| Path              | Package                | Purpose                             |
+| ----------------- | ---------------------- | ----------------------------------- |
+| `apps/root`       | `@raioviajante/root`   | Personal home and ecosystem index   |
+| `apps/dump`       | `@raioviajante/dump`   | Technical writing                   |
+| `apps/docs`       | `@raioviajante/docs`   | Curated technical documentation     |
+| `apps/lab`        | `@raioviajante/lab`    | Interactive experiments             |
+| `packages/design` | `@raioviajante/design` | Shared design, behavior and artwork |
 
-- The apps are deployed independently. Apps must not import from one another.
-- Shared code lives in `packages/`. Move code there only when it has a real
-  shared responsibility. Apps may depend on packages; packages never depend on
-  apps.
-- Repository-level documentation lives in `docs/`; each app has its own `docs/`.
-- `apps/root`, `apps/docs`, and `apps/lab` have their own `AGENTS.md`.
-  `apps/dump` has none committed: the `AGENTS.md` and `CLAUDE.md` that Next.js
-  generates there are intentionally gitignored.
+- Apps deploy independently and never import one another. Packages never import
+  apps. Repository docs live in `docs/`; app maintenance docs in `apps/*/docs/`.
+- Use English for repository content, identifiers, comments, commits and GitHub
+  metadata. Do not rewrite unrelated existing content just to enforce this.
+- Inspect relevant code and docs before editing. Preserve unrelated owner edits.
+- pnpm 12.8.1 only, Node 24 from `.nvmrc`. One workspace and root lockfile;
+  change the lockfile only through pnpm. Prefer named filters from the root.
+- Scope dependency changes to the task. Do not unify intentional version
+  differences. Packages with install scripts need workspace `allowBuilds` entries.
 
-## Language
+## Shared design
 
-Use English for source code, identifiers, comments, documentation, commit
-messages, package metadata, and GitHub metadata. This applies to repository
-content, not to conversation with the user. Do not rewrite existing content only
-to enforce it.
+Read `docs/design-system.md` and `docs/blocks.md` for the implemented contract.
 
-## Package management
+- Every repeated component, style, behavior, sound and artwork has one
+  implementation in `packages/design`. Apps own routes, content and unique
+  interactions. Play does not automatically inherit this system.
+- All four apps load `@raioviajante/design/styles.css`. Colors come from
+  `styles/tokens.css`; literals belong only there and in the tested Shiki mirror.
+  Page chrome is gray; color belongs inside code and lab output.
+- One typeface: self-hosted Noto Sans Mono, preloaded by each app. Social cards
+  use the shared renderer and token colors. Never copy a renderer into an app.
+- Use words for status, warnings and controls. No decorative icons, gradients,
+  glow, colored badges, emoji, bento grids or second typeface. Preserve the
+  documented root gallery effects; do not add shadows elsewhere.
+- Artwork lives once in `packages/design/assets`, with its all-rights-reserved
+  license. Use `Art`/gallery static imports, meaningful alt text (empty for
+  decorative images), explicit dimensions and lazy loading below the fold.
+- Site icons are generated from `assets/icons/source.png` with
+  `pnpm --filter @raioviajante/design icons`; never edit the app copies.
+- The avatar belongs on index headers and social cards; the search character
+  belongs on search, the 404 sticker on 404, and the empty-search sticker on
+  empty results. Search heads are at least 28px. Other placements need a task.
+- Soft blocks use the shared markup and build-time custom Shiki theme.
+- Next.js renders shared React on the server. Astro uses `@astrojs/react`
+  statically: no `client:*` or browser React. Shared `behavior` handles common
+  interactions; lab benches use small plain TypeScript Astro scripts.
+- Web Audio synthesis lives in `packages/design/sound`; no audio files or sound
+  on load. Use `data-sound` / `playSound`, one `rv-sound` cookie on
+  `.raioviajante.com`, and respect reduced motion.
+- Keep one h1, semantic landmarks, visible keyboard focus, 44px standalone
+  controls, 4.5:1 text contrast and live feedback. Inline prose links retain
+  natural text flow. Outcomes must remain clear without color or sound.
+- Never publish placeholders or invent dates, versions, permissions or legal
+  facts. Omit unknown facts and record them in the report. Preserve source
+  placeholders in historical briefs. Document implemented and planned work honestly.
 
-- pnpm only, version 12.8.1 (`packageManager`). Node 24, pinned in `.nvmrc`.
-- One root `pnpm-workspace.yaml` and one root `pnpm-lock.yaml`. Do not add
-  per-app lockfiles, `package-lock.json`, or `yarn.lock`.
-- Change `pnpm-lock.yaml` only through pnpm commands, never by hand.
-- Prefer running from the repository root with named filters:
-  `pnpm --filter @raioviajante/<app> <script>`.
-- Dependency changes must be intentional and scoped to the task. Apps may
-  intentionally use different versions of the same dependency (TypeScript
-  included); do not unify versions just for consistency.
-- Packages with install scripts must be listed under `allowBuilds` in
-  `pnpm-workspace.yaml`; pnpm fails the install otherwise.
+## Migration sessions
 
-## Change scope
+Read the full brief, Status and next-session instructions in
+`docs/design-migration-plan.md`. Work on `feat/design-migration`; do not create
+another branch. The local design handoff is ignored and owner-managed: never
+stage, delete or modify it. Copy required artwork into the shared package.
+Stage explicit files/hunks; never `git add -A` or `git add .`.
+Commit coherent validated steps; never push, amend, rebase shared commits or
+force-push during migration. Preserve uncommitted playground edits.
 
-- Inspect the relevant code and documentation before modifying anything.
-- Keep changes focused on the task. Do not refactor or restyle other apps
-  unless the task requires it.
-- Avoid cross-app abstractions without real reuse. A shared abstraction
-  normally needs at least two real consumers, or a clear architectural reason.
+## Validation and Git
 
-## Design
-
-- root, dump, docs, and lab share the broader RaioViajante identity. They are
-  not required to be pixel-identical; each app implements it for its framework.
-- Shared design code should come from proven reuse. `@raioviajante/design`
-  provides only the five shared color primitives (`--rv-color-*` in
-  `tokens.css`). root and lab consume it; dump and docs do not.
-- A consuming app keeps its own semantic aliases (for example
-  `--bg: var(--rv-color-bg)`) and its app-specific tokens. Selectors, focus and
-  selection rules, theme bootstrap, typography, layout, width, and gutter stay
-  in each app.
-- Play is planned separately and must not automatically inherit the
-  RaioViajante shared design package.
-- Do not default to generic SaaS layouts, card-heavy dashboards, bento grids,
-  gratuitous gradients, decorative blobs, or glassmorphism.
-
-## Documentation honesty
-
-- Distinguish what is implemented, designed, planned, or experimental. Never
-  document planned behavior as implemented.
-- Do not claim deployments, CI runs, packages, or repository archival that have
-  not actually happened.
-- When unsure about the current state, inspect the repository or the relevant
-  infrastructure before writing about it.
-
-## Validation
-
-Run the checks each affected app defines; the minimum should match the scope of
-the change.
-
-| App  | Commands (`pnpm --filter @raioviajante/<app> …`)     |
+| App  | Scripts with `pnpm --filter @raioviajante/<app>`     |
 | ---- | ---------------------------------------------------- |
 | root | `format:check`, `lint`, `typecheck`, `build`         |
 | dump | `format:check`, `lint`, `typecheck`, `test`, `build` |
 | docs | `typecheck`, `build`                                 |
-| lab  | `format:check`, `lint`, `typecheck`, `build`         |
+| lab  | `format:check`, `lint`, `typecheck`, `test`, `build` |
 
-docs has no lint, format, or test scripts; do not invent them. For changes that
-span apps or touch workspace configuration, run everything:
+Docs has no lint, format or test scripts. Shared/workspace changes require:
 
 ```sh
 NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate
 ```
 
-Report checks exactly as run; do not claim checks that did not run.
+For UI changes, check desktop/mobile, keyboard, focus, overflow and relevant
+interactions. Report only checks actually run. Use Conventional Commits in
+English; review staged diffs and commit meaningful validated progress.
+Never push without explicit authorization or rewrite imported history/tags
+(`import/root`, `import/dump`, `import/docs`, `import/lab`).
 
-## Git
+## Production and generated files
 
-- Conventional Commits, in English, one coherent change per commit. Do not mix
-  unrelated cleanup into a commit.
-- Commit after meaningful, validated progress. Review the staged diff before
-  committing.
-- Never push unless the user explicitly authorizes it. Never force-push without
-  explicit authorization.
-- The app histories were imported with rewritten SHAs on purpose. Do not rewrite
-  the imported commits, and do not move or recreate the tags `import/root`,
-  `import/dump`, `import/docs`, or `import/lab`.
-
-## Production infrastructure
-
-- Each app is its own Vercel project, with Root Directory `apps/root`,
-  `apps/dump`, `apps/docs`, or `apps/lab`. See `docs/deployment.md` for the
-  current configuration.
-- Vercel project settings, domains, environment variables, and Ignored Build
-  Step commands are production infrastructure. Do not change them unless the
-  user explicitly asks.
-- Before an app starts consuming a package from `packages/`, its Ignored Build
-  Step must already list that package's path (for example
-  `../../packages/design`). Today root's and lab's do; dump's and docs' do not.
-- `NEXT_PUBLIC_SITE_URL` (dump) is public configuration, not a secret.
-- Do not describe a rollout as live until production actually runs it.
-
-## Generated files
-
-Do not edit these by hand:
-
-- `pnpm-lock.yaml` (changes only through pnpm)
-- `node_modules/`, `.next/`, `dist/`, `.astro/`, `coverage/`
-- `*.tsbuildinfo`, and framework-generated `next-env.d.ts`
+- See `docs/deployment.md`: four Vercel projects, Root Directory `apps/<app>`.
+  Each app's `vercel.json` holds its framework and Ignored Build Step, which
+  must watch `../../packages/design`. Dashboard settings, domains and
+  environment (docs `VERCEL_DEEP_CLONE=true`, dump `NEXT_PUBLIC_SITE_URL`) are
+  infrastructure; change them only when explicitly requested. Do not claim an
+  unverified rollout.
+- Never edit generated `node_modules/`, `.next/`, `dist/`, `.astro/`, coverage,
+  `*.tsbuildinfo` or framework-generated `next-env.d.ts` by hand.
+- Root/docs/lab have app rules. Dump's framework-generated `AGENTS.md` and
+  `CLAUDE.md` remain intentionally gitignored.

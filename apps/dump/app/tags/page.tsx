@@ -1,22 +1,23 @@
-import type { Metadata } from "next";
+import { staticMetadata } from "@/lib/seo";
+import { PageHeader } from "@raioviajante/design/parts";
 
+import { DumpShell } from "@/components/DumpShell";
 import { TagIndex } from "@/components/TagViews";
 import { getAllTags } from "@/lib/posts";
-import { alternatesFor } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Tags",
-  description: "Browse posts by topic.",
-  alternates: alternatesFor("/tags"),
-};
+export const metadata = staticMetadata("/tags");
 
 export default function TagsPage() {
   const tags = getAllTags();
 
   return (
-    <div className="tags-page">
-      <h1 className="tags-heading">Tags</h1>
+    <DumpShell current="/tags">
+      <PageHeader
+        label="Tags"
+        title="Topics"
+        line="What keeps showing up, sorted by how often."
+      />
       <TagIndex tags={tags} />
-    </div>
+    </DumpShell>
   );
 }

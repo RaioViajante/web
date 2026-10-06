@@ -3,6 +3,18 @@ import { render, screen } from "@testing-library/react";
 import { PostArticle } from "@/components/PostArticle";
 import type { Post } from "@/lib/posts";
 
+jest.mock("../lib/post-details", () => ({
+  getPostDetails: () => ({
+    headings: [],
+    minutes: 2,
+    related: [],
+    previous: null,
+    next: null,
+    currentSeries: null,
+    lab: null,
+  }),
+}));
+
 const post: Post = {
   slug: "article",
   title: "Article title",
@@ -24,7 +36,7 @@ describe("<PostArticle />", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "Article title" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("September 3, 2026")).toBeInTheDocument();
+    expect(screen.getAllByText("2026-09-03")).toHaveLength(2);
     expect(screen.getByText("Article description.")).toBeInTheDocument();
     expect(screen.getByText("Article body.")).toBeInTheDocument();
   });

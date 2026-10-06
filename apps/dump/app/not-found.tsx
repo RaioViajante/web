@@ -1,16 +1,32 @@
+import { notFoundMetadata } from "@raioviajante/design/seo";
 import Link from "next/link";
+import { NotFoundPage } from "@raioviajante/design/templates";
+
+import { DumpShell } from "@/components/DumpShell";
 
 export default function NotFound() {
   return (
-    <div className="not-found-page">
-      <p className="not-found-eyebrow">404</p>
-      <h1 className="not-found-heading">Nothing here.</h1>
-      <p className="not-found-copy">
-        Either this page never existed, or I broke something again.
-      </p>
-      <p className="not-found-back">
-        <Link href="/">← back to posts</Link>
-      </p>
-    </div>
+    <DumpShell>
+      <NotFoundPage
+        site="dump"
+        linkComponent={Link}
+        line="this page moved, never existed, or I haven't written it yet."
+        tryInstead={[
+          { label: "dump", value: "start over", href: "/" },
+          { label: "archive", value: "everything", href: "/archive" },
+          { label: "tags", value: "topics", href: "/tags" },
+          {
+            label: "raioviajante.com",
+            value: "home",
+            href: "https://raioviajante.com",
+          },
+        ]}
+      />
+    </DumpShell>
   );
 }
+
+export const metadata = notFoundMetadata(
+  "https://dump.raioviajante.com",
+  "dump",
+);

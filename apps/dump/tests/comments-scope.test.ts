@@ -10,8 +10,8 @@ const nonArticlePages = [
   "app/archive/page.tsx",
   "app/tags/page.tsx",
   "app/tags/[tag]/page.tsx",
-  "app/about/page.tsx",
-  "app/uses/page.tsx",
+  "app/terms/page.tsx",
+  "app/privacy/page.tsx",
   "app/not-found.tsx",
 ];
 
@@ -23,7 +23,7 @@ describe("comments rendering scope", () => {
   it.each(nonArticlePages)(
     "does not render comments on %s",
     (relPath: string) => {
-      expect(readFile(relPath)).not.toMatch(/Comments/);
+      expect(readFile(relPath)).not.toMatch(/<Comments|components\/Comments/);
     },
   );
 });

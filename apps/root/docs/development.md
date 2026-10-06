@@ -20,8 +20,8 @@ Run these commands from `apps/root`, or from the monorepo root as
 
 ## Structure and conventions
 
-- `app/layout.tsx` defines the root document and metadata; `app/page.tsx` is a
-  minimal placeholder. The approved pages and shared UI are not implemented yet.
+- `app/layout.tsx` defines the root document, metadata, and shared shell;
+  `app/page.tsx` renders the index and its recent writing section.
 - Use Next.js App Router, React, TypeScript, and pnpm. Keep architecture simple
   and dependencies minimal; add tools only when needed.
 - Use ESLint and Prettier for linting and formatting. Write repository content in
@@ -43,5 +43,5 @@ Before committing, run `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, and
 `pnpm build`. Review the diff and stage only the intended work. Check documentation
 accuracy, local links, and consistency when documentation changes.
 
-For future UI implementation, compare desktop and mobile rendering with the
-approved reference and check navigation, focus states, and horizontal overflow.
+For UI changes, compare desktop and mobile rendering with the editorial
+reference and check navigation, focus states, and horizontal overflow.

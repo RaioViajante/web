@@ -1,3 +1,7 @@
+jest.mock("../lib/render-post", () => ({
+  renderPost: async () => () => null,
+}));
+
 import type { Post } from "@/lib/posts";
 
 // jest.mock() takes a literal specifier, not one resolved through the "@/"
@@ -79,22 +83,6 @@ describe("static pages keep canonical and RSS together", () => {
       types: RSS_TYPES,
     });
   });
-
-  it("about", async () => {
-    const { metadata } = await import("@/app/about/page");
-    expect(metadata.alternates).toEqual({
-      canonical: "/about",
-      types: RSS_TYPES,
-    });
-  });
-
-  it("uses", async () => {
-    const { metadata } = await import("@/app/uses/page");
-    expect(metadata.alternates).toEqual({
-      canonical: "/uses",
-      types: RSS_TYPES,
-    });
-  });
 });
 
 describe("websiteJsonLd", () => {
@@ -131,7 +119,7 @@ describe("blogPostingJsonLd", () => {
       datePublished: "2026-01-15",
       url: `${PRODUCTION_ORIGIN}/posts/example-post`,
       author: { "@type": "Person", name: "RaioViajante" },
-      image: `${PRODUCTION_ORIGIN}/posts/example-post/opengraph-image`,
+      image: `${PRODUCTION_ORIGIN}/og/posts/example-post.png`,
     });
   });
 

@@ -20,10 +20,10 @@ Each subdomain is its own app in the `RaioViajante/web` monorepo and its own dep
 This app maintains a strict separation between two kinds of documentation:
 
 - **Repository documentation** — lives in `docs/` (this directory, `apps/docs/docs/`). It documents how to develop, maintain, and reason about this app itself: architecture, content philosophy, design system, development workflow, deployment. It is read by contributors and agents, not published to the site. Monorepo-wide documentation lives in the repository root's `docs/`.
-- **Public documentation** — lives in `src/content/docs/`, rendered by Starlight as the actual pages of docs.raioviajante.com.
+- **Public documentation** — lives in `src/content/docs/`, rendered by Astro, on the shared shell, as the actual pages of docs.raioviajante.com.
 
 Do not place public-facing content in `docs/`, and do not place repository-maintenance notes in `src/content/docs/`.
 
 ## Status
 
-The Astro/Starlight application is initialized. The content collection is rendered from `src/content/docs/`, with the current public routes grouped under `projects/` and `raioviajante/`. The approved visual system, article navigation, table of contents, heading permalinks, and theme controls are implemented in the application.
+The Astro application is initialized. The content collection is rendered from `src/content/docs/`, with the current public routes grouped under `projects/` and `raioviajante/`. The approved visual system, article navigation, table of contents, and heading permalinks are implemented in the application.

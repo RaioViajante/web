@@ -1,72 +1,70 @@
 import Link from "next/link";
+import { LeaderRow, Section } from "@raioviajante/design/parts";
 
-import {
-  formatPostDate,
-  sortPostsNewestFirst,
-  type Post,
-  type TagCount,
-} from "@/lib/posts";
-
-interface TagIndexProps {
-  tags: TagCount[];
-}
-
-interface TagPostListProps {
-  posts: Post[];
-}
-
-const tagPostDateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "2-digit",
-  year: "2-digit",
-  timeZone: "UTC",
-});
+import { sortPostsNewestFirst, type Post, type TagCount } from "@/lib/posts";
 
 export function tagHref(tag: string): string {
   return `/tags/${encodeURIComponent(tag)}`;
 }
-
 export function formatTagPostDate(date: string): string {
-  const formatted = tagPostDateFormatter.format(new Date(`${date}T00:00:00Z`));
-  const [monthDay, year] = formatted.split(", ");
-  return `${monthDay} '${year}`;
+  return date.slice(2);
 }
 
-export function TagIndex({ tags }: TagIndexProps) {
-  if (tags.length === 0) {
-    return <p className="tags-empty">No tags yet.</p>;
-  }
-
+export function TagIndex({ tags }: { tags: TagCount[] }) {
+  if (!tags.length) return <p className="tags-empty">No tags yet.</p>;
+  const groups = [
+    {
+      label: "Recurring",
+      number: "02.",
+      items: tags.filter((item) => item.count > 1),
+    },
+    {
+      label: "Once so far",
+      number: "02.1",
+      items: tags.filter((item) => item.count === 1),
+    },
+  ].filter((group) => group.items.length > 0);
   return (
-    <ol className="tag-index">
-      {tags.map(({ tag, count }) => (
-        <li className="tag-index-item" key={tag}>
-          <Link className="tag-index-link" href={tagHref(tag)}>
-            <span className="tag-index-name">{tag}</span>
-            <span className="tag-index-leader" aria-hidden="true" />
-            <span className="tag-index-count">{count}</span>
-          </Link>
-        </li>
+    <>
+      {groups.map(({ label, number, items }, index) => (
+        <Section
+          key={label}
+          number={index === 0 ? "02." : number}
+          title={label}
+        >
+          <ol
+            className={
+              label === "Recurring" ? "tag-index" : "tag-index tag-index--two"
+            }
+          >
+            {items.map(({ tag, count }) => (
+              <li className="tag-index-item" key={tag}>
+                <LeaderRow
+                  label={tag}
+                  value={count}
+                  href={tagHref(tag)}
+                  linkComponent={Link}
+                />
+              </li>
+            ))}
+          </ol>
+        </Section>
       ))}
-    </ol>
+    </>
   );
 }
 
-export function TagPostList({ posts }: TagPostListProps) {
+export function TagPostList({ posts }: { posts: Post[] }) {
   return (
     <ol className="tag-post-list">
       {sortPostsNewestFirst(posts).map((post) => (
-        <li className="tag-post" key={post.slug}>
-          <time
-            className="tag-post-date"
-            dateTime={post.date}
-            aria-label={formatPostDate(post.date)}
-          >
-            {formatTagPostDate(post.date)}
-          </time>
-          <Link className="tag-post-title" href={`/posts/${post.slug}`}>
-            {post.title}
-          </Link>
+        <li key={post.slug}>
+          <LeaderRow
+            label={post.title}
+            value={<time dateTime={post.date}>{post.date.slice(5)}</time>}
+            href={`/posts/${post.slug}`}
+            linkComponent={Link}
+          />
         </li>
       ))}
     </ol>

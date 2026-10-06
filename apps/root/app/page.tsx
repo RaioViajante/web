@@ -1,70 +1,79 @@
+import { metadataFor } from "../lib/seo";
 import Link from "next/link";
-import { places, recentActivity } from "../lib/home";
-import styles from "./page.module.css";
+import {
+  IndexHeader,
+  LeaderRow,
+  Section,
+} from "@raioviajante/design/components";
+import { AvatarCoin } from "@raioviajante/design/avatar-coin";
+import { PreviewRow } from "../components/PreviewRow";
+import { ProjectPreviewRow } from "../components/ProjectPreviewRow";
+import { RootShell } from "../components/RootShell";
+import { primaryLinks } from "../lib/links";
+import { projects } from "../lib/projects";
+import { getRecentPosts } from "../lib/writing";
 
-export default function Home() {
+export const metadata = metadataFor("/");
+
+export const revalidate = 60;
+
+export default async function Home() {
+  const posts = await getRecentPosts();
+
   return (
-    <>
-      <h1 className="page-heading">curious enough to build it myself.</h1>
-      <p className={`page-description ${styles.description}`}>
-        I write things, build things and occasionally go too far trying to
-        understand how they work.
-      </p>
+    <RootShell current="/">
+      <IndexHeader
+        name="RaioViajante"
+        line="curious enough to build it myself."
+        avatar={<AvatarCoin />}
+      />
 
-      <section className={styles.places} aria-labelledby="places-heading">
-        <h2
-          id="places-heading"
-          className={`section-label ${styles.sectionHeading}`}
-        >
-          places/
-        </h2>
-        <div className={styles.placesList}>
-          {places.map((place) => {
-            const external = place.href.startsWith("https://");
-            return (
-              <Link
-                key={place.href}
-                href={place.href}
-                className={styles.place}
-                target={external ? "_blank" : undefined}
-                rel={external ? "noreferrer noopener" : undefined}
-                prefetch={false}
-              >
-                <div>
-                  <span className={styles.placeName}>{place.name}</span>
-                  <div className={styles.placeDescription}>
-                    {place.description}
-                  </div>
-                </div>
-                <span className={styles.arrow} aria-hidden="true">
-                  {external ? "↗" : "→"}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+      <Section number="00." title="Primary links" id="links-heading" index>
+        {primaryLinks.map((link) => (
+          <PreviewRow
+            key={link.href}
+            id={`primary-link-${link.category}`}
+            label={link.label}
+            href={link.href}
+            note={link.category}
+            description={link.description}
+          />
+        ))}
+      </Section>
 
-      <section aria-labelledby="recent-heading">
-        <h2
-          id="recent-heading"
-          className={`section-label ${styles.sectionHeading} ${styles.recentHeading}`}
-        >
-          recent/
-        </h2>
-        <ul className={styles.recentList}>
-          {recentActivity.map((entry) => (
-            <li
-              key={`${entry.date}-${entry.source}`}
-              className={styles.recentRow}
-            >
-              <time dateTime={entry.date}>{entry.date}</time>
-              <span className={styles.source}>{entry.source}</span>
-              <span className={styles.message}>{entry.message}</span>
-            </li>
+      <Section number="00.1" title="Projects" id="projects-heading" index>
+        {projects
+          .filter((project) => project.name !== "Dump")
+          .map((project) => (
+            <ProjectPreviewRow key={project.name} project={project} />
           ))}
-        </ul>
-      </section>
-    </>
+      </Section>
+
+      <Section number="00.2" title="Latest writing" id="writing-heading" index>
+        {posts.map((post) => (
+          <LeaderRow
+            linkComponent={Link}
+            key={post.url}
+            label={post.title}
+            value={post.date}
+            href={post.url}
+          />
+        ))}
+        <p className="home-feed-note">
+          <a href="https://dump.raioviajante.com" data-sound="nav">
+            from dump.raioviajante.com
+          </a>
+        </p>
+      </Section>
+
+      <Section number="00.3" title="Other links" id="other-links-heading" index>
+        <LeaderRow
+          linkComponent={Link}
+          label="Setup"
+          value="gear"
+          href="/setup"
+        />
+      </Section>
+    </RootShell>
   );
 }

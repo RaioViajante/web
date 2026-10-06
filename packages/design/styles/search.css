@@ -1,0 +1,293 @@
+@import "./tokens.css";
+.rv-search,
+.rv-shell a.rv-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fg-2);
+  border-left: 1px solid transparent;
+  padding: 6px 0 6px 14px;
+  text-decoration: none;
+  min-height: 44px;
+}
+.rv-search:hover,
+.rv-search:focus-visible,
+.rv-search[aria-current="page"],
+.rv-shell a.rv-search:hover,
+.rv-shell a.rv-search:focus-visible,
+.rv-shell a.rv-search[aria-current="page"] {
+  color: var(--fg);
+}
+.rv-search[aria-current="page"] {
+  border-left-color: var(--fg);
+}
+.rv-search__num {
+  color: var(--fg-3);
+}
+.rv-search__dots,
+.rv-result__dots {
+  flex: 1 1 12px;
+  border-bottom: 1px dotted var(--dots);
+  transform: translateY(4px);
+}
+.rv-search__key {
+  color: var(--fg-3);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.rv-peek {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+.rv-peek img {
+  width: 30px;
+  height: 30px;
+  display: block;
+  margin: -7px 0 -5px;
+}
+.rv-peek__q {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 5px);
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  background: var(--bubble-bg);
+  color: var(--bubble-fg);
+  border-radius: 8px;
+  padding: 3px 5px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+.rv-peek__q::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 6px;
+  height: 6px;
+  background: var(--bubble-bg);
+  transform: translateX(-50%) rotate(45deg);
+}
+.rv-search:hover .rv-peek,
+.rv-search:focus-visible .rv-peek {
+  animation: rv-search-hop 0.6s ease 1;
+}
+.rv-search:hover .rv-peek__q,
+.rv-search:focus-visible .rv-peek__q {
+  animation: rv-search-pop 0.25s ease 0.15s forwards;
+}
+@keyframes rv-search-hop {
+  30% {
+    transform: translateY(-5px) rotate(-10deg);
+  }
+  60% {
+    transform: rotate(5deg);
+  }
+}
+@keyframes rv-search-pop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv-search:hover .rv-peek,
+  .rv-search:focus-visible .rv-peek,
+  .rv-search:hover .rv-peek__q,
+  .rv-search:focus-visible .rv-peek__q {
+    animation: none;
+  }
+  .rv-search:hover .rv-peek__q,
+  .rv-search:focus-visible .rv-peek__q {
+    opacity: 1;
+  }
+}
+.rv-search-page {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  color: var(--fg);
+  font-family: var(--font-mono, var(--font));
+}
+.rv-search-page__header {
+  text-align: center;
+}
+.rv-search-page h1 {
+  font-size: clamp(34px, 6vw, 48px);
+  margin: 8px 0 30px;
+}
+.rv-search-page .rv-label {
+  color: var(--fg-3);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.rv-ask {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 48px;
+}
+.rv-ask img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+}
+.rv-bubble {
+  position: relative;
+  background: var(--bubble-bg);
+  color: var(--bubble-fg);
+  border-radius: 18px;
+  padding: 12px 18px;
+  margin: 0 0 34px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+}
+.rv-bubble::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  bottom: 14px;
+  width: 14px;
+  height: 14px;
+  background: var(--bubble-bg);
+  transform: rotate(45deg);
+}
+.rv-search-input {
+  display: block;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--fg);
+  font: inherit;
+  font-size: 24px;
+  caret-color: var(--fg);
+}
+/* Focus is the underline itself: bright and 2px, without a box around it. */
+.rv-search-input:focus {
+  outline: none;
+  border-bottom-color: var(--fg);
+  box-shadow: 0 1px 0 var(--fg);
+}
+.rv-search-scope {
+  margin: 22px 0 36px;
+  color: var(--fg-3);
+}
+.rv-search-scope button {
+  min-height: var(--touch);
+  min-width: var(--touch);
+  color: inherit;
+  font: inherit;
+  background: none;
+  border: 0;
+  padding: 8px 3px;
+  cursor: pointer;
+}
+.rv-search-scope button {
+  text-decoration: none;
+}
+.rv-search-scope button[aria-pressed="true"] {
+  color: color-mix(in srgb, var(--fg-2), var(--fg) 55%);
+}
+.rv-search-scope button[aria-pressed="false"]:hover,
+.rv-search-scope button[aria-pressed="false"]:focus-visible {
+  color: color-mix(in srgb, var(--fg-2), var(--fg) 30%);
+}
+.rv-search-group {
+  margin: 28px 0;
+}
+.rv-result {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 0 8px 14px;
+  border-left: 1px solid transparent;
+  color: var(--fg-2);
+  text-decoration: none;
+}
+.rv-result:hover,
+.rv-result[aria-current="true"] {
+  color: var(--fg);
+  border-left-color: var(--fg);
+}
+.rv-result__number,
+.rv-result__note {
+  color: var(--fg-3);
+}
+.rv-result__note {
+  white-space: nowrap;
+  font-size: 12px;
+}
+.rv-search-note {
+  margin: 0 0 28px;
+  color: var(--fg-3);
+  font-size: 12px;
+}
+.rv-search-note[hidden] {
+  display: none;
+}
+.rv-search-empty {
+  text-align: center;
+}
+.rv-search-empty[hidden] {
+  display: none;
+}
+.rv-search-empty img {
+  margin: 0 auto;
+  width: 180px;
+  height: 180px;
+}
+/* Suggestions continue the character's sentence, quietly: the words share
+   its color and differ only in weight; hover and focus brighten the text,
+   like every other link on the sites. */
+.rv-search-suggestions {
+  margin-top: 6px;
+  color: var(--fg-2);
+  font-size: var(--size-small);
+  text-wrap: balance;
+}
+.rv-search-suggestion {
+  white-space: nowrap;
+}
+.rv-search-suggestions button {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--weight-heading);
+  cursor: pointer;
+  transition: color var(--ease-link) ease;
+}
+.rv-search-suggestions button:hover,
+.rv-search-suggestions button:focus-visible {
+  color: var(--fg);
+}
+@media (max-width: 500px) {
+  .rv-ask img {
+    width: 100px;
+    height: 100px;
+  }
+  .rv-bubble {
+    font-size: 15px;
+  }
+  .rv-result__note {
+    display: none;
+  }
+}

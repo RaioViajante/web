@@ -2,7 +2,68 @@
   "name": "@raioviajante/design",
   "version": "0.0.0",
   "private": true,
+  "license": "MIT",
   "exports": {
-    "./tokens.css": "./tokens.css"
+    "./styles.css": "./styles/index.css",
+    "./components": "./components/index.ts",
+    "./art": "./components/art.tsx",
+    "./shell": "./components/Shell.tsx",
+    "./parts": "./components/page.tsx",
+    "./templates": "./components/templates.tsx",
+    "./avatar-coin": "./components/avatar-coin.tsx",
+    "./search": "./components/search.tsx",
+    "./blocks": "./blocks/index.ts",
+    "./sections": "./blocks/sections.ts",
+    "./sound": "./sound/index.ts",
+    "./behavior": "./behavior.ts",
+    "./behavior-react": "./behavior-react.tsx",
+    "./gallery": "./components/gallery.ts",
+    "./avatar": "./components/avatar.ts",
+    "./seo": "./seo.ts",
+    "./social-image": "./social-image.tsx",
+    "./seo-head": "./components/seo-head.tsx",
+    "./fonts/*": "./fonts/*",
+    "./fonts.css": "./styles/fonts.css"
+  },
+  "dependencies": {
+    "@vercel/og": "0.11.1",
+    "hast-util-to-jsx-runtime": "^2.3.6",
+    "hast-util-to-string": "^3.0.1",
+    "hastscript": "^9.0.1",
+    "shiki": "^4.4.3",
+    "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/hast": "^3.0.5",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^24.13.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "jsdom": "^26.1.0",
+    "mdast-util-directive": "^3.1.0",
+    "prettier": "^3.9.6",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rehype-stringify": "^10.0.1",
+    "remark-directive": "^4.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "sharp": "0.34.5",
+    "typescript": "^6.0.3",
+    "unified": "^11.0.5",
+    "vitest": "^5.0.3"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "playground": "vite playground --open",
+    "icons": "node scripts/icons.mjs"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }

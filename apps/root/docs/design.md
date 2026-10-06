@@ -1,56 +1,70 @@
 # Design
 
-## Source of truth
+The root site is the first implementation of the editorial RaioViajante design.
+Its visual reference is bero.land: a charcoal canvas, restrained monospaced
+typography, numbered navigation and sections, dotted leader rows, generous
+whitespace, and a small centered footer. The character illustration and content
+are original to RaioViajante.
 
-`/refence/claude-export/` is the approved visual source of truth named in the
-project brief. It was kept locally at `reference/claude-export/`, untracked,
-and is not part of the monorepo checkout. Where available, keep it read-only:
-do not modify, move, rename, delete, or build the application inside it.
+Root uses the shared design system in `@raioviajante/design`. `app/layout.tsx`
+imports `@raioviajante/design/styles.css` and renders the shared `<Behavior />`
+script once. Each page renders `components/RootShell.tsx`, which configures the
+shared `Shell` (sidebar, sound toggle, 740px column, footer) with root's pages
+and the search menu item. Page parts (`IndexHeader`, `PageHeader`, `Section`,
+`LeaderRow`), the `Quote` block, `LegalPage` and `NotFoundPage` also come from
+the package. Internal links use `next/link` for client-side navigation, without
+prefetching. `lib/seo.ts` lists every page's title and description; it feeds
+page metadata, the social cards under `/og/`, `sitemap.xml` and `robots.txt`.
 
-Use the approved Home, Projects, Now, Nav, and Footer exports. Their page styles
-establish the design; the bundled generic Broadsheet theme does not replace them.
-Implement the reference rather than reinterpreting it.
+Root keeps only what is its own, in `app/globals.css` and `components/`: the
+avatar flip (`AvatarCoin`), the hover descriptions on home rows (`PreviewRow`),
+the projects list, the gallery board, and the font binding for `next/font`.
+Artwork is not stored in the app: the avatar frames, the gallery images and the
+"work of art" sticker come from `packages/design/assets`. The gallery geometry
+is written in rem against a 110% root size, which `globals.css` keeps.
 
-## Visual principles
+Root has routes for home, about, projects, contact, gallery, this site, setup,
+search, privacy, and terms of use, and a 404 page (`app/not-found.tsx`) built on
+the shared template. The primary navigation contains the local content
+routes except Setup,
+which is linked from the home page. The footer links to the four independently
+deployed sites. The home page shows recent dump posts from its public RSS feed;
+the feed is eligible for revalidation after 60 seconds. A known-post fallback
+keeps the section populated if the feed is unavailable. The footer contains the
+supplied public email. Its CNPJ
+line shows the CNPJ supplied by the user. The footer links to the root site's
+privacy policy and terms of use.
 
-- A personal internet home, not a portfolio.
-- An editorial / Unix-inspired aesthetic with typography-driven hierarchy.
-- Dark background (`#18161b`), warm foreground (`#ece7e0`), and restrained purple
-  accent (`#c3b3e0`).
-- Source Serif 4 and IBM Plex Mono, following the reference's sizes and line heights.
-- Generous whitespace and a consistent horizontal content container across pages,
-  header, and footer. Preserve the exported 680px maximum and fluid gutter styling,
-  checking its box model and responsive behavior during implementation.
-- GitHub icon-only header treatment linking to https://github.com/RaioViajante,
-  with an accessible name.
-- External domains shown as external destinations; internal routes presented as
-  part of raioviajante.com.
-- Preserve spacing, separators, hover states, and responsive padding accurately.
+Typography is the shared token scale (Noto Sans Mono, 16.5px body, 1.82 line
+height, 740px column), taken from root's earlier values. Primary links currently
+contains the user's GitHub and public email. Setup has a real route and a typed
+gear list based on the user's supplied model names; no product links have been
+provided yet.
+The home page links to Setup under "Other links" after "Latest writing".
+Linked rows are clickable across their full width. Primary links and project
+rows on the home page reveal their descriptions after 400 ms of pointer hover,
+or immediately on keyboard focus. The avatar flips on click
+with a separate two-part flip sound.
+Its ten-frame illustration loops every three seconds after the frames have
+loaded. Reduced motion keeps the centered portrait still and disables the flip.
+Sound is off until enabled by the visitor; the shared preference is the
+`rv-sound` cookie on `.raioviajante.com`.
+Its text toggle sits alone at the top of the reading column. The Projects page
+uses an editorial list with name, status, description, type, and destination for
+each entry.
+The gallery opens with the user's "Work of Art" illustration. It floats subtly
+on hover or keyboard focus; clicking or tapping it reveals two overlapping groups
+of artwork, including the character sticker sheet and hospital scene, with a short paper-like sound when
+SOUND is enabled. Each artwork rises gently on hover or keyboard focus and opens
+the full image when selected. Reduced motion keeps the click-to-reveal interaction
+without the movement. The homepage avatar and favicon also come from the user's
+art collection. The supplied favicon PNG is
+the source for the multi-size `app/favicon.ico`, `app/icon.png`,
+`app/apple-icon.png`, and the 192-pixel icon referenced by `app/manifest.ts`.
+The About page uses Bryan's supplied personal introduction and interests without
+turning into a résumé. Contact keeps email as the primary channel and gives a
+short guide to first messages. This Site describes the root app and links to the
+public source repository.
 
-## Color tokens
-
-root consumes `@raioviajante/design` (`"@raioviajante/design": "workspace:*"`).
-`app/layout.tsx` imports `@raioviajante/design/tokens.css` before
-`app/globals.css`, and `globals.css` keeps root's own variable names as aliases
-of the shared primitives:
-
-- `--background` → `--rv-color-bg`
-- `--foreground` → `--rv-color-fg`
-- `--accent` → `--rv-color-accent`
-- `--muted` → `--rv-color-muted`
-- `--separator` → `--rv-color-hairline`
-
-Pages and components use the root names, never `--rv-color-*` directly. Values
-specific to root stay in `globals.css`: `--subtle`, `color-scheme`, the content
-width and gutter, and the theme toggle's sun color and shadows. The selection
-and focus rules and the theme bootstrap also stay in root. The switch to shared
-tokens was made without any rendered change.
-
-## Prohibited additions
-
-Do not add glassmorphism, bento grids, glowing gradients, decorative blobs, fake
-terminal chrome, skill bars, huge animations, generic SaaS UI, generic developer
-portfolio sections, or unnecessary cards. Do not add background grids, language
-logos, CTA sections, or other decoration absent from the reference.
-
-Whitespace is intentional; do not fill empty areas merely because they are empty.
+The earlier Claude export in the local `reference/` directory remains an
+untracked historical reference. It is not the source of truth for this redesign.

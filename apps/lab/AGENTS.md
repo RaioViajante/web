@@ -1,50 +1,56 @@
 # AGENTS.md — apps/lab
 
 App-specific instructions for `@raioviajante/lab`. Repository-wide rules are in
-the root `AGENTS.md`.
+root `AGENTS.md`.
 
 ## Purpose
 
-This app serves lab.raioviajante.com: experiments, prototypes, and technical
-curiosities that have not decided what they are yet. It is not a portfolio,
-blog, or stable documentation.
+lab.raioviajante.com hosts experiments and technical curiosities. The shell
+stays consistent; each experiment owns its interactive surface.
 
-Core rule: **the shell is consistent, the experiments are allowed to
-misbehave.** The global shell (header, footer, theme selector, canonical content
-width) stays disciplined and unmistakably RaioViajante. An experiment may
-introduce a specialized interactive surface inside its own content area, but it
-must not redesign or destabilize the shell.
+## Stack and rendering
 
-## Stack
+- Astro and TypeScript, static output. Shared React components render through
+  `@astrojs/react` without hydration. Never add `client:*` or browser React.
+- `BaseLayout.astro` loads self-hosted Noto Sans Mono, shared `styles.css` and
+  `startBehavior()`. `LabFrame.tsx` configures the shared `Shell`, search item,
+  experiment navigation and footer. Apps never import another app.
+- Interactive benches use small plain TypeScript scripts in Astro `<script>`
+  tags. Pure logic lives in `src/lib`; source excerpts live in `src/data`.
+- Keep page JavaScript minimal. Shared behavior handles sound, search, avatar,
+  copy buttons and other shared interactions.
 
-Astro and TypeScript, static-first. No React, Vue, Svelte, or other UI framework
-unless a specific experiment needs more client-side interactivity than a small
-inline script can provide.
+## Content and provenance
 
-## Experiments
+- `src/data/experiments.ts` owns permanent IDs, dates, status, project, revision,
+  fidelity and public source links. Preserve 001–003 and descending index order.
+- Follow [docs/content.md](docs/content.md). Check pinned real source before
+  changing behavior; sibling repositories are read-only evidence.
+- Filename suffixes reproduce Python 3.14 POSIX `Path.suffix`, lowercased for
+  Sweep matching. Preserve spaces. A trailing dot is suffix `.`.
+- Execution rules reproduce Orbit `cd97666`, including Java blank-message
+  semantics and integer exit codes. Rejected actions preserve all state fields.
+- Boot source and notes come from x86-os-experiment `e966889`. Do not substitute
+  reconstructed assembly, generate bytes, or imply browser emulation.
+- No unknown fact or placeholder may render publicly. Omit it and record it in
+  the migration report. Omit private source links.
 
-- Experiment data is centralized in `src/data/experiments.ts`, not hardcoded in
-  page markup. Do not add a database or CMS.
-- Experiment pages default to the canonical 680px column. Opt into the `wide`
-  layout only when an experiment genuinely needs more horizontal space.
-- Keep each experiment's code isolated to its own surface component and helpers.
-- Experiments are real, provenance-backed content. Follow
-  [docs/content.md](docs/content.md) for immutable numbering, publication dates,
-  and public source links. Never present planned project functionality as
-  implemented, and do not invent fictional technical content.
+## Design and interactivity
 
-## Design
+- See [docs/design.md](docs/design.md). Use shared page parts, soft blocks,
+  benches, controls, legal and 404 templates. Anything reused across pages
+  belongs in `packages/design`; `lab.css` contains lab-specific pieces only.
+- No local shell, colors, font system, sound synthesis or artwork copies.
+- Bench output may use shared syntax tokens; the surrounding page is gray.
+- Accepted actions call `playSound("success")`, rejected actions call
+  `playSound("reject")`. No sound on load. Words, solid/dotted buttons and live
+  feedback must convey the outcome without sound or color.
+- Dotted controls remain keyboard reachable and clickable to demonstrate a
+  rejection. New examples reset browser state; no commands run or data persists.
 
-- Follow [docs/design.md](docs/design.md) for the shared shell: the 680px column
-  with a `clamp(1rem, 4vw, 1.25rem)` gutter, the color tokens, and the rule that
-  mono identifies and serif speaks.
-- The original design export was kept locally at `reference/claude-export/`. It
-  is untracked and not part of the monorepo; where a local copy exists, treat it
-  as read-only and never format, build in, or commit it. Implement the intended
-  design, not bugs from the design environment listed in `docs/design.md`.
-- No dashboards, fake browser or terminal chrome, or unnecessary animation.
+## Validation
 
-## UI validation
-
-For UI changes, also follow the manual verification checklist in
-[docs/development.md](docs/development.md).
+Run lab `format:check`, `lint`, `typecheck`, `test` and `build`, using named pnpm
+filters from the repository root. Tests use Node 24's built-in runner and native
+TypeScript support. For UI changes, check every lab page at 1440px and 390px,
+including experiments with mouse and keyboard; see [docs/development.md](docs/development.md).
