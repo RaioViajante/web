@@ -362,7 +362,7 @@ Branch `feat/design-migration`. Nothing is pushed.
 | 1. Shared home         | done        | styles, assets, sound                                                                       |
 | 2. Shared components   | done        | components, blocks, sound, behavior, templates; no app consumes them yet                    |
 | 3. Search              | done        | shared menu/page/behavior, four static indexes and routes; pending Vercel settings          |
-| 4. Migrate each site   | partly      | root (4a) and dump (4b) done; docs and lab not started                                      |
+| 4. Migrate each site   | partly      | root (4a), dump (4b) and docs (4c) done; lab not started                                    |
 | 5. Features to finish  | partly      | `AGENTS.md` / `CLAUDE.md` rules are written; SEO, accessibility and performance work remain |
 | 6. Verify and clean up | not started |                                                                                             |
 
@@ -540,6 +540,52 @@ small cookie on .raioviajante.com" (the "Last updated" date was not changed).
   reading times are computed (220 words per minute); the giscus box only loads
   online and when scrolled near.
 
+### Phase 4c: docs (done)
+
+- Decision: Starlight is removed; docs is a plain Astro content collection
+  (`src/content.config.ts`, glob loader) on the shared shell. Starlight could
+  not give the two-column layout with "on this page" in the sidebar without
+  overriding most of itself. Pagefind went with it; search is the shared
+  client-side search. Recorded in `apps/docs/docs/design.md` and
+  `apps/docs/AGENTS.md`.
+- Markdown pipeline (`astro.config.mjs`, `unified()` from
+  `@astrojs/markdown-remark`, which Astro 7 no longer installs by default):
+  `remark-directive`, `remarkSoftCallouts`, `rehypeNumberSections`,
+  `rehypeSteps`, `rehypeSoftBlocks`; Astro's own highlighter is off.
+- Layout: `src/layouts/DocsShell.astro` plus `DocsFrame.tsx` (the shared shell
+  rendered statically). `.astro` files cannot pass JSX in props to React, so
+  anything with JSX props (shell, page header, legal pages) is a small React
+  component in `src/components/`. Fonts: `@fontsource-variable/noto-sans-mono`.
+  Removed: the purple accent, IBM Plex, Source Serif, the theme toggle, Google
+  Fonts and every Starlight override.
+- Pages: home (`IndexHeader`, the dotted search row, `01. projects/` and
+  `02. raioviajante/` with status words), guide and reference layout
+  (`[...slug].astro`: breadcrumb label, status and meta row, numbered sections,
+  steps, tables, callouts, last updated, edit on GitHub, prev/next), search,
+  Terms, Privacy, 404 (`/404.html`).
+- Content: the three pages keep their text. Additions that only restructure:
+  `## Overview` above Sweep's intro, three sentences wrapped as callouts
+  (`:::note`, `:::important`, `:::warning`), a `## Try it and read more` list
+  of real links (the filename classifier in lab, two dump posts, the source),
+  and frontmatter. New: `projects/sweep/cli.md` (the reference layout), written
+  only from facts already in the Sweep guide. The design-language page is
+  rewritten for the current system (tokens, root values, no purple accent, no
+  serif, footer with no current site). The home page adds hum, orbit and
+  yanawa as in the reference (orbit and yanawa link to their dump posts).
+- Last updated: the date of the last git commit that touched the page, read at
+  build time and omitted on a shallow clone or without git; never invented. No
+  version or commit hash is shown.
+- Left out because the repository does not say: the version, the changelog and
+  exit codes of the Sweep CLI, the "guide (draft)" line for hum, a Terms
+  license for text and artwork, any retention period, and a legal "last
+  updated" date. The tabs of the reference (preview and run) are not used: the
+  guide's text keeps "Preview" and "Run" as separate subsections, so the
+  platform tabs are only covered by the shared behavior and its tests, not by a
+  docs page.
+- Footer: no site is marked as current on any site (`aria-current` removed from
+  `Footer`, `docs/design-system.md` updated).
+- Contact quote on root: already done in `d8ea6de`.
+
 ### Checks run
 
 - Phase 2: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
@@ -555,6 +601,7 @@ small cookie on .raioviajante.com" (the "Last updated" date was not changed).
   typing; Esc cleared it; and the empty state showed the sticker and chips.
   This test found and fixed local index lookup and Astro trailing-slash routes.
 - Throwaway pages (not committed): a root page and a lab page rendered `Shell`, `IndexHeader`, `CodeBlock`, `Callout`, `NotFoundPage` and the behavior script; both builds passed and emitted only the artwork they use.
+- Phase 4c: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` passed (50 package tests, 102 dump tests, four builds). Playwright checked every docs page at 1440px and 390px: no overflow, the three callouts, steps, copy buttons, the "on this page" tracking, sound, `/` to search, search "this site" and "everywhere", and the 404 path. axe was not run.
 - Phase 4b and the root regression pass: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` passed (format, lint, typecheck, 49 package tests, 102 dump tests, four builds; dump prerendered 69 pages). Playwright checked every dump page at 1440px and 390px: no overflow, scroll tracking, 29 copy buttons, sound toggle, ⌘K, search and the 404 path. axe was not run.
 - Phase 4a: `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`
   passed (format, lint, typecheck, 43 package tests, 122 dump tests, four
@@ -570,50 +617,48 @@ small cookie on .raioviajante.com" (the "Last updated" date was not changed).
 
 ## 4. Next session
 
-Phases 4a (root) and 4b (dump) are complete. Do **Phase 4c: docs** only, then
-lab in a later session. Do not start Phase 5 or 6.
+Phases 4a (root), 4b (dump) and 4c (docs) are complete. Do **Phase 4d: lab**
+only. Do not start Phase 5 or 6.
 
 ### Before you start
 
 1. Work on `feat/design-migration`. `git status` and `git log --oneline -15`.
    Preserve uncommitted work (the owner's edits to
    `packages/design/{.prettierignore,package.json,tsconfig.json}` and
-   `packages/design/playground/`: stage only your own hunks, for example
-   `git diff -U3 <file>`, keep only your hunk, `git apply --cached`).
-2. Read `AGENTS.md` (design rules), `docs/design-system.md` (the restored root
-   values), `docs/blocks.md`, `apps/root/docs/design.md` and
-   `apps/dump/docs/design.md` (worked examples for Next apps).
-3. Docs is Astro. Shared React renders statically through `@astrojs/react`
-   (already installed). There is no `next/link`: omit `linkComponent`. Call
-   `startBehavior()` from a `<script>` in the base layout (see
-   `packages/design/behavior.ts`). Rendering shared components from `.astro`
-   files is already proven by the Phase 3 search pages.
-4. Compare with the reference pages in `raioviajante-design/docs/` at 1440px
-   and 390px using Playwright installed outside the repo, and compare computed
-   styles against the old docs where a value matters. Fonts: load Noto Sans Mono
-   self-hosted; remove the Google Fonts links.
-5. docs has no lint, format or test scripts: do not invent them. Validate with
-   `pnpm --filter @raioviajante/docs typecheck build`, then the whole repo with
-   `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`.
-6. The owner must still add `../../packages/design` to the Vercel Ignored Build
-   Step of dump and docs (D10).
-7. Legal text: no placeholder may render on a public page. Use only facts
-   already in the repository; omit and list anything else.
-8. Stage files explicitly; one logical step per commit.
-
-### Phase 4c: docs (`apps/docs`, Astro + Starlight)
-
-1. The design package, React dependencies, and `react()` integration were
-   added in Phase 3. Keep them while migrating the docs layout. The owner
-   still needs to apply the Vercel Ignored Build Step before deployment.
-2. Decide how much of Starlight stays. The design needs left tree nav, content, "on this page", breadcrumb label, status word, last updated and "edit on GitHub". Keep Starlight for content collections and routing, and override `PageFrame`/`Sidebar`/`TableOfContents`/`Footer` and the page title with shared components, or drop Starlight for a plain Astro content collection. Record the choice in `apps/docs/docs/`.
-3. Replace Starlight's Expressive Code with the shared pipeline (`expressiveCode: false`, then `markdown.remarkPlugins`: `remark-directive`, `remarkSoftCallouts`; `markdown.rehypePlugins`: `rehypeSoftBlocks`; `markdown.syntaxHighlight: false`).
-4. Remove the Google Fonts links (IBM Plex Mono, Source Serif), the theme switcher overrides and `src/styles/theme.css`; load Noto Sans Mono self-hosted or preloaded.
-5. Pages: home (dotted search row, projects with status, standards, "reading these docs"), guide and reference layouts (`raioviajante-design/docs/sweep.html`, `sweep-cli.html`), the rewritten design language page (`docs/components.html`, `design-language.html`; rewrite `src/content/docs/raioviajante/design-language.md` for the new system), terms, privacy, `404.astro`.
-6. Keep `[VERSION]`, `[DATE]`, `[COMMIT]` and other placeholders in the new pages; the existing content in `projects/sweep` and `repository-conventions` stays factual.
-7. Keep the existing `/search` page, menu item, and build-time index working
-   after the docs layout and content pipeline changes; verify section anchors.
-8. Validate: `pnpm --filter @raioviajante/docs typecheck build` (docs has no lint, format or test scripts: do not invent them).
+   `packages/design/playground/`: stage only your own hunks with
+   `git diff -U3 <file>`, keep your hunk, `git apply --cached`). Use
+   `git add <paths>` only after `git restore --staged` on anything unrelated,
+   because earlier `git rm` calls end up in the next commit.
+2. Read `AGENTS.md`, `docs/design-system.md`, `docs/blocks.md`,
+   `apps/docs/docs/design.md` (the closest example: Astro, shared React
+   rendered statically) and `apps/lab/AGENTS.md`.
+3. Lab is Astro. Follow the docs pattern: a layout that renders a React
+   `*Frame.tsx` around the shared `Shell` (`.astro` files cannot pass JSX in
+   props), `styles.css`, a `<script>` calling `startBehavior()`, the font from
+   `@fontsource-variable/noto-sans-mono` (family `"Noto Sans Mono Variable"`),
+   `trailingSlash` is `always` (so pass `href="/search/"` to the search item).
+   Drop `@raioviajante/design/tokens.css` and every local color, the
+   IBM Plex / Source Serif fonts and the old header, footer and `global.css`.
+4. Compare with `raioviajante-design/lab/` (index, three experiments, search,
+   terms, privacy, 404) at 1440px and 390px with Playwright installed outside
+   the repo; the old lab can be run from `git worktree add <dir> <commit>` with
+   `cp -Rc node_modules` (see how the root was compared).
+5. Pages: experiments index (filter all/active/done, fidelity explained,
+   notebook), the three experiments with `LabBench`, `BenchBand`, `StateMark`,
+   `ActionButton`, search, terms, privacy, 404, as in the Phase 4d list below.
+   Experiments keep 001–003 and `aria-live` results; accepted actions call
+   `playSound("success")`, rejected ones `playSound("reject")`.
+6. Lab logic: compare `src/lib/filename-classifier.ts` and
+   `src/lib/execution-states.ts` with `source/lab/*.dc.html` and report any
+   difference; boot sector: replace the reconstructed code and notes with
+   revision `e966889` only if that source is available in the repository or
+   handoff, otherwise keep what exists and say so. No placeholder may render on
+   a public page: leave out what is unknown and list it.
+7. Validate: `pnpm --filter @raioviajante/lab format:check lint typecheck build`,
+   then `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`.
+8. The owner must still add `../../packages/design` to the Vercel Ignored Build
+   Step of dump and docs (D10). Stage files explicitly; one logical step per
+   commit.
 
 ### Phase 4d: lab (`apps/lab`, Astro)
 
