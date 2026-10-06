@@ -24,7 +24,7 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "format": "prettier --write .",
