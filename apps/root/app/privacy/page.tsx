@@ -10,7 +10,7 @@ export default function Privacy() {
       <LegalPage
         site="root"
         title="Privacy Policy"
-        lastUpdated="October 4, 2026"
+        lastUpdated="October 6, 2026"
         inShort={[
           { label: "registration", value: "none" },
           { label: "email", value: "only what you send" },
@@ -39,10 +39,11 @@ export default function Privacy() {
                 </p>
                 <p>
                   Your sound preference is saved in a small cookie on
-                  .raioviajante.com, so every raioviajante site remembers it. It
-                  is not used for tracking. The home page requests the public
-                  RSS feed from dump.raioviajante.com on the server to display
-                  recent posts.
+                  .raioviajante.com, so every raioviajante site remembers it.
+                  The cookie is created only when you switch sound on or off,
+                  holds just that choice, and lasts one year. It is not used for
+                  tracking. The home page requests the public RSS feed from
+                  dump.raioviajante.com on the server to display recent posts.
                 </p>
               </>
             ),
@@ -80,7 +81,7 @@ export default function Privacy() {
                   This page will be updated when the site&apos;s data practices
                   change.
                 </p>
-                <p>Last updated: October 4, 2026.</p>
+                <p>Last updated: October 6, 2026.</p>
               </>
             ),
           },

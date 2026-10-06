@@ -15,7 +15,7 @@ export function PrivacyPage() {
 				title: "In your browser",
 				body: (
 					<p>
-						Your sound preference is saved in a small cookie on .raioviajante.com, so every raioviajante site remembers it. It is
+						Your sound preference is saved in a small cookie on .raioviajante.com, so every raioviajante site remembers it. The cookie is created only when you switch sound on or off, holds just that choice, and lasts one year. It is
 						not used for tracking.
 					</p>
 				),

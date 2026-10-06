@@ -79,9 +79,11 @@ export function PrivacyPage() {
             body: (
               <p>
                 Your sound preference is saved in a small cookie on
-                .raioviajante.com so the sites share it. Experiment inputs and
-                results live in page memory and disappear when you reload. No
-                experiment sends your input to a server.
+                .raioviajante.com so the sites share it. The cookie is created
+                only when you switch sound on or off, holds just that choice,
+                and lasts one year. Experiment inputs and results live in page
+                memory and disappear when you reload. No experiment sends your
+                input to a server.
               </p>
             ),
           },

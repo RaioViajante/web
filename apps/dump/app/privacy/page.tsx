@@ -22,8 +22,10 @@ export default function Privacy() {
             body: (
               <p>
                 Your sound preference is saved in a small cookie on
-                .raioviajante.com, so every raioviajante site remembers it. It
-                is not used for tracking.
+                .raioviajante.com, so every raioviajante site remembers it. The
+                cookie is created only when you switch sound on or off, holds
+                just that choice, and lasts one year. It is not used for
+                tracking.
               </p>
             ),
           },
@@ -41,10 +43,13 @@ export default function Privacy() {
             title: "Comments and feeds",
             body: (
               <p>
-                Comments go through giscus to GitHub Discussions. Signing in and
-                posting happen with GitHub, under GitHub&apos;s privacy policy;
-                dump never sees your password. The RSS feed is a plain file —
-                feed readers request it like any page.
+                Comments go through giscus to GitHub Discussions. They load only
+                when you scroll to the comments section or ask for them; until
+                then this page does not contact giscus or GitHub. Once they
+                load, your browser connects to giscus.app and GitHub. Signing in
+                and posting happen with GitHub, under GitHub&apos;s privacy
+                policy; dump never sees your password. The RSS feed is a plain
+                file — feed readers request it like any page.
               </p>
             ),
           },
