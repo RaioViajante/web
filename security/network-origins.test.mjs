@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { contentSecurityPolicy, siteOrigins } from "./headers.ts";
+import { contentSecurityPolicy } from "./headers.ts";
+import { siteOrigins } from "../site/sites.ts";
 import {
   classify,
   frameHosts,

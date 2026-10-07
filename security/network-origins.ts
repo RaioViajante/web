@@ -1,4 +1,4 @@
-import { siteOrigins, type Site } from "./headers.ts";
+import { siteOrigins, type SiteId as Site } from "../site/sites.ts";
 
 // The authoritative list of origins the apps may contact from the browser.
 // It is a regression guard, not an enforcement layer: the CSP in headers.ts

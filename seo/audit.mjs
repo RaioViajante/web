@@ -9,7 +9,7 @@ import {
   checkSitemap,
   searchPaths,
 } from "./metadata-policy.ts";
-import { siteOrigins } from "../security/headers.ts";
+import { siteOrigins } from "../site/sites.ts";
 
 // Glue shared by the build-output test and the HTTP verifier: given the
 // documents of one app, run every rule. The page inventory is always the app's
@@ -30,7 +30,7 @@ export async function expectedThemeColor() {
 
 /**
  * @param {object} input
- * @param {import("../security/headers.ts").Site} input.site
+ * @param {import("../site/sites.ts").SiteId} input.site
  * @param {{ sitemap: string, robots: string, manifest: string, rss?: string }} input.files
  * @param {((path: string) => Promise<string | undefined>) | undefined} input.html
  *   Returns a document's HTML, or undefined when it cannot be read here.

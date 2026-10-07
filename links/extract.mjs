@@ -1,4 +1,4 @@
-import { siteOrigins } from "../security/headers.ts";
+import { siteOrigins } from "../site/sites.ts";
 
 // Pure helpers for the link and resource checker: extraction from HTML/CSS and
 // classification of URLs. No I/O, so they are tested with fixtures.

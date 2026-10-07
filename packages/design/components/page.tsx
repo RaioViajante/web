@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import { Art } from "./art";
 import { SiteLink, type LinkComponent } from "./link";
-import { siteById, type SiteId } from "./sites";
+import { siteById, type SiteId } from "../../../site/sites";
 
 /** Index header: avatar, site name, one line. */
 export function IndexHeader({

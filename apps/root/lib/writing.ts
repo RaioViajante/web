@@ -1,5 +1,6 @@
-const FEED_URL = "https://dump.raioviajante.com/rss.xml";
-const DUMP_ORIGIN = "https://dump.raioviajante.com";
+import { siteOrigins } from "../../../site/sites";
+const DUMP_ORIGIN = siteOrigins.dump;
+const FEED_URL = `${DUMP_ORIGIN}/rss.xml`;
 
 export interface RecentPost {
   title: string;

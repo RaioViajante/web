@@ -1,11 +1,11 @@
-import { siteOrigins, type Site } from "./headers.ts";
+import { CONTACT, siteOrigins, type SiteId as Site } from "../site/sites.ts";
 
 // RFC 9116 source of truth for every host's /.well-known/security.txt.
 // Renew by moving `expires` forward (under one year), then run
 // `node security/sync-vercel.mjs`. `pnpm security:check` fails inside the
 // 30-day renewal window.
 export const securityTxt = {
-  contact: "mailto:mail@raioviajante.com",
+  contact: `mailto:${CONTACT.email}`,
   expires: "2027-10-01T00:00:00Z",
   preferredLanguages: "en, pt",
 };

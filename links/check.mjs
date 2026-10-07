@@ -1,5 +1,5 @@
 import { ports, startServers } from "../security/local-servers.mjs";
-import { siteOrigins } from "../security/headers.ts";
+import { siteOrigins } from "../site/sites.ts";
 import dumpConfig from "../apps/dump/next.config.mjs";
 import {
   anchors,

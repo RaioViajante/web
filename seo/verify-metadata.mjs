@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { siteOrigins } from "../security/headers.ts";
+import { siteOrigins } from "../site/sites.ts";
 import { ports, startServers } from "../security/local-servers.mjs";
 import { auditSite, expectedThemeColor } from "./audit.mjs";
 import {

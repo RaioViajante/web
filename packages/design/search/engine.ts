@@ -1,4 +1,4 @@
-import { SITES, type SiteId } from "../components/sites";
+import { SITES, type SiteId } from "../../../site/sites";
 import type { SearchEntry } from "../components/search";
 
 /** Every word of the query must appear in the title, description or body. */

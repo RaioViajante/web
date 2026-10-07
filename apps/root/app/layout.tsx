@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { connection } from "next/server";
 import type { ReactNode } from "react";
+import { siteOrigins } from "../../../site/sites";
 import localFont from "next/font/local";
 import { Behavior } from "@raioviajante/design/behavior-react";
 import { themeColor } from "@raioviajante/design/theme-color";
@@ -15,7 +16,7 @@ const mono = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://raioviajante.com"),
+  metadataBase: new URL(siteOrigins.root),
   title: {
     default: "raioviajante",
     template: "%s — raioviajante",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "RaioViajante",
     description: "curious enough to build it myself.",
-    url: "https://raioviajante.com",
+    url: siteOrigins.root,
     siteName: "RaioViajante",
     type: "website",
   },

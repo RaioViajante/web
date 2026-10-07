@@ -1,6 +1,7 @@
 import { getPages, pathOf } from "./docs";
 import { notFoundSeo } from "@raioviajante/design/seo";
-export const origin = "https://docs.raioviajante.com";
+import { siteOrigins } from "../../../../site/sites";
+export const origin = siteOrigins.docs;
 interface SeoPage {
 	path: string;
 	title: string;

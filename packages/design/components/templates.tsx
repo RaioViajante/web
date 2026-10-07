@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Art } from "./art";
 import { type LinkComponent } from "./link";
 import { LeaderRow, PageHeader, Section } from "./page";
-import { siteById, type SiteId } from "./sites";
+import { siteById, type SiteId } from "../../../site/sites";
 
 export interface LegalSection {
   title: string;

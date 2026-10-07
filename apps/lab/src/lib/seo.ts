@@ -1,6 +1,7 @@
 import { notFoundSeo } from "@raioviajante/design/seo";
 import { experiments } from "../data/experiments";
-export const origin = "https://lab.raioviajante.com";
+import { siteOrigins } from "../../../../site/sites";
+export const origin = siteOrigins.lab;
 export function getSeoPages() {
   return [
     { path: "/", title: "things may break." },

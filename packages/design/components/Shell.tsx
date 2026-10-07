@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { SiteLink, type LinkComponent } from "./link";
-import { CONTACT, SITES, type SiteId } from "./sites";
+import { CONTACT, SITES, type SiteId } from "../../../site/sites";
 
 export interface NavItem {
   label: string;

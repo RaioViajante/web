@@ -1,13 +1,5 @@
 import { createHash } from "node:crypto";
-
-export type Site = "root" | "dump" | "docs" | "lab";
-
-export const siteOrigins: Record<Site, string> = {
-  root: "https://raioviajante.com",
-  dump: "https://dump.raioviajante.com",
-  docs: "https://docs.raioviajante.com",
-  lab: "https://lab.raioviajante.com",
-};
+import { siteOrigins, type SiteId as Site } from "../site/sites.ts";
 
 function styleHash(value: string) {
   return `'sha256-${createHash("sha256").update(value).digest("base64")}'`;

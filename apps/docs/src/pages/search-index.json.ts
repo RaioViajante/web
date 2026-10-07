@@ -1,3 +1,4 @@
+import { siteOrigins } from "../../../../site/sites";
 import type { APIRoute } from "astro";
 import { getCollection, render } from "astro:content";
 import type { SearchEntry } from "@raioviajante/design/search";
@@ -9,7 +10,7 @@ export const GET: APIRoute = async () => {
       docs.map(async (doc) => {
         const body = doc.body ?? "";
         const { headings } = await render(doc);
-        const base = `https://docs.raioviajante.com/${doc.id.replace(/\/index$/, "")}/`;
+        const base = `${siteOrigins.docs}/${doc.id.replace(/\/index$/, "")}/`;
         const title = String(doc.data.title);
         const page: SearchEntry = {
           site: "docs",

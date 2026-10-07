@@ -10,6 +10,7 @@ const shared = [
   "../../packages/design",
   "../../security",
   "../../seo",
+  "../../site",
 ];
 
 test("every ignoreCommand is identical, short enough, and watches shared code", async () => {

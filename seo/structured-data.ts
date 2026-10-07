@@ -1,3 +1,5 @@
+import { siteOrigins } from "../site/sites.ts";
+
 // Shared public identity and JSON-LD builders for the four sites. Plain
 // TypeScript with no dependencies, imported by relative path like
 // `security/headers.ts`; it is not part of the design system.
@@ -9,8 +11,8 @@
  */
 export const identity = {
   name: "RaioViajante",
-  url: "https://raioviajante.com/",
-  id: "https://raioviajante.com/#person",
+  url: `${siteOrigins.root}/`,
+  id: `${siteOrigins.root}/#person`,
   github: "https://github.com/RaioViajante",
 } as const;
 

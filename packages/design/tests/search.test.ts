@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { SearchEntry } from "../components/search";
-import type { SiteId } from "../components/sites";
+import type { SiteId } from "../../../site/sites";
 import {
   loadEverywhere,
   searchEntries,

@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import { staticHeaders } from "../../security/headers.ts";
+import { siteOrigins } from "../../site/sites.ts";
 import react from "@astrojs/react";
 
 export default defineConfig({
@@ -20,6 +21,6 @@ export default defineConfig({
     },
   },
   integrations: [react()],
-  site: "https://lab.raioviajante.com",
+  site: siteOrigins.lab,
   trailingSlash: "always",
 });

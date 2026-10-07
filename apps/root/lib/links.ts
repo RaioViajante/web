@@ -1,3 +1,4 @@
+import { CONTACT } from "../../../site/sites";
 import { identity } from "../../../seo/structured-data";
 
 export interface PrimaryLink {
@@ -18,8 +19,8 @@ export const primaryLinks: PrimaryLink[] = [
     description: "Code, projects and experiments in progress.",
   },
   {
-    label: "mail@raioviajante.com",
-    href: "mailto:mail@raioviajante.com",
+    label: CONTACT.email,
+    href: `mailto:${CONTACT.email}`,
     category: "email",
     description: "Write to me about an idea, question or collaboration.",
   },

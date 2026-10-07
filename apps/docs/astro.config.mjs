@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import { staticHeaders } from "../../security/headers.ts";
+import { siteOrigins } from "../../site/sites.ts";
 import react from "@astrojs/react";
 import { unified } from "@astrojs/markdown-remark";
 import remarkDirective from "remark-directive";
@@ -24,7 +25,7 @@ export default defineConfig({
 			prerender: { resolve: { external: ["@vercel/og", "harfbuzzjs"] } },
 		},
 	},
-	site: "https://docs.raioviajante.com",
+	site: siteOrigins.docs,
 	trailingSlash: "always",
 	integrations: [react()],
 	markdown: {

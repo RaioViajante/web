@@ -1,4 +1,4 @@
-import { siteOrigins, type Site } from "../security/headers.ts";
+import { siteOrigins, type SiteId as Site } from "../site/sites.ts";
 import { identity } from "./structured-data.ts";
 
 // The SEO contract of the four sites, as pure checks over strings. Nothing
