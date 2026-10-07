@@ -78,6 +78,6 @@ tests/       Jest specs
 
 ## License
 
-Source code is [MIT](LICENSE). The written articles in `content/posts/` are
+Source code is [MIT](../../LICENSE). The written articles in `content/posts/` are
 not — they're Copyright RaioViajante, all rights reserved. See
 [`content/README.md`](content/README.md).
