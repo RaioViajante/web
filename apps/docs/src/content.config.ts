@@ -22,7 +22,7 @@ export const collections = {
 			status: z.string(),
 			/** The rest of the meta row, after the status word. */
 			meta: z.array(z.string()).default([]),
-			/** Explicit editorial date; takes priority over git history. */
+			/** Explicit editorial date; the only source of a last-updated date. */
 			lastUpdated: z.iso.date().optional(),
 			/** The project's source repository. */
 			source: z.url().optional(),

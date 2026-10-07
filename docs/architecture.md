@@ -102,11 +102,10 @@ Next.js apps render the components on the server; Astro apps render through
 sound, search, avatar animation and block controls. Lab enhances its benches
 with small plain TypeScript Astro scripts and shares pure logic with Node tests.
 
-`styles.css` replaces the legacy color primitives and editorial shell entries.
-Those old exports remain until Phase 6 verifies and removes obsolete code. No
-app loads both style systems. Migration status and remaining work are tracked
-in [design-migration-plan](design-migration-plan.md); rules are in
-[design-system](design-system.md) and [blocks](blocks.md).
+`styles.css` replaced the legacy color primitives and editorial shell entries;
+the old exports have been removed and the cleanup is complete. The migration
+history is kept in [design-migration-plan](design-migration-plan.md); rules are
+in [design-system](design-system.md) and [blocks](blocks.md).
 
 Each consumer documents its own mapping: see root's
 [design notes](../apps/root/docs/design.md) and lab's

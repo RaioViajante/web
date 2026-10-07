@@ -53,7 +53,8 @@ entry, `/.github/actions/*`, relies on the documented glob support of
 confirmed until Dependabot's first run.
 
 `dependabot.yml` is **version** updates. Dependabot **security updates** and
-alerts are separate GitHub settings; see "Manual after push".
+alerts are separate GitHub settings. Current, intentional state: Dependabot
+alerts are enabled and Dependabot security updates are disabled.
 
 ## CodeQL
 
@@ -63,8 +64,7 @@ requests, pushes to `main`, weekly (Wednesday 04:37 UTC) and manually. It is the
 one workflow with write access, `security-events: write` to upload results, plus
 `contents: read`; the CI workflow stays read-only and a test enforces both.
 GitHub's template adds `packages: read` and `actions: read` for private or
-internal repositories only. Its first real run happens on GitHub; nothing was run
-locally.
+internal repositories only. It runs on GitHub, not locally.
 
 **Prerequisite before relying on it:** an advanced workflow and GitHub's CodeQL
 _default setup_ are alternatives (GitHub's switch from default to advanced means
@@ -124,8 +124,9 @@ suppression.
   above).
 - Check Settings > Advanced Security > CodeQL analysis: advanced workflow, not
   default setup.
-- Enable Dependabot **security updates** and alerts, and secret scanning with push
-  protection if available (Settings, Code security).
+- Keep Dependabot **alerts** enabled and Dependabot **security updates**
+  disabled (the intentional state), and secret scanning with push protection if
+  available (Settings, Code security).
 - Check that Actions is enabled with default workflow permissions read-only, and
   that Dependabot pull requests are merged with a merge commit (not squash).
 - Look at the first Dependabot run for the composite action.

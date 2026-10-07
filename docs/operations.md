@@ -2,9 +2,9 @@
 
 The runbook for shipping and maintaining the four sites. It lists procedures and
 the order to follow them in, and links to the document that explains each check.
-Nothing here has been run against GitHub or Vercel yet: everything under "First
-push" and "First deploy" is an unverified checklist until someone does it, and
-the repository is not claimed to be deployed.
+The repository, GitHub checks and the four Vercel projects have been run and
+verified in production. "First push" and "First deploy" below record what was
+inspected then and remain the checklist for repeating that on a new setup.
 
 ## Local, before every push
 
@@ -45,9 +45,9 @@ everything runs on real GitHub-hosted x64 runners. Inspect:
 - **Dependabot**: accepts `.github/dependabot.yml`, finds the local composite
   action, and the schedules in all workflows were accepted.
 
-Things that may fail only because they have never run remotely: the x64 runner
-image and its Firefox libraries, `--with-deps` on that image, real timings, the
-CodeQL upload and Dependabot's glob for the composite action.
+Things that can differ only on a remote runner: the x64 runner image and its
+Firefox libraries, `--with-deps` on that image, real timings, the CodeQL upload
+and Dependabot's glob for the composite action.
 
 ## GitHub settings (manual, remote)
 
@@ -62,8 +62,9 @@ Not done by any commit. Settings > Rules or Branches, for `main`:
   whose previous commit is missing fails that step).
 
 Settings > Actions: default workflow permissions read-only. Settings > Code
-security: Dependabot alerts and security updates, secret scanning and push
-protection where available, and CodeQL on **advanced setup** (this repository's
+security: Dependabot alerts on and Dependabot security updates off (intentional,
+see [security-maintenance.md](security-maintenance.md#dependabot)), secret
+scanning and push protection where available, and CodeQL on **advanced setup** (this repository's
 workflow), with default setup off. Merge Dependabot pull requests with a merge
 commit, not squash (see [security-maintenance.md](security-maintenance.md#codeql)).
 

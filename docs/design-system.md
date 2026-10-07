@@ -133,7 +133,7 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 
 - Home: animated avatar, projects with status and raioviajante standards. Search is only in the sidebar.
 - Two columns: sidebar (pages and "on this page") and content.
-- Guide pages: breadcrumb label, status, steps, tables, callouts, **try it and read more**, last updated and edit on GitHub. Last updated prefers explicit ISO-date frontmatter, then full git history, and is omitted when unavailable.
+- Guide pages: breadcrumb label, status, steps, tables, callouts, **try it and read more**, last updated and edit on GitHub. Last updated comes only from explicit ISO-date `lastUpdated` frontmatter (never git history) and is omitted when absent.
 - Reference pages render verified commands and behavior. Unknown versions, exit codes and changelogs are omitted. Tabs and file trees are shared capabilities, used only where content needs them.
 - Search: numbered sidebar item `03. search  /`, the only search entry point (the docs home has no search line of its own). It opens a full search page (no icon, no box, no key chips): caps label, plain input, results as numbered leader rows, selected result marked with the sidebar rule. Finds docs sections and dump posts from one shared index. Shortcut `/` on every site.
 - **Design language** page rewritten for this system (the old one described a purple accent and serif prose).
@@ -169,7 +169,7 @@ Sound is part of the identity. Every site uses the same Web Audio synthesis and 
 | action accepted     | lab bench                           | `[ROOT: success]`                             |
 | action rejected     | lab bench                           | `[ROOT: reject]` — never harsh                |
 
-Rules: never play on page load; one preference across subdomains (localStorage is per subdomain, so the preference is the `rv-sound` cookie on `.raioviajante.com`; the root's old localStorage value is migrated on first read). There are no audio files: every sound is synthesized with Web Audio in `packages/design/sound/`, and `[ROOT: name]` means the voice the root already synthesizes for that kind of event. Under reduced motion, hover and typing sounds are skipped; sounds that confirm an action still play.
+Rules: never play on page load; one preference across subdomains (localStorage is per subdomain, so the preference is the `rv-sound` cookie on `.raioviajante.com`; reads have no side effects, and an old localStorage value is honored until the next explicit toggle, which writes the cookie and removes it). There are no audio files: every sound is synthesized with Web Audio in `packages/design/sound/`, and `[ROOT: name]` means the voice the root already synthesizes for that kind of event. Under reduced motion, hover and typing sounds are skipped; sounds that confirm an action still play.
 
 ## 6. Interactive behavior (lab)
 
