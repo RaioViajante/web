@@ -44,18 +44,12 @@ async function one(page, profile) {
       logLevel: "error",
       onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
     };
-    // Lighthouse's trace engine prints a stack when it cannot compute LCP
-    // (NO_LCP); the audit already reports it, so keep the output readable.
-    const originals = {
-      error: console.error,
-      warn: console.warn,
-      log: console.log,
-    };
-    for (const name of Object.keys(originals))
-      console[name] = (...a) =>
-        String(a[0]).includes("LanternError")
-          ? undefined
-          : originals[name](...a);
+    // Lighthouse's trace engine prints a stack on stderr when it cannot compute
+    // LCP (NO_LCP); the audit already reports that, so hold its stderr and show
+    // it only if Lighthouse itself throws.
+    const held = [];
+    const write = process.stderr.write.bind(process.stderr);
+    process.stderr.write = (chunk) => (held.push(String(chunk)), true);
     let lhr;
     try {
       ({ lhr } = await lighthouse(
@@ -63,8 +57,12 @@ async function one(page, profile) {
         flags,
         profile === "desktop" ? desktopConfig : undefined,
       ));
+    } catch (error) {
+      process.stderr.write = write;
+      write(held.join(""));
+      throw error;
     } finally {
-      Object.assign(console, originals);
+      process.stderr.write = write;
     }
     await mkdir(new URL("./.results/reports/", import.meta.url), {
       recursive: true,

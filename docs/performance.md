@@ -28,11 +28,11 @@ and rendered per request (nonce CSP); Docs and Lab are static Astro.
 
 ## Baseline (three runs each)
 
-- **All 14 pages × 2 profiles score 95-100 in performance** except one: the docs
-  search page on mobile, where Lighthouse intermittently cannot compute LCP
-  (`NO_LCP`, 11 of 13 runs) although the browser reports ~180 ms. Unexplained
-  Lighthouse artifact; those runs are ignored for the performance floor and
-  noted in the output.
+- **All 14 pages × 2 profiles score 95-100 in performance** wherever Lighthouse
+  produces a score. The exception is the docs search page on mobile, where
+  Lighthouse 13 intermittently cannot collect an LCP at all (`NO_LCP`, 11 of 13
+  baseline runs) although the page renders and Chromium's own
+  `PerformanceObserver` reports an LCP; see "NO_LCP" below.
 - Accessibility and best practices are 100 everywhere. SEO is 100 except the
   four `/search` pages at 69: they are `noindex` on purpose (see `seo.md`), so
   Lighthouse's "blocked from indexing" audit fails by design.
@@ -74,11 +74,38 @@ Astro pages without a framework runtime.
 - **Hard, with variance handling** (`perf:lighthouse`): performance >= 90,
   accessibility 100, best practices >= 95, SEO 100 (69 for `/search`), CLS <=
   0.02. A page below a floor is measured twice more and the median decides.
+  The performance floor of **90 is a regression guard, not the goal**: the
+  quality target is **95**, and a valid score from 90 to 94 passes but is
+  reported as below target. The floor is not 95 because the same bytes scored
+  95-100 across runs (simulated-throttling variance of up to five points).
 - **Soft** (printed, never failing): FCP, LCP, TBT and Speed Index against
-  generous thresholds, and images much larger than their slot.
+  generous thresholds, a performance score under the 95 target, and images much
+  larger than their slot.
 - Budgets are never rewritten by a tool. `node perf/check.mjs --baseline` prints
   the measurements and writes `perf/.results/suggested.json`; change the file
   by hand in a reviewed commit and say why.
+
+## NO_LCP: when Lighthouse cannot collect an LCP
+
+`NO_LCP` means Lighthouse found no largest-contentful-paint candidate and scored
+performance 0. That is a collection failure, not a score, and it must not hide a
+page that really has no LCP. So:
+
+- **Anywhere unexpected it fails**, and a run is never dropped from the counts.
+- **One exception, written in `perf/budgets.json` (`knownNoLcp`):** docs
+  `/search/` on mobile. A `NO_LCP` there is accepted only while Chromium itself
+  observes a real LCP entry on the page (`perf/browser-lcp.mjs`), the page has
+  visible content, answers 200, and has no page error or failed first-party
+  request. The proof is existence only, with no numeric threshold. If the browser
+  also sees no LCP, the check fails.
+- Valid Lighthouse runs of that page still count normally. The output states how
+  many runs were valid and how many were `NO_LCP`. If every run is `NO_LCP` the
+  page passes on the browser proof alone and **no Lighthouse score is reported**
+  for it.
+- `perf/lighthouse-policy.test.mjs` covers these rules with fixtures (unexpected
+  NO_LCP, the exception with and without a browser LCP, scores under 90, scores
+  from 90 to 94, other floors, and the exception's exact scope), so they do not
+  depend on the live quirk.
 
 ## Findings
 
@@ -89,7 +116,9 @@ Astro pages without a framework runtime.
   root gallery's character sheet (125 KB WebP) and the **search character**
   (94 KB PNG, 640 px intrinsic, shown at 100 px, the LCP of every search page).
   That is artwork: a smaller derivative would save about 70 KB per search visit,
-  but it needs a decision from you, so it is reported, not changed.
+  but it needs a decision from you, so it is reported, not changed. This is an
+  optional future asset optimization (640 px source for a slot of about 100 px),
+  not a blocker for anything.
 - No genuine performance defect was found, so no performance fix was made.
 
 Relationship to Phase 10A: `pnpm browser:check` owns accessibility correctness

@@ -16,7 +16,7 @@
     "seo:check": "node --test seo/*.test.mjs",
     "browser:check": "playwright test --config e2e/playwright.config.ts",
     "perf:check": "node perf/check.mjs",
-    "perf:lighthouse": "node perf/check-lighthouse.mjs",
+    "perf:lighthouse": "node --test perf/*.test.mjs && node perf/check-lighthouse.mjs",
     "links:check": "node --test links/*.test.mjs && node links/check.mjs",
     "links:external": "node links/check.mjs --external",
     "seo:verify": "node seo/verify-metadata.mjs",

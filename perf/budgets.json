@@ -257,7 +257,7 @@
     }
   },
   "lighthouse": {
-    "_readme": "HARD floors: category scores; CLS. A failing page/profile is re-run twice and the median decides, to absorb simulated-throttling variance (observed performance range 95-100). SOFT: lab timings, compared with the thresholds below. Lighthouse intermittently cannot compute LCP (NO_LCP) for the docs search page on mobile (seen in 11 of 13 runs); those runs are ignored for the performance floor, reported as a note, and the other categories are still checked. The browser itself reports an LCP of ~180 ms there; the cause is unexplained.",
+    "_readme": "HARD floors: category scores; CLS. A failing page/profile is re-run twice and the median decides, to absorb simulated-throttling variance (observed performance range 95-100). SOFT: lab timings, compared with the thresholds below. NO_LCP (Lighthouse could not collect an LCP) is a failure everywhere except the entries in knownNoLcp, and even there only while the browser independently observes an LCP.",
     "hard": {
       "performance": 90,
       "accessibility": 100,
@@ -622,6 +622,18 @@
           "si_ms": 267
         }
       }
-    }
+    },
+    "quality": {
+      "performance": 95
+    },
+    "_quality": "Quality target, reported but never failing: a valid performance score between the hard floor (90) and 95 is noted. The hard floor stays 90 because the local baseline varies by up to five points; it is a regression guard, not the goal.",
+    "knownNoLcp": [
+      {
+        "app": "docs",
+        "route": "/search/",
+        "profile": "mobile",
+        "why": "Lighthouse 13 intermittently cannot collect an LCP for this page (NO_LCP in 11 of 13 baseline runs) although the page renders and Chromium's own PerformanceObserver reports an LCP; accepted only while an independent browser observation of the page finds a real LCP entry, visible content, no page error and no failed first-party request"
+      }
+    ]
   }
 }

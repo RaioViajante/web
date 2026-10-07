@@ -1,5 +1,8 @@
 import { readFile } from "node:fs/promises";
+import { observeBrowserLcp } from "./browser-lcp.mjs";
+import { startServers } from "../security/local-servers.mjs";
 import { measure } from "./lighthouse.mjs";
+import { evaluate, judgeBrowserLcp, knownNoLcp } from "./lighthouse-policy.mjs";
 
 // Lighthouse floors from perf/budgets.json on the representative pages, mobile
 // and desktop. Synthetic lab data against local production builds, not
@@ -30,40 +33,19 @@ function floorsFor(id, name, profile) {
   }
   return floors;
 }
-const category = {
-  performance: "performance",
-  accessibility: "accessibility",
-  "best-practices": "best-practices",
-  seo: "seo",
-};
-function judge(samples, floors) {
-  const problems = [];
-  const notes = [];
-  for (const [key, floor] of Object.entries(floors)) {
-    if (floor === null || floor === undefined || key === "cls") continue;
-    // Lighthouse sometimes cannot compute LCP at all (NO_LCP) and then scores
-    // performance 0 although the browser reports an LCP. Such samples are
-    // ignored for the performance floor and noted, never counted as 0.
-    const usable = samples.filter(
-      (s) => key !== "performance" || s.metrics.lcp !== null,
-    );
-    if (usable.length < samples.length && key === "performance")
-      notes.push(
-        `${samples.length - usable.length} of ${samples.length} runs had no LCP (NO_LCP) and were ignored for performance`,
-      );
-    if (!usable.length) {
-      notes.push("performance not measurable (NO_LCP in every run)");
-      continue;
-    }
-    const value = median(usable.map((s) => s.scores[category[key]]));
-    if (value < floor)
-      problems.push(`${key} ${value} is below the floor ${floor}`);
-  }
-  const cls = Math.max(...samples.map((s) => s.metrics.cls ?? 0));
-  if (cls > floors.cls) problems.push(`CLS ${cls} exceeds ${floors.cls}`);
-  return { problems, notes };
+async function judge(r, samples, floors) {
+  const known = knownNoLcp(budget.knownNoLcp ?? [], r);
+  return evaluate(samples, floors, {
+    known,
+    quality: budget.quality,
+    browserLcp: async () => judgeBrowserLcp(await observeBrowserLcp(r)),
+  });
 }
 
+// Own the servers for the whole run: the browser fallback needs them after the
+// Lighthouse matrix has finished.
+const { stop } = await startServers();
+process.on("exit", stop);
 const results = await measure({
   runs,
   only: only ? (p) => `${p.app}/${p.name}`.startsWith(only) : undefined,
@@ -77,14 +59,26 @@ for (const r of results) {
   const id = `${r.app}/${r.name}`;
   const floors = floorsFor(id, r.name, r.profile);
   let samples = r.samples;
-  let { problems, notes } = judge(samples, floors);
-  if (problems.length && samples.length < 3) {
+  let { problems, notes, valid, noLcp, performance } = await judge(
+    r,
+    samples,
+    floors,
+  );
+  // A floor miss is re-measured twice (the median decides); NO_LCP is not retried away.
+  if (
+    problems.some((p) => p.includes("below the floor")) &&
+    samples.length < 3
+  ) {
     const more = await measure({
       runs: 2,
       only: (p) => p.app === r.app && p.name === r.name,
     }).then((all) => all.find((x) => x.profile === r.profile).samples);
     samples = [...samples, ...more];
-    ({ problems, notes } = judge(samples, floors));
+    ({ problems, notes, valid, noLcp, performance } = await judge(
+      r,
+      samples,
+      floors,
+    ));
     console.log(
       `  (re-measured ${id} ${r.profile}: median of ${samples.length})`,
     );
@@ -92,8 +86,12 @@ for (const r of results) {
   const m = (f) => median(samples.map(f).filter((v) => Number.isFinite(v)));
   const lcp = m((s) => s.metrics.lcp);
   console.log(
-    `${id.padEnd(30)}${r.profile.padEnd(9)}${String(median(samples.filter((s) => s.metrics.lcp !== null).map((s) => s.scores.performance))).padEnd(6)}${String(m((s) => s.scores.accessibility)).padEnd(6)}${String(m((s) => s.scores["best-practices"])).padEnd(5)}${String(m((s) => s.scores.seo)).padEnd(5)}| ${String(lcp).padEnd(7)}${String(m((s) => s.metrics.fcp)).padEnd(7)}${String(m((s) => s.metrics.tbt)).padEnd(5)}${m((s) => s.metrics.cls)}`,
+    `${id.padEnd(30)}${r.profile.padEnd(9)}${String(performance ?? "n/a").padEnd(6)}${String(m((s) => s.scores.accessibility)).padEnd(6)}${String(m((s) => s.scores["best-practices"])).padEnd(5)}${String(m((s) => s.scores.seo)).padEnd(5)}| ${String(lcp).padEnd(7)}${String(m((s) => s.metrics.fcp)).padEnd(7)}${String(m((s) => s.metrics.tbt)).padEnd(5)}${m((s) => s.metrics.cls)}`,
   );
+  if (noLcp)
+    console.log(
+      `  ${id} ${r.profile}: ${valid} valid Lighthouse run(s), ${noLcp} NO_LCP`,
+    );
   for (const n of notes)
     warnings.push(`[${r.app}] ${r.path} [${r.profile}]: ${n}`);
   for (const p of problems)
@@ -112,6 +110,7 @@ for (const r of results) {
       );
   }
 }
+stop();
 if (warnings.length)
   console.log(
     `\nSOFT (not failing):\n${warnings.map((w) => `  - ${w}`).join("\n")}`,
