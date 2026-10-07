@@ -40,10 +40,11 @@ function main() {
   for (const ref of [from, to]) {
     if (!exists(ref)) {
       if (event === "push" && ref === from) {
-        console.log(
-          "Commit messages not checked: the previous commit is not in this clone (forced push).",
+        console.error(
+          `The previous commit ${from} is not in this clone, so the pushed commits cannot be identified. ` +
+            "A forced push can cause this; fetch full history or check the commits locally.",
         );
-        return 0;
+        return 2;
       }
       console.error(
         `Unknown commit: ${ref}. Fetch enough history or pass --from/--to.`,

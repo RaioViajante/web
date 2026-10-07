@@ -54,18 +54,40 @@ test("a pull request checks exactly base..head", () => {
   assert.throws(() => resolveRange({ event: "pull_request", base: a }));
 });
 
-test("a push checks before..after unless there is no previous commit", () => {
+test("a push checks before..after; only branch creation is skipped", () => {
   assert.deepEqual(resolveRange({ event: "push", before: a, after: b }), {
     kind: "range",
     from: a,
     to: b,
   });
-  for (const before of ["0".repeat(40), "", undefined]) {
-    assert.equal(
-      resolveRange({ event: "push", before, after: b }).kind,
-      "skip",
-    );
+  assert.equal(
+    resolveRange({ event: "push", before: "0".repeat(40), after: b }).kind,
+    "skip",
+  );
+});
+
+test("a push without usable SHAs fails instead of passing", () => {
+  for (const before of ["", undefined, "not-a-sha"]) {
+    assert.throws(() => resolveRange({ event: "push", before, after: b }));
   }
+  assert.throws(() => resolveRange({ event: "push", before: a }));
+});
+
+test("a push whose previous commit is not in the clone fails loudly", () => {
+  const head = spawnSync("git", ["rev-parse", "HEAD"], {
+    encoding: "utf8",
+  }).stdout.trim();
+  const result = spawnSync("node", ["commits/check.mjs"], {
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      COMMITS_EVENT: "push",
+      COMMITS_BEFORE: "1".repeat(40),
+      COMMITS_AFTER: head,
+    },
+  });
+  assert.equal(result.status, 2);
+  assert.match(result.stderr, /not in this clone/);
 });
 
 test("manual runs and unknown events invent no range", () => {

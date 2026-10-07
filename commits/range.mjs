@@ -20,15 +20,17 @@ export function resolveRange(input) {
     return { kind: "range", from: base, to: head };
   }
   if (event === "push") {
-    if (
-      !SHA.test(before ?? "") ||
-      ZERO.test(before) ||
-      !SHA.test(after ?? "")
-    ) {
+    // Only a branch's first push has no previous commit: GitHub reports an
+    // all-zero SHA. Anything else that is not a SHA is a tooling mistake, and a
+    // check that quietly passes there would let commits through unchecked.
+    if (ZERO.test(before ?? "x")) {
       return {
         kind: "skip",
-        reason: "this push has no previous commit to compare against",
+        reason: "this push created the branch, so there is no previous commit",
       };
+    }
+    if (!SHA.test(before ?? "") || !SHA.test(after ?? "")) {
+      throw new Error("push needs the before and after commit SHAs");
     }
     return { kind: "range", from: before, to: after };
   }
