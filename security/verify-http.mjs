@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { contentSecurityPolicy, securityHeaders } from "./headers.ts";
+import { ports, startServers } from "./local-servers.mjs";
 
-// Run against production builds: Next start (3002/3001), Astro preview
-// (4321/4322). This checks HTTP/HTML, not browser execution or Vercel rollout.
-const ports = { root: 3002, dump: 3001, docs: 4321, lab: 4322 };
+// Run against the built apps (`pnpm -r build`): Next start (3002/3001) and
+// Astro preview (4321/4322), reused if already running and otherwise started
+// and stopped here. This checks HTTP/HTML, not browser execution or Vercel rollout.
+const { stop } = await startServers();
+process.on("exit", stop);
 const nonces = new Set();
 let documents = 0;
 let assets = 0;
@@ -134,3 +137,4 @@ for (const [site, port] of Object.entries(ports)) {
 console.log(
   `Passed: ${documents} documents, ${assets} assets, ${nonces.size} unique 128-bit nonces plus repeated-request checks.`,
 );
+stop();

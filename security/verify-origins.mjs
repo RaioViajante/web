@@ -211,7 +211,10 @@ const articles = [
 ].map(([, u]) => new URL(u).pathname);
 let long;
 for (const path of articles) {
-  const html = await (await fetch(local("dump") + path)).text();
+  // Node does not resolve *.localhost (Firefox does, glibc Linux does not).
+  const html = await (
+    await fetch(`http://127.0.0.1:${ports.dump}${path}`)
+  ).text();
   if (/giscus\.app\/client\.js|<iframe|<script[^>]+giscus/.test(html))
     failures.push(
       `dump ${path}: initial HTML contains a giscus script or frame`,
