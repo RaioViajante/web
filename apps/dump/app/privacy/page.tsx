@@ -20,11 +20,23 @@ export default function Privacy() {
           {
             title: "In your browser",
             body: (
-              <p>
-                Your sound preference is saved in a small cookie on
-                .raioviajante.com, so every raioviajante site remembers it. It
-                is not used for tracking.
-              </p>
+              <>
+                <p>
+                  Your sound preference is saved in a small cookie on
+                  .raioviajante.com, so every raioviajante site remembers it.
+                  The cookie is created only when you switch sound on or off,
+                  holds just that choice, and lasts one year. It is not used for
+                  tracking.
+                </p>
+                <p>
+                  If you sign in with GitHub to comment, the giscus script that
+                  runs on this page keeps a sign-in value in your browser&apos;s
+                  local storage for dump.raioviajante.com, under the name
+                  giscus-session. dump does not read or use it; giscus and
+                  GitHub decide how long it stays valid. It is not created
+                  unless you sign in.
+                </p>
+              </>
             ),
           },
           {
@@ -41,10 +53,16 @@ export default function Privacy() {
             title: "Comments and feeds",
             body: (
               <p>
-                Comments go through giscus to GitHub Discussions. Signing in and
-                posting happen with GitHub, under GitHub&apos;s privacy policy;
-                dump never sees your password. The RSS feed is a plain file —
-                feed readers request it like any page.
+                Comments go through giscus to GitHub Discussions. They load when
+                the comments section comes near the screen as you scroll (on a
+                short article, that can be as soon as the page opens), or when
+                you press Load comments in a browser that cannot detect
+                scrolling. Before then this page does not contact giscus or
+                GitHub. Once they load, your browser connects to giscus.app and
+                GitHub. Signing in and posting happen with GitHub, under
+                GitHub&apos;s privacy policy; dump never sees your password. The
+                RSS feed is a plain file — feed readers request it like any
+                page.
               </p>
             ),
           },

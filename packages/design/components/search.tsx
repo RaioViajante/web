@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { Art, art } from "./art";
 import { SiteLink, type LinkComponent } from "./link";
-import { SITES, type SiteId } from "./sites";
+import { SITES, type SiteId } from "../../../site/sites";
 
 /** Searches that find something on each site, offered when nothing matched. */
 const SUGGESTIONS: Record<SiteId, readonly string[]> = {

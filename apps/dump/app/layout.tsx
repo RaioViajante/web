@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
 import { alternatesFor, site } from "@/lib/site";
-import { jsonLdScript, websiteJsonLd } from "@/lib/structured-data";
 import { Behavior } from "@raioviajante/design/behavior-react";
+import { themeColor } from "@raioviajante/design/theme-color";
 
 import "@raioviajante/design/styles.css";
 import "./globals.css";
@@ -46,15 +47,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export async function generateViewport(): Promise<Viewport> {
+  return { themeColor: await themeColor() };
+}
+
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  // Reading the request opts HTML into dynamic rendering for per-request CSP.
+  await headers();
   return (
     <html lang={site.locale} className={mono.variable}>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteJsonLd()) }}
-        />
-      </head>
       <body>
         {children}
         <Behavior />

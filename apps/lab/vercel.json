@@ -1,5 +1,36 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "astro",
-  "ignoreCommand": "p=$VERCEL_GIT_PREVIOUS_SHA; printf %s \"$p\" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e \"$p^{commit}\" && git diff --quiet \"$p\" HEAD -- . ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ../../packages/design || exit 1"
+  "ignoreCommand": "node ../../security/vercel-ignore.mjs",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), display-capture=(), payment=(), usb=(), fullscreen=(), autoplay=(self), clipboard-read=(), clipboard-write=(self)"
+        },
+        {
+          "key": "Cross-Origin-Opener-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; style-src-attr 'unsafe-hashes' 'sha256-BDgIqUOjni0WelhOfIRW4cmSnxZNAa0L9tCq85UnRac='; img-src 'self'; font-src 'self'; connect-src 'self' https://raioviajante.com https://dump.raioviajante.com https://docs.raioviajante.com; frame-src 'none'; worker-src 'none'; media-src 'none'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+        }
+      ]
+    }
+  ]
 }

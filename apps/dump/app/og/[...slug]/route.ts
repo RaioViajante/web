@@ -1,4 +1,4 @@
-import { socialKey } from "@raioviajante/design/seo";
+import { socialKey } from "../../../../../seo/metadata";
 import { getSeoPages } from "@/lib/seo";
 import { site } from "@/lib/site";
 

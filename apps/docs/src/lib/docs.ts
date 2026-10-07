@@ -1,5 +1,3 @@
-import { execFileSync } from "node:child_process";
-import path from "node:path";
 import { getCollection, type CollectionEntry } from "astro:content";
 
 export type DocEntry = CollectionEntry<"docs">;
@@ -51,29 +49,13 @@ export async function searchNumber() {
 }
 
 /**
- * An explicit editorial date, then the last source commit's date. Omit when
- * neither is available; shallow history cannot reliably date a source edit.
+ * Only an explicit `lastUpdated` frontmatter date. Git history is not used: a
+ * commit can be a design or tooling change rather than an edit of the page,
+ * so a commit date would claim an update that did not happen. No date is shown
+ * (or published to search engines) when the page has none.
  */
 export function lastUpdated(entry: DocEntry) {
-	if (entry.data.lastUpdated) return entry.data.lastUpdated;
-	if (!entry.filePath) return undefined;
-	try {
-		// A shallow clone would report the oldest commit it has, not the last
-		// edit: leave the date out rather than show a wrong one.
-		const shallow = execFileSync("git", ["rev-parse", "--is-shallow-repository"], {
-			encoding: "utf8",
-			stdio: ["ignore", "pipe", "ignore"],
-		}).trim();
-		if (shallow !== "false") return undefined;
-		const date = execFileSync(
-			"git",
-			["log", "-1", "--format=%cs", "--", path.join(process.cwd(), entry.filePath ?? "")],
-			{ encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
-		).trim();
-		return /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : undefined;
-	} catch {
-		return undefined;
-	}
+	return entry.data.lastUpdated;
 }
 
 export function editUrl(entry: DocEntry) {

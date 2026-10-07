@@ -2,8 +2,10 @@
  * One sound preference for every RaioViajante site.
  *
  * localStorage is per origin, so the preference lives in a cookie on
- * `.raioviajante.com`. The legacy `rv-sound` localStorage value written by
- * the root and dump toggles is migrated on first read.
+ * `.raioviajante.com`. Reading is side-effect free. A legacy `rv-sound`
+ * localStorage value (written by older root and dump toggles) is honored on
+ * that origin until the visitor next switches sound, which writes the cookie
+ * and removes the legacy value.
  */
 export const SOUND_COOKIE = "rv-sound";
 const ONE_YEAR = 60 * 60 * 24 * 365;
@@ -50,21 +52,17 @@ export function writePreference(
   env: PreferenceEnvironment = browserEnvironment(),
 ) {
   env.setCookie(serializePreference(enabled, env.hostname, env.protocol));
+  env.clearLegacy();
 }
 
-/** Reads the preference; the first read moves a legacy localStorage value into the cookie. */
+/** Reads the preference without writing anything; a cookie wins over a legacy localStorage value. */
 export function readPreference(
   env: PreferenceEnvironment = browserEnvironment(),
 ): boolean {
   const stored = parsePreference(env.getCookie());
   if (stored !== null) return stored;
   const legacy = env.getLegacy();
-  if (legacy === "on" || legacy === "off") {
-    writePreference(legacy === "on", env);
-    env.clearLegacy();
-    return legacy === "on";
-  }
-  return false;
+  return legacy === "on";
 }
 
 export function browserEnvironment(): PreferenceEnvironment {

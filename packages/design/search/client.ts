@@ -1,4 +1,4 @@
-import { SITES, type SiteId } from "../components/sites";
+import { SITES, type SiteId } from "../../../site/sites";
 import type { SearchEntry } from "../components/search";
 import { loadEverywhere, searchEntries, unavailableNote } from "./engine";
 

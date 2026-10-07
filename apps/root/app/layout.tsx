@@ -1,7 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { connection } from "next/server";
 import type { ReactNode } from "react";
+import { siteOrigins } from "../../../site/sites";
 import localFont from "next/font/local";
 import { Behavior } from "@raioviajante/design/behavior-react";
+import { themeColor } from "@raioviajante/design/theme-color";
 import "@raioviajante/design/styles.css";
 import "./globals.css";
 
@@ -13,7 +16,7 @@ const mono = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://raioviajante.com"),
+  metadataBase: new URL(siteOrigins.root),
   title: {
     default: "raioviajante",
     template: "%s — raioviajante",
@@ -22,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "RaioViajante",
     description: "curious enough to build it myself.",
-    url: "https://raioviajante.com",
+    url: siteOrigins.root,
     siteName: "RaioViajante",
     type: "website",
   },
@@ -33,7 +36,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export async function generateViewport(): Promise<Viewport> {
+  return { themeColor: await themeColor() };
+}
+
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  // Nonces must be generated for each document, never at prerender time.
+  await connection();
   return (
     <html lang="en" className={mono.variable}>
       <body>

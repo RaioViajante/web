@@ -19,9 +19,8 @@
     "./behavior-react": "./behavior-react.tsx",
     "./gallery": "./components/gallery.ts",
     "./avatar": "./components/avatar.ts",
-    "./seo": "./seo.ts",
+    "./theme-color": "./theme-color.ts",
     "./social-image": "./social-image.tsx",
-    "./seo-head": "./components/seo-head.tsx",
     "./fonts/*": "./fonts/*",
     "./fonts.css": "./styles/fonts.css"
   },
@@ -49,7 +48,7 @@
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
-    "sharp": "0.34.5",
+    "sharp": "0.35.5",
     "typescript": "^6.0.3",
     "unified": "^11.0.5",
     "vitest": "^5.0.3"
@@ -60,7 +59,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "playground": "vite playground --open",
-    "icons": "node scripts/icons.mjs"
+    "icons": "node scripts/icons.mjs",
+    "search-art": "node scripts/search-art.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0",

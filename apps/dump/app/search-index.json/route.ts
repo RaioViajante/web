@@ -1,3 +1,4 @@
+import { siteOrigins } from "../../../../site/sites";
 import type { SearchEntry } from "@raioviajante/design/search";
 import { getPublishedPosts } from "@/lib/posts";
 import fs from "node:fs";
@@ -9,7 +10,7 @@ export function GET() {
   const entries: SearchEntry[] = getPublishedPosts().map((post) => ({
     site: "dump",
     title: post.title,
-    href: `https://dump.raioviajante.com/posts/${post.slug}`,
+    href: `${siteOrigins.dump}/posts/${post.slug}`,
     description: post.description,
     date: post.date,
     body: fs

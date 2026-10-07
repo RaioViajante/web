@@ -1,47 +1,58 @@
-import { socialUrl } from "@raioviajante/design/seo";
+import { socialUrl } from "../../../seo/metadata";
+import {
+  personRef,
+  websiteId,
+  websiteJsonLd,
+} from "../../../seo/structured-data";
 
 import type { Post } from "@/lib/posts";
 import { absoluteUrl, site } from "@/lib/site";
 
 /**
  * Minimal JSON-LD, derived from the same `site`/`Post` data that already
- * feeds ordinary metadata — not a separate source of truth, and not a
- * general structured-data framework.
+ * feeds ordinary metadata — not a separate source of truth. The author is the
+ * shared person identity from `seo/structured-data.ts` (one `@id` across the
+ * sites); serialization is the shared `jsonLdScript`.
  */
 
-/** Site-level `WebSite`, rendered once from the root layout. */
-export function websiteJsonLd() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: site.name,
-    description: site.description,
-    url: site.url,
-  };
+const blogId = () => `${site.url}/#blog`;
+
+/** Home page: the `WebSite` and the `Blog` it contains, by the same person. */
+export function homeJsonLd() {
+  return [
+    websiteJsonLd(site.url, site.name, site.description, { author: true }),
+    {
+      "@type": "Blog" as const,
+      "@id": blogId(),
+      name: site.name,
+      description: site.description,
+      url: absoluteUrl("/"),
+      inLanguage: site.locale,
+      author: personRef(),
+      isPartOf: { "@id": websiteId(site.url) },
+    },
+  ];
 }
 
 /**
  * Article-level `BlogPosting` for a published post. Only fields the project
- * genuinely has: no dateModified, publisher, logo, or other invented data.
+ * genuinely has: `datePublished` is the frontmatter date; there is no
+ * modification date, so no `dateModified`, and no publisher, logo or other
+ * invented data. The image is the post's generated social card.
  */
 export function blogPostingJsonLd(post: Post) {
+  const url = absoluteUrl(`/posts/${post.slug}`);
   return {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    "@type": "BlogPosting" as const,
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    url: absoluteUrl(`/posts/${post.slug}`),
-    author: { "@type": "Person", name: site.author },
+    url,
+    mainEntityOfPage: { "@type": "WebPage" as const, "@id": url },
+    author: personRef(),
+    inLanguage: site.locale,
+    isPartOf: { "@id": blogId() },
+    ...(post.tags.length ? { keywords: post.tags.join(", ") } : {}),
     image: socialUrl(site.url, `/posts/${post.slug}`),
   };
-}
-
-/**
- * Serialize a JSON-LD object for embedding in a `<script
- * type="application/ld+json">`. Escapes `<` so a value can never prematurely
- * close the surrounding script tag.
- */
-export function jsonLdScript(data: unknown): string {
-  return JSON.stringify(data).replace(/</g, "\\u003c");
 }

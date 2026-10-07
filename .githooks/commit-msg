@@ -1,0 +1,4 @@
+#!/bin/sh
+# Opt-in Conventional Commits check; enable with `pnpm hooks:install`.
+# CI runs the same rules and is authoritative.
+exec pnpm exec commitlint --config commitlint.config.mjs --edit "$1"

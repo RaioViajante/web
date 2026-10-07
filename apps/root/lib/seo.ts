@@ -1,5 +1,6 @@
-import { pageMetadata, type PageSeo } from "@raioviajante/design/seo";
-export const origin = "https://raioviajante.com";
+import { pageMetadata, type PageSeo } from "../../../seo/metadata";
+import { siteOrigins } from "../../../site/sites";
+export const origin = siteOrigins.root;
 export const pages: PageSeo[] = [
   {
     path: "/",

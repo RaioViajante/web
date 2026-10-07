@@ -1,5 +1,14 @@
 # Design migration plan
 
+> **Historical record.** This is the working plan of the design migration, which
+> finished and was merged into `main` (pull request #15). Its paths, statuses and
+> "next session" instructions describe that moment and are kept unchanged. For
+> how the repository works today, read [architecture.md](architecture.md),
+> [design-system.md](design-system.md), [deployment.md](deployment.md) and
+> [operations.md](operations.md). Examples of what has moved since: shared
+> metadata and `SeoHead` live in `seo/`, site origins in `site/`, and the Ignored
+> Build Step is `security/vercel-ignore.mjs`.
+
 Migration of raioviajante.com (root), dump, docs and lab to one shared design
 system in `packages/design`. Two agents (Claude and Codex) work on it in
 sessions, on the same branch, `feat/design-migration`.
@@ -711,7 +720,7 @@ apps/docs/           explicit date schema, date resolver and conditional footer
 Taken over from an interrupted session: the uncommitted Phase 5 work was
 reviewed, corrected and committed.
 
-- Shared metadata (`packages/design/seo.ts`), the build-time social card
+- Shared metadata (then `packages/design/seo.ts`, now `seo/metadata.ts`), the build-time social card
   renderer (`social-image.tsx`, `@vercel/og`, avatar, token colors, Noto Sans
   Mono TTF with OFL), the Astro `SeoHead`, and the self-hosted Latin variable
   WOFF2 (`fonts/`, `styles/fonts.css`; Next uses `next/font/local`). `sharp`

@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 
 import { PostArticle } from "@/components/PostArticle";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
 import { renderPost } from "@/lib/render-post";
 import { metadataFor } from "@/lib/seo";
-import { blogPostingJsonLd, jsonLdScript } from "@/lib/structured-data";
+import { jsonLdScript } from "../../../../../seo/structured-data";
+import { blogPostingJsonLd } from "@/lib/structured-data";
 
 export const dynamicParams = false;
 
@@ -46,10 +48,12 @@ export default async function PostPage({ params }: PageProps) {
   if (!post) notFound();
 
   const Content = await renderPost(slug);
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <>
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLdScript(blogPostingJsonLd(post)),

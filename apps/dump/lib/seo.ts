@@ -1,8 +1,4 @@
-import {
-  pageMetadata,
-  notFoundSeo,
-  type PageSeo,
-} from "@raioviajante/design/seo";
+import { pageMetadata, notFoundSeo, type PageSeo } from "../../../seo/metadata";
 import { getPublishedPosts, getAllTags } from "./posts";
 import { site, alternatesFor } from "./site";
 export const staticPages: PageSeo[] = [

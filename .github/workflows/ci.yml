@@ -1,7 +1,14 @@
 name: CI
 
-# Validates every app in the workspace on pull requests and pushes to main.
-# Vercel remains solely responsible for deploying; this workflow never does.
+# Two kinds of checks, kept apart on purpose:
+#   quality          deterministic, repository-controlled, BLOCKING. Require it.
+#   dependency-audit BLOCKING too, but it asks the package registry, so it can
+#                    start failing without a commit. Require it as well.
+#   observational  synthetic performance, live third-party origins and external
+#                  links. It varies with the machine and the public internet, so
+#                  it is reported and never blocks.
+# Vercel alone deploys; this workflow never does. No secrets are used, so it runs
+# unchanged for pull requests from forks. See docs/ci.md.
 on:
   pull_request:
   push:
@@ -12,20 +19,30 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  # A newer push to the same pull request cancels the older run. Runs for main
+  # and manual runs get their own group (the commit), so a newer main commit
+  # never cancels an older one's validation.
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: true
 
 env:
-  # Public, not a secret: dump's canonical origin, so CI validates the site as
-  # it actually ships instead of falling back to the localhost dev origin.
+  # Public, not a secret: dump's canonical origin, so the build and the
+  # metadata checks see the site as it ships, not the localhost dev origin.
   NEXT_PUBLIC_SITE_URL: https://dump.raioviajante.com
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
+  quality:
+    name: quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # The commit-message check needs the PR or push range; this
+          # repository is small enough that full history is the simplest
+          # reliable choice, and it works for forks without extra fetches.
+          fetch-depth: 0
 
       - name: Reject npm and yarn lockfiles
         run: |
@@ -36,15 +53,134 @@ jobs:
             exit 1
           fi
 
-      # Reads the pnpm version from package.json#packageManager.
-      - uses: pnpm/action-setup@v6
+      - id: setup
+        uses: ./.github/actions/setup
 
-      - uses: actions/setup-node@v7
+      # Only the commits this event introduces; manual runs have no range.
+      - name: Commit messages (Conventional Commits)
+        run: node commits/check.mjs
+        env:
+          COMMITS_EVENT: ${{ github.event_name }}
+          COMMITS_BASE: ${{ github.event.pull_request.base.sha }}
+          COMMITS_HEAD: ${{ github.event.pull_request.head.sha }}
+          COMMITS_BEFORE: ${{ github.event.before }}
+          COMMITS_AFTER: ${{ github.sha }}
+
+      # format:check, lint, typecheck, test, build, security:check (headers,
+      # security.txt, storage and origin policy, workflow policy), seo:check and
+      # the commit-message tooling tests.
+      - name: Validate
+        run: pnpm validate
+
+      # Everything below runs against the apps built by the step above.
+      - name: Browser and accessibility (Chromium, axe)
+        run: pnpm browser:check
+      - name: SEO over HTTP
+        run: pnpm seo:verify
+      - name: Security headers and CSP over HTTP
+        run: node security/verify-http.mjs
+      - name: Network origins (Firefox, no third-party traffic)
+        run: pnpm security:origins
+        env:
+          ORIGINS_SKIP_THIRD_PARTY: "1"
+          FIREFOX_BIN: ${{ steps.setup.outputs.firefox-path }}
+      - name: Page weight and image/font rules
+        run: pnpm perf:check
+      - name: Internal links and first-party resources
+        run: pnpm links:check
+
+      - name: Upload failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          node-version-file: .nvmrc
-          cache: pnpm
+          name: quality-failure
+          path: |
+            e2e/.results
+            perf/.results
+          if-no-files-found: ignore
+          retention-days: 7
 
-      - run: pnpm install --frozen-lockfile
+  observational:
+    # Not a required check. A red job here is information, not a merge blocker:
+    # the job and each check are allowed to fail without failing the workflow.
+    name: observational (non-blocking)
+    needs: quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      # format:check, lint, typecheck, test and build across every app.
-      - run: pnpm validate
+      - id: setup
+        uses: ./.github/actions/setup
+
+      # A second, isolated build keeps the jobs independent of each other.
+      - name: Build
+        run: pnpm build
+
+      # Synthetic Lighthouse: floors, quality target and the narrow NO_LCP
+      # policy live in perf/budgets.json; a failing floor is a signal, not a block.
+      - id: lighthouse
+        name: Lighthouse (synthetic)
+        run: pnpm perf:lighthouse
+        continue-on-error: true
+      # The giscus states reach the public internet and a third-party frame.
+      - id: origins
+        name: Network origins including live giscus
+        run: pnpm security:origins
+        env:
+          FIREFOX_BIN: ${{ steps.setup.outputs.firefox-path }}
+        continue-on-error: true
+      # Remote sites rate-limit, block bots and go down.
+      - id: links
+        name: External links (live)
+        run: pnpm links:external
+        continue-on-error: true
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Observational checks (never block merging)"
+            echo "- Lighthouse: $LIGHTHOUSE"
+            echo "- Network origins with live giscus: $ORIGINS"
+            echo "- External links: $LINKS"
+          } >> "$GITHUB_STEP_SUMMARY"
+          for check in "Lighthouse:$LIGHTHOUSE" "Network origins:$ORIGINS" "External links:$LINKS"; do
+            [ "${check#*:}" = "success" ] || echo "::warning title=Observational check::${check%%:*} finished as ${check#*:}"
+          done
+        env:
+          LIGHTHOUSE: ${{ steps.lighthouse.outcome }}
+          ORIGINS: ${{ steps.origins.outcome }}
+          LINKS: ${{ steps.links.outcome }}
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: observational-reports
+          path: perf/.results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # BLOCKING, and different in kind from `quality`: it asks the package registry
+  # about advisories, so it needs the network and can change without any commit
+  # (a new advisory, a new fix, an expiring exception). It reads only the
+  # lockfile and security/audit-exceptions.json. Require it next to `quality`.
+  dependency-audit:
+    name: dependency-audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          browsers: "false"
+
+      - name: Dependency audit (reviewed exceptions only)
+        run: pnpm audit:check

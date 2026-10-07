@@ -77,12 +77,21 @@ export function PrivacyPage() {
           {
             title: "In your browser",
             body: (
-              <p>
-                Your sound preference is saved in a small cookie on
-                .raioviajante.com so the sites share it. Experiment inputs and
-                results live in page memory and disappear when you reload. No
-                experiment sends your input to a server.
-              </p>
+              <>
+                <p>
+                  Your sound preference is saved in a small cookie on
+                  .raioviajante.com so the sites share it. The cookie is created
+                  only when you switch sound on or off, holds just that choice,
+                  and lasts one year. Experiment inputs and results live in page
+                  memory and disappear when you reload. No experiment sends your
+                  input to a server.
+                </p>
+                <p>
+                  Older versions of lab had a theme switcher that stored a
+                  choice in your browser as lab-theme. Nothing reads or writes
+                  it now, so a leftover value is inert and can be cleared.
+                </p>
+              </>
             ),
           },
           {

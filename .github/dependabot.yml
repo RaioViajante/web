@@ -1,0 +1,25 @@
+version: 2
+
+# Version updates for GitHub Actions. Every action here is pinned to a full
+# commit SHA with a `# vX.Y.Z` comment; Dependabot rewrites both. It also looks
+# inside the local composite actions. Minor and patch updates share one pull
+# request; majors stay separate so they get their own review. No auto-merge,
+# labels, assignees or reviewers.
+#
+# The npm/pnpm ecosystem is deliberately not configured: GitHub documents
+# Dependabot pnpm support through v10 and this repository uses pnpm 12. Package
+# advisories are covered by `pnpm audit:check`; see docs/security-maintenance.md.
+updates:
+  - package-ecosystem: github-actions
+    directories:
+      - "/"
+      - "/.github/actions/*"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      actions-minor-and-patch:
+        update-types:
+          - minor
+          - patch

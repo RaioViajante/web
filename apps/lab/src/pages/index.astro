@@ -1,9 +1,15 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { websiteJsonLd } from "../../../../seo/structured-data";
 import { LabIndex } from "../components/LabIndex";
+import { origin } from "../lib/seo";
 ---
 
-<BaseLayout>
+<BaseLayout
+  jsonLd={[
+    websiteJsonLd(origin, "lab", "lab.raioviajante.com — things may break."),
+  ]}
+>
   <LabIndex />
 </BaseLayout>
 <script>

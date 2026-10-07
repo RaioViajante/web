@@ -1,0 +1,639 @@
+{
+  "_readme": "Performance budgets for the four apps, measured on local production builds. HARD budgets fail `pnpm perf:check` / `pnpm perf:lighthouse`; SOFT ones only warn. See docs/performance.md. Weights are deterministic bytes (cold mobile load, gzip as served by the local server); each max is the measured baseline + 15% + 4 KB. Lighthouse numbers are synthetic lab measurements, not real-user Core Web Vitals. Budgets are never rewritten automatically: change them here, in a reviewed commit, with the reason.",
+  "largestImage": 153600,
+  "_largestImage": "Single-image transfer ceiling. Largest today: the root gallery character sheet, 125 KB WebP at the 750px variant.",
+  "weight": {
+    "root/home": {
+      "baseline": {
+        "total": 341365,
+        "script": 156529,
+        "stylesheet": 9203,
+        "font": 33835,
+        "image": 131711,
+        "requests": 21
+      },
+      "max": {
+        "total": 397312,
+        "script": 184320,
+        "stylesheet": 15360,
+        "font": 43008,
+        "image": 155648,
+        "requests": 24
+      }
+    },
+    "root/gallery": {
+      "baseline": {
+        "total": 707824,
+        "script": 167062,
+        "stylesheet": 9203,
+        "font": 33835,
+        "image": 488910,
+        "requests": 22
+      },
+      "max": {
+        "total": 818176,
+        "script": 196608,
+        "stylesheet": 15360,
+        "font": 43008,
+        "image": 567296,
+        "requests": 25
+      }
+    },
+    "root/search": {
+      "baseline": {
+        "total": 260450,
+        "script": 156529,
+        "stylesheet": 9203,
+        "font": 33835,
+        "image": 48693,
+        "requests": 13
+      },
+      "max": {
+        "total": 304128,
+        "script": 184320,
+        "stylesheet": 15360,
+        "font": 43008,
+        "image": 60416,
+        "requests": 16
+      }
+    },
+    "dump/home": {
+      "baseline": {
+        "total": 336046,
+        "script": 152801,
+        "stylesheet": 7800,
+        "font": 33302,
+        "image": 125848,
+        "requests": 23
+      },
+      "max": {
+        "total": 391168,
+        "script": 180224,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 149504,
+        "requests": 26
+      }
+    },
+    "dump/article": {
+      "baseline": {
+        "total": 217528,
+        "script": 153654,
+        "stylesheet": 7800,
+        "font": 33302,
+        "image": 10106,
+        "requests": 19
+      },
+      "max": {
+        "total": 254976,
+        "script": 181248,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 22
+      }
+    },
+    "dump/search": {
+      "baseline": {
+        "total": 353274,
+        "script": 152801,
+        "stylesheet": 7800,
+        "font": 33302,
+        "image": 47627,
+        "requests": 13
+      },
+      "max": {
+        "total": 410624,
+        "script": 180224,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 59392,
+        "requests": 16
+      }
+    },
+    "docs/home": {
+      "baseline": {
+        "total": 175641,
+        "script": 7106,
+        "stylesheet": 7292,
+        "font": 33251,
+        "image": 124713,
+        "requests": 15
+      },
+      "max": {
+        "total": 206848,
+        "script": 12288,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 148480,
+        "requests": 18
+      }
+    },
+    "docs/reference": {
+      "baseline": {
+        "total": 61531,
+        "script": 7106,
+        "stylesheet": 7292,
+        "font": 33251,
+        "image": 10002,
+        "requests": 5
+      },
+      "max": {
+        "total": 75776,
+        "script": 12288,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 8
+      }
+    },
+    "docs/search": {
+      "baseline": {
+        "total": 104312,
+        "script": 7106,
+        "stylesheet": 7292,
+        "font": 33251,
+        "image": 47420,
+        "requests": 7
+      },
+      "max": {
+        "total": 124928,
+        "script": 12288,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 59392,
+        "requests": 10
+      }
+    },
+    "lab/home": {
+      "baseline": {
+        "total": 180306,
+        "script": 10382,
+        "stylesheet": 7554,
+        "font": 33315,
+        "image": 125417,
+        "requests": 17
+      },
+      "max": {
+        "total": 211968,
+        "script": 16384,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 148480,
+        "requests": 20
+      }
+    },
+    "lab/boot-sector": {
+      "baseline": {
+        "total": 66328,
+        "script": 10553,
+        "stylesheet": 7554,
+        "font": 33315,
+        "image": 10066,
+        "requests": 7
+      },
+      "max": {
+        "total": 80896,
+        "script": 16384,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 10
+      }
+    },
+    "lab/execution-states": {
+      "baseline": {
+        "total": 66357,
+        "script": 11239,
+        "stylesheet": 7554,
+        "font": 33315,
+        "image": 10066,
+        "requests": 7
+      },
+      "max": {
+        "total": 80896,
+        "script": 17408,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 10
+      }
+    },
+    "lab/filename-classifier": {
+      "baseline": {
+        "total": 65921,
+        "script": 10860,
+        "stylesheet": 7554,
+        "font": 33315,
+        "image": 10066,
+        "requests": 7
+      },
+      "max": {
+        "total": 80896,
+        "script": 17408,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 10
+      }
+    },
+    "lab/search": {
+      "baseline": {
+        "total": 102471,
+        "script": 8743,
+        "stylesheet": 7554,
+        "font": 33315,
+        "image": 47548,
+        "requests": 8
+      },
+      "max": {
+        "total": 122880,
+        "script": 14336,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 59392,
+        "requests": 11
+      }
+    }
+  },
+  "lighthouse": {
+    "_readme": "HARD floors: category scores; CLS. A failing page/profile is re-run twice and the median decides, to absorb simulated-throttling variance (observed performance range 95-100). SOFT: lab timings, compared with the thresholds below. NO_LCP (Lighthouse could not collect an LCP) is a failure everywhere except the entries in knownNoLcp, and even there only while the browser independently observes an LCP.",
+    "hard": {
+      "performance": 90,
+      "accessibility": 100,
+      "best-practices": 95,
+      "seo": 100,
+      "cls": 0.02
+    },
+    "hardOverrides": {
+      "search": {
+        "seo": 69,
+        "_why": "All four /search pages are noindex on purpose, so Lighthouse's 'blocked from indexing' audit fails: 69 is the expected score, not a defect."
+      }
+    },
+    "soft": {
+      "mobile": {
+        "fcp_ms": 1800,
+        "lcp_ms": 3500,
+        "tbt_ms": 200,
+        "si_ms": 3400
+      },
+      "desktop": {
+        "fcp_ms": 600,
+        "lcp_ms": 1200,
+        "tbt_ms": 100,
+        "si_ms": 1200
+      }
+    },
+    "baseline": {
+      "root/home": {
+        "mobile": {
+          "performance": [99, 99, 99],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 1960,
+          "fcp_ms": 757,
+          "tbt_ms": 14,
+          "cls": 0,
+          "si_ms": 757
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 511,
+          "fcp_ms": 208,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 208
+        }
+      },
+      "root/gallery": {
+        "mobile": {
+          "performance": [100, 95, 95],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 3009,
+          "fcp_ms": 761,
+          "tbt_ms": 14,
+          "cls": 0,
+          "si_ms": 761
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 625,
+          "fcp_ms": 215,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 215
+        }
+      },
+      "root/search": {
+        "mobile": {
+          "performance": [98, 95, 98],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 69,
+          "lcp_ms": 2412,
+          "fcp_ms": 762,
+          "tbt_ms": 14,
+          "cls": 0,
+          "si_ms": 762
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 69,
+          "lcp_ms": 568,
+          "fcp_ms": 208,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 208
+        }
+      },
+      "dump/home": {
+        "mobile": {
+          "performance": [100, 98, 98],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 2335,
+          "fcp_ms": 758,
+          "tbt_ms": 23,
+          "cls": 0,
+          "si_ms": 758
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 511,
+          "fcp_ms": 208,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 208
+        }
+      },
+      "dump/article": {
+        "mobile": {
+          "performance": [100, 98, 98],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 2336,
+          "fcp_ms": 762,
+          "tbt_ms": 13,
+          "cls": 0,
+          "si_ms": 762
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 508,
+          "fcp_ms": 210,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 210
+        }
+      },
+      "dump/search": {
+        "mobile": {
+          "performance": [98, 96, 96],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 69,
+          "lcp_ms": 2856,
+          "fcp_ms": 757,
+          "tbt_ms": 19,
+          "cls": 0,
+          "si_ms": 757
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 69,
+          "lcp_ms": 570,
+          "fcp_ms": 210,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 210
+        }
+      },
+      "docs/home": {
+        "mobile": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 1581,
+          "fcp_ms": 906,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 906
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 345,
+          "fcp_ms": 245,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 245
+        }
+      },
+      "docs/reference": {
+        "mobile": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 1355,
+          "fcp_ms": 905,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 905
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 328,
+          "fcp_ms": 248,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 248
+        }
+      },
+      "docs/search": {
+        "mobile": {
+          "performance": [0, 0, 0],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 69,
+          "lcp_ms": null,
+          "fcp_ms": 915,
+          "tbt_ms": null,
+          "cls": 0,
+          "si_ms": 915
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 69,
+          "lcp_ms": 446,
+          "fcp_ms": 248,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 248
+        }
+      },
+      "lab/home": {
+        "mobile": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 1655,
+          "fcp_ms": 1057,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 1057
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 384,
+          "fcp_ms": 266,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 266
+        }
+      },
+      "lab/boot-sector": {
+        "mobile": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 1356,
+          "fcp_ms": 1057,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 1057
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 329,
+          "fcp_ms": 268,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 268
+        }
+      },
+      "lab/execution-states": {
+        "mobile": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 1356,
+          "fcp_ms": 1057,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 1057
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 329,
+          "fcp_ms": 267,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 267
+        }
+      },
+      "lab/filename-classifier": {
+        "mobile": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 1356,
+          "fcp_ms": 1057,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 1057
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 100,
+          "lcp_ms": 332,
+          "fcp_ms": 270,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 270
+        }
+      },
+      "lab/search": {
+        "mobile": {
+          "performance": [99, 99, 99],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 69,
+          "lcp_ms": 1954,
+          "fcp_ms": 980,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 980
+        },
+        "desktop": {
+          "performance": [100, 100, 100],
+          "accessibility": 100,
+          "best-practices": 100,
+          "seo": 69,
+          "lcp_ms": 445,
+          "fcp_ms": 267,
+          "tbt_ms": 0,
+          "cls": 0,
+          "si_ms": 267
+        }
+      }
+    },
+    "quality": {
+      "performance": 95
+    },
+    "_quality": "Quality target, reported but never failing: a valid performance score between the hard floor (90) and 95 is noted. The hard floor stays 90 because the local baseline varies by up to five points; it is a regression guard, not the goal.",
+    "knownNoLcp": [
+      {
+        "app": "docs",
+        "route": "/search/",
+        "profile": "mobile",
+        "why": "Lighthouse 13 intermittently cannot collect an LCP for this page (NO_LCP in 11 of 13 baseline runs) although the page renders and Chromium's own PerformanceObserver reports an LCP; accepted only while an independent browser observation of the page finds a real LCP entry, visible content, no page error and no failed first-party request"
+      }
+    ]
+  }
+}

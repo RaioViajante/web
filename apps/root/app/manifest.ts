@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
-import { webManifest } from "@raioviajante/design/seo";
+import { webManifest } from "../../../seo/metadata";
+import { themeColor } from "@raioviajante/design/theme-color";
 
-export default function manifest(): MetadataRoute.Manifest {
-  return webManifest("RaioViajante");
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  return webManifest("RaioViajante", {
+    themeColor: await themeColor(),
+  });
 }

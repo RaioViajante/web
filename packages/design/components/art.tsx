@@ -25,7 +25,7 @@ const image = (asset: StaticAsset, width: number, height: number) => ({
 /** Intrinsic sizes of the exported files; `Art` scales them by CSS. */
 export const art = {
   avatar: image(avatar, 256, 256),
-  searchCharacter: image(searchCharacter, 640, 640),
+  searchCharacter: image(searchCharacter, 320, 320),
   searchHeadStatic: image(searchHeadStatic, 64, 64),
   searchNotFound: image(searchNotFound, 360, 360),
   notFound: image(notFound, 640, 829),

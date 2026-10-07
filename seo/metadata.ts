@@ -13,6 +13,17 @@ export function socialUrl(origin: string, path: string) {
   return new URL(`/og/${socialKey(path)}`, origin).href;
 }
 
+/**
+ * The search page is reachable and crawlable but not indexed: it is a form
+ * with about 35 words of prompt text before a query, near-identical on all four
+ * sites. It keeps one canonical (the bare path; `?q=` never changes it) and is
+ * left out of the sitemaps. It must not be blocked in robots.txt, or crawlers
+ * could not see the noindex.
+ */
+export function isSearchPath(path: string) {
+  return /^\/search\/?$/.test(path);
+}
+
 export function pageMetadata(origin: string, site: string, page: PageSeo) {
   const title = page.path === "/" ? page.title : `${page.title} — ${site}`;
   const images = [
@@ -22,6 +33,9 @@ export function pageMetadata(origin: string, site: string, page: PageSeo) {
     title: { absolute: title },
     description: page.description,
     alternates: { canonical: page.path },
+    ...(isSearchPath(page.path)
+      ? { robots: { index: false, follow: true } }
+      : {}),
     openGraph: {
       type: "website" as const,
       siteName: site,
@@ -52,9 +66,22 @@ const xml = (value: string) =>
       })[char]!,
   );
 
-export function sitemapResponse(origin: string, paths: string[]) {
+export interface SitemapEntry {
+  path: string;
+  /** Only a real content date (`YYYY-MM-DD`); never a build time. */
+  lastmod?: string;
+}
+
+export function sitemapResponse(
+  origin: string,
+  entries: Array<string | SitemapEntry>,
+) {
+  // Never list pages that are not indexed: the search page and the 404 page.
+  const urls = entries
+    .map((entry) => (typeof entry === "string" ? { path: entry } : entry))
+    .filter(({ path }) => !isSearchPath(path) && !isNotFoundPath(path));
   return new Response(
-    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${paths.map((path) => `<url><loc>${xml(new URL(path, origin).href)}</loc></url>`).join("")}</urlset>`,
+    `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(({ path, lastmod }) => `<url><loc>${xml(new URL(path, origin).href)}</loc>${lastmod ? `<lastmod>${xml(lastmod)}</lastmod>` : ""}</url>`).join("")}</urlset>`,
     { headers: { "Content-Type": "application/xml; charset=utf-8" } },
   );
 }
@@ -84,13 +111,20 @@ export function notFoundMetadata(origin: string, site: string) {
   return { ...metadata, alternates: {} };
 }
 
-/** Web app manifest: every site serves the same generated icon set. */
-export function webManifest(name: string) {
+/**
+ * Web app manifest: every site serves the same generated icon set. It names
+ * the site and its icons and colors only. The sites have no service worker or
+ * offline mode, so `display` stays `browser` rather than claiming an app shell.
+ */
+export function webManifest(name: string, colors?: { themeColor: string }) {
   return {
     name,
     short_name: name,
     start_url: "/",
-    display: "standalone" as const,
+    display: "browser" as const,
+    ...(colors
+      ? { theme_color: colors.themeColor, background_color: colors.themeColor }
+      : {}),
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { src: "/icon.png", sizes: "512x512", type: "image/png" },

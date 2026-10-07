@@ -1,10 +1,11 @@
+import { siteOrigins } from "../../../../site/sites";
 import type { SearchEntry } from "@raioviajante/design/search";
 import { projects } from "../../lib/projects";
 
 export const dynamic = "force-static";
 
 export function GET() {
-  const base = "https://raioviajante.com";
+  const base = siteOrigins.root;
   const pages: SearchEntry[] = [
     ["index", "/", "Personal home and latest writing"],
     ["about", "/about", "About RaioViajante"],

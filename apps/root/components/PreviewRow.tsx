@@ -9,6 +9,7 @@ export function PreviewRow({
   note,
   description,
   meta,
+  rel,
 }: {
   id: string;
   label: string;
@@ -16,6 +17,7 @@ export function PreviewRow({
   note: string;
   description: string;
   meta?: string;
+  rel?: string;
 }) {
   return (
     <div className="preview-row">
@@ -25,6 +27,7 @@ export function PreviewRow({
         href={href}
         describedBy={id}
         linkComponent={Link}
+        rel={rel}
       />
       <div className="row-preview" id={id} role="tooltip">
         <p>{description}</p>

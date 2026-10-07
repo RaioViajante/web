@@ -82,13 +82,35 @@ describe("preference", () => {
     expect(parsePreference("a=b; rv-sound=off; c=d")).toBe(false);
   });
 
-  it("migrates the legacy localStorage value once", () => {
+  it("honors a legacy localStorage value without writing anything", () => {
     const { env, state } = fakeEnvironment({ legacy: "on" });
     expect(readPreference(env)).toBe(true);
-    expect(state.legacy).toBeNull();
-    expect(state.written).toHaveLength(1);
     expect(readPreference(env)).toBe(true);
-    expect(state.written).toHaveLength(1);
+    expect(state.written).toEqual([]);
+    expect(state.cookie).toBe("");
+    expect(state.legacy).toBe("on");
+  });
+
+  it("an explicit toggle writes the cookie and retires the legacy value", () => {
+    const { env, state } = fakeEnvironment({ legacy: "on" });
+    writePreference(false, env);
+    expect(state.written).toEqual([
+      "rv-sound=off; Path=/; Max-Age=31536000; SameSite=Lax; Domain=.raioviajante.com; Secure",
+    ]);
+    expect(state.legacy).toBeNull();
+    expect(readPreference(env)).toBe(false);
+  });
+
+  it("keeps local development host-only when toggled", () => {
+    const { env, state } = fakeEnvironment({
+      hostname: "localhost",
+      protocol: "http:",
+    });
+    writePreference(true, env);
+    expect(state.written).toEqual([
+      "rv-sound=on; Path=/; Max-Age=31536000; SameSite=Lax",
+    ]);
+    expect(readPreference(env)).toBe(true);
   });
 
   it("prefers the cookie over legacy storage", () => {

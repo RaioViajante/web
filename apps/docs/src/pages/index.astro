@@ -3,6 +3,7 @@ import { LeaderRow, Section } from "@raioviajante/design/parts";
 import { DocsIndexHeader } from "../components/DocsIndexHeader";
 import DocsShell from "../layouts/DocsShell.astro";
 import { getPages, pathOf } from "../lib/docs";
+import { homeJsonLd } from "../lib/structured-data";
 
 const pages = (await getPages()).filter((entry) => !entry.data.sub);
 const guides = pages.filter((entry) => entry.data.group === "projects");
@@ -14,6 +15,7 @@ const standards = pages.filter((entry) => entry.data.group === "raioviajante");
 	description="Public technical documentation for projects and systems built under RaioViajante."
 	current="/"
 	fullTitle
+	jsonLd={homeJsonLd()}
 >
 	<DocsIndexHeader />
 

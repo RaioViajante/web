@@ -1,4 +1,5 @@
-import { act, render } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 
 import { Comments } from "@/components/Comments";
 
@@ -11,8 +12,14 @@ class MockIntersectionObserver {
   disconnect = jest.fn();
   unobserve = jest.fn();
 
-  constructor(callback: IntersectionObserverCallback) {
+  options?: IntersectionObserverInit;
+
+  constructor(
+    callback: IntersectionObserverCallback,
+    options?: IntersectionObserverInit,
+  ) {
     this.callback = callback;
+    this.options = options;
     MockIntersectionObserver.instances.push(this);
   }
 
@@ -44,6 +51,130 @@ describe("<Comments />", () => {
 
     expect(container.querySelector("div.comments")).toBeInTheDocument();
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
+  });
+
+  describe("returning from GitHub sign-in", () => {
+    afterEach(() => window.history.replaceState(null, "", "/"));
+
+    it("loads giscus immediately, once, when the URL carries ?giscus=", () => {
+      window.history.replaceState(null, "", "/posts/x?giscus=token");
+      render(<Comments />);
+      // No scroll or intersection needed.
+      expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
+      expect(screen.getByRole("status")).toHaveTextContent("Loading comments");
+      // A late intersection must not add a second script.
+      const observer = MockIntersectionObserver.instances.at(-1);
+      if (observer) act(() => observer.trigger(true));
+      expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
+    });
+
+    it("also loads without IntersectionObserver, with the configuration unchanged", () => {
+      delete (global as unknown as { IntersectionObserver?: unknown })
+        .IntersectionObserver;
+      window.history.replaceState(null, "", "/posts/x?giscus=token");
+      render(<Comments />);
+      const script = document.querySelector(SCRIPT_SELECTOR);
+      expect(script).toBeInTheDocument();
+      expect(script).toHaveAttribute("data-repo", "RaioViajante/web");
+      expect(script).toHaveAttribute("data-mapping", "pathname");
+    });
+
+    it("does not read, copy or change the token or the URL itself", () => {
+      window.history.replaceState(null, "", "/posts/x?giscus=token");
+      const setItem = jest.spyOn(Storage.prototype, "setItem");
+      render(<Comments />);
+      expect(window.location.search).toBe("?giscus=token");
+      expect(setItem).not.toHaveBeenCalled();
+      setItem.mockRestore();
+    });
+
+    it("keeps the lazy behaviour for ordinary visits and unrelated parameters", () => {
+      window.history.replaceState(null, "", "/posts/x?ref=feed");
+      render(<Comments />);
+      expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows a local status instead of contacting giscus", () => {
+    render(<Comments />);
+    expect(screen.getByRole("status")).toHaveTextContent(/when you scroll/);
+    expect(document.querySelector("iframe")).not.toBeInTheDocument();
+  });
+
+  it("observes with a 200px margin and loads the script only once", () => {
+    render(<Comments />);
+    const observer = MockIntersectionObserver.instances.at(-1)!;
+    expect(observer.options).toEqual({ rootMargin: "200px" });
+    intersectFirst();
+    intersectFirst();
+    expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
+    expect(screen.getByRole("status")).toHaveTextContent("Loading comments");
+    act(() => {
+      document.querySelector(SCRIPT_SELECTOR)!.dispatchEvent(new Event("load"));
+    });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("without IntersectionObserver waits for an explicit button press", () => {
+    delete (global as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver;
+    render(<Comments />);
+    expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
+    const button = screen.getByRole("button", { name: "Load comments" });
+    fireEvent.click(button);
+    fireEvent.click(button);
+    expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
+  });
+
+  it("hydrates without IntersectionObserver and offers the button", () => {
+    delete (global as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver;
+    const container = document.createElement("div");
+    container.innerHTML = renderToString(<Comments />);
+    document.body.appendChild(container);
+    render(<Comments />, { container, hydrate: true });
+    expect(screen.getByRole("button", { name: "Load comments" })).toBeVisible();
+    expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
+    container.remove();
+  });
+
+  it("keeps keyboard focus on the status text after Load comments", () => {
+    delete (global as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver;
+    render(<Comments />);
+    const button = screen.getByRole("button", { name: "Load comments" });
+    button.focus();
+    fireEvent.click(button);
+    expect(screen.getByRole("status")).toHaveFocus();
+  });
+
+  it("moves focus into the widget when a keyboard reader's load finishes", () => {
+    delete (global as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver;
+    render(<Comments />);
+    const button = screen.getByRole("button", { name: "Load comments" });
+    button.focus();
+    fireEvent.click(button);
+    const script = document.querySelector(SCRIPT_SELECTOR)!;
+    const frame = document.createElement("iframe");
+    script.parentElement!.appendChild(frame);
+    act(() => {
+      script.dispatchEvent(new Event("load"));
+    });
+    expect(frame).toHaveFocus();
+  });
+
+  it("reports a failed load and allows a retry", () => {
+    render(<Comments />);
+    intersectFirst();
+    act(() => {
+      document
+        .querySelector(SCRIPT_SELECTOR)!
+        .dispatchEvent(new Event("error"));
+    });
+    expect(screen.getByRole("status")).toHaveTextContent("could not be loaded");
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
   });
 
   it("defers loading giscus until the comments area nears the viewport", () => {
