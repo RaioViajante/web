@@ -12,6 +12,14 @@ const mono = localFont({
   src: "../../../packages/design/fonts/NotoSansMono-Latin-Variable.woff2",
   weight: "100 900",
   display: "optional",
+  adjustFontFallback: false,
+  fallback: [
+    "ui-monospace",
+    "SFMono-Regular",
+    "Menlo",
+    "Consolas",
+    "monospace",
+  ],
   variable: "--font-mono",
 });
 
