@@ -56,6 +56,6 @@ than waiting for the deadline.
 
 The RFC requires `Content-Type: text/plain; charset=utf-8`. Local previews
 return `text/plain; charset=UTF-8` from Next and `text/plain` without a charset
-from Astro preview; the Vercel production response has not been verified. After
-deployment, request each URL over HTTPS and confirm the header and body; add
-explicit header configuration only if the charset is missing.
+from Astro preview, so the Vercel response is what counts: the live check is
+part of [operations.md](operations.md). Add explicit header configuration only if
+a host ever serves it without the charset.

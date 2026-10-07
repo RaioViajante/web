@@ -125,14 +125,11 @@ page that really has no LCP. So:
   once (`next/font` in Root and Dump, an explicit link in Docs and Lab), no
   third-party font request, `font-display: optional`. Nothing was added.
 - **Images:** all responses are real images; none is empty. The largest are the
-  root gallery's character sheet (125 KB WebP) and the **search character**
-  (94 KB PNG, 640 px intrinsic, shown at 100 px, the LCP of every search page).
-  That is artwork: a smaller derivative would save about 70 KB per search visit,
-  but it needs a decision from you, so it is reported, not changed. This is an
-  optional future asset optimization (640 px source for a slot of about 100 px),
-  not a blocker for anything.
+  root gallery's character sheet (125 KB WebP) and the search character, the LCP
+  of every search page, now the 320 px derivative described in
+  [Search illustration](#search-illustration).
 - No genuine performance defect was found, so no performance fix was made.
 
-Relationship to Phase 10A: `pnpm browser:check` owns accessibility correctness
-(axe, keyboard, focus); Lighthouse's accessibility score here is only a floor
-that must not drop. Link and resource integrity is `links.md`.
+Relationship to `browser-checks.md`: `pnpm browser:check` owns accessibility
+correctness (axe, keyboard, focus); Lighthouse's accessibility score here is only
+a floor that must not drop. Link and resource integrity is `links.md`.

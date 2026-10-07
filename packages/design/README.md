@@ -5,8 +5,8 @@ styles, artwork, sound, soft blocks and the React components that build the
 shared frame. Private, no build step; apps import the source.
 
 Rules and the full spec: [docs/design-system.md](../../docs/design-system.md)
-and [docs/blocks.md](../../docs/blocks.md). Migration status:
-[docs/design-migration-plan.md](../../docs/design-migration-plan.md).
+and [docs/blocks.md](../../docs/blocks.md). The finished migration is recorded
+in [docs/design-migration-plan.md](../../docs/design-migration-plan.md).
 
 ## Layout
 
@@ -14,12 +14,13 @@ and [docs/blocks.md](../../docs/blocks.md). Migration status:
 styles/      tokens.css, base.css, blocks.css, search.css (styles.css imports them);
              fonts.css for Astro
 fonts/       Noto Sans Mono: Latin variable WOFF2 for pages, TTF weights for social cards
-assets/      character/, stickers/, search/ (search/head/ frames + sprite), gallery/
+assets/      character/, stickers/, search/ (search/head/ static head, source/), gallery/, icons/
 sound/       Web Audio synthesis, sound map, shared preference, player
 blocks/      Shiki theme, highlighting, markup builder, rehype/remark plugins, client behavior
 components/  Shell, page parts, soft blocks, lab bench, legal and 404 templates
 behavior.ts  one client script: sound, blocks, search, scroll, avatar, 404 path
-seo.ts       metadata, sitemap and robots conventions; social-image.tsx renders cards
+social-image.tsx  renders the social cards (metadata conventions live in the
+             repository's `seo/`)
 ```
 
 ## Use
@@ -63,6 +64,7 @@ pnpm --filter @raioviajante/design test
 
 ## Deployment
 
-An app that consumes this package needs `../../packages/design` in the
-`ignoreCommand` of its `vercel.json`. See
-[docs/deployment.md](../../docs/deployment.md).
+Every app's Ignored Build Step (`security/vercel-ignore.mjs`) watches
+`packages/design`, so a change here rebuilds all four apps. A new app gets the
+same `ignoreCommand` in its `vercel.json`; see
+[docs/deployment.md](../../docs/deployment.md#ignored-build-step).

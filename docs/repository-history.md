@@ -29,10 +29,11 @@ Commit SHAs are different from the originals, because the tree paths changed.
 
 Before the monorepo, each app had its own lockfile and package manager: dump
 used npm, root used pnpm 12.4.1, and docs and lab were built with pnpm 10 on
-Vercel. The pnpm workspace replaced them with one root lockfile; all four apps
-now build with pnpm 12.4.1. Merging the per-app lockfiles reconciled a few
+Vercel. The pnpm workspace replaced them with one root lockfile, and all four
+apps then built with pnpm 12.4.1. Merging the per-app lockfiles reconciled a few
 transitive dependency versions, recorded in the `chore: establish pnpm
-workspace` commit.
+workspace` commit. The workspace has since moved to pnpm 12.8.1, pinned in the
+root `package.json`.
 
 ## Historical references
 
@@ -41,7 +42,6 @@ original `RaioViajante/dump` issue tracker, not to issues in this repository.
 
 ## Original repositories
 
-The original repositories remain available. root, docs, and lab are archived;
-dump remains active while the new comments flow is verified in production.
-The current dump source configuration targets GitHub Discussions on
-`RaioViajante/web`.
+The original repositories remain available and are all archived; dump, kept
+active for a while after the import, was the last. Dump's comments now use
+GitHub Discussions on `RaioViajante/web`.

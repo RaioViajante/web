@@ -52,7 +52,7 @@ It reuses servers already listening on the usual local ports and otherwise
 starts the built apps with `security/local-servers.mjs`, stopping the ones it
 started. A missing build exits with a message naming the app. The suite takes a
 few minutes (about 3.5 for the pages, 1 for the interactions). Locally there are
-no retries, so a flaky result is visible; CI can decide later.
+no retries, so a flaky result is visible; CI runs it the same way.
 
 Failures name app, route, viewport and cause, for example
 `[docs] /projects/sweep/cli/ [390px]: horizontal document overflow:
@@ -64,5 +64,5 @@ written to `e2e/.results/` (ignored by git); no video is recorded.
 Chromium only. The config has one project, so adding Firefox or WebKit later is
 a config change. The Firefox WebDriver checks in `security/` and `seo/` remain
 as they are. Lighthouse and performance budgets and link and resource checking
-are `performance.md` and `links.md`. Not here: CI wiring, caching browser binaries and retries
-(Phase 10C).
+are `performance.md` and `links.md`. How CI installs the browser and runs this
+check is in `ci.md`.

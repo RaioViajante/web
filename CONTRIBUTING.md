@@ -26,8 +26,8 @@ Run what is relevant, and say in the pull request what you ran.
 
 - **Documentation or content only:** `pnpm format:check`, and `pnpm links:check`
   after `pnpm build` when you touched links.
-- **Code in one app:** that app's own scripts (which apps have which is in
-  [docs/development.md](docs/development.md)), for example
+- **Code in one app:** that app's own scripts (which packages have which is in
+  [AGENTS.md](AGENTS.md#validation-and-git)), for example
   `pnpm --filter @raioviajante/dump test`.
 - **Shared code (`packages/design`, `site/`, `seo/`, `security/`) or
   workspace/dependency changes:**

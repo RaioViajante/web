@@ -122,8 +122,9 @@ that the CSP reports no violation. A real sign-in, posting and populated
 discussions were not tested.
 
 Not inspected: cookies or storage that giscus.app or GitHub set inside their own
-frame, and their retention. Those are controlled by giscus and GitHub. The live
-production site was not tested.
+frame, and their retention. Those are controlled by giscus and GitHub. This
+inventory was taken from local production builds; checks of the live sites are
+recorded in [operations.md](operations.md).
 
 ## Updating
 

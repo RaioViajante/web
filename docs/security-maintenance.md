@@ -49,8 +49,9 @@ advisories. Re-evaluate when GitHub documents support for the pnpm version in us
 What Dependabot reads for the actions: its default for `/` is `.github/workflows`
 plus an `action.yml` at the repository root, not `.github/actions/*`. The second
 entry, `/.github/actions/*`, relies on the documented glob support of
-`directories` to reach the composite action. That the glob finds it is not
-confirmed until Dependabot's first run.
+`directories` to reach the composite action. Dependabot's first run
+(2026-10-07) updated the `/.github/actions/setup` directory, so the glob reaches
+it.
 
 `dependabot.yml` is **version** updates. Dependabot **security updates** and
 alerts are separate GitHub settings. Current, intentional state: Dependabot
@@ -66,11 +67,11 @@ one workflow with write access, `security-events: write` to upload results, plus
 GitHub's template adds `packages: read` and `actions: read` for private or
 internal repositories only. It runs on GitHub, not locally.
 
-**Prerequisite before relying on it:** an advanced workflow and GitHub's CodeQL
-_default setup_ are alternatives (GitHub's switch from default to advanced means
-disabling default setup). After the first push, in Settings > Advanced Security
-(Code security) > CodeQL analysis, confirm the repository uses this workflow, not
-default setup, and disable default setup if it is on.
+**The setting it relies on:** an advanced workflow and GitHub's CodeQL _default
+setup_ are alternatives (GitHub's switch from default to advanced means disabling
+default setup). Settings > Advanced Security (Code security) > CodeQL analysis
+must use this workflow, with default setup off; [operations.md](operations.md)
+records the current settings.
 
 Pull requests, as far as GitHub's documentation says:
 
@@ -87,9 +88,9 @@ Pull requests, as far as GitHub's documentation says:
   they get no extra access and no `pull_request_target`; their code is analysed
   once merged. If GitHub confirms the upload works for forks, drop the condition.
 
-CodeQL is **not** a required check yet. Require it only after its first run
-succeeds and uploads, its behaviour on these pull requests is understood, and the
-check name it actually emits is known; the name is not assumed here.
+CodeQL is **not** a required check. Making it one is a separate decision: only
+once its behaviour on these pull requests is understood and the check name it
+actually emits is known; the name is not assumed here.
 
 ## Scheduled maintenance
 
@@ -117,18 +118,19 @@ permissions, concurrency, timeouts, off-peak weekly schedules, no secrets, no
 event text in shell, checkout without persisted credentials, no audit
 suppression.
 
-## After the first push (manual, remote)
+## Repository settings (manual, remote)
 
-- Require the checks **`quality`** and **`dependency-audit`**; leave
-  `observational (non-blocking)` optional. Do **not** require CodeQL yet (see
-  above).
-- Check Settings > Advanced Security > CodeQL analysis: advanced workflow, not
+These live in GitHub, not in the repository. The intended configuration
+([operations.md](operations.md) records what has been checked):
+
+- The checks **`quality`** and **`dependency-audit`** are required;
+  `observational (non-blocking)` and CodeQL are not (see above).
+- Settings > Advanced Security > CodeQL analysis uses the advanced workflow, not
   default setup.
-- Keep Dependabot **alerts** enabled and Dependabot **security updates**
-  disabled (the intentional state), and secret scanning with push protection if
+- Dependabot **alerts** are enabled and Dependabot **security updates** disabled
+  (the intentional state), with secret scanning and push protection where
   available (Settings, Code security).
-- Check that Actions is enabled with default workflow permissions read-only, and
-  that Dependabot pull requests are merged with a merge commit (not squash).
-- Look at the first Dependabot run for the composite action.
-- The consolidated checklist, with the Vercel and live-host checks, is in
-  [operations.md](operations.md).
+- Actions is enabled with read-only default workflow permissions, and Dependabot
+  pull requests are merged with a merge commit (not squash).
+- The consolidated checklist and the current verification state, with the
+  Vercel and live-host checks, are in [operations.md](operations.md).
