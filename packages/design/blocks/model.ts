@@ -38,11 +38,53 @@ export interface BlockModel {
   notes: string[];
 }
 
-const MARKER = /\s*\[!(\d+)\]\s*$/;
+const isSpace = (char: string | undefined) =>
+  char !== undefined && /\s/.test(char);
+const isDigit = (char: string | undefined) =>
+  char !== undefined && char >= "0" && char <= "9";
+
+/** Drops the final newlines in one pass, with no backtracking. */
+export function stripTrailingNewlines(code: string) {
+  let end = code.length;
+  while (end > 0 && code.charCodeAt(end - 1) === 10) end--;
+  return code.slice(0, end);
+}
+
+/**
+ * Splits a trailing `[!n]` marker, and the space before it, off a line. It
+ * scans backwards from the end, so long runs of spaces cost nothing extra.
+ */
+export function splitMarker(text: string): { text: string; mark?: number } {
+  let end = text.length;
+  while (end > 0 && isSpace(text[end - 1])) end--;
+  if (text[end - 1] !== "]") return { text };
+  let digits = end - 2;
+  while (digits >= 0 && isDigit(text[digits])) digits--;
+  if (digits === end - 2) return { text };
+  if (digits < 1 || text[digits] !== "!" || text[digits - 1] !== "[")
+    return { text };
+  let start = digits - 1;
+  while (start > 0 && isSpace(text[start - 1])) start--;
+  return {
+    text: text.slice(0, start),
+    mark: Number(text.slice(digits + 1, end - 1)),
+  };
+}
+
+const TREE_GLYPHS = "│├└─";
+/** Splits leading tree glyphs and whitespace from the name that follows. */
+export function splitTreeBranch(text: string): [branch: string, name: string] {
+  let index = 0;
+  while (
+    index < text.length &&
+    (TREE_GLYPHS.includes(text[index]!) || isSpace(text[index]))
+  )
+    index++;
+  return [text.slice(0, index), text.slice(index)];
+}
 
 function terminalRows(code: string): BlockRow[] {
-  return code
-    .replace(/\n+$/, "")
+  return stripTrailingNewlines(code)
     .split("\n")
     .map((text) =>
       text.startsWith("$ ")
@@ -52,8 +94,7 @@ function terminalRows(code: string): BlockRow[] {
 }
 
 function diffRows(code: string): BlockRow[] {
-  return code
-    .replace(/\n+$/, "")
+  return stripTrailingNewlines(code)
     .split("\n")
     .map((text) => {
       const kind = text.startsWith("+")
@@ -69,13 +110,11 @@ function diffRows(code: string): BlockRow[] {
     });
 }
 
-const TREE_BRANCH = /^([│├└─\s]*)(.*)$/;
 function treeRows(code: string): BlockRow[] {
-  return code
-    .replace(/\n+$/, "")
+  return stripTrailingNewlines(code)
     .split("\n")
     .map((text) => {
-      const [, branch = "", name = ""] = text.match(TREE_BRANCH) ?? [];
+      const [branch, name] = splitTreeBranch(text);
       const tokens: Line = [];
       if (branch.trim()) tokens.push({ text: branch, cls: "punct" });
       else if (branch) tokens.push({ text: branch });
@@ -102,14 +141,12 @@ async function rowsFor(
   if (variant === "diff") return diffRows(code);
   if (variant === "tree") return treeRows(code);
   const marks = new Map<number, number>();
-  const source = code
-    .replace(/\n+$/, "")
+  const source = stripTrailingNewlines(code)
     .split("\n")
-    .map((text, index) => {
-      const match = text.match(MARKER);
-      if (!match) return text;
-      marks.set(index, Number(match[1]));
-      return text.replace(MARKER, "");
+    .map((line, index) => {
+      const { text, mark } = splitMarker(line);
+      if (mark !== undefined) marks.set(index, mark);
+      return text;
     })
     .join("\n");
   const lines = await highlightLines(source, lang);
