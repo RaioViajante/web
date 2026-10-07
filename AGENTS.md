@@ -15,6 +15,10 @@ explicit task instructions take precedence. `CLAUDE.md` mirrors this file.
 
 - Apps deploy independently and never import one another. Packages never import
   apps. Repository docs live in `docs/`; app maintenance docs in `apps/*/docs/`.
+- Beside the apps: `site/` (origins and contact constants, imports nothing),
+  `seo/` (metadata, sitemap, robots, manifest, JSON-LD) and `security/` (headers,
+  security.txt, verification) import `site/`, never an app; `packages/design`
+  may import `site/`. No re-export shims. See `docs/architecture.md`.
 - Use English for repository content, identifiers, comments, commits and GitHub
   metadata. Do not rewrite unrelated existing content just to enforce this.
 - Inspect relevant code and docs before editing. Preserve unrelated owner edits.
@@ -42,7 +46,9 @@ Read `docs/design-system.md` and `docs/blocks.md` for the implemented contract.
   license. Use `Art`/gallery static imports, meaningful alt text (empty for
   decorative images), explicit dimensions and lazy loading below the fold.
 - Site icons are generated from `assets/icons/source.png` with
-  `pnpm --filter @raioviajante/design icons`; never edit the app copies.
+  `pnpm --filter @raioviajante/design icons`; never edit the app copies. The
+  search illustration is derived from `assets/search/source/` with
+  `pnpm --filter @raioviajante/design search-art`.
 - The avatar belongs on index headers and social cards; the search character
   belongs on search, the 404 sticker on 404, and the empty-search sticker on
   empty results. Search heads are at least 28px. Other placements need a task.
@@ -60,15 +66,13 @@ Read `docs/design-system.md` and `docs/blocks.md` for the implemented contract.
   facts. Omit unknown facts and record them in the report. Preserve source
   placeholders in historical briefs. Document implemented and planned work honestly.
 
-## Migration sessions
+## Branches and staging
 
-Read the full brief, Status and next-session instructions in
-`docs/design-migration-plan.md`. Work on `feat/design-migration`; do not create
-another branch. The local design handoff is ignored and owner-managed: never
-stage, delete or modify it. Copy required artwork into the shared package.
-Stage explicit files/hunks; never `git add -A` or `git add .`.
-Commit coherent validated steps; never push, amend, rebase shared commits or
-force-push during migration. Preserve uncommitted playground edits.
+The design migration is complete; `docs/design-migration-plan.md` is a historical
+record, not instructions. Work on the branch the task names, and inspect the
+current Git state (branch, status, recent log) before changing anything. Stage
+explicit files or hunks; never `git add -A` or `git add .`. Preserve unrelated
+uncommitted edits, including playground edits.
 
 ## Validation and Git
 
@@ -87,7 +91,8 @@ NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate
 
 For UI changes, check desktop/mobile, keyboard, focus, overflow and relevant
 interactions. Report only checks actually run. Use Conventional Commits in
-English; review staged diffs and commit meaningful validated progress.
+English (CI checks them with commitlint; try `pnpm commits:check`); review
+staged diffs and commit meaningful validated progress.
 Never push without explicit authorization or rewrite imported history/tags
 (`import/root`, `import/dump`, `import/docs`, `import/lab`).
 
@@ -95,10 +100,10 @@ Never push without explicit authorization or rewrite imported history/tags
 
 - See `docs/deployment.md`: four Vercel projects, Root Directory `apps/<app>`.
   Each app's `vercel.json` holds its framework and Ignored Build Step
-  (`security/vercel-ignore.mjs`), which must watch `packages/design`. Dashboard settings, domains and
-  environment (docs `VERCEL_DEEP_CLONE=true`, dump `NEXT_PUBLIC_SITE_URL`) are
-  infrastructure; change them only when explicitly requested. Do not claim an
-  unverified rollout.
+  (`security/vercel-ignore.mjs`), which must keep watching the shared paths
+  listed there. Dashboard settings, domains and environment (dump
+  `NEXT_PUBLIC_SITE_URL`) are infrastructure; change them only when explicitly
+  requested. Do not claim an unverified rollout. See `docs/operations.md`.
 - Never edit generated `node_modules/`, `.next/`, `dist/`, `.astro/`, coverage,
   `*.tsbuildinfo` or framework-generated `next-env.d.ts` by hand.
 - Root/docs/lab have app rules. Dump's framework-generated `AGENTS.md` and
