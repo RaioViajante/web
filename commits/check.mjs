@@ -71,7 +71,6 @@ function main() {
         from,
         "--to",
         to,
-        "--verbose",
       ],
       { stdio: "inherit" },
     ).status ?? 1
