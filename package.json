@@ -14,9 +14,11 @@
     "format:check": "pnpm -r --if-present format:check",
     "security:origins": "node security/verify-origins.mjs",
     "seo:check": "node --test seo/*.test.mjs",
+    "browser:check": "playwright test --config e2e/playwright.config.ts",
     "perf:check": "node perf/check.mjs",
     "perf:lighthouse": "node perf/check-lighthouse.mjs",
-    "browser:check": "playwright test --config e2e/playwright.config.ts",
+    "links:check": "node --test links/*.test.mjs && node links/check.mjs",
+    "links:external": "node links/check.mjs --external",
     "seo:verify": "node seo/verify-metadata.mjs",
     "security:check": "node --test security/*.test.mjs && node security/sync-vercel.mjs --check",
     "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm security:check && pnpm seo:check"

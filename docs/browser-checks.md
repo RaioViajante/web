@@ -63,6 +63,6 @@ written to `e2e/.results/` (ignored by git); no video is recorded.
 
 Chromium only. The config has one project, so adding Firefox or WebKit later is
 a config change. The Firefox WebDriver checks in `security/` and `seo/` remain
-as they are. Not here: Lighthouse and performance budgets, link and media
-checking (Phase 10B), and CI wiring, caching browser binaries and retries
+as they are. Lighthouse and performance budgets and link and resource checking
+are `performance.md` and `links.md`. Not here: CI wiring, caching browser binaries and retries
 (Phase 10C).
