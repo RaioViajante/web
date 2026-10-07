@@ -41,19 +41,19 @@
     },
     "root/search": {
       "baseline": {
-        "total": 320930,
+        "total": 260450,
         "script": 156529,
         "stylesheet": 9203,
         "font": 33835,
-        "image": 109198,
+        "image": 48693,
         "requests": 13
       },
       "max": {
-        "total": 373760,
+        "total": 304128,
         "script": 184320,
         "stylesheet": 15360,
         "font": 43008,
-        "image": 130048,
+        "image": 60416,
         "requests": 16
       }
     },
@@ -95,19 +95,19 @@
     },
     "dump/search": {
       "baseline": {
-        "total": 413742,
+        "total": 353274,
         "script": 152801,
         "stylesheet": 7800,
         "font": 33302,
-        "image": 108132,
+        "image": 47627,
         "requests": 13
       },
       "max": {
-        "total": 480256,
+        "total": 410624,
         "script": 180224,
         "stylesheet": 13312,
         "font": 43008,
-        "image": 129024,
+        "image": 59392,
         "requests": 16
       }
     },
@@ -149,19 +149,19 @@
     },
     "docs/search": {
       "baseline": {
-        "total": 164787,
+        "total": 104312,
         "script": 7106,
         "stylesheet": 7292,
         "font": 33251,
-        "image": 107924,
+        "image": 47420,
         "requests": 7
       },
       "max": {
-        "total": 194560,
+        "total": 124928,
         "script": 12288,
         "stylesheet": 13312,
         "font": 43008,
-        "image": 129024,
+        "image": 59392,
         "requests": 10
       }
     },
@@ -239,19 +239,19 @@
     },
     "lab/search": {
       "baseline": {
-        "total": 162946,
+        "total": 102471,
         "script": 8743,
         "stylesheet": 7554,
         "font": 33315,
-        "image": 108052,
+        "image": 47548,
         "requests": 8
       },
       "max": {
-        "total": 191488,
+        "total": 122880,
         "script": 14336,
         "stylesheet": 13312,
         "font": 43008,
-        "image": 129024,
+        "image": 59392,
         "requests": 11
       }
     }

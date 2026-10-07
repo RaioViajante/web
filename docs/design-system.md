@@ -40,7 +40,7 @@ Everything below that appears on more than one page or site is **one shared impl
 | file                                            | where                                                                         |
 | ----------------------------------------------- | ----------------------------------------------------------------------------- |
 | `character/avatar.png`                          | index headers and social cards                                                |
-| `search/search-character.png`                   | search page, full pose next to the bubble (150px)                             |
+| `search/search-character.png`                   | search page, full pose next to the bubble (150px; 100px on phones). A 320px derivative of `search/source/search-character.png` made by `pnpm --filter @raioviajante/design search-art` |
 | `search/head/static.png`                        | search menu item (30px) and "ask RaioViajante" rows (34px) — never below 28px |
 | `character/avatar-frames/frame-01…10.png`       | index avatar animation (224px, shown at 112px), via `components/avatar.ts`    |
 | `search/not-found.png`                          | empty search (180px)                                                          |

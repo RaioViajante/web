@@ -37,7 +37,7 @@ and rendered per request (nonce CSP); Docs and Lab are static Astro.
   four `/search` pages at 69: they are `noindex` on purpose (see `seo.md`), so
   Lighthouse's "blocked from indexing" audit fails by design.
 - CLS 0 and TBT under 40 ms on every page. Mobile LCP is 1.2-3.0 s in the
-  simulation, highest on pages whose LCP is the 94 KB search-character image or
+  simulation, highest on pages whose LCP is the 36 KB search-character image or
   the gallery sheet; the unthrottled browser reports 0.1-0.2 s.
 - Scores that dip below 100 are simulated-throttling variance (root gallery
   mobile ranged 95-100 over three runs with the same bytes).
@@ -63,6 +63,18 @@ the same framework with no extra chunk. Nothing unexpectedly large is pulled in.
 This is measured from the browser's own network events (`perf/weight.mjs`), not
 from source sizes. Docs and Lab ship 7-11 KB of script because they are static
 Astro pages without a framework runtime.
+
+## Search illustration
+
+The search page showed a 640px, 94 KB PNG in a 150px slot (100px on phones),
+and nothing else uses it. Since 2026-10-07 the page serves a 320px derivative
+(36 KB; 2x on desktop and 3x on phones) generated from the untouched source in
+`packages/design/assets/search/source/` by
+`pnpm --filter @raioviajante/design search-art`. A test checks its size and that
+it still matches the source, and the four `*/search` baselines in
+`perf/budgets.json` dropped by about 60 KB of images and total transfer for that
+reason. A 3x desktop display would show it upscaled to 150px of a 320px file;
+that is rare and was judged not worth the bytes. Other artwork is unchanged.
 
 ## Budgets (`perf/budgets.json`)
 

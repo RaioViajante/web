@@ -59,7 +59,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "playground": "vite playground --open",
-    "icons": "node scripts/icons.mjs"
+    "icons": "node scripts/icons.mjs",
+    "search-art": "node scripts/search-art.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0",
