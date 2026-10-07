@@ -13,11 +13,11 @@ src/
     surfaces/     static React bench markup and Astro browser scripts
   data/           experiments.ts and verified boot-sector source excerpts
   layouts/        BaseLayout.astro, ExperimentLayout.astro
-  lib/            pure filename and execution logic, title convention
+  lib/            pure filename and execution logic, filter count, title convention
   pages/          index, search, search-index.json, terms, privacy, 404
     experiments/  [slug].astro — three static experiment routes
   styles/         lab.css — index and experiment-specific layout
- tests/            Node unit tests for classifier and lifecycle rules
+ tests/            Node unit tests for classifier, lifecycle rules and filter count
 ```
 
 `BaseLayout.astro` owns metadata (the shared `SeoHead`, fed by `src/lib/seo.ts`,

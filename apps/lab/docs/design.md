@@ -52,5 +52,6 @@ use reject. Preference is the shared `rv-sound` cookie; nothing plays on load.
 
 Public legal pages omit an update date, log retention, analytics assertions,
 quoting/artwork permissions, snippet licensing and governing law until those
-facts are confirmed. Source links are omitted for Orbit while its repository
-is not public. The migration plan records omissions and reference differences.
+facts are confirmed. Every experiment's project repository is public, so each
+renders a source link. The migration plan records omissions and reference
+differences.

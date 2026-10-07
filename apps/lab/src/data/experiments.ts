@@ -55,6 +55,7 @@ export const experiments: Experiment[] = [
     revision: "cd97666",
     fidelity: "simulated",
     created: "2026-09-13",
+    source: "https://github.com/RaioViajante/orbit",
     what: "Which operations does each state accept, and what does a rejected one look like? An interactive representation of Orbit’s current Execution domain rules. State changes happen in this browser example: no commands run, and there is no scheduler behind the page.",
     notes:
       "Based on Orbit revision cd97666. Timestamps are browser-generated sample values, with no persistence. Retry and timeout settings are configuration only.",

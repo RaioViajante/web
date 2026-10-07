@@ -13,6 +13,8 @@ import { origin } from "../lib/seo";
   <LabIndex />
 </BaseLayout>
 <script>
+  import { experimentCount } from "../lib/experiment-count";
+
   const buttons = document.querySelectorAll<HTMLButtonElement>("[data-filter]");
   buttons.forEach((button) =>
     button.addEventListener("click", () => {
@@ -29,7 +31,7 @@ import { origin } from "../lib/seo";
           if (!item.hidden) count++;
         });
       document.querySelector("[data-filter-result]")!.textContent =
-        `${count} ${count === 1 ? "experiment" : "experiments"}`;
+        experimentCount(count);
     }),
   );
 </script>
