@@ -9,9 +9,9 @@ export function scriptOpenTags(html) {
 
 /** Attribute text and body of every closed <script> element. */
 export function scriptElements(html) {
-  return [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)].map(
-    (m) => ({ attributes: m[1], body: m[2] }),
-  );
+  return [
+    ...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\b[^>]*>/gi),
+  ].map((m) => ({ attributes: m[1], body: m[2] }));
 }
 
 /** Whether the attributes mark a JSON-LD block, which the browser never executes. */

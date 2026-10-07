@@ -12,6 +12,14 @@ test("script tags are found whatever their casing", () => {
   );
 });
 
+test("an end tag may carry whitespace or attributes and still ends the script", () => {
+  const html = "<script>a</script\t\n bar><script>b</script >";
+  assert.deepEqual(
+    scriptElements(html).map((s) => s.body),
+    ["a", "b"],
+  );
+});
+
 test("a script with attributes keeps them, and similar tags are not scripts", () => {
   const html =
     '<script async src="/a.js"></script><scripts></scripts><noscript></noscript>';
