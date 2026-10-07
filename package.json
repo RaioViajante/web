@@ -17,5 +17,9 @@
     "seo:verify": "node seo/verify-metadata.mjs",
     "security:check": "node --test security/*.test.mjs && node security/sync-vercel.mjs --check",
     "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm security:check && pnpm seo:check"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0"
   }
 }
