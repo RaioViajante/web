@@ -18,6 +18,8 @@ export function DocsFrame({
 }) {
 	return (
 		<Shell
+			termsHref="/terms/"
+			privacyHref="/privacy/"
 			site="docs"
 			pages={pages}
 			currentPage={current}

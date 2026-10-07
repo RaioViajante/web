@@ -73,7 +73,7 @@ export function ExperimentRelated({
           {
             title: "Sweep · classification",
             site: "docs" as const,
-            href: "https://docs.raioviajante.com/projects/sweep/#classification",
+            href: "https://docs.raioviajante.com/projects/sweep/#012classification",
           },
           {
             title: "Apparently Moving a File Has Edge Cases",
