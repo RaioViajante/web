@@ -69,7 +69,7 @@ The page is gray. Color appears only inside code and bench output, where it iden
   --syn-function: #8fb8d6;
   --syn-string: #a8c791;
   --syn-number: #de9f8c;
-  --syn-comment: #7b818a;
+  --syn-comment: #9aa3af;
 }
 ```
 
