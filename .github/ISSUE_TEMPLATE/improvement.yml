@@ -1,0 +1,28 @@
+name: Feature or improvement
+description: Suggest a change to a site, the design system or the tooling.
+body:
+  - type: dropdown
+    id: site
+    attributes:
+      label: Where
+      options:
+        - raioviajante.com (root)
+        - dump.raioviajante.com
+        - docs.raioviajante.com
+        - lab.raioviajante.com
+        - Shared design or tooling
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem or motivation
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What you would like to see
+    validations:
+      required: true

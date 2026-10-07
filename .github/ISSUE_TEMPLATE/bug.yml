@@ -1,0 +1,44 @@
+name: Bug report
+description: Something on one of the sites or in the tooling does not work as expected.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report security vulnerabilities here. Email mail@raioviajante.com instead; see SECURITY.md.
+  - type: dropdown
+    id: site
+    attributes:
+      label: Where
+      options:
+        - raioviajante.com (root)
+        - dump.raioviajante.com
+        - docs.raioviajante.com
+        - lab.raioviajante.com
+        - Shared design or tooling
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to reproduce
+      description: A URL, steps, or a command.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      description: Optional, for display or interaction problems.
