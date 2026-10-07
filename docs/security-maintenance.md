@@ -39,11 +39,18 @@ the local composite action. The pins are full SHAs with a `# vX.Y.Z` comment and
 Dependabot rewrites both; minor and patch updates share one pull request, majors
 stay separate, at most five open, no auto-merge, labels or reviewers.
 
-The **npm/pnpm ecosystem is not configured**, on purpose: GitHub documents
-Dependabot support for pnpm 7 to 10, and this repository uses pnpm 12 with a
-`pnpm-workspace.yaml` holding overrides and `minimumReleaseAge` (which has made
-Dependabot pull requests fail in pnpm 11 projects). Add it only after checking a
-real Dependabot run against the lockfile, or move to Renovate; it needs a decision.
+**Package (pnpm) version updates are intentionally not automated.** This
+repository uses pnpm 12.8.1, and GitHub currently documents Dependabot pnpm
+support only through v10, so no unsupported npm configuration, downgrade or other
+updater is used. Dependency versions are reviewed by hand; this is not a security
+gap: `pnpm audit:check` (every pull request, push and week) is what watches for
+advisories. Re-evaluate when GitHub documents support for the pnpm version in use.
+
+What Dependabot reads for the actions: its default for `/` is `.github/workflows`
+plus an `action.yml` at the repository root, not `.github/actions/*`. The second
+entry, `/.github/actions/*`, relies on the documented glob support of
+`directories` to reach the composite action. That the glob finds it is not
+confirmed until Dependabot's first run.
 
 `dependabot.yml` is **version** updates. Dependabot **security updates** and
 alerts are separate GitHub settings; see "Manual after push".
@@ -56,10 +63,33 @@ requests, pushes to `main`, weekly (Wednesday 04:37 UTC) and manually. It is the
 one workflow with write access, `security-events: write` to upload results, plus
 `contents: read`; the CI workflow stays read-only and a test enforces both.
 GitHub's template adds `packages: read` and `actions: read` for private or
-internal repositories only. Pull requests from forks and from Dependabot get a
-read-only token, where the upload can fail with "Resource not accessible by
-integration"; that is GitHub's restriction and the permissions are not widened
-for it. Its first real run happens on GitHub; nothing was run locally.
+internal repositories only. Its first real run happens on GitHub; nothing was run
+locally.
+
+**Prerequisite before relying on it:** an advanced workflow and GitHub's CodeQL
+_default setup_ are alternatives (GitHub's switch from default to advanced means
+disabling default setup). After the first push, in Settings > Advanced Security
+(Code security) > CodeQL analysis, confirm the repository uses this workflow, not
+default setup, and disable default setup if it is on.
+
+Pull requests, as far as GitHub's documentation says:
+
+- **Same-repository pull requests** run, with the job's `security-events: write`.
+- **Dependabot pull requests** are same-repository and use the `pull_request`
+  event, for which GitHub says code scanning always accepts the upload even though
+  Dependabot's token is read-only. The documented trap is a Dependabot change
+  _merged by squash_: the resulting push to `main` runs read-only and the upload
+  fails; merge Dependabot pull requests with a merge commit or auto-merge as
+  GitHub recommends.
+- **External fork pull requests** are skipped by a job-level condition
+  (`head.repo.full_name == github.repository`). They have a read-only token and
+  the documentation I found does not say the upload is accepted for them, so
+  they get no extra access and no `pull_request_target`; their code is analysed
+  once merged. If GitHub confirms the upload works for forks, drop the condition.
+
+CodeQL is **not** a required check yet. Require it only after its first run
+succeeds and uploads, its behaviour on these pull requests is understood, and the
+check name it actually emits is known; the name is not assumed here.
 
 ## Scheduled maintenance
 
@@ -90,11 +120,13 @@ suppression.
 ## After the first push (manual, remote)
 
 - Require the checks **`quality`** and **`dependency-audit`**; leave
-  `observational (non-blocking)` optional. Decide whether to require the CodeQL
-  check (`analyze (javascript-typescript)`) after seeing its first runs, including
-  how it behaves on Dependabot and fork pull requests.
+  `observational (non-blocking)` optional. Do **not** require CodeQL yet (see
+  above).
+- Check Settings > Advanced Security > CodeQL analysis: advanced workflow, not
+  default setup.
 - Enable Dependabot **security updates** and alerts, and secret scanning with push
   protection if available (Settings, Code security).
-- Check that Actions is enabled with default workflow permissions read-only.
-- Decide the pnpm Dependabot question above.
+- Check that Actions is enabled with default workflow permissions read-only, and
+  that Dependabot pull requests are merged with a merge commit (not squash).
+- Look at the first Dependabot run for the composite action.
 - Developer-workflow polish such as commit hooks is Phase 11, not here.

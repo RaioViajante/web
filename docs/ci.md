@@ -122,5 +122,5 @@ and real timings.
 
 Mark the checks named **`quality`** and **`dependency-audit`** as required
 (branch protection or a ruleset).
-Leave `observational (non-blocking)` unrequired. The remaining manual settings
+Leave `observational (non-blocking)` and CodeQL unrequired for now. The remaining manual settings
 are listed in `security-maintenance.md`.
