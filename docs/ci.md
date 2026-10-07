@@ -72,6 +72,35 @@ a `::warning` annotation per check that did not succeed):
   `browser-actions/setup-firefox` installs 157.0.1 and the check reads it from
   `FIREFOX_BIN`. Bump it deliberately.
 
+## Commit messages
+
+`quality` checks that the commits an event introduces follow Conventional
+Commits, using commitlint (`commitlint.config.mjs`: the standard rules plus the
+`content` type the history uses for posts). The range comes from the event, passed
+through `env:` to `commits/check.mjs`:
+
+| Event               | Range checked                             |
+| ------------------- | ----------------------------------------- |
+| `pull_request`      | the PR's base commit to its head commit   |
+| push to `main`      | the push's `before` to its `after` commit |
+| `workflow_dispatch` | none: there is no range, so it is skipped |
+
+A push with no previous commit, or one whose previous commit is gone after a
+forced push, is skipped with a message rather than failing. Merge commits made
+by git or GitHub are ignored by commitlint's defaults. Older history that
+predates the convention is never checked.
+
+The `quality` checkout uses `fetch-depth: 0`. A shallow checkout would not
+contain the base commit, and a targeted fetch needs extra logic for forks; this
+repository is small enough that full history costs seconds. Fork pull requests
+work the same way, with no secrets and no privileged fetch, because the merge
+commit GitHub checks out already contains both parents.
+
+Locally, `pnpm commits:check` lints `origin/main..HEAD` (or pass
+`-- --from <ref> --to <ref>`), and `pnpm commits:test` runs the wrapper's tests,
+which are part of `pnpm validate`. `pnpm hooks:install` optionally enables
+`.githooks/commit-msg` for this clone only; CI is authoritative either way.
+
 ## Action pinning
 
 Every external action, in the workflow and in the composite action, is pinned to

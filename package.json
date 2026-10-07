@@ -19,13 +19,19 @@
     "perf:check": "node perf/check.mjs",
     "perf:lighthouse": "node --test perf/*.test.mjs && node perf/check-lighthouse.mjs",
     "links:check": "node --test links/*.test.mjs && node links/check.mjs",
+    "commits:check": "node commits/check.mjs",
+    "commits:test": "node --test commits/*.test.mjs",
+    "hooks:install": "git config core.hooksPath .githooks",
+    "hooks:uninstall": "git config --unset core.hooksPath",
     "links:external": "node links/check.mjs --external",
     "seo:verify": "node seo/verify-metadata.mjs",
     "security:check": "node --test security/*.test.mjs && node security/sync-vercel.mjs --check",
-    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm security:check && pnpm seo:check"
+    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm security:check && pnpm seo:check && pnpm commits:test"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
+    "@commitlint/cli": "21.2.3",
+    "@commitlint/config-conventional": "21.2.3",
     "@playwright/test": "1.63.0",
     "lighthouse": "13.5.0"
   }

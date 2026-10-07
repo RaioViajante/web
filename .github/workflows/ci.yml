@@ -39,6 +39,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # The commit-message check needs the PR or push range; this
+          # repository is small enough that full history is the simplest
+          # reliable choice, and it works for forks without extra fetches.
+          fetch-depth: 0
 
       - name: Reject npm and yarn lockfiles
         run: |
@@ -52,8 +56,19 @@ jobs:
       - id: setup
         uses: ./.github/actions/setup
 
+      # Only the commits this event introduces; manual runs have no range.
+      - name: Commit messages (Conventional Commits)
+        run: node commits/check.mjs
+        env:
+          COMMITS_EVENT: ${{ github.event_name }}
+          COMMITS_BASE: ${{ github.event.pull_request.base.sha }}
+          COMMITS_HEAD: ${{ github.event.pull_request.head.sha }}
+          COMMITS_BEFORE: ${{ github.event.before }}
+          COMMITS_AFTER: ${{ github.sha }}
+
       # format:check, lint, typecheck, test, build, security:check (headers,
-      # security.txt, storage and origin policy, workflow policy) and seo:check.
+      # security.txt, storage and origin policy, workflow policy), seo:check and
+      # the commit-message tooling tests.
       - name: Validate
         run: pnpm validate
 
