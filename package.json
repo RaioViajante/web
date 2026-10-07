@@ -14,6 +14,8 @@
     "format:check": "pnpm -r --if-present format:check",
     "security:origins": "node security/verify-origins.mjs",
     "seo:check": "node --test seo/*.test.mjs",
+    "perf:check": "node perf/check.mjs",
+    "perf:lighthouse": "node perf/check-lighthouse.mjs",
     "browser:check": "playwright test --config e2e/playwright.config.ts",
     "seo:verify": "node seo/verify-metadata.mjs",
     "security:check": "node --test security/*.test.mjs && node security/sync-vercel.mjs --check",
