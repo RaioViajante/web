@@ -17,6 +17,9 @@ export interface FenceMeta {
   notes: string[];
 }
 
+/** A range expands to at most this many lines, whatever its endpoints say. */
+const MAX_RANGE_LINES = 1000;
+
 export function parseHighlightRanges(spec: string) {
   const lines = new Set<number>();
   for (const part of spec.split(",")) {
@@ -24,12 +27,17 @@ export function parseHighlightRanges(spec: string) {
     if (
       from === undefined ||
       to === undefined ||
-      !Number.isInteger(from) ||
-      !Number.isInteger(to) ||
+      !Number.isSafeInteger(from) ||
+      !Number.isSafeInteger(to) ||
       from < 1
     )
       continue;
-    for (let line = from; line <= to && line - from < 1000; line++)
+    // Counted, not compared: beyond 2^53 `line++` stops changing the number.
+    for (
+      let line = from, count = 0;
+      line <= to && count < MAX_RANGE_LINES && Number.isSafeInteger(line);
+      line++, count++
+    )
       lines.add(line);
   }
   return [...lines].sort((a, b) => a - b);

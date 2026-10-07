@@ -119,10 +119,23 @@ app dump page /posts/example (after comments trigger): unexpected frame host htt
 app root page /: unexpected origin https://tracker.example (document) https://tracker.example/p.gif
 ```
 
-The two giscus states need the public internet. Set
-`ORIGINS_SKIP_THIRD_PARTY=1` to skip them (everything else, including the
-before-trigger requirement, still runs). Exit code 2 means Firefox or a build
-was missing and nothing was verified.
+The two giscus states need the public internet, so there are two modes:
+
+- **Full** (no variable; the observational job): the real external services are
+  contacted and observed.
+- **Deterministic** (`ORIGINS_SKIP_THIRD_PARTY=1`; the blocking check): the
+  network is controlled and nothing leaves the machine. BiDi interception answers
+  a request to a sibling's production origin from that sibling's local server,
+  lets loopback through, and fails every other request before it is sent. The
+  giscus states are skipped, and a short article that loads comments on arrival
+  has its giscus request blocked rather than made, whatever the page geometry.
+  Any other blocked origin fails the run. Firefox also gets a proxy that records
+  and refuses every connection it is handed, to catch what interception cannot
+  see; Mozilla, OpenH264 and Google update hosts are reported as browser-internal,
+  and any other host fails. Everything else, including the before-trigger
+  requirement, still runs.
+
+Exit code 2 means Firefox or a build was missing and nothing was verified.
 
 ## Limits
 

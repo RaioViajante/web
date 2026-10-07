@@ -1,10 +1,13 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { mkdtemp } from "node:fs/promises";
+import { mkdtemp, writeFile } from "node:fs/promises";
+import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { siteOrigins } from "../site/sites.ts";
 import {
   classify,
+  createFrameTracker,
   frameInternalOrigins,
   judge,
   sites,
@@ -12,7 +15,6 @@ import {
   violations,
 } from "./network-origins.ts";
 import { ports, startServers } from "./local-servers.mjs";
-import { includesOrigin } from "./url-match.mjs";
 
 // Runtime network-origin check. Not part of `pnpm validate`: it needs built
 // apps, local sockets and Firefox. Run `pnpm security:origins` after
@@ -25,6 +27,34 @@ const searchPath = {
   docs: "/search/",
   lab: "/search/",
 };
+// Deterministic mode (the blocking CI check) must not touch the internet. The
+// policy still sees the logical URLs; the network is controlled twice:
+//  - BiDi interception answers requests to a sibling's production origin from
+//    the matching local server and fails any other non-local request before it
+//    is sent (so a lazy trigger firing early cannot reach giscus);
+//  - Firefox is pointed at a trap proxy that records and refuses every
+//    connection it is handed, which catches anything BiDi cannot see.
+// The loopback (*.localhost, 127.0.0.1) is exempt from proxying.
+const deterministic = !!process.env.ORIGINS_SKIP_THIRD_PARTY;
+const siteByOrigin = new Map(
+  Object.entries(siteOrigins).map(([site, origin]) => [origin, site]),
+);
+const blockedExternal = new Map();
+const trapped = [];
+let trap;
+if (deterministic) {
+  trap = createServer((socket) => {
+    socket.once("data", (chunk) => {
+      trapped.push(chunk.toString("latin1").split("\r\n")[0].slice(0, 120));
+      socket.end("HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n");
+    });
+    socket.on("error", () => {});
+  });
+  await new Promise((resolve) => trap.listen(0, "127.0.0.1", resolve));
+}
+const isLoopback = (host) =>
+  host === "localhost" || host.endsWith(".localhost") || host === "127.0.0.1";
+
 const local = (site) => `http://${site}.localhost:${ports[site]}`;
 const ownOrigins = (site) => [local(site)];
 
@@ -42,6 +72,47 @@ if (!firefox) {
 const { stop: stopServers } = await startServers();
 
 const profile = await mkdtemp(join(tmpdir(), "rv-origins-"));
+if (deterministic) {
+  const { port } = trap.address();
+  const prefs = {
+    "network.proxy.type": 1,
+    "network.proxy.http": "127.0.0.1",
+    "network.proxy.http_port": port,
+    "network.proxy.ssl": "127.0.0.1",
+    "network.proxy.ssl_port": port,
+    "network.proxy.no_proxies_on": "localhost, 127.0.0.1, .localhost",
+    "network.proxy.allow_hijacking_localhost": false,
+    "app.update.auto": false,
+    "app.update.enabled": false,
+    "datareporting.healthreport.uploadEnabled": false,
+    "toolkit.telemetry.enabled": false,
+    "browser.safebrowsing.malware.enabled": false,
+    "browser.safebrowsing.phishing.enabled": false,
+    "network.captive-portal-service.enabled": false,
+    "network.connectivity-service.enabled": false,
+    "extensions.update.enabled": false,
+    "geo.enabled": false,
+    "services.settings.server": "http://127.0.0.1:1/v1",
+    "browser.region.network.url": "",
+    "browser.search.update": false,
+    "media.gmp-provider.enabled": false,
+    "media.gmp-manager.url": "",
+    "media.gmp-gmpopenh264.enabled": false,
+    "browser.safebrowsing.downloads.enabled": false,
+    "browser.safebrowsing.blockedURIs.enabled": false,
+    "browser.search.suggest.enabled": false,
+    "browser.urlbar.suggest.searches": false,
+  };
+  await writeFile(
+    join(profile, "user.js"),
+    Object.entries(prefs)
+      .map(
+        ([key, value]) =>
+          `user_pref(${JSON.stringify(key)}, ${JSON.stringify(value)});`,
+      )
+      .join("\n"),
+  );
+}
 const browser = spawn(
   firefox,
   [
@@ -77,20 +148,57 @@ let id = 0;
 const pending = new Map();
 let requests = [];
 let top;
-const frameHosts = new Map();
+let track;
+// Answers one intercepted request; see the comment on `deterministic`.
+async function control({ request: { request: requestId, url } }) {
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    parsed = null;
+  }
+  const origin = parsed?.origin;
+  const site = siteByOrigin.get(origin);
+  if (!parsed || ["data:", "blob:", "about:"].includes(parsed.protocol)) {
+    await send("network.continueRequest", { request: requestId });
+  } else if (isLoopback(parsed.hostname)) {
+    await send("network.continueRequest", { request: requestId });
+  } else if (site) {
+    const response = await fetch(
+      `http://127.0.0.1:${ports[site]}${parsed.pathname}${parsed.search}`,
+    );
+    const body = Buffer.from(await response.arrayBuffer());
+    const skip = new Set([
+      "content-encoding",
+      "content-length",
+      "transfer-encoding",
+      "connection",
+    ]);
+    await send("network.provideResponse", {
+      request: requestId,
+      statusCode: response.status,
+      reasonPhrase: response.statusText || "OK",
+      headers: [...response.headers]
+        .filter(([name]) => !skip.has(name))
+        .map(([name, value]) => ({ name, value: { type: "string", value } })),
+      body: { type: "base64", value: body.toString("base64") },
+    });
+  } else {
+    blockedExternal.set(origin, (blockedExternal.get(origin) ?? 0) + 1);
+    await send("network.failRequest", { request: requestId });
+  }
+}
 ws.onmessage = ({ data }) => {
   const message = JSON.parse(data);
   if (message.id && pending.has(message.id)) {
     pending.get(message.id)(message);
     pending.delete(message.id);
   } else if (message.method === "network.beforeRequestSent") {
-    const { context } = message.params;
-    const url = message.params.request.url;
-    const frame = context !== top;
-    // A frame's first request is its own document: that is the frame host.
-    if (frame && !frameHosts.has(context))
-      frameHosts.set(context, new URL(url).origin);
-    requests.push({ url, frame, frameHost: frameHosts.get(context) });
+    const { context, navigation, request } = message.params;
+    // A navigation request is a frame's document (first load, later
+    // navigation or redirect hop) and replaces that frame's host.
+    requests.push(track({ context, url: request.url, navigation }));
+    if (message.params.isBlocked) control(message.params);
   }
 };
 const send = (method, params = {}) =>
@@ -104,7 +212,10 @@ await send("session.new", {
   capabilities: { alwaysMatch: { webSocketUrl: true } },
 });
 await send("session.subscribe", { events: ["network.beforeRequestSent"] });
+if (deterministic)
+  await send("network.addIntercept", { phases: ["beforeRequestSent"] });
 top = (await send("browsingContext.getTree")).result.contexts[0].context;
+track = createFrameTracker(top);
 const evaluate = async (expression) =>
   (
     await send("script.evaluate", {
@@ -264,7 +375,7 @@ else {
       failures.push(
         `dump ${long}: giscus client.js was not requested exactly once`,
       );
-    if (!includesOrigin(frameHosts.values(), "https://giscus.app"))
+    if (!requests.some((r) => r.frame && r.frameHost === "https://giscus.app"))
       failures.push(
         `dump ${long}: no frame was served from https://giscus.app`,
       );
@@ -314,6 +425,42 @@ for (const [key, count] of [...origins].sort())
   console.log(`${key} (${count} requests)`);
 console.log(`${pages} sitemap pages, ${observed.length} requests inspected`);
 
+if (deterministic) {
+  // giscus.app is the one external origin a page may legitimately try (a
+  // short article loads comments on arrival); it is blocked, not contacted.
+  for (const [origin, count] of [...blockedExternal].sort()) {
+    console.log(`blocked before sending (deterministic) ${origin} (${count})`);
+    if (origin !== "https://giscus.app")
+      failures.push(
+        `deterministic mode: a page requested external origin ${origin}`,
+      );
+  }
+  // Page traffic never gets this far (it is intercepted above), so what the
+  // trap sees is the browser's own housekeeping, refused. Mozilla's hosts are
+  // reported (Mozilla, Cisco OpenH264, Google updater/safe-browsing); any other host means something bypassed the interception.
+  const attempts = new Map();
+  for (const line of trapped) {
+    const host = line.split(" ")[1] ?? line;
+    attempts.set(host, (attempts.get(host) ?? 0) + 1);
+  }
+  for (const [host, count] of [...attempts].sort()) {
+    const browserInternal =
+      /(^|\.)(mozilla\.(net|com|org)|firefox\.com|openh264\.org|gvt1\.com|googleapis\.com):443$/.test(
+        host,
+      ) || host === "www.google.com:443";
+    console.log(
+      `${browserInternal ? "refused browser-internal" : "REFUSED"} ${host} (${count})`,
+    );
+    if (!browserInternal)
+      failures.push(
+        `deterministic mode: Firefox tried to leave the machine: ${host}`,
+      );
+  }
+  console.log(
+    `deterministic mode: ${blockedExternal.size} external origin(s) blocked in the page, ${attempts.size} host(s) reached the trap proxy`,
+  );
+  trap.close();
+}
 ws.close();
 if (failures.length) {
   console.error(`\nFAILED:\n${failures.map((f) => `  - ${f}`).join("\n")}`);
