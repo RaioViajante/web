@@ -98,8 +98,14 @@ treats them as low value). `isSearchPath` in `seo/metadata.ts` is the
 one place that drives the robots meta, the sitemap exclusion and, through
 `seo/metadata-policy.ts`, the checks.
 
-404 pages are `noindex` and not in sitemaps (Next marks its own 404s, Astro's
-`404.html` carries `noindex, follow`).
+404 pages are `noindex` and not in sitemaps. Astro's `404.html` carries
+`noindex, follow`. Next documents injecting `noindex` on its 404 responses and
+does so for a page-level `notFound()`, but on Vercel an unmatched URL is served
+through the `/_not-found` route and arrived without it (observed live after the
+first production deploy). Root and Dump therefore also declare
+`robots: { index: false }` in the `not-found` metadata (`notFoundMetadata` in
+`seo/metadata.ts`). Where Next also injects its own tag the page carries two
+identical `noindex` tags, which is harmless. The status was always a real 404.
 
 ## Manifest
 

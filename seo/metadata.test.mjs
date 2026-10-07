@@ -3,6 +3,7 @@ import { existsSync } from "node:fs";
 import test from "node:test";
 import {
   isNotFoundPath,
+  notFoundMetadata,
   isSearchPath,
   pageMetadata,
   sitemapResponse,
@@ -13,7 +14,10 @@ import {
 test("social keys keep nested paths distinct and normalize trailing slashes", () => {
   assert.equal(socialKey("/"), "index.png");
   assert.equal(socialKey("/projects/sweep/"), "projects/sweep.png");
-  assert.notEqual(socialKey("/projects/sweep-cli"), socialKey("/projects/sweep/cli"));
+  assert.notEqual(
+    socialKey("/projects/sweep-cli"),
+    socialKey("/projects/sweep/cli"),
+  );
 });
 
 test("each page gets its own canonical, title and social image", () => {
@@ -24,7 +28,10 @@ test("each page gets its own canonical, title and social image", () => {
   });
   assert.deepEqual(value.title, { absolute: "Sweep — docs" });
   assert.equal(value.alternates.canonical, "/projects/sweep/");
-  assert.equal(value.openGraph.url, "https://docs.raioviajante.com/projects/sweep/");
+  assert.equal(
+    value.openGraph.url,
+    "https://docs.raioviajante.com/projects/sweep/",
+  );
   assert.deepEqual(value.twitter.images, value.openGraph.images);
   assert.equal(
     value.openGraph.images[0]?.url,
@@ -41,7 +48,9 @@ test("every way a host serves its 404 page is recognised", () => {
 });
 
 test("sitemaps escape URLs and only emit lastmod when known", async () => {
-  const escaped = await sitemapResponse("https://example.com", ["/a?b=1&c=2"]).text();
+  const escaped = await sitemapResponse("https://example.com", [
+    "/a?b=1&c=2",
+  ]).text();
   assert.ok(escaped.includes("b=1&amp;c=2"));
   assert.ok(!escaped.includes("lastmod"));
   const xml = await sitemapResponse("https://x.example", [
@@ -49,7 +58,9 @@ test("sitemaps escape URLs and only emit lastmod when known", async () => {
     { path: "/b", lastmod: "2026-09-07" },
   ]).text();
   assert.ok(xml.includes("<loc>https://x.example/a</loc></url>"));
-  assert.ok(xml.includes("<loc>https://x.example/b</loc><lastmod>2026-09-07</lastmod>"));
+  assert.ok(
+    xml.includes("<loc>https://x.example/b</loc><lastmod>2026-09-07</lastmod>"),
+  );
   assert.equal(xml.match(/<lastmod>/g)?.length, 1);
 });
 
@@ -64,7 +75,10 @@ test("the manifest names the site without claiming an app shell", () => {
 
 test("manifest icons are files the site actually serves", () => {
   for (const icon of webManifest("lab").icons) {
-    assert.ok(existsSync(new URL(`../apps/lab/public${icon.src}`, import.meta.url)), icon.src);
+    assert.ok(
+      existsSync(new URL(`../apps/lab/public${icon.src}`, import.meta.url)),
+      icon.src,
+    );
   }
 });
 
@@ -96,4 +110,16 @@ test("the search page is noindex, follow, keeps its canonical and is not in site
   assert.ok(!xml.includes("search"));
   assert.ok(!xml.includes("404"));
   assert.ok(xml.includes("/about"));
+});
+
+test("a Next.js 404 declares noindex itself and no canonical", () => {
+  const meta = notFoundMetadata("https://example.com", "x");
+  assert.deepEqual(meta.robots, { index: false });
+  assert.deepEqual(meta.alternates, {});
+  assert.equal(meta.title.absolute, "404 — not found — x");
+  assert.equal(
+    meta.description,
+    "This page could not be found on example.com.",
+  );
+  assert.equal(meta.openGraph.url, "https://example.com/404");
 });
