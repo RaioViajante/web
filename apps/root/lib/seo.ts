@@ -1,4 +1,4 @@
-import { pageMetadata, type PageSeo } from "@raioviajante/design/seo";
+import { pageMetadata, type PageSeo } from "../../../seo/metadata";
 import { siteOrigins } from "../../../site/sites";
 export const origin = siteOrigins.root;
 export const pages: PageSeo[] = [

@@ -1,5 +1,5 @@
 import { createSocialImage } from "@raioviajante/design/social-image";
-import { socialKey, notFoundSeo } from "@raioviajante/design/seo";
+import { socialKey, notFoundSeo } from "../../../../../seo/metadata";
 import { pages, origin } from "../../../lib/seo";
 export const dynamic = "force-static";
 export const dynamicParams = false;

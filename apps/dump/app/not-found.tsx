@@ -1,4 +1,4 @@
-import { notFoundMetadata } from "@raioviajante/design/seo";
+import { notFoundMetadata } from "../../../seo/metadata";
 import Link from "next/link";
 import { NotFoundPage } from "@raioviajante/design/templates";
 

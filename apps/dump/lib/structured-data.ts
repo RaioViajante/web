@@ -1,4 +1,4 @@
-import { socialUrl } from "@raioviajante/design/seo";
+import { socialUrl } from "../../../seo/metadata";
 import {
   personRef,
   websiteId,

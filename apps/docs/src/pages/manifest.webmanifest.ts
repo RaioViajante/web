@@ -1,4 +1,4 @@
-import { webManifest } from "@raioviajante/design/seo";
+import { webManifest } from "../../../../seo/metadata";
 import { themeColor } from "@raioviajante/design/theme-color";
 
 export async function GET() {

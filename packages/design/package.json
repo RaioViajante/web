@@ -19,10 +19,8 @@
     "./behavior-react": "./behavior-react.tsx",
     "./gallery": "./components/gallery.ts",
     "./avatar": "./components/avatar.ts",
-    "./seo": "./seo.ts",
     "./theme-color": "./theme-color.ts",
     "./social-image": "./social-image.tsx",
-    "./seo-head": "./components/seo-head.tsx",
     "./fonts/*": "./fonts/*",
     "./fonts.css": "./styles/fonts.css"
   },

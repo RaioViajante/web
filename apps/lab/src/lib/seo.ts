@@ -1,4 +1,4 @@
-import { notFoundSeo } from "@raioviajante/design/seo";
+import { notFoundSeo } from "../../../../seo/metadata";
 import { experiments } from "../data/experiments";
 import { siteOrigins } from "../../../../site/sites";
 export const origin = siteOrigins.lab;

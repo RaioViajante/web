@@ -1,4 +1,4 @@
-import { socialUrl } from "@raioviajante/design/seo";
+import { socialUrl } from "../../../../seo/metadata";
 import { breadcrumbJsonLd, websiteId, websiteJsonLd } from "../../../../seo/structured-data";
 import { getPages, pathOf, type DocEntry } from "./docs";
 import { origin } from "./seo";

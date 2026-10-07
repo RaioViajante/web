@@ -97,6 +97,13 @@ test("apps never import another app", () => {
   assert.deepEqual(bad, []);
 });
 
+test("design no longer exposes SEO or site-config entry points", () => {
+  const pkg = JSON.parse(readFileSync(join(root, "packages/design/package.json"), "utf8"));
+  for (const key of Object.keys(pkg.exports)) {
+    assert.ok(!/seo|sites/.test(key), key);
+  }
+});
+
 test("site config describes the four production origins and the contact data", () => {
   assert.deepEqual(
     Object.fromEntries(SITES.map((site) => [site.id, site.href])),

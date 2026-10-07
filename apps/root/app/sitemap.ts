@@ -1,4 +1,4 @@
-import { isSearchPath } from "@raioviajante/design/seo";
+import { isSearchPath } from "../../../seo/metadata";
 import { pages, origin } from "../lib/seo";
 export default function sitemap() {
   return pages

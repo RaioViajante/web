@@ -1,4 +1,4 @@
-import { isNotFoundPath, sitemapResponse } from "@raioviajante/design/seo";
+import { isNotFoundPath, sitemapResponse } from "../../../../seo/metadata";
 import { getSeoPages, origin } from "../lib/seo";
 export async function GET() {
 	return sitemapResponse(
