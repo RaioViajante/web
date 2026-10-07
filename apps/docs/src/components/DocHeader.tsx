@@ -1,4 +1,5 @@
 import { PageHeader } from "@raioviajante/design/parts";
+import type { Crumb } from "../lib/nav";
 
 /** The header of a documentation page: breadcrumb, title, one line, meta row. */
 export function DocHeader({
@@ -10,7 +11,7 @@ export function DocHeader({
 	source,
 }: {
 	/** Breadcrumb after "docs"; the last one is the current page. */
-	crumbs: string[];
+	crumbs: Crumb[];
 	title: string;
 	line: string;
 	status: string;
@@ -23,9 +24,15 @@ export function DocHeader({
 				<>
 					<a href="/">docs</a>
 					{crumbs.map((crumb, index) => (
-						<span key={crumb}>
+						<span key={`${index}-${crumb.label}`}>
 							{" / "}
-							{index === crumbs.length - 1 ? <span aria-current="page">{crumb}</span> : crumb}
+							{index === crumbs.length - 1 ? (
+								<span aria-current="page">{crumb.label}</span>
+							) : crumb.href ? (
+								<a href={crumb.href}>{crumb.label}</a>
+							) : (
+								crumb.label
+							)}
 						</span>
 					))}
 				</>

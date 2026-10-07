@@ -5,7 +5,8 @@ import { sectionNumber } from "@raioviajante/design/sections";
 import { DocHeader } from "../components/DocHeader";
 import DocsShell from "../layouts/DocsShell.astro";
 import { pageJsonLd } from "../lib/structured-data";
-import { editUrl, getPages, labelOf, lastUpdated, pathOf } from "../lib/docs";
+import { editUrl, getPages, labelOf, lastUpdated, navPages, pathOf } from "../lib/docs";
+import { breadcrumb } from "../lib/nav";
 
 export async function getStaticPaths() {
 	const pages = await getPages();
@@ -29,8 +30,7 @@ const toc = headings
 		number: sectionNumber(number),
 	}));
 
-const crumbs = path.split("/").filter(Boolean);
-if (data.sub) crumbs[crumbs.length - 1] = "cli reference";
+const crumbs = breadcrumb(await navPages(), index, data.group);
 const updated = lastUpdated(entry);
 const jsonLd = await pageJsonLd(entry);
 

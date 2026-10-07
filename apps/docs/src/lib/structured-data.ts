@@ -1,6 +1,7 @@
 import { socialUrl } from "../../../../seo/metadata";
 import { breadcrumbJsonLd, websiteId, websiteJsonLd } from "../../../../seo/structured-data";
 import { getPages, pathOf, type DocEntry } from "./docs";
+import { parentIndex } from "./nav";
 import { origin } from "./seo";
 
 export const docsDescription =
@@ -24,9 +25,9 @@ export const homeJsonLd = () => [websiteJsonLd(origin, "docs", docsDescription)]
 export async function pageJsonLd(entry: DocEntry) {
 	const pages = await getPages();
 	const index = pages.findIndex((page) => page.id === entry.id);
-	const parent = entry.data.sub
-		? pages.slice(0, index).reverse().find((page) => !page.data.sub)
-		: undefined;
+	const nav = pages.map((page) => ({ path: pathOf(page), label: page.data.title, sub: page.data.sub }));
+	const parentAt = parentIndex(nav, index);
+	const parent = parentAt === undefined ? undefined : pages[parentAt];
 	const path = pathOf(entry);
 	const url = new URL(path, origin).href;
 	const modified = entry.data.lastUpdated;

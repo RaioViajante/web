@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from "astro:content";
+import { navNumbers, type NavPage } from "./nav";
 
 export type DocEntry = CollectionEntry<"docs">;
 
@@ -17,31 +18,35 @@ export function labelOf(entry: DocEntry) {
 	return entry.data.label ?? entry.data.title.toLowerCase();
 }
 
+/** The pages as the navigation rules see them, in sidebar order. */
+export async function navPages(): Promise<NavPage[]> {
+	return (await getPages()).map((entry) => ({
+		path: pathOf(entry),
+		label: labelOf(entry),
+		sub: entry.data.sub,
+	}));
+}
+
 /**
  * Sidebar items: the home page, every page in order (a `sub` page under the
  * one before it), then the search item added by the shell. Numbers follow
  * the order: 00. index, 01. sweep, 01.1 cli reference, 02. ...
  */
 export async function navItems() {
-	const pages = await getPages();
-	let number = 0;
+	const pages = await navPages();
+	const numbers = navNumbers(pages);
 	return [
 		{ label: "index", href: "/", number: "00.", sub: false },
-		...pages.map((entry) => {
-			if (!entry.data.sub) number += 1;
-			return {
-				label: labelOf(entry),
-				href: pathOf(entry),
-				number: entry.data.sub
-					? `${String(number).padStart(2, "0")}.1`
-					: `${String(number).padStart(2, "0")}.`,
-				sub: entry.data.sub,
-			};
-		}),
+		...pages.map((page, index) => ({
+			label: page.label,
+			href: page.path,
+			number: numbers[index]!,
+			sub: page.sub,
+		})),
 	];
 }
 
-/** Number of the search item: the one after the last page. */
+/** Number of the search item: the one after the last top-level page. */
 export async function searchNumber() {
 	const items = await navItems();
 	const top = items.filter((item) => !item.sub).length;
