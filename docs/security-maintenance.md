@@ -129,4 +129,5 @@ suppression.
 - Check that Actions is enabled with default workflow permissions read-only, and
   that Dependabot pull requests are merged with a merge commit (not squash).
 - Look at the first Dependabot run for the composite action.
-- Developer-workflow polish such as commit hooks is Phase 11, not here.
+- The consolidated checklist, with the Vercel and live-host checks, is in
+  [operations.md](operations.md).

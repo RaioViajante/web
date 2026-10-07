@@ -94,8 +94,8 @@ Never push without explicit authorization or rewrite imported history/tags
 ## Production and generated files
 
 - See `docs/deployment.md`: four Vercel projects, Root Directory `apps/<app>`.
-  Each app's `vercel.json` holds its framework and Ignored Build Step, which
-  must watch `../../packages/design`. Dashboard settings, domains and
+  Each app's `vercel.json` holds its framework and Ignored Build Step
+  (`security/vercel-ignore.mjs`), which must watch `packages/design`. Dashboard settings, domains and
   environment (docs `VERCEL_DEEP_CLONE=true`, dump `NEXT_PUBLIC_SITE_URL`) are
   infrastructure; change them only when explicitly requested. Do not claim an
   unverified rollout.

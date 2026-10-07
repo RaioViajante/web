@@ -36,7 +36,7 @@ Root Directory, and it takes precedence over the same setting in the dashboard.
 | Key             | Value                                      | Why                                                             |
 | --------------- | ------------------------------------------ | --------------------------------------------------------------- |
 | `framework`     | `nextjs` (root, dump), `astro` (docs, lab) | Pins the framework preset the table above lists                 |
-| `ignoreCommand` | the command below                          | Skips builds that cannot change the app (identical in all four) |
+| `ignoreCommand` | `node ../../security/vercel-ignore.mjs`    | Skips builds that cannot change the app (identical in all four) |
 
 Everything else the apps need is already in the repository: the Node version
 (`engines.node` in `package.json`, `.nvmrc` locally), pnpm (`packageManager`),
@@ -47,73 +47,69 @@ the app's `build` script.
 
 ## Ignored Build Step
 
-Every project skips builds for commits that do not affect it. The command runs
-from the project's Root Directory and compares `VERCEL_GIT_PREVIOUS_SHA` (the
-commit of the project's last successful deployment) with `HEAD`, so every
-commit in a push is taken into account. Exit code `0` skips the build and `1`
-builds; Vercel treats any other exit code as a failed deployment.
+Every project skips builds for commits that do not affect it. Each
+`vercel.json` holds the same short command, and the logic lives in one tested
+script:
 
-The check fails open: a missing, malformed, or unresolvable previous SHA, or a
-`git diff` error, ends in `|| exit 1` and builds rather than skipping. Without
-that normalization, `git cat-file` exits `128` when the previous commit is not
-in Vercel's shallow clone, which fails the deployment instead of building it.
-
-All four apps consume `@raioviajante/design`, so every `ignoreCommand` watches
-`../../packages/design`. The command is identical in all four files. It uses a
-short form so that it stays within Vercel's 256-character limit for this
-setting (it is 230 characters):
-
-```sh
-p=$VERCEL_GIT_PREVIOUS_SHA; printf %s "$p" | grep -Eq '^[0-9a-fA-F]{40}$' && git cat-file -e "$p^{commit}" && git diff --quiet "$p" HEAD -- . ../../package.json ../../pnpm-* ../../packages/design ../../security ../../seo || exit 1
+```json
+"ignoreCommand": "node ../../security/vercel-ignore.mjs"
 ```
 
-The paths cover:
+This is Vercel's "Run my Node script" form. Vercel runs the command in the
+project's Root Directory (`apps/<app>`) and reads the exit code: `1` continues
+the build and `0` cancels it ([project settings](https://vercel.com/docs/project-configuration/project-settings#ignored-build-step)).
+The script is named after that: it returns **1 to build, 0 to skip**. It needs
+only Node and git, because it runs before dependencies are installed.
 
-- `.` — changes inside the app's own directory.
-- `../../package.json` — root workspace scripts and package-manager metadata.
-- `../../pnpm-*` — the lockfile (dependency changes, which may affect any app) and the workspace file (membership and install-script policy).
-- `../../packages/design` — the shared package all four apps consume.
-- `../../security` — security header builders consumed by every app.
-- `../../seo` — shared metadata, sitemap, robots and manifest helpers, `SeoHead`, and the public identity and JSON-LD builders.
-- `../../site` — the canonical site origins and contact constants imported by design, security, seo and the apps.
+`security/vercel-ignore.mjs` works out the app from the working directory
+(`apps/<name>` only) and compares `VERCEL_GIT_PREVIOUS_SHA` (the commit of the
+project's last successful deployment) with `HEAD`, so every commit in a push is
+taken into account. It skips only when `git diff --quiet` proves nothing changed
+in:
 
-Security header architecture, local verification, and the intentional Next.js
-rendering change are documented in [security-headers.md](security-headers.md).
-security.txt is documented in [security-txt.md](security-txt.md).
-Browser storage and third-party activity are inventoried in [privacy-storage.md](privacy-storage.md).
-The allowed network origins and their checks are in [network-origins.md](network-origins.md).
-Metadata, structured data and indexing decisions are in [seo.md](seo.md).
-Browser and accessibility checks are in [browser-checks.md](browser-checks.md).
-Performance budgets are in [performance.md](performance.md) and link checks in [links.md](links.md).
-Continuous integration is described in [ci.md](ci.md), dependency audit, CodeQL and scheduled checks in [security-maintenance.md](security-maintenance.md).
-Astro header literals are generated with `node security/sync-vercel.mjs` and
-checked by `pnpm security:check`; no Vercel dashboard settings are changed.
+- `apps/<app>`: the app itself, and no other app;
+- `package.json`: workspace scripts and package-manager metadata;
+- `pnpm-*`: the lockfile (dependencies) and the workspace file (membership and install-script policy);
+- `packages/design`: the shared package all four apps consume;
+- `security`: header builders, security.txt, and the ignore script itself, so changing the rule rebuilds everything;
+- `seo`: shared metadata, sitemap, robots and manifest helpers, `SeoHead`, and JSON-LD builders;
+- `site`: the canonical origins and contact constants.
+
+Everything else fails open to **build**: a missing, malformed or unknown
+previous SHA, a previous commit that is not in Vercel's clone (shallow clones
+are common), an unrecognizable working directory, or a `git diff` error. A
+skipped deployment is the costly mistake, so anything the script cannot trust
+builds. There is no command-length limit to manage: add a shared path to
+`sharedPaths` in the script, and `security/vercel-ignore.test.mjs` proves each
+path rebuilds every app.
 
 Changes only under `docs/`, other apps or the root README skip every project
-that they do not touch. When another app starts consuming a shared package,
-add the package's path to every consumer's `ignoreCommand` first, so a shared
-change can never skip one of its consumers.
+that they do not touch. When another app starts consuming a shared package or
+folder, add its path to `sharedPaths` first, so a shared change can never skip
+one of its consumers.
+
+Other documentation: [security-headers.md](security-headers.md),
+[security-txt.md](security-txt.md), [privacy-storage.md](privacy-storage.md),
+[network-origins.md](network-origins.md), [seo.md](seo.md),
+[browser-checks.md](browser-checks.md), [performance.md](performance.md),
+[links.md](links.md), [ci.md](ci.md) and
+[security-maintenance.md](security-maintenance.md). Astro header literals are
+generated with `node security/sync-vercel.mjs` and checked by
+`pnpm security:check`.
 
 ### Verification
 
-The command was run locally in a scratch clone with `VERCEL_GIT_PREVIOUS_SHA`
-set, once per app (`sh -c` from `apps/<app>`):
+`security/vercel-ignore.test.mjs` runs the real script in throwaway git
+repositories shaped like this one: a change in one app builds only that app;
+each shared path builds all four; unrelated paths and no change skip; and an
+absent, empty, malformed, injected-looking or unknown previous SHA, a git
+failure or a wrong working directory all build. The old inline command was
+compared with the script over 13 previous commits (including a zero and a
+malformed SHA) for all four apps with identical results.
 
-| Change since the previous SHA                             | root                 | dump  | docs  | lab   |
-| --------------------------------------------------------- | -------------------- | ----- | ----- | ----- |
-| nothing                                                   | skip                 | skip  | skip  | skip  |
-| only `apps/docs`                                          | skip                 | skip  | build | skip  |
-| `apps/docs` and `apps/lab`, two commits                   | skip                 | skip  | build | build |
-| only `apps/root`                                          | build                | skip  | skip  | skip  |
-| only `apps/dump`                                          | skip                 | build | skip  | skip  |
-| `packages/design`                                         | build                | build | build | build |
-| only `docs/` and `README.md`                              | skip                 | skip  | skip  | skip  |
-| `pnpm-lock.yaml`, `pnpm-workspace.yaml` or `package.json` | build                | build | build | build |
-| an app commit followed by a `docs/`-only commit           | only that app builds |       |       |       |
-| empty, malformed or unknown previous SHA                  | build                | build | build | build |
-
-This simulates Vercel's variables; it does not prove how the dashboard
-evaluates the setting. Confirm it on the first deployments after merging.
+This proves the script, not how Vercel's dashboard evaluates the setting.
+Confirm it on the first deployments: see the checklist in
+[operations.md](operations.md).
 
 ## Environment
 
@@ -174,7 +170,7 @@ After the first deployments of the migration:
 
 `packages/design` (`@raioviajante/design`) is consumed by all four apps.
 A commit that changes only `packages/design` rebuilds all four apps, because
-every `ignoreCommand` watches it.
+the Ignored Build Step watches it.
 
 ## Metadata build assets
 

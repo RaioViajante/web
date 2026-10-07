@@ -1,5 +1,14 @@
 # Design migration plan
 
+> **Historical record.** This is the working plan of the design migration, which
+> finished and was merged into `main` (pull request #15). Its paths, statuses and
+> "next session" instructions describe that moment and are kept unchanged. For
+> how the repository works today, read [architecture.md](architecture.md),
+> [design-system.md](design-system.md), [deployment.md](deployment.md) and
+> [operations.md](operations.md). Examples of what has moved since: shared
+> metadata and `SeoHead` live in `seo/`, site origins in `site/`, and the Ignored
+> Build Step is `security/vercel-ignore.mjs`.
+
 Migration of raioviajante.com (root), dump, docs and lab to one shared design
 system in `packages/design`. Two agents (Claude and Codex) work on it in
 sessions, on the same branch, `feat/design-migration`.

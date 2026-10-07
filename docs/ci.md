@@ -85,8 +85,9 @@ through `env:` to `commits/check.mjs`:
 | push to `main`      | the push's `before` to its `after` commit |
 | `workflow_dispatch` | none: there is no range, so it is skipped |
 
-A push with no previous commit, or one whose previous commit is gone after a
-forced push, is skipped with a message rather than failing. Merge commits made
+Only a branch's first push (an all-zero previous SHA) is skipped, with a message.
+A push whose previous commit is missing or malformed, which a forced push can
+cause, fails the check rather than letting unchecked commits through. Merge commits made
 by git or GitHub are ignored by commitlint's defaults. Older history that
 predates the convention is never checked.
 
@@ -151,5 +152,5 @@ and real timings.
 
 Mark the checks named **`quality`** and **`dependency-audit`** as required
 (branch protection or a ruleset).
-Leave `observational (non-blocking)` and CodeQL unrequired for now. The remaining manual settings
-are listed in `security-maintenance.md`.
+Leave `observational (non-blocking)` and CodeQL unrequired for now. The full
+first-push and settings checklist is in [operations.md](operations.md).
