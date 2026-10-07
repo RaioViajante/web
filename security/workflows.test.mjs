@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
+import { topLevelPermissionsAreReadOnly } from "./workflow-text.mjs";
 
 // Policy for our own GitHub workflows and composite actions (docs/ci.md). A
 // source-level check on files we control, not a YAML parser: it keeps the
@@ -75,9 +76,8 @@ test("only the CodeQL job may write, and only security events", () => {
   }
   for (const { name, text } of workflows) {
     const code = uncomment(text);
-    assert.match(
-      code,
-      /^permissions:\n {2}contents: read\n(?:\s*\n)*(?=\S)/m,
+    assert.ok(
+      topLevelPermissionsAreReadOnly(code),
       `${name}: top-level permissions must be exactly contents: read`,
     );
     if (name !== "workflows/codeql.yml")
@@ -174,9 +174,8 @@ test("scheduled and security workflows read only, no secrets, and no audit suppr
 
 test("ci.yml: workflow-level read-only permissions, concurrency, timeouts and no secrets", () => {
   const code = uncomment(ci.text);
-  assert.match(
-    code,
-    /^permissions:\n {2}contents: read\n(?:\s*\n)*(?=\S)/m,
+  assert.ok(
+    topLevelPermissionsAreReadOnly(code),
     "top-level permissions must be exactly contents: read",
   );
   assert.ok(

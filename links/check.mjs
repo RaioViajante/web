@@ -1,6 +1,7 @@
 import { ports, startServers } from "../security/local-servers.mjs";
 import { siteOrigins } from "../site/sites.ts";
 import dumpConfig from "../apps/dump/next.config.mjs";
+import { typeOk } from "./content-types.mjs";
 import {
   anchors,
   classify,
@@ -119,14 +120,6 @@ for (const { app, path, text } of pages) {
 }
 
 // 3. Resolve every target once.
-const typeOk = {
-  stylesheet: /^text\/css/,
-  script: /javascript/,
-  font: /font|octet-stream/,
-  image: /^image\//,
-  icon: /^image\/|icon/,
-  manifest: /json/,
-};
 const queue = [...targets.values()];
 const stylesheets = [];
 async function resolve(entry) {

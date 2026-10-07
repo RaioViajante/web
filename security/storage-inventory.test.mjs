@@ -117,7 +117,7 @@ test("docs/privacy-storage.md names every storage item it covers", async () => {
       doc.includes(`\`${key}\``),
       `docs/privacy-storage.md omits ${key}`,
     );
-  assert.match(doc, /\.raioviajante\.com/);
+  assert.match(doc, /Domain=\.raioviajante\.com;/);
 });
 
 test("the dump privacy copy discloses the giscus session", async () => {

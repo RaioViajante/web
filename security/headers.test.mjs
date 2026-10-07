@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 import { contentSecurityPolicy, staticHeaders } from "./headers.ts";
+import { isJsonLd, scriptElements } from "./html-scripts.mjs";
 
 for (const site of ["root", "dump", "docs", "lab"]) {
   test(`${site}: restrictive production policy and scoped origins`, () => {
@@ -52,12 +53,10 @@ for (const site of ["docs", "lab"]) {
     )) {
       const html = await readFile(file, "utf8");
       pages++;
-      for (const [, attributes, body] of html.matchAll(
-        /<script\b([^>]*)>([\s\S]*?)<\/script>/g,
-      )) {
+      for (const { attributes, body } of scriptElements(html)) {
         // A JSON-LD block is data the browser never executes, so the CSP does
         // not govern it; it must still be well-formed JSON.
-        if (/\btype="application\/ld\+json"/.test(attributes)) {
+        if (isJsonLd(attributes)) {
           assert.doesNotThrow(() => JSON.parse(body), `${file}: JSON-LD`);
           continue;
         }

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { contentSecurityPolicy, securityHeaders } from "./headers.ts";
+import { isJsonLd, scriptOpenTags } from "./html-scripts.mjs";
 import { ports, startServers } from "./local-servers.mjs";
 
 // Run against the built apps (`pnpm -r build`): Next start (3002/3001) and
@@ -84,9 +85,9 @@ for (const [site, port] of Object.entries(ports)) {
       await repeat.arrayBuffer();
     } else assert.equal(nonce, undefined);
     assert.equal(csp, contentSecurityPolicy(site, nonce));
-    for (const [, attributes] of html.matchAll(/<script\b([^>]*)>/g)) {
+    for (const attributes of scriptOpenTags(html)) {
       // JSON-LD is data, not executed, so the CSP does not govern it.
-      if (/\btype="application\/ld\+json"/.test(attributes)) continue;
+      if (isJsonLd(attributes)) continue;
       if (nonce)
         assert.ok(
           attributes.includes(`nonce="${nonce}"`),

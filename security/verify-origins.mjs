@@ -12,6 +12,7 @@ import {
   violations,
 } from "./network-origins.ts";
 import { ports, startServers } from "./local-servers.mjs";
+import { includesOrigin } from "./url-match.mjs";
 
 // Runtime network-origin check. Not part of `pnpm validate`: it needs built
 // apps, local sockets and Firefox. Run `pnpm security:origins` after
@@ -263,7 +264,7 @@ else {
       failures.push(
         `dump ${long}: giscus client.js was not requested exactly once`,
       );
-    if (![...frameHosts.values()].includes("https://giscus.app"))
+    if (!includesOrigin(frameHosts.values(), "https://giscus.app"))
       failures.push(
         `dump ${long}: no frame was served from https://giscus.app`,
       );

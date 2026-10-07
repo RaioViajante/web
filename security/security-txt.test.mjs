@@ -53,7 +53,7 @@ test("rejects malformed and duplicated fields", () => {
     ["﻿" + good, /BOM/],
     [good + "Expires: 2028-01-01T00:00:00Z\n", /duplicate expires/],
     [good.replace("Expires:", "Expires"), /malformed/],
-    [good.replace("\n", "\r\n"), /LF/],
+    [good.replaceAll("\n", "\r\n"), /LF/],
     [good.trimEnd(), /final newline/],
     [good.replace("docs.", "lab."), /canonical/],
     [good.replace("2027-10-01T00:00:00Z", "soon"), /RFC 3339/],

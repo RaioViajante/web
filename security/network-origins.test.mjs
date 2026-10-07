@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { contentSecurityPolicy } from "./headers.ts";
 import { siteOrigins } from "../site/sites.ts";
+import { cspListsHost } from "./url-match.mjs";
 import {
   classify,
   frameHosts,
@@ -48,8 +49,8 @@ test("the allowlist agrees with the CSP in both directions", () => {
     for (const host of frameHosts[site] ?? [])
       assert.match(csp, new RegExp(`frame-src ${host}`), host);
     // ...and what a frame loads is the frame owner's business: never listed.
-    assert.ok(!csp.includes("githubassets.com"));
-    assert.ok(!csp.includes("githubusercontent.com"));
+    assert.ok(!cspListsHost(csp, "githubassets.com"));
+    assert.ok(!cspListsHost(csp, "githubusercontent.com"));
     assert.ok(
       (thirdParties[site]?.comments ?? []).every(
         (item) => item.reason.length > 20,
