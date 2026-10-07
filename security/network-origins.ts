@@ -143,6 +143,36 @@ export function judge(
   return { verdict: "ok", kind: result.kind, origin: result.origin };
 }
 
+/** The fields of a WebDriver BiDi `network.beforeRequestSent` event the policy needs. */
+export interface RequestEvent {
+  context: string;
+  url: string;
+  /** Set for document loads (including each redirect hop), null for subresources. */
+  navigation: string | null;
+}
+
+/**
+ * Turns request events into observation fields. A frame's host is the origin
+ * of its *current* document: every navigation request in a frame, whether the
+ * first, a later navigation or a redirect hop, replaces it, so a frame that
+ * moves from an approved origin to another is judged by the new one. Requests
+ * without a navigation (images, scripts, XHR) never change it.
+ */
+export function createFrameTracker(topContext: string) {
+  const hosts = new Map<string, string>();
+  return ({ context, url, navigation }: RequestEvent) => {
+    const frame = context !== topContext;
+    if (frame && navigation !== null) {
+      try {
+        hosts.set(context, new URL(url).origin);
+      } catch {
+        hosts.set(context, url);
+      }
+    }
+    return { url, frame, frameHost: hosts.get(context) };
+  };
+}
+
 /** Lines for every request that breaks the policy. */
 export function violations(
   observations: readonly Observation[],

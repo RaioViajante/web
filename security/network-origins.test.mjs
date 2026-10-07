@@ -5,6 +5,7 @@ import { siteOrigins } from "../site/sites.ts";
 import { cspListsHost } from "./url-match.mjs";
 import {
   classify,
+  createFrameTracker,
   frameHosts,
   frameInternalOrigins,
   judge,
@@ -159,6 +160,90 @@ test("parent-page origins hard fail; frame hosts are enforced; frame internals a
     () => own,
   );
   assert.deepEqual([...seen], [["https://github.githubassets.com", 2]]);
+});
+
+test("a frame is judged by its current document, not its first", () => {
+  const own = ["http://dump.localhost:3001"];
+  const TOP = "top";
+  const GISCUS = "https://giscus.app/en/widget?origin=x";
+  // Replays BiDi request events through the tracker and returns each verdict.
+  const replay = (events) => {
+    const track = createFrameTracker(TOP);
+    return events.map(([context, url, navigation = null]) =>
+      judge(
+        {
+          app: "dump",
+          page: "/posts/x",
+          ...track({ context, url, navigation }),
+        },
+        "comments",
+        own,
+      ),
+    );
+  };
+  const verdicts = (events) => replay(events).map((v) => v.verdict);
+
+  // A. approved initial frame document
+  assert.deepEqual(verdicts([["f1", GISCUS, "n1"]]), ["ok"]);
+  // B. its ordinary subresources are reported, not failed
+  assert.deepEqual(
+    verdicts([
+      ["f1", GISCUS, "n1"],
+      ["f1", "https://github.githubassets.com/a.gif"],
+      ["f1", "https://avatars.githubusercontent.com/u/1"],
+    ]),
+    ["ok", "report", "report"],
+  );
+  // C. a later document navigation to an unapproved origin hard fails
+  const moved = replay([
+    ["f1", GISCUS, "n1"],
+    ["f1", "https://unexpected.example/frame", "n2"],
+    ["f1", "https://unexpected.example/x.js"],
+  ]);
+  assert.deepEqual(
+    moved.map((v) => v.verdict),
+    ["ok", "fail", "fail"],
+  );
+  assert.match(
+    moved[1].message,
+    /unexpected frame host https:\/\/unexpected\.example/,
+  );
+  // ...including through a redirect hop (same navigation id, redirectCount 1)
+  assert.deepEqual(
+    verdicts([
+      ["f1", GISCUS, "n1"],
+      ["f1", "https://giscus.app/redirect", "n2"],
+      ["f1", "https://unexpected.example/landing", "n2"],
+    ]),
+    ["ok", "ok", "fail"],
+  );
+  // D. a same-origin navigation is allowed, and subresources stay reported
+  assert.deepEqual(
+    verdicts([
+      ["f1", GISCUS, "n1"],
+      ["f1", "https://giscus.app/en/widget?page=2", "n2"],
+      ["f1", "https://github.githubassets.com/b.gif"],
+    ]),
+    ["ok", "ok", "report"],
+  );
+  // E. an unapproved initial frame document hard fails
+  assert.deepEqual(verdicts([["f1", "https://unexpected.example/", "n1"]]), [
+    "fail",
+  ]);
+  // Frames are independent, and a navigation back to an approved origin is fine.
+  assert.deepEqual(
+    verdicts([
+      ["f1", GISCUS, "n1"],
+      ["f2", "https://unexpected.example/", "n2"],
+      ["f1", "https://github.githubassets.com/c.gif"],
+    ]),
+    ["ok", "fail", "report"],
+  );
+  // The top document is never a frame.
+  assert.equal(
+    replay([[TOP, "http://dump.localhost:3001/", "n0"]])[0].verdict,
+    "ok",
+  );
 });
 
 test("a violation names app, page, origin and URL", () => {

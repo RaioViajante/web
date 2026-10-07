@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   classify,
+  createFrameTracker,
   frameInternalOrigins,
   judge,
   sites,
@@ -12,7 +13,6 @@ import {
   violations,
 } from "./network-origins.ts";
 import { ports, startServers } from "./local-servers.mjs";
-import { includesOrigin } from "./url-match.mjs";
 
 // Runtime network-origin check. Not part of `pnpm validate`: it needs built
 // apps, local sockets and Firefox. Run `pnpm security:origins` after
@@ -77,20 +77,17 @@ let id = 0;
 const pending = new Map();
 let requests = [];
 let top;
-const frameHosts = new Map();
+let track;
 ws.onmessage = ({ data }) => {
   const message = JSON.parse(data);
   if (message.id && pending.has(message.id)) {
     pending.get(message.id)(message);
     pending.delete(message.id);
   } else if (message.method === "network.beforeRequestSent") {
-    const { context } = message.params;
-    const url = message.params.request.url;
-    const frame = context !== top;
-    // A frame's first request is its own document: that is the frame host.
-    if (frame && !frameHosts.has(context))
-      frameHosts.set(context, new URL(url).origin);
-    requests.push({ url, frame, frameHost: frameHosts.get(context) });
+    const { context, navigation, request } = message.params;
+    // A navigation request is a frame's document (first load, later
+    // navigation or redirect hop) and replaces that frame's host.
+    requests.push(track({ context, url: request.url, navigation }));
   }
 };
 const send = (method, params = {}) =>
@@ -105,6 +102,7 @@ await send("session.new", {
 });
 await send("session.subscribe", { events: ["network.beforeRequestSent"] });
 top = (await send("browsingContext.getTree")).result.contexts[0].context;
+track = createFrameTracker(top);
 const evaluate = async (expression) =>
   (
     await send("script.evaluate", {
@@ -264,7 +262,7 @@ else {
       failures.push(
         `dump ${long}: giscus client.js was not requested exactly once`,
       );
-    if (!includesOrigin(frameHosts.values(), "https://giscus.app"))
+    if (!requests.some((r) => r.frame && r.frameHost === "https://giscus.app"))
       failures.push(
         `dump ${long}: no frame was served from https://giscus.app`,
       );
