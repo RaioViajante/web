@@ -112,6 +112,51 @@ describe("fence meta", () => {
       { word: 'e="open' },
     ]);
   });
+  describe("highlight ranges", () => {
+    const highlight = (spec: string) =>
+      parseFenceMeta(`ts {${spec}}`).highlight;
+    const MAX_SAFE = Number.MAX_SAFE_INTEGER;
+    it("keeps single lines and ranges", () => {
+      expect(highlight("3")).toEqual([3]);
+      expect(highlight("2-4,9")).toEqual([2, 3, 4, 9]);
+      expect(highlight("5,5,4-5")).toEqual([4, 5]);
+    });
+    it("expands a range to at most 1000 lines", () => {
+      expect(highlight("1-1000")).toHaveLength(1000);
+      expect(highlight("1-1001")).toHaveLength(1000);
+      expect(highlight("1-100000000")).toHaveLength(1000);
+      expect(highlight("50-100000000")).toEqual(
+        Array.from({ length: 1000 }, (_, i) => 50 + i),
+      );
+    });
+    it("rejects endpoints that are not safe integers", () => {
+      expect(highlight("9007199254740992")).toEqual([]);
+      expect(highlight("9007199254740992-9007199254740993")).toEqual([]);
+      expect(highlight("1-9007199254740992")).toEqual([]);
+      expect(highlight("99999999999999999999999")).toEqual([]);
+      expect(highlight("1-99999999999999999999999")).toEqual([]);
+    });
+    it("stops at the last safe integer instead of stalling", () => {
+      expect(highlight(`${MAX_SAFE - 1}-${MAX_SAFE}`)).toEqual([
+        MAX_SAFE - 1,
+        MAX_SAFE,
+      ]);
+      expect(highlight(`${MAX_SAFE}`)).toEqual([MAX_SAFE]);
+    });
+    it("ignores reversed and non-positive ranges, keeping valid parts", () => {
+      expect(highlight("9-3")).toEqual([]);
+      expect(highlight("0-3")).toEqual([]);
+      expect(highlight("3-9,2")).toEqual([2, 3, 4, 5, 6, 7, 8, 9]);
+      expect(highlight("7-5,1")).toEqual([1]);
+    });
+    it("terminates on unsafe input (smoke guard; the cases above are the proof)", () => {
+      expect(
+        timed(() =>
+          highlight("9007199254740992,9007199254740992-9007199254740999"),
+        ),
+      ).toBeLessThan(FAST_MS);
+    });
+  });
   it("handles very long words, quotes and spaces quickly", () => {
     for (const input of [
       "a".repeat(200_000),
