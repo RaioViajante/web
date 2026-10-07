@@ -74,7 +74,8 @@ The paths cover:
 - `../../pnpm-*` — the lockfile (dependency changes, which may affect any app) and the workspace file (membership and install-script policy).
 - `../../packages/design` — the shared package all four apps consume.
 - `../../security` — security header builders consumed by every app.
-- `../../seo` — the shared public identity and JSON-LD builders consumed by every app.
+- `../../seo` — shared metadata, sitemap, robots and manifest helpers, `SeoHead`, and the public identity and JSON-LD builders.
+- `../../site` — the canonical site origins and contact constants imported by design, security, seo and the apps.
 
 Security header architecture, local verification, and the intentional Next.js
 rendering change are documented in [security-headers.md](security-headers.md).

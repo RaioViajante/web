@@ -10,8 +10,8 @@ Title, description, canonical URL on the production host, `og:*` and
 `twitter:*` tags with a generated social card that exists at its URL, `lang="en"`,
 icon links and the manifest, and `theme-color` (the page background token,
 read from `styles/tokens.css`). Titles and descriptions are unique across all
-71 pages. Root and Dump use Next metadata; Docs and Lab use the shared
-`SeoHead`. The pieces that repeat live in `packages/design/seo.ts`.
+71 pages. Root and Dump use Next metadata; Docs and Lab use `seo/SeoHead.astro`. The
+pieces that repeat live in `seo/metadata.ts`.
 
 ## Identity
 
@@ -94,7 +94,7 @@ tracking parameters never change it. Why: before a query each is a form with
 about 35 words of prompt text, near-identical on all four sites, and the results
 need typed input and client JavaScript, so there is nothing for a search engine
 to index (Google documents no policy against indexed internal search pages, but
-treats them as low value). `isSearchPath` in `packages/design/seo.ts` is the
+treats them as low value). `isSearchPath` in `seo/metadata.ts` is the
 one place that drives the robots meta, the sitemap exclusion and, through
 `seo/metadata-policy.ts`, the checks.
 

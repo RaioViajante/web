@@ -43,6 +43,35 @@ another site as a local route.
 The split follows what each site needs. There is no goal of converging on one
 framework.
 
+## Where code belongs
+
+Four shared locations sit beside the apps. Each answers one question.
+
+| Location          | Holds                                                                                   |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| `site/`           | Neutral site identity: the four production origins and contact/company constants        |
+| `packages/design` | Visual language and shared user-facing behavior: tokens, styles, artwork, components, sound, search UI, the social-image renderer, theme color |
+| `seo/`            | Metadata, sitemap, robots and manifest helpers, `SeoHead.astro`, JSON-LD, SEO checks    |
+| `security/`       | HTTP security policy (CSP, headers), network-origin and `security.txt` tooling          |
+
+Dependency direction (enforced by `security/boundaries.test.mjs`):
+
+```text
+site/ ◀── packages/design, seo/, security/, links/, apps/*
+seo/, security/ ──▶ site/ (seo/ may also read design's theme color)
+packages/design ──▶ site/
+apps/* ──▶ packages/design, seo/, security/, site/
+site/ imports nothing; nothing shared imports an app; apps never import one another
+```
+
+Rules of thumb: a fact about a site (its origin, an email, a company number)
+is written once in `site/`. Anything that describes how a page looks or behaves
+for a visitor belongs in `packages/design`. Anything that only crawlers,
+browsers' network layer or deployment read belongs in `seo/` or `security/`.
+There are no re-export shims: import from the canonical location. The shared
+top-level paths are watched by each app's Ignored Build Step (see
+[deployment.md](deployment.md)).
+
 ## Shared packages
 
 Shared code lives in `packages/`, with one allowed direction:

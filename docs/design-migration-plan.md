@@ -711,7 +711,7 @@ apps/docs/           explicit date schema, date resolver and conditional footer
 Taken over from an interrupted session: the uncommitted Phase 5 work was
 reviewed, corrected and committed.
 
-- Shared metadata (`packages/design/seo.ts`), the build-time social card
+- Shared metadata (then `packages/design/seo.ts`, now `seo/metadata.ts`), the build-time social card
   renderer (`social-image.tsx`, `@vercel/og`, avatar, token colors, Noto Sans
   Mono TTF with OFL), the Astro `SeoHead`, and the self-hosted Latin variable
   WOFF2 (`fonts/`, `styles/fonts.css`; Next uses `next/font/local`). `sharp`

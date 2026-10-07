@@ -16,7 +16,8 @@ four small sites, one design system.
 
 ```
 apps/              one folder per site
-packages/design/   everything shared, in one place
+packages/design/   shared visual language and behavior
+site/ seo/ security/   neutral config, SEO helpers, HTTP policy
 docs/              the long version of everything
 ```
 
