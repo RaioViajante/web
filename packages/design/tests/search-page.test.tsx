@@ -2,6 +2,18 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { SearchPage } from "../components/search";
 
+/** Text of an HTML fragment: everything outside `<...>`, read in one pass. */
+function textOf(html: string) {
+  let text = "";
+  let inTag = false;
+  for (const char of html) {
+    if (char === "<") inTag = true;
+    else if (char === ">" && inTag) inTag = false;
+    else if (!inTag) text += char;
+  }
+  return text;
+}
+
 const lines = (html: string) =>
   Object.fromEntries(
     [
@@ -12,7 +24,7 @@ const lines = (html: string) =>
       scope,
       {
         hidden: Boolean(hidden),
-        text: body!.replace(/<[^>]+>/g, ""),
+        text: textOf(body!),
       },
     ]),
   );

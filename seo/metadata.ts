@@ -107,8 +107,11 @@ export function notFoundMetadata(origin: string, site: string) {
     ...notFoundSeo,
     description: `This page could not be found on ${new URL(origin).host}.`,
   });
-  // Next.js already marks not-found responses noindex.
-  return { ...metadata, alternates: {} };
+  // Next.js documents injecting `noindex` on 404 responses, and does so for a
+  // page-level notFound(). On Vercel, unmatched URLs are served through the
+  // `/_not-found` route and arrive without it, so say it here, through the
+  // documented `metadata` export, and keep no canonical on an error page.
+  return { ...metadata, alternates: {}, robots: { index: false } };
 }
 
 /**
