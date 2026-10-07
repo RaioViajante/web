@@ -325,3 +325,17 @@ test("dependabot keeps the pinned actions current without auto-merging", () => {
   assert.match(code, /update-types:\n\s+- minor\n\s+- patch/);
   assert.ok(!/- major/.test(code));
 });
+
+test("CodeQL skips external fork pull requests instead of widening access", () => {
+  const code = uncomment(
+    workflows.find((f) => f.name === "workflows/codeql.yml").text,
+  );
+  assert.match(
+    code,
+    /^ {4}if: github\.event_name != 'pull_request' \|\| github\.event\.pull_request\.head\.repo\.full_name == github\.repository$/m,
+    "the fork guard on the CodeQL job was removed or changed",
+  );
+  assert.ok(!/pull_request_target/.test(code));
+  // Event data stays in `if:`, never in a shell command (the run-block test also checks this).
+  assert.ok(!/run:[^\n]*\$\{\{/.test(code));
+});

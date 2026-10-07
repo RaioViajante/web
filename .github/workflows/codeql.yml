@@ -23,6 +23,11 @@ concurrency:
 jobs:
   analyze:
     name: analyze (javascript-typescript)
+    # Pull requests from forks get a read-only token, and GitHub does not document
+    # that the results upload works for them, so they are skipped rather than
+    # given more access; their code is analysed once it lands on main. Same-repo
+    # and Dependabot pull requests, pushes, the schedule and manual runs all run.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
