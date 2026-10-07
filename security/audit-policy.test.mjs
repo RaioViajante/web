@@ -287,3 +287,15 @@ test("missing audit data fails instead of passing", () => {
     "pnpm audit returned no advisory data; the gate cannot judge it",
   ]);
 });
+
+test("docs/security-maintenance.md names every exception and its expiry", async () => {
+  const doc = await readFile(
+    new URL("../docs/security-maintenance.md", import.meta.url),
+    "utf8",
+  );
+  for (const e of policy.exceptions) {
+    assert.ok(doc.includes(e.advisory), `${e.advisory} is not in the doc`);
+    assert.ok(doc.includes(e.package), `${e.package} is not in the doc`);
+    assert.ok(doc.includes(e.expires), `${e.expires} is not in the doc`);
+  }
+});

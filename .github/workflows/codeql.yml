@@ -1,0 +1,48 @@
+name: CodeQL
+
+# Static analysis of the JavaScript and TypeScript in this repository. It is the
+# one workflow allowed to write security events (the SARIF upload); everything
+# else stays read-only. `build-mode: none` analyses the source without building
+# the monorepo. No secrets. See docs/security-maintenance.md.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # Weekly, off the busiest minute: new queries can find old problems.
+    - cron: "37 4 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: analyze (javascript-typescript)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      # Required to upload the results. `contents: read` is for the checkout
+      # (GitHub's template lists the packs/actions permissions only for private
+      # or internal repositories, which this one is not).
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          # The default suite plus lower-severity and lower-precision security queries.
+          queries: security-extended
+
+      - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          category: "/language:javascript-typescript"

@@ -48,7 +48,7 @@ test("every external action is pinned to a full commit SHA with a version commen
     }
 });
 
-test("no pull_request_target, write-all or write permission anywhere", () => {
+test("no pull_request_target, write-all or id-token anywhere", () => {
   for (const { name, text } of all) {
     const code = uncomment(text);
     assert.ok(
@@ -56,12 +56,120 @@ test("no pull_request_target, write-all or write permission anywhere", () => {
       `${name}: pull_request_target`,
     );
     assert.ok(!/write-all/.test(code), `${name}: permissions: write-all`);
-    assert.ok(!/:\s*write\b/.test(code), `${name}: a write permission`);
+    assert.ok(!/id-token/.test(code), `${name}: id-token permission`);
+  }
+});
+
+// Write access is allowed in exactly one place: CodeQL's job may upload its
+// results (`security-events: write`). Everything else is contents: read, with no
+// job-level widening, so a new write permission anywhere fails here.
+test("only the CodeQL job may write, and only security events", () => {
+  for (const { name, text } of all) {
+    const code = uncomment(text);
+    const writes = [...code.matchAll(/^\s*([\w-]+):\s*write\b/gm)].map(
+      (m) => m[1],
+    );
+    if (name === "workflows/codeql.yml")
+      assert.deepEqual(writes, ["security-events"], name);
+    else assert.deepEqual(writes, [], `${name}: write permission`);
+  }
+  for (const { name, text } of workflows) {
+    const code = uncomment(text);
+    assert.match(
+      code,
+      /^permissions:\n {2}contents: read\n(?:\s*\n)*(?=\S)/m,
+      `${name}: top-level permissions must be exactly contents: read`,
+    );
+    if (name !== "workflows/codeql.yml")
+      assert.ok(
+        !/^ {2,}permissions:/m.test(code),
+        `${name}: jobs must not widen permissions`,
+      );
+  }
+  const codeql = uncomment(
+    workflows.find((f) => f.name === "workflows/codeql.yml").text,
+  ).replace(/\n\s*\n/g, "\n");
+  const job = /^ {4}permissions:\n((?: {6}.*\n)+)/m.exec(codeql)?.[1] ?? "";
+  assert.deepEqual(
+    job
+      .trim()
+      .split("\n")
+      .map((l) => l.trim())
+      .sort(),
+    ["contents: read", "security-events: write"],
+  );
+});
+
+test("composite actions are inside the pinning guard", () => {
+  const setup = all.find((f) => f.name === "actions/setup/action.yml");
+  assert.ok(setup, "the local setup action was not scanned");
+  const external = [...setup.text.matchAll(/^\s*-?\s*uses:\s*(\S+)/gm)]
+    .map((m) => m[1])
+    .filter((u) => !u.startsWith("./"));
+  assert.ok(
+    external.length >= 3,
+    "the composite action's external actions were not seen",
+  );
+});
+
+test("every workflow cancels stale runs, bounds its jobs, and uses an off-peak schedule", () => {
+  for (const { name, text } of workflows) {
+    const code = uncomment(text);
+    assert.match(
+      code,
+      /^concurrency:\n(?:(?: {2}.*)?\n)*? {2}cancel-in-progress: true$/m,
+      `${name}: concurrency`,
+    );
+    const jobs = code
+      .split(/^jobs:\n/m)[1]
+      .split(/^ {2}(?=[\w-]+:$)/m)
+      .filter(Boolean);
+    for (const job of jobs)
+      assert.match(
+        job,
+        /timeout-minutes: \d+/,
+        `${name}: a job lacks timeout-minutes`,
+      );
+    for (const [, cron] of code.matchAll(/cron:\s*"([^"]+)"/g)) {
+      const [minute, , , , day] = cron.split(" ");
+      assert.equal(cron.split(" ").length, 5, `${name}: ${cron}`);
+      assert.ok(
+        !["0", "15", "30", "45"].includes(minute),
+        `${name}: ${cron} runs on a busy minute`,
+      );
+      assert.notEqual(
+        day,
+        "*",
+        `${name}: ${cron} should run weekly, not daily`,
+      );
+    }
+  }
+});
+
+test("scheduled and security workflows read only, no secrets, and no audit suppression", () => {
+  for (const { name, text } of all) {
+    const code = uncomment(text);
+    assert.ok(!/secrets\.|GITHUB_TOKEN/.test(code), `${name}: secrets`);
     assert.ok(
-      !/id-token|security-events/.test(code),
-      `${name}: an elevated permission`,
+      !/audit[^\n]*\|\|\s*(true|:)/.test(code),
+      `${name}: audit failure suppressed`,
     );
   }
+  const maintenance = uncomment(
+    workflows.find((f) => f.name === "workflows/security-maintenance.yml").text,
+  );
+  assert.ok(
+    maintenance.includes("node security/sync-vercel.mjs --check") &&
+      maintenance.includes("pnpm audit:check"),
+  );
+  assert.ok(
+    !/continue-on-error/.test(maintenance),
+    "maintenance failures must be visible",
+  );
+  assert.match(
+    maintenance,
+    /^on:\n {2}schedule:\n(?: {4}.*\n)+ {2}workflow_dispatch:/m,
+  );
 });
 
 test("ci.yml: workflow-level read-only permissions, concurrency, timeouts and no secrets", () => {
@@ -183,4 +291,37 @@ test("installs are frozen, and Node and pnpm come from the repository's own pins
     "versions must not be duplicated in the workflow",
   );
   assert.ok(!/cache:\s*\S*node_modules/.test(setup));
+});
+
+test("the dependency audit blocks in CI and is exact", () => {
+  const code = uncomment(ci.text);
+  const audit = code.split(/^ {2}(?=dependency-audit:)/m)[1];
+  assert.ok(audit, "ci.yml has no dependency-audit job");
+  assert.ok(audit.includes("run: pnpm audit:check"));
+  assert.ok(!/continue-on-error/.test(audit), "the audit job must block");
+  assert.ok(
+    !/needs:/.test(audit),
+    "the audit job must not wait for the other checks",
+  );
+  assert.ok(
+    !/pnpm audit(?!:)/.test(code.replace(/pnpm audit:check/g, "")),
+    "use the policy gate, not raw pnpm audit",
+  );
+});
+
+test("dependabot keeps the pinned actions current without auto-merging", () => {
+  const config = all.find((f) => f.name === "dependabot.yml");
+  assert.ok(config, ".github/dependabot.yml is missing");
+  const code = uncomment(config.text);
+  assert.match(code, /package-ecosystem: github-actions/);
+  assert.match(code, /interval: weekly/);
+  // The local composite action's external pins are updated too.
+  assert.match(code, /\/\.github\/actions\/\*/);
+  assert.ok(
+    !/auto-?merge|labels:|assignees:|reviewers:/i.test(code),
+    "no auto-merge, labels, assignees or reviewers",
+  );
+  // Minor and patch updates are grouped; majors are not.
+  assert.match(code, /update-types:\n\s+- minor\n\s+- patch/);
+  assert.ok(!/- major/.test(code));
 });

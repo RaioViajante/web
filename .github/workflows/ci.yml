@@ -1,8 +1,9 @@
 name: CI
 
 # Two kinds of checks, kept apart on purpose:
-#   quality        deterministic, repository-controlled, BLOCKING. This is the
-#                  check to require in branch protection.
+#   quality          deterministic, repository-controlled, BLOCKING. Require it.
+#   dependency-audit BLOCKING too, but it asks the package registry, so it can
+#                    start failing without a commit. Require it as well.
 #   observational  synthetic performance, live third-party origins and external
 #                  links. It varies with the machine and the public internet, so
 #                  it is reported and never blocks.
@@ -148,3 +149,23 @@ jobs:
           path: perf/.results
           if-no-files-found: ignore
           retention-days: 7
+
+  # BLOCKING, and different in kind from `quality`: it asks the package registry
+  # about advisories, so it needs the network and can change without any commit
+  # (a new advisory, a new fix, an expiring exception). It reads only the
+  # lockfile and security/audit-exceptions.json. Require it next to `quality`.
+  dependency-audit:
+    name: dependency-audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+        with:
+          browsers: "false"
+
+      - name: Dependency audit (reviewed exceptions only)
+        run: pnpm audit:check

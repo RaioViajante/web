@@ -4,6 +4,11 @@ description: >
   .nvmrc), a frozen install, Playwright's Chromium, and a pinned Firefox for the
   WebDriver BiDi origin check. Run after actions/checkout.
 
+inputs:
+  browsers:
+    description: Install Playwright's Chromium and the pinned Firefox ("false" for jobs that only need the packages).
+    default: "true"
+
 outputs:
   firefox-path:
     description: Path of the Firefox executable (the origin check reads it as FIREFOX_BIN).
@@ -27,12 +32,14 @@ runs:
 
     # Not cached on purpose: the download is small next to the suite, and an
     # always-fresh install cannot leave a stale browser behind a new Playwright.
-    - run: pnpm exec playwright install --with-deps chromium
+    - if: inputs.browsers == 'true'
+      run: pnpm exec playwright install --with-deps chromium
       shell: bash
 
     # security:origins drives Firefox over WebDriver BiDi, so the version is
     # explicit (the runner's own Firefox is not a pinned dependency).
     - id: firefox
+      if: inputs.browsers == 'true'
       uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1.7.2
       with:
         firefox-version: 157.0.1

@@ -84,7 +84,7 @@ The allowed network origins and their checks are in [network-origins.md](network
 Metadata, structured data and indexing decisions are in [seo.md](seo.md).
 Browser and accessibility checks are in [browser-checks.md](browser-checks.md).
 Performance budgets are in [performance.md](performance.md) and link checks in [links.md](links.md).
-Continuous integration is described in [ci.md](ci.md).
+Continuous integration is described in [ci.md](ci.md), dependency audit, CodeQL and scheduled checks in [security-maintenance.md](security-maintenance.md).
 Astro header literals are generated with `node security/sync-vercel.mjs` and
 checked by `pnpm security:check`; no Vercel dashboard settings are changed.
 

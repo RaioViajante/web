@@ -1,6 +1,7 @@
 # Continuous integration
 
-One workflow, `.github/workflows/ci.yml`, with two kinds of checks. It validates
+`.github/workflows/ci.yml` has three jobs of two kinds, next to the CodeQL and
+scheduled security workflows described in `security-maintenance.md`. It validates
 only; Vercel alone deploys. It uses no secrets, so it runs the same for pull
 requests from forks.
 
@@ -38,6 +39,12 @@ protection (see "After the first push"). Deterministic, under repository control
    without third-party traffic.
 6. `pnpm perf:check`: page-weight budgets and image/font rules.
 7. `pnpm links:check`: internal links and first-party resources.
+
+**`dependency-audit`: also blocking.** `pnpm audit:check`, 15-minute timeout,
+read-only, no secrets, independent of `quality`. Unlike `quality` it is not
+deterministic: it asks the package registry about advisories, so it can start
+failing with no commit (a new advisory, a fix for an accepted one, an exception
+reaching its date; see `security-maintenance.md`). Require it as well.
 
 **`observational (non-blocking)`: never required.** Runs after `quality`
 passes, with its own isolated build, and is allowed to fail without failing the
@@ -113,6 +120,7 @@ and real timings.
 
 ## After the first push (manual, remote)
 
-Mark the check named **`quality`** as required (branch protection or a ruleset).
-Leave `observational (non-blocking)` unrequired. Phase 10D adds the dependency
-audit gate, CodeQL, Dependabot and the scheduled `security.txt` check.
+Mark the checks named **`quality`** and **`dependency-audit`** as required
+(branch protection or a ruleset).
+Leave `observational (non-blocking)` unrequired. The remaining manual settings
+are listed in `security-maintenance.md`.
