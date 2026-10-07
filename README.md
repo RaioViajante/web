@@ -35,6 +35,8 @@ pnpm validate
 <a href="docs/design-system.md">design-system.md</a> ············· how it looks and sounds
 <a href="docs/blocks.md">blocks.md</a> ···················· code and content blocks
 <a href="docs/deployment.md">deployment.md</a> ················ how it ships
+<a href="CONTRIBUTING.md">CONTRIBUTING.md</a> ·············· setup, checks, commits
+<a href="SECURITY.md">SECURITY.md</a> ·················· reporting a vulnerability
 <a href="AGENTS.md">AGENTS.md</a> ···················· rules for whoever touches the code
 </pre>
 
