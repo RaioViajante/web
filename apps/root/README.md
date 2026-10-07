@@ -14,6 +14,7 @@ Internal routes:
 - `/contact` — contact email and message guidance
 - `/gallery` — animated collection of original character art
 - `/this-site` — notes on the site and its source code
+- `/search` — search across this site and the other RaioViajante sites
 - `/privacy` — privacy information for the root site
 - `/terms` — terms of use for the root site
 

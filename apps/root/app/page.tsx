@@ -21,8 +21,6 @@ import { getRecentPosts } from "../lib/writing";
 
 export const metadata = metadataFor("/");
 
-export const revalidate = 60;
-
 export default async function Home() {
   const posts = await getRecentPosts();
   const nonce = (await headers()).get("x-nonce") ?? undefined;
