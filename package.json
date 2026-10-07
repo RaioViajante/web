@@ -15,6 +15,7 @@
     "security:origins": "node security/verify-origins.mjs",
     "seo:check": "node --test seo/*.test.mjs",
     "browser:check": "playwright test --config e2e/playwright.config.ts",
+    "audit:check": "node security/audit-check.mjs",
     "perf:check": "node perf/check.mjs",
     "perf:lighthouse": "node --test perf/*.test.mjs && node perf/check-lighthouse.mjs",
     "links:check": "node --test links/*.test.mjs && node links/check.mjs",
