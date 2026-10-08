@@ -10,6 +10,16 @@ toggle remain.
 - `astro.config.mjs` sets the Markdown pipeline: `remark-directive`, the shared
   `remarkSoftCallouts`, the shared `rehypeNumberSections`, `rehypeSteps` and
   `rehypeSoftBlocks`. Code is highlighted at build time with the shared theme.
+  After block transformations, `rehype-slug` runs before numbering, so heading
+  ids come from the title alone: the visible section numbers are presentation
+  and never part of an id or a search title. Docs opts into `captureHeadings`:
+  before numbering, the plugin saves
+  each heading's semantic text and existing slug in Astro plugin frontmatter.
+  It attaches the visual number to the same heading record when numbering that
+  node. The TOC uses only numbered headings; search also includes nested h2/h3
+  headings. Neither consumer reconstructs titles from presentation text or
+  metadata order. Section search descriptions retain the page title so qualified
+  queries such as `sweep classification` continue to work.
 - `src/layouts/DocsShell.astro` is the one layout: head, the shared shell
   (`src/components/DocsFrame.tsx`, rendered statically) and the shared
   behavior script. Styles come from `@raioviajante/design/styles.css` and

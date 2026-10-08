@@ -9,4 +9,9 @@ export { parseFenceMeta } from "./meta";
 export { highlightLines } from "./highlight";
 export { raioviajanteTheme, SYNTAX } from "./theme";
 export { rehypeSoftBlocks, remarkSoftCallouts } from "./rehype";
-export { rehypeNumberSections, rehypeSteps, sectionNumber } from "./sections";
+export {
+  rehypeNumberSections,
+  rehypeSteps,
+  sectionNumber,
+  getSectionHeadings,
+} from "./sections";
