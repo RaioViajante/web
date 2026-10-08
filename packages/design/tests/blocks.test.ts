@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
 import remarkDirective from "remark-directive";
 import remarkGfm from "remark-gfm";
@@ -7,6 +8,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { rehypeSoftBlocks, remarkSoftCallouts } from "../blocks/rehype";
+import { rehypeNumberSections, getSectionHeadings } from "../blocks/sections";
 import { parseFenceMeta } from "../blocks/meta";
 import { highlightLines } from "../blocks/highlight";
 import { SYNTAX } from "../blocks/theme";
@@ -151,5 +153,150 @@ describe("markdown pipeline", () => {
   it("keeps stray colons as text", async () => {
     const html = await render("at 10:30 or :smile today");
     expect(html).toContain(":smile");
+  });
+});
+
+describe("section numbers", () => {
+  async function numbered(markdown: string) {
+    const file = await unified()
+      .use(remarkParse)
+      .use(remarkRehype)
+      .use(rehypeNumberSections)
+      .use(rehypeStringify)
+      .process(markdown);
+    return String(file);
+  }
+
+  it("shows the number in front of each top-level h2 and leaves h3 alone", async () => {
+    const html = await numbered("## One\n\n### Inner\n\n## Two\n");
+    expect(html).toContain(
+      '<h2><span class="rv-num" aria-hidden="true">01.</span><span>One</span></h2>',
+    );
+    expect(html).toContain(">01.1</span><span>Two</span>");
+    expect(html).toContain("<h3>Inner</h3>");
+  });
+
+  async function captured(markdown: string, captureHeadings = true) {
+    return unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkDirective)
+      .use(remarkSoftCallouts)
+      .use(remarkRehype)
+      .use(rehypeSoftBlocks)
+      .use(rehypeSlug)
+      .use(rehypeNumberSections, { captureHeadings })
+      .use(rehypeStringify)
+      .process(markdown);
+  }
+
+  function headings(file: Awaited<ReturnType<typeof captured>>) {
+    return getSectionHeadings(
+      (file.data.astro as { frontmatter: Record<string, unknown> }).frontmatter,
+    );
+  }
+
+  it("changes Classification's visual number without changing its title or id", async () => {
+    const before = await captured("## Overview\n\n## Classification\n");
+    const after = await captured(
+      "## Overview\n\n## New\n\n## Classification\n",
+    );
+    expect(String(before)).toContain(
+      '<h2 id="classification"><span class="rv-num" aria-hidden="true">01.1</span><span>Classification</span></h2>',
+    );
+    expect(String(after)).toContain(
+      '<h2 id="classification"><span class="rv-num" aria-hidden="true">01.2</span><span>Classification</span></h2>',
+    );
+    expect(headings(before).at(-1)).toEqual({
+      depth: 2,
+      slug: "classification",
+      text: "Classification",
+      number: "01.1",
+    });
+    expect(headings(after).at(-1)).toEqual({
+      depth: 2,
+      slug: "classification",
+      text: "Classification",
+      number: "01.2",
+    });
+  });
+
+  it("preserves the slugger's duplicate-heading suffixes", async () => {
+    const file = await captured("## Notes\n\n## Notes\n\n### Notes\n");
+    expect(headings(file).map((heading) => heading.slug)).toEqual([
+      "notes",
+      "notes-1",
+      "notes-2",
+    ]);
+    expect(
+      [...String(file).matchAll(/<h[23] id="([^"]*)"/g)].map(
+        (match) => match[1],
+      ),
+    ).toEqual(["notes", "notes-1", "notes-2"]);
+  });
+
+  it.each([
+    ["blockquote", "> ## Nested"],
+    ["callout", ":::note\n## Nested\n:::"],
+    ["list", "- ## Nested"],
+    ["h3", "### Nested"],
+  ])(
+    "captures clean titles with an intervening %s heading",
+    async (_kind, nested) => {
+      const file = await captured(
+        `## Overview\n\n${nested}\n\n## Classification`,
+      );
+      expect(headings(file).map((heading) => heading.text)).toEqual([
+        "Overview",
+        "Nested",
+        "Classification",
+      ]);
+      expect(headings(file)[1]).not.toHaveProperty("number");
+      expect(headings(file).filter((heading) => heading.number)).toEqual([
+        { depth: 2, slug: "overview", text: "Overview", number: "01." },
+        {
+          depth: 2,
+          slug: "classification",
+          text: "Classification",
+          number: "01.1",
+        },
+      ]);
+      expect(String(file)).toContain(
+        '<h2 id="classification"><span class="rv-num" aria-hidden="true">01.1</span><span>Classification</span></h2>',
+      );
+      if (_kind === "callout")
+        expect(String(file)).toContain('class="callout"');
+    },
+  );
+
+  it("preserves authored numbers and inline title text without prefix stripping", async () => {
+    const file = await captured("## 01.2 *Classification* and `rules`\n");
+    expect(headings(file)[0]?.text).toBe("01.2 Classification and rules");
+  });
+
+  it("does not retain the generated footnote heading removed by soft blocks", async () => {
+    const file = await captured("## Overview\n\nA note[^1].\n\n[^1]: Details.");
+    expect(headings(file).map((heading) => heading.slug)).toEqual(["overview"]);
+    expect(String(file)).toContain('class="footnotes"');
+  });
+
+  it("keeps the default Dump pipeline output unchanged when capture is enabled", async () => {
+    const markdown =
+      "## Overview\n\n:::note\n## Nested\n::: \n\n### Inner\n\n## Classification\n\n## Classification";
+    // Dump keeps its original slug -> number -> blocks pipeline, without capture.
+    const normal = await unified()
+      .use(remarkParse)
+      .use(remarkDirective)
+      .use(remarkSoftCallouts)
+      .use(remarkRehype)
+      .use(rehypeSlug)
+      .use(rehypeNumberSections)
+      .use(rehypeSoftBlocks)
+      .use(rehypeStringify)
+      .process(markdown);
+    const semantic = await captured(markdown);
+    expect(String(semantic)).toBe(String(normal));
+    expect(normal.data.astro).toBeUndefined();
+    expect(headings(semantic).at(-1)?.slug).toBe("classification-1");
   });
 });

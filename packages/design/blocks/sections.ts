@@ -5,21 +5,77 @@ export function sectionNumber(index: number): string {
   return index === 0 ? "01." : `01.${index}`;
 }
 
+export interface SectionHeading {
+  depth: number;
+  slug: string;
+  text: string;
+  /** Present only on headings actually numbered by this plugin. */
+  number?: string;
+}
+
+/** Read the semantic headings persisted through Astro's content renderer. */
+export function getSectionHeadings(
+  frontmatter: Record<string, unknown>,
+): SectionHeading[] {
+  if (!Array.isArray(frontmatter.sectionHeadings)) {
+    throw new Error(
+      "Enable captureHeadings in rehypeNumberSections before reading section headings",
+    );
+  }
+  return frontmatter.sectionHeadings as SectionHeading[];
+}
+
 /**
  * Numbers a page's top-level `##` headings in document order with
- * `sectionNumber`, as a leading `.rv-num` span. The "on this page" list uses
- * the same function, so the two always agree.
+ * `sectionNumber`, as a leading `.rv-num` span. With capture enabled, consumers
+ * receive semantic titles and the exact number assigned to each heading.
  */
-export function rehypeNumberSections() {
-  return (tree: Root) => {
+export function rehypeNumberSections({ captureHeadings = false } = {}) {
+  return async (
+    tree: Root,
+    file: {
+      data: {
+        [key: string]: unknown;
+        astro?: { frontmatter?: Record<string, unknown> };
+      };
+    },
+  ) => {
+    // Opt in for Astro: its normal heading collection runs after numbering.
+    // Preserve text before mutation, keyed by the actual node, never position.
+    const headings = new Map<Element, SectionHeading>();
+    if (captureHeadings) {
+      // Consumers of sectionNumber (including Dump's Jest tests) do not need
+      // these ESM-only utilities. Load them only for the opted-in pipeline.
+      const [{ toString }, { visit }] = await Promise.all([
+        import("hast-util-to-string"),
+        import("unist-util-visit"),
+      ]);
+      visit(tree, "element", (node) => {
+        if (!/^h[1-6]$/.test(node.tagName)) return;
+        if (typeof node.properties.id !== "string") {
+          throw new Error("Run rehype-slug before capturing section headings");
+        }
+        headings.set(node, {
+          depth: Number(node.tagName[1]),
+          slug: node.properties.id,
+          text: toString(node),
+        });
+      });
+      const astro = (file.data.astro ??= {});
+      const frontmatter = (astro.frontmatter ??= {});
+      frontmatter.sectionHeadings = [...headings.values()];
+    }
     let index = 0;
     for (const node of tree.children) {
       if (node.type !== "element" || node.tagName !== "h2") continue;
+      const label = sectionNumber(index);
+      const heading = headings.get(node);
+      if (heading) heading.number = label;
       const number: Element = {
         type: "element",
         tagName: "span",
         properties: { className: ["rv-num"], ariaHidden: "true" },
-        children: [{ type: "text", value: sectionNumber(index) }],
+        children: [{ type: "text", value: label }],
       };
       // Keep inline code/emphasis in one flex item so the title wraps as text.
       node.children = [

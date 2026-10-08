@@ -1,7 +1,7 @@
 ---
 import { render } from "astro:content";
 import { Pager, Prose } from "@raioviajante/design/parts";
-import { sectionNumber } from "@raioviajante/design/sections";
+import { getSectionHeadings } from "@raioviajante/design/sections";
 import { DocHeader } from "../components/DocHeader";
 import DocsShell from "../layouts/DocsShell.astro";
 import { pageJsonLd } from "../lib/structured-data";
@@ -17,17 +17,18 @@ export async function getStaticPaths() {
 }
 
 const { entry, index } = Astro.props;
-const { Content, headings } = await render(entry);
+const { Content, remarkPluginFrontmatter } = await render(entry);
+const headings = getSectionHeadings(remarkPluginFrontmatter);
 const pages = await getPages();
 const { data } = entry;
 const path = pathOf(entry);
 
 const toc = headings
-	.filter((heading) => heading.depth === 2)
-	.map((heading, number) => ({
-		label: heading.text.replace(/^\d{2}(\.\d+)?\.?\s*/, ""),
+	.filter((heading) => heading.number !== undefined)
+	.map((heading) => ({
+		label: heading.text,
 		href: `#${heading.slug}`,
-		number: sectionNumber(number),
+		number: heading.number,
 	}));
 
 const crumbs = breadcrumb(await navPages(), index, data.group);

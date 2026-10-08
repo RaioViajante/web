@@ -4,6 +4,7 @@ import { staticHeaders } from "../../security/headers.ts";
 import { siteOrigins } from "../../site/sites.ts";
 import react from "@astrojs/react";
 import { unified } from "@astrojs/markdown-remark";
+import rehypeSlug from "rehype-slug";
 import remarkDirective from "remark-directive";
 import {
 	rehypeNumberSections,
@@ -33,7 +34,14 @@ export default defineConfig({
 		syntaxHighlight: false,
 		processor: unified({
 			remarkPlugins: [remarkDirective, remarkSoftCallouts],
-			rehypePlugins: [rehypeNumberSections, rehypeSteps, rehypeSoftBlocks],
+			// Finish block transformations before capturing the surviving headings.
+			// Slug before numbering: Astro keeps the semantic ids already set.
+			rehypePlugins: [
+				rehypeSteps,
+				rehypeSoftBlocks,
+				rehypeSlug,
+				[rehypeNumberSections, { captureHeadings: true }],
+			],
 		}),
 	},
 });
