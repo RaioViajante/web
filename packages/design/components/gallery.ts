@@ -10,6 +10,12 @@ import mirrorDonkey from "../assets/gallery/mirror-donkey.webp";
 import purplePortrait from "../assets/gallery/purple-portrait.webp";
 import sunsetGuitar from "../assets/gallery/sunset-guitar.webp";
 
+import stickerPreview from "../assets/gallery/branding-stickers-preview.avif";
+import brandingStickers from "../assets/gallery/branding-stickers.webp";
+import frameSheet from "../assets/gallery/avatar-frames.webp";
+import profileHmm from "../assets/gallery/profile-hmm.png";
+import profileLaptop from "../assets/gallery/profile-laptop.png";
+
 type StaticAsset = string | { src: string };
 const image = (asset: StaticAsset, width: number, height: number) => ({
   src: typeof asset === "string" ? asset : asset.src,
@@ -32,3 +38,11 @@ export const gallery = {
 } as const;
 
 export type GalleryName = keyof typeof gallery;
+
+export const galleryBranding = {
+  stickers: image(brandingStickers, 2160, 1800),
+  stickerPreview: image(stickerPreview, 1080, 900),
+  frames: image(frameSheet, 2400, 240),
+  profileHmm: image(profileHmm, 1254, 1254),
+  profileLaptop: image(profileLaptop, 1254, 1254),
+} as const;

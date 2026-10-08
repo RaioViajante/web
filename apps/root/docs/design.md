@@ -20,8 +20,7 @@ Root keeps only what is its own, in `app/globals.css` and `components/`: the
 avatar flip (`AvatarCoin`), the hover descriptions on home rows (`PreviewRow`),
 the projects list, the gallery board, and the font binding for `next/font`.
 Artwork is not stored in the app: the avatar frames, the gallery images and the
-"work of art" sticker come from `packages/design/assets`. The gallery geometry
-is written in rem against a 110% root size, which `globals.css` keeps.
+"work of art" sticker come from `packages/design/assets`. Gallery styles are scoped to its route; the shared shell keeps its existing geometry.
 
 Root has routes for home, about, projects, contact, gallery, this site, setup,
 search, privacy, and terms of use, and a 404 page (`app/not-found.tsx`) built on
@@ -52,12 +51,38 @@ Sound is off until enabled by the visitor; the shared preference is the
 Its text toggle sits alone at the top of the reading column. The Projects page
 uses an editorial list with name, status, description, type, and destination for
 each entry.
-The gallery opens with the user's "Work of Art" illustration. It floats subtly
-on hover or keyboard focus; clicking or tapping it reveals two overlapping groups
-of artwork, including the character sticker sheet and hospital scene, with a short paper-like sound when
-SOUND is enabled. Each artwork rises gently on hover or keyboard focus and opens
-the full image when selected. Reduced motion keeps the click-to-reveal interaction
-without the movement. The homepage avatar and favicon also come from the user's
+The gallery opens from an isolated, gently floating Work of Art cover, with a
+small muted hint below the sticker. Activating its keyboard-accessible button
+reveals or hides Branding, Profiles, and Personal, with a short unfolding motion
+and staggered sticker release. Focus
+stays on the cover, which scrolls into view as the collection enters normal document
+flow. Reduced motion
+stops the float and reveals immediately; without JavaScript the server-rendered
+collection remains visible. The local export starts open and has no opening
+choreography; this entry interaction refines it without changing the final layout.
+Gallery artwork uses the shared `data-sound="gallery"` hover/click voice, including
+the cover, with no additional manual sound dispatch. Thirty
+stickers share one transparent atlas (a 1080px AVIF preview, with the 2160px WebP
+original reserved for the viewer and downloads); the avatar uses the existing shared animation
+and shows its ten frames. Personal artwork forms a responsive overlapping collage.
+The artwork model lives in `lib/gallery.ts`, the client interaction in
+`components/GalleryBoard.tsx`, and the route styles in `app/gallery/gallery.css`.
+Artwork stays in the shared design package; the existing nine Personal images are reused.
+
+Selecting a piece opens a native modal dialog with title, category, supported usage
+metadata, unboxed ←/→ controls named Previous artwork / Next artwork, arrow-key navigation, Escape, and focus restoration.
+Navigation wraps within its category. The dialog keeps keyboard focus inside, makes
+the background inert, and locks page scrolling. Motion respects reduced-motion preferences.
+Individual profile downloads use the supplied 1254px PNG originals; Personal downloads
+use the existing full-size WebPs. Stickers are viewed individually and downloaded as
+a sheet, matching the reference. Collection downloads select Branding (sticker and
+avatar sheets), Profiles, and/or Personal, and package only those files in a ZIP.
+Regenerate the display atlas with
+`pnpm --filter @raioviajante/design exec node scripts/gallery-art.mjs`.
+The dependency-free ZIP helper loads on demand; a failed fetch cancels the archive
+instead of silently saving an incomplete collection. No game artwork is included.
+
+The homepage avatar and favicon also come from the user's
 art collection. The supplied favicon PNG is
 the source for the multi-size `app/favicon.ico`, `app/icon.png`,
 `app/apple-icon.png`, and the 192-pixel icon referenced by `app/manifest.ts`.
@@ -66,5 +91,6 @@ turning into a résumé. Contact keeps email as the primary channel and gives a
 short guide to first messages. This Site describes the root app and links to the
 public source repository.
 
-The earlier Claude export in the local `reference/` directory remains an
-untracked historical reference. It is not the source of truth for this redesign.
+The supplied Gallery export in the local `reference/` directory is the visual and
+interaction specification for this redesign. It is locally excluded from Git; its
+runtime and prototype source are not production dependencies.

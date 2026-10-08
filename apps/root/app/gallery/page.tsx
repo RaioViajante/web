@@ -1,5 +1,6 @@
+import "./gallery.css";
 import { metadataFor } from "../../lib/seo";
-import { PageHeader, Section } from "@raioviajante/design/components";
+import { PageHeader } from "@raioviajante/design/components";
 import { GalleryBoard } from "../../components/GalleryBoard";
 import { RootShell } from "../../components/RootShell";
 
@@ -13,9 +14,7 @@ export default function Gallery() {
         title="A visual puzzle"
         line="Illustrations, characters and scenes from RaioViajante's world, arranged like a board."
       />
-      <Section number="04." title="Collection" id="collection-heading">
-        <GalleryBoard />
-      </Section>
+      <GalleryBoard />
     </RootShell>
   );
 }

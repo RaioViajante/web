@@ -11,3 +11,7 @@ declare module "*.webp" {
   const asset: string | { src: string };
   export default asset;
 }
+declare module "*.avif" {
+  const asset: string | { src: string };
+  export default asset;
+}
