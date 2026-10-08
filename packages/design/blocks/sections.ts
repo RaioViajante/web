@@ -1,4 +1,4 @@
-import type { Element, Root } from "hast";
+import type { Element, ElementContent, Root } from "hast";
 
 /** `01.` for the first section of a page, then `01.1`, `01.2`, … */
 export function sectionNumber(index: number): string {
@@ -25,13 +25,33 @@ export function getSectionHeadings(
   return frontmatter.sectionHeadings as SectionHeading[];
 }
 
+/** Concatenated text of a node's descendants, as `hast-util-to-string`. */
+function textOf(node: Element): string {
+  const part = (child: ElementContent): string =>
+    child.type === "text"
+      ? child.value
+      : child.type === "element"
+        ? textOf(child)
+        : "";
+  return node.children.map(part).join("");
+}
+
+/** Every heading element under `node`, in document order, at any depth. */
+function* headingElements(node: Root | Element): Generator<Element> {
+  for (const child of node.children) {
+    if (child.type !== "element") continue;
+    if (/^h[1-6]$/.test(child.tagName)) yield child;
+    yield* headingElements(child);
+  }
+}
+
 /**
  * Numbers a page's top-level `##` headings in document order with
  * `sectionNumber`, as a leading `.rv-num` span. With capture enabled, consumers
  * receive semantic titles and the exact number assigned to each heading.
  */
 export function rehypeNumberSections({ captureHeadings = false } = {}) {
-  return async (
+  return (
     tree: Root,
     file: {
       data: {
@@ -44,23 +64,19 @@ export function rehypeNumberSections({ captureHeadings = false } = {}) {
     // Preserve text before mutation, keyed by the actual node, never position.
     const headings = new Map<Element, SectionHeading>();
     if (captureHeadings) {
-      // Consumers of sectionNumber (including Dump's Jest tests) do not need
-      // these ESM-only utilities. Load them only for the opted-in pipeline.
-      const [{ toString }, { visit }] = await Promise.all([
-        import("hast-util-to-string"),
-        import("unist-util-visit"),
-      ]);
-      visit(tree, "element", (node) => {
-        if (!/^h[1-6]$/.test(node.tagName)) return;
+      // No dynamic imports here: Astro renders Markdown through a Vite module
+      // runner that can close mid-transform, and Dump's Jest (CommonJS) loads
+      // this file for `sectionNumber`, so ESM-only helpers are avoided.
+      for (const node of headingElements(tree)) {
         if (typeof node.properties.id !== "string") {
           throw new Error("Run rehype-slug before capturing section headings");
         }
         headings.set(node, {
           depth: Number(node.tagName[1]),
           slug: node.properties.id,
-          text: toString(node),
+          text: textOf(node),
         });
-      });
+      }
       const astro = (file.data.astro ??= {});
       const frontmatter = (astro.frontmatter ??= {});
       frontmatter.sectionHeadings = [...headings.values()];
