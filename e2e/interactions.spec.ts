@@ -355,6 +355,130 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
   });
 });
 
+// "On this page" is a native disclosure on small screens so a long page opens
+// on its title, not on its table of contents; wide screens keep the list open.
+const tocNav = 'nav[aria-label="on this page"]';
+
+/** The sitemap page with the longest "on this page" list, read from the HTML. */
+async function longestToc(site: Site) {
+  const { paths } = await inventory(site);
+  let longest = { path: "", links: 0 };
+  for (const path of paths) {
+    const html = await (await fetch(base(site) + path)).text();
+    const start = html.indexOf('aria-label="on this page"');
+    if (start < 0) continue;
+    const nav = html.slice(start, html.indexOf("</nav>", start));
+    const links = nav.match(/<a /g)?.length ?? 0;
+    if (links > longest.links) longest = { path, links };
+  }
+  expect(
+    longest.links,
+    `${site} has a page with "on this page"`,
+  ).toBeGreaterThan(1);
+  return longest;
+}
+
+test.describe("on this page (mobile)", () => {
+  const mobile = viewports.mobile;
+  test.use({ viewport: mobile });
+
+  for (const site of ["dump", "docs"] as Site[])
+    test(`${site}: the longest page opens on its title; the list opens and closes from the keyboard`, async ({
+      page,
+    }) => {
+      const { path, links: count } = await longestToc(site);
+      const health = await open(page, site, path);
+      const links = page.locator(`${tocNav} a`);
+      const summary = page.locator(`${tocNav} summary`);
+
+      // The whole h1 is inside the first viewport, and the list is closed.
+      expect(await page.evaluate(() => scrollY)).toBe(0);
+      const h1 = (await page.locator("h1").boundingBox())!;
+      expect(h1.y + h1.height, `${path}: h1 bottom`).toBeLessThanOrEqual(
+        mobile.height,
+      );
+      await expect(links.first()).toBeHidden();
+      await expect(summary).toContainText(`ON THIS PAGE · ${count}`);
+      expect((await summary.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+
+      expect(await tabTo(page, `${tocNav} summary`)).toBe(true);
+      await expectFocusRing(page, `${site} on this page`);
+      await page.keyboard.press("Enter");
+      await expect(links).toHaveCount(count);
+      for (const link of await links.all()) await expect(link).toBeVisible();
+      await page.keyboard.press("Tab");
+      await expect(links.first()).toBeFocused();
+      await expectFocusRing(page, `${site} on this page link`);
+      expect(
+        await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth <=
+            document.documentElement.clientWidth,
+        ),
+        "no horizontal overflow with the list open",
+      ).toBe(true);
+
+      // Space closes it again and Tab moves past the hidden links.
+      await page.keyboard.press("Shift+Tab");
+      await expect(summary).toBeFocused();
+      await page.keyboard.press("Space");
+      await expect(links.first()).toBeHidden();
+      await page.keyboard.press("Tab");
+      expect(
+        await page.evaluate(
+          (nav) => document.activeElement?.closest(nav) === null,
+          tocNav,
+        ),
+      ).toBe(true);
+      expect(health, health.join("\n")).toEqual([]);
+    });
+
+  test("dump: the disclosure works without JavaScript", async ({ browser }) => {
+    const { path } = await longestToc("dump");
+    const context = await browser.newContext({
+      viewport: mobile,
+      javaScriptEnabled: false,
+    });
+    const page = await context.newPage();
+    await isolate(page, []);
+    await page.goto(base("dump") + path);
+    const h1 = (await page.locator("h1").boundingBox())!;
+    expect(h1.y + h1.height).toBeLessThanOrEqual(mobile.height);
+    await expect(page.locator(`${tocNav} a`).first()).toBeHidden();
+    await page.locator(`${tocNav} summary`).click();
+    await expect(page.locator(`${tocNav} a`).first()).toBeVisible();
+    await context.close();
+  });
+
+  for (const site of ["root", "lab"] as Site[])
+    test(`${site}: no page list means no disclosure`, async ({ page }) => {
+      await open(page, site, "/");
+      await expect(page.locator(`${tocNav}, .rv-sidebar summary`)).toHaveCount(
+        0,
+      );
+    });
+});
+
+test.describe("on this page (desktop)", () => {
+  test.use({ viewport: desktop });
+
+  for (const site of ["dump", "docs"] as Site[])
+    test(`${site}: the list stays open under its label and Tab reaches it`, async ({
+      page,
+    }) => {
+      const { path, links: count } = await longestToc(site);
+      const health = await open(page, site, path);
+      await expect(page.locator(`${tocNav} summary`)).toBeHidden();
+      await expect(page.locator(`${tocNav} .rv-label`).first()).toBeVisible();
+      const links = page.locator(`${tocNav} a`);
+      await expect(links).toHaveCount(count);
+      for (const link of await links.all()) await expect(link).toBeVisible();
+      expect(await tabTo(page, `${tocNav} a`)).toBe(true);
+      await expect(links.first()).toBeFocused();
+      expect(health, health.join("\n")).toEqual([]);
+    });
+});
+
 test.describe("lab experiments", () => {
   test.use({ viewport: desktop });
 

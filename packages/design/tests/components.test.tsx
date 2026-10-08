@@ -104,6 +104,26 @@ describe("Shell", () => {
       pagesNav.lastIndexOf("archive"),
     );
   });
+
+  it("puts ON THIS PAGE behind a closed native disclosure, and only that group", () => {
+    const toc = html.slice(
+      html.indexOf('aria-label="on this page"'),
+      html.indexOf('aria-label="experiments"'),
+    );
+    expect(toc).toMatch(/<details class="rv-nav__details">\s*<summary/);
+    expect(toc).not.toMatch(/<details[^>]* open/);
+    expect(toc).toMatch(
+      /<summary[^>]*>ON THIS PAGE <span aria-hidden="true">·<\/span> 1<\/summary>/,
+    );
+    expect(toc.indexOf("</summary>")).toBeLessThan(toc.indexOf('href="#code"'));
+    expect(html.match(/<details/g)).toHaveLength(1);
+    const withoutToc = renderToStaticMarkup(
+      <Shell site="root" pages={pages}>
+        x
+      </Shell>,
+    );
+    expect(withoutToc).not.toMatch(/<details|<summary|ON THIS PAGE/);
+  });
 });
 
 describe("page parts", () => {
