@@ -22,21 +22,60 @@ function isIncidental(kind: string, action: SoundAction) {
 
 /** Attaches the delegated listeners driven by `data-sound`. Returns a detach function. */
 export function attachSoundEvents(play: Play) {
-  function onHover(event: PointerEvent) {
-    if (event.pointerType === "touch") return;
-    const target = event.target;
-    if (!(target instanceof Element)) return;
+  // A layout or animation change under a stationary pointer makes the browser
+  // re-hit-test it, producing a leave/re-enter pair on the same control without
+  // any pointer movement. Remember a real leave and suppress that one synthetic
+  // re-entry; any actual pointer move clears it, so genuine re-entries play.
+  let left: { element: HTMLElement; x: number; y: number } | null = null;
+
+  function hoverControl(target: EventTarget | null) {
+    if (!(target instanceof Element)) return null;
     const element = target.closest<HTMLElement>("[data-sound]");
     if (
       !element ||
       element.dataset.soundOn === "click" ||
       !HOVER_KINDS.has(element.dataset.sound ?? "nav") ||
-      (!element.matches("a, button") && !element.querySelector("a, button")) ||
+      (!element.matches("a, button") && !element.querySelector("a, button"))
+    )
+      return null;
+    return element;
+  }
+
+  function onHover(event: PointerEvent) {
+    if (event.pointerType === "touch") return;
+    const element = hoverControl(event.target);
+    if (
+      !element ||
       (event.relatedTarget instanceof Node &&
         element.contains(event.relatedTarget))
     )
       return;
+    if (
+      left &&
+      left.element === element &&
+      left.x === event.clientX &&
+      left.y === event.clientY
+    ) {
+      left = null;
+      return;
+    }
     play(element.dataset.sound ?? "nav");
+  }
+
+  function onLeave(event: PointerEvent) {
+    if (event.pointerType === "touch") return;
+    const element = hoverControl(event.target);
+    if (
+      !element ||
+      (event.relatedTarget instanceof Node &&
+        element.contains(event.relatedTarget))
+    )
+      return;
+    left = { element, x: event.clientX, y: event.clientY };
+  }
+
+  function onMove() {
+    left = null;
   }
 
   function onClick(event: MouseEvent) {
@@ -74,12 +113,16 @@ export function attachSoundEvents(play: Play) {
   }
 
   document.addEventListener("pointerover", onHover);
+  document.addEventListener("pointerout", onLeave);
+  document.addEventListener("pointermove", onMove);
   document.addEventListener("click", onClick);
   document.addEventListener("input", onInput);
   window.addEventListener(SOUND_EVENT, onRequest);
   window.addEventListener("rv-gallery-reveal", onGalleryReveal);
   return () => {
     document.removeEventListener("pointerover", onHover);
+    document.removeEventListener("pointerout", onLeave);
+    document.removeEventListener("pointermove", onMove);
     document.removeEventListener("click", onClick);
     document.removeEventListener("input", onInput);
     window.removeEventListener(SOUND_EVENT, onRequest);

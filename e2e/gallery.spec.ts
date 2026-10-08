@@ -353,6 +353,10 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   expect(await voices()).toBe(beforeHover + 1);
   await cover.click();
   expect(await voices()).toBe(beforeHover + 2);
+  // The reveal re-hit-tests the stationary pointer; no late duplicate hover
+  // voice may arrive once the animations and scroll settle.
+  await page.waitForTimeout(800);
+  expect(await voices()).toBe(beforeHover + 2);
   const sticker = page.getByRole("button", {
     name: "View Work of art",
     exact: true,

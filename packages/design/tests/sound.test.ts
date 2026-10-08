@@ -1,5 +1,7 @@
+// @vitest-environment jsdom
 import { describe, expect, it } from "vitest";
 import {
+  attachSoundEvents,
   cookieDomain,
   parsePreference,
   readPreference,
@@ -8,6 +10,7 @@ import {
   writePreference,
   type PreferenceEnvironment,
 } from "../sound";
+import type { SoundAction } from "../sound";
 
 function fakeEnvironment(
   init: {
@@ -116,5 +119,105 @@ describe("preference", () => {
   it("prefers the cookie over legacy storage", () => {
     const { env } = fakeEnvironment({ cookie: "rv-sound=off", legacy: "on" });
     expect(readPreference(env)).toBe(false);
+  });
+});
+
+describe("delegated sound events", () => {
+  function fixture() {
+    document.body.innerHTML = `
+      <div id="wrap">
+        <button type="button" data-sound="gallery" id="cover">
+          <span id="inner"></span>
+        </button>
+      </div>`;
+    const plays: [string, SoundAction | undefined][] = [];
+    const detach = attachSoundEvents((kind, action) =>
+      plays.push([kind, action]),
+    );
+    return {
+      plays,
+      detach,
+      wrap: document.getElementById("wrap")!,
+      cover: document.getElementById("cover")!,
+      inner: document.getElementById("inner")!,
+    };
+  }
+
+  function fire(
+    type: string,
+    target: Element | Document,
+    relatedTarget: Element | null = null,
+    x = 10,
+    y = 10,
+  ) {
+    target.dispatchEvent(
+      new MouseEvent(type, {
+        bubbles: true,
+        relatedTarget,
+        clientX: x,
+        clientY: y,
+      }),
+    );
+  }
+
+  it("plays one hover per entry and one click per activation", () => {
+    const { plays, detach, cover, inner } = fixture();
+    fire("pointerover", cover);
+    expect(plays).toEqual([["gallery", undefined]]);
+    // Transitions inside the same control are not another entry.
+    fire("pointerout", cover, inner);
+    fire("pointerover", inner, cover);
+    expect(plays).toHaveLength(1);
+    fire("click", inner);
+    expect(plays).toEqual([
+      ["gallery", undefined],
+      ["gallery", "click"],
+    ]);
+    detach();
+  });
+
+  it("suppresses a layout-driven re-entry into the same control at rest", () => {
+    const { plays, detach, wrap, cover } = fixture();
+    fire("pointerover", cover, null, 100, 200);
+    expect(plays).toHaveLength(1);
+    // Reveal animations re-hit-test the stationary pointer: it briefly leaves
+    // the control to its parent and re-enters at the same coordinates, with no
+    // pointermove in between. That synthetic re-entry must not play again.
+    fire("pointerout", cover, wrap, 100, 200);
+    fire("pointerover", wrap, cover, 100, 200);
+    fire("pointerout", wrap, cover, 100, 200);
+    fire("pointerover", cover, wrap, 100, 200);
+    expect(plays).toHaveLength(1);
+    detach();
+  });
+
+  it("plays again when the pointer genuinely moves away and back", () => {
+    const { plays, detach, wrap, cover } = fixture();
+    fire("pointerover", cover, null, 100, 200);
+    fire("pointerout", cover, wrap, 100, 200);
+    fire("pointermove", document);
+    fire("pointerover", cover, wrap, 100, 200);
+    expect(plays).toEqual([
+      ["gallery", undefined],
+      ["gallery", undefined],
+    ]);
+    detach();
+  });
+
+  it("plays a re-entry at different coordinates even without a move event", () => {
+    const { plays, detach, wrap, cover } = fixture();
+    fire("pointerover", cover, null, 100, 200);
+    fire("pointerout", cover, wrap, 100, 200);
+    fire("pointerover", cover, wrap, 140, 200);
+    expect(plays).toHaveLength(2);
+    detach();
+  });
+
+  it("detaches every listener", () => {
+    const { plays, detach, cover } = fixture();
+    detach();
+    fire("pointerover", cover);
+    fire("click", cover);
+    expect(plays).toEqual([]);
   });
 });
