@@ -24,7 +24,11 @@ and local sockets. It runs nothing against public hosts.
   cookie before it is used, `rv-sound` on and off after, host-only on localhost);
   dump's comments placeholder, the no-`IntersectionObserver` fallback, the
   failure message with Try again (one script after the retry) and the sign-in
-  return (`?giscus=`); every control in each lab experiment reachable by Tab;
+  return (`?giscus=`); "on this page" on the longest dump and docs pages (at
+  390px the whole h1 is in the first viewport and the list is a closed native
+  disclosure that opens and closes from the keyboard, also without JavaScript;
+  at 1440px it stays open; root and lab have none); every control in each lab
+  experiment reachable by Tab;
   and reduced motion (the avatar loop and every CSS animation stop; the home page
   is checked first to have motion to stop).
 - **`e2e/harness.spec.ts`** injects a missing alt, an unnamed button, an

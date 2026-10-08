@@ -19,6 +19,11 @@ export interface NavGroupProps {
   ariaLabel?: string;
   /** Rendered inside the group after the items (the search menu item). */
   extra?: ReactNode;
+  /**
+   * Collapses the items behind a native disclosure on small screens; wider
+   * screens always show them under the plain label ("on this page").
+   */
+  collapsible?: boolean;
   linkComponent?: LinkComponent;
 }
 
@@ -30,24 +35,40 @@ export function NavGroup({
   current,
   ariaLabel,
   extra,
+  collapsible,
   linkComponent,
 }: NavGroupProps) {
+  const links = items.map((item, index) => (
+    <SiteLink
+      key={item.href}
+      linkComponent={linkComponent}
+      href={item.href}
+      data-sound="nav"
+      className={item.sub ? "rv-nav__sub" : undefined}
+      aria-current={item.href === current ? "page" : undefined}
+    >
+      <span className="rv-nav__num">{item.number ?? pad(index)}</span>
+      <span>{item.label}</span>
+    </SiteLink>
+  ));
   return (
     <nav className="rv-nav" aria-label={ariaLabel ?? label.toLowerCase()}>
-      <div className="rv-label">{label}</div>
-      {items.map((item, index) => (
-        <SiteLink
-          key={item.href}
-          linkComponent={linkComponent}
-          href={item.href}
-          data-sound="nav"
-          className={item.sub ? "rv-nav__sub" : undefined}
-          aria-current={item.href === current ? "page" : undefined}
-        >
-          <span className="rv-nav__num">{item.number ?? pad(index)}</span>
-          <span>{item.label}</span>
-        </SiteLink>
-      ))}
+      {collapsible ? (
+        <>
+          <div className="rv-label rv-nav__heading">{label}</div>
+          <details className="rv-nav__details">
+            <summary className="rv-label rv-nav__summary">
+              {label} <span aria-hidden="true">·</span> {items.length}
+            </summary>
+            {links}
+          </details>
+        </>
+      ) : (
+        <>
+          <div className="rv-label">{label}</div>
+          {links}
+        </>
+      )}
       {extra}
     </nav>
   );
@@ -174,6 +195,7 @@ export function Shell({
               items={toc}
               current={currentToc}
               ariaLabel="on this page"
+              collapsible
               linkComponent={linkComponent}
             />
           ) : null}
