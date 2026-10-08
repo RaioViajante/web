@@ -1,12 +1,12 @@
 ---
 title: Repository conventions
-description: Commits, branches, and how work lands across RaioViajante repositories.
+description: Commits, publishing changes, and the working language across RaioViajante repositories.
 order: 3
 group: raioviajante
 status: standard
 meta:
   - applies to every raioviajante repository
-summary: commits, branches, releases
+summary: commits, publishing, language
 ---
 
 Conventions that apply across RaioViajante's repositories, this site included.

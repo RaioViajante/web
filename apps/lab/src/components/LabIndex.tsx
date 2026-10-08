@@ -2,6 +2,7 @@ import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { IndexHeader, Section, LeaderRow } from "@raioviajante/design/parts";
 import { ToggleButton } from "@raioviajante/design/components";
 import { experiments } from "../data/experiments";
+import { experimentCount } from "../lib/experiment-count";
 
 export function LabIndex() {
   return (
@@ -59,7 +60,7 @@ export function LabIndex() {
           aria-live="polite"
           data-filter-result
         >
-          3 experiments
+          {experimentCount(experiments.length)}
         </p>
       </Section>
       <Section number="00.1" title="What runs here">

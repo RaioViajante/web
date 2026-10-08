@@ -45,7 +45,7 @@ No database, CMS, or plugin registry is needed. Keep the approved shell and shar
 
 Check intended links without authentication before publishing them. Omit `source` when the repository is not publicly accessible; never substitute a fake destination. Local evidence can support approved experiment content without exposing additional private source material.
 
-On 2026-09-13, unauthenticated requests returned 200 for the Sweep and x86-os-experiment repositories and 404 for Orbit. The first two render source links; Orbit does not. The boot page's revision-specific assembly and learning-note links also returned 200.
+On 2026-09-13, unauthenticated requests returned 200 for the Sweep and x86-os-experiment repositories and 404 for Orbit, so only the first two rendered source links. On 2026-10-07 the Orbit repository and its pinned revision `cd97666` returned 200 unauthenticated, and execution states now renders its source link too. The boot page's revision-specific assembly and learning-note links also returned 200.
 
 Keep the referenced revision visible in notes. When changing behavior, recheck the source and tests and update provenance deliberately.
 

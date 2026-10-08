@@ -13,9 +13,9 @@ blog, marketing site, or an automatic mirror of other projects' internal docs.
 
 Astro, with shared React components from `@raioviajante/design` rendered
 statically (`@astrojs/react`, no hydration) and a plain Astro content
-collection. Starlight was removed in Phase 4c: the design needs a two-column
-shell it does not provide. Search is the shared client-side search over
-`/search-index.json`. Do not introduce another framework or documentation
+collection. Starlight was removed in the design migration: the design needs a
+two-column shell it does not provide. Search is the shared client-side search
+over `/search-index.json`. Do not introduce another framework or documentation
 system without explicit instruction.
 
 ## Three kinds of documentation
@@ -55,6 +55,7 @@ repository. Publish project behavior only once it is implemented and stable.
 
 ## Formatting and validation
 
-This app has no formatter, linter, or tests configured. Match the existing
-style, including tab indentation in Astro and config files. Validate with
-`typecheck` (`astro check`) and `build`.
+This app has no formatter or linter configured. Match the existing style,
+including tab indentation in Astro and config files. Pure helpers in `src/lib`
+(sidebar numbering and breadcrumbs in `nav.ts`) have Node tests in `tests/`.
+Validate with `typecheck` (`astro check`), `test` and `build`.

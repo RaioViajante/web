@@ -19,7 +19,10 @@ toggle remain.
   lists the pages for the `/og/` cards and `sitemap.xml`.
 - Two columns, like every site. "On this page" sits in the sidebar under
   PAGES; there is no right column. A page that belongs under another (the
-  Sweep CLI reference) is a `sub` item: `01.1 cli reference`.
+  Sweep CLI reference) is a `sub` item, listed under the nearest top-level page
+  before it in `order` and numbered `01.1`, `01.2`, … (`src/lib/nav.ts`). Its
+  breadcrumb is the folder, that page as a link, then its own sidebar label, and
+  the home page notes the pages listed under each project guide.
 - `src/pages/[...slug].astro` renders every documentation page: breadcrumb
   label, status word and meta row, numbered sections, steps, tables, callouts,
   "last updated" and "edit this page on GitHub", and previous/next. The

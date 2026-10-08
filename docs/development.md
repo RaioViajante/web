@@ -37,22 +37,17 @@ directory also works.
 ## Validate
 
 ```sh
-pnpm validate
+NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate
 ```
 
-This runs `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, `pnpm test`, and
-`pnpm build` in order. Each root script runs only in the apps that define it:
-
-| App  | format:check | lint | typecheck | test | build |
-| ---- | :----------: | :--: | :-------: | :--: | :---: |
-| root |      ✓       |  ✓   |     ✓     |      |   ✓   |
-| dump |      ✓       |  ✓   |     ✓     |  ✓   |   ✓   |
-| docs |              |      |     ✓     |      |   ✓   |
-| lab  |      ✓       |  ✓   |     ✓     |      |   ✓   |
-
-docs and lab run `typecheck` through `astro check`. CI runs the same install
-and `pnpm validate` on pull requests and pushes to `main`
-([`.github/workflows/ci.yml`](../.github/workflows/ci.yml)).
+`validate` (the script in the root [`package.json`](../package.json)) runs
+`format:check`, `lint`, `typecheck`, `test` and `build` across the workspace,
+each only in the packages that define it, then `pnpm security:check`,
+`pnpm seo:check` and `pnpm commits:test`. Which package defines which script is
+the table in [`AGENTS.md`](../AGENTS.md#validation-and-git). docs and lab run
+`typecheck` through `astro check`. CI runs the same install and `pnpm validate`,
+then the browser, HTTP, performance and link checks, on pull requests and pushes
+to `main` ([ci.md](ci.md)).
 
 ## Environment variables
 

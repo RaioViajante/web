@@ -87,7 +87,11 @@ packages/
 ```
 
 An app depends on a package through `workspace:*` and imports it through the
-package's `exports`, never by a relative path into `packages/`.
+package's `exports`, not by a relative path into `packages/`. Two exceptions
+read a file rather than import a module, because the tool needs a path: Root and
+Dump pass the shared font file to `next/font/local`
+(`../../../packages/design/fonts/…`), and Dump's `/giscus.css` route reads
+`packages/design/styles/tokens.css` at build time to theme the comments frame.
 
 ## Shared design policy
 

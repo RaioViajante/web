@@ -2,10 +2,21 @@
 import { LeaderRow, Section } from "@raioviajante/design/parts";
 import { DocsIndexHeader } from "../components/DocsIndexHeader";
 import DocsShell from "../layouts/DocsShell.astro";
-import { getPages, pathOf } from "../lib/docs";
+import { getPages, navPages, pathOf } from "../lib/docs";
+import { childIndexes } from "../lib/nav";
 import { homeJsonLd } from "../lib/structured-data";
 
-const pages = (await getPages()).filter((entry) => !entry.data.sub);
+const all = await getPages();
+const nav = await navPages();
+// A project's guide is followed by the pages listed under it (the Sweep CLI
+// reference): the note names them, so a guide without any shows no note.
+const notes = new Map(
+	all.map((entry, index) => {
+		const children = childIndexes(nav, index).map((child) => nav[child]!.label);
+		return [entry.id, children.length ? ["guide", ...children].join(" · ") : undefined];
+	}),
+);
+const pages = all.filter((entry) => !entry.data.sub);
 const guides = pages.filter((entry) => entry.data.group === "projects");
 const standards = pages.filter((entry) => entry.data.group === "raioviajante");
 ---
@@ -25,7 +36,7 @@ const standards = pages.filter((entry) => entry.data.group === "raioviajante");
 				<div class="docs-entry">
 					<LeaderRow label={entry.data.title.toLowerCase()} value={entry.data.status} href={pathOf(entry)} />
 					<p>{entry.data.summary}</p>
-					<p class="docs-entry__note">guide · reference</p>
+					{notes.get(entry.id) && <p class="docs-entry__note">{notes.get(entry.id)}</p>}
 				</div>
 			))
 		}

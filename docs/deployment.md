@@ -107,9 +107,8 @@ failure or a wrong working directory all build. The old inline command was
 compared with the script over 13 previous commits (including a zero and a
 malformed SHA) for all four apps with identical results.
 
-This proves the script, not how Vercel's dashboard evaluates the setting.
-Confirm it on the first deployments: see the checklist in
-[operations.md](operations.md).
+This proves the script, not how Vercel's dashboard evaluates the setting; that
+is confirmed on real deployments, recorded in [operations.md](operations.md).
 
 ## Environment
 
@@ -120,15 +119,16 @@ Production environment to set its canonical origin (see
 back to `VERCEL_PROJECT_PRODUCTION_URL`. docs no longer needs
 `VERCEL_DEEP_CLONE`: its "last updated" dates come only from explicit
 `lastUpdated: "YYYY-MM-DD"` frontmatter, never from git history, and are
-omitted without it. The dump setting has not been applied or verified by the
-migration agent. Root and lab do not use custom environment
-variables.
+omitted without it. Root and lab do not use custom environment variables.
+Dashboard values cannot be read from the repository; whether they have been
+checked is recorded in [operations.md](operations.md).
 
 ## Owner checklist (Vercel dashboard)
 
 Only what cannot live in the repository. Screen names follow the Vercel
-dashboard as last documented; they may have moved slightly. Nothing here has
-been applied or verified by the migration agent.
+dashboard as last documented; they may have moved slightly. The current
+production state of these settings is recorded in
+[operations.md](operations.md).
 
 For every project (`raioviajante.com`, `dump`, `docs`, `lab`):
 
@@ -158,7 +158,7 @@ Per project:
    Variables → keep `NEXT_PUBLIC_SITE_URL` = `https://dump.raioviajante.com`
    for Production (Preview may be left unset).
 
-After the first deployments of the migration:
+After changing any of these settings, or setting up a new project:
 
 8. **Verify.** Check each site's sitemap, robots, social images, host 404,
    cross-origin search index, the icons and manifest, and that a commit

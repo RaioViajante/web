@@ -6,6 +6,10 @@ The repository, GitHub checks and the four Vercel projects have been run and
 verified in production. "First push" and "First deploy" below record what was
 inspected then and remain the checklist for repeating that on a new setup.
 
+This page is the one place that records the current production and deployment
+verification state. The other documents explain mechanisms and policies, and
+link here rather than keeping their own "verified" or "not yet verified" notes.
+
 ## Local, before every push
 
 Node comes from `.nvmrc` and pnpm from `packageManager`.

@@ -1,15 +1,11 @@
-# Production security headers — Phase 4
+# Production security headers
 
-## Recovery and scope
+## Scope
 
-Work started on `chore/production-hardening`, with a clean working tree and
-`232a57d chore: update vulnerable dependencies` at HEAD. The only inherited
-commit ahead of `main` was that dependency remediation commit. No deployment,
-push, dashboard, DNS, external repository, or later hardening phase is included.
-
-The installed frameworks are Next.js 16.3.8 and Astro 7.3.6. The current Docs app
-does **not** use Starlight: the earlier design migration removed it. All four
-apps use a fixed dark palette, with no theme bootstrap or theme-switch control.
+The HTTP security headers and Content Security Policy of the four apps, written
+against Next.js 16.3.8 and Astro 7.3.6. Docs does **not** use Starlight: the
+design migration removed it. All four apps use a fixed dark palette, with no
+theme bootstrap or theme-switch control.
 Astro renders shared React statically; there are no hydrated React islands.
 Giscus already loads near the viewport; that implementation is unchanged.
 
@@ -145,10 +141,11 @@ node security/verify-http.mjs
 git diff --check
 ```
 
-The HTTP verifier expects production servers on Root 3002, Dump 3001, Docs 4321
-and Lab 4322. Start them with the corresponding named filter's `start --port`
-or `preview --ignore-lock --host 127.0.0.1 --port` command. `--ignore-lock`
-preserves any pre-existing Astro preview. Do not deploy to run these checks.
+The HTTP verifier uses production servers on Root 3002, Dump 3001, Docs 4321
+and Lab 4322 (`security/local-servers.mjs`): it reuses servers already running
+there and otherwise starts the built apps itself and stops them afterwards.
+Astro previews run with `--ignore-lock`, which preserves any pre-existing Astro
+preview. Do not deploy to run these checks.
 
 Local browser testing uses `root.localhost`, `dump.localhost`, `docs.localhost`
 and `lab.localhost` at those ports. Unlike bare localhost, these names avoid the
@@ -158,8 +155,9 @@ production CSP. Everywhere search still fetches the public sibling indexes.
 
 Astro preview does not attach `server.headers` to its own missing-route fallback.
 The HTTP verifier therefore checks the built `404.html` directly for the static
-apps. Production `vercel.json` has an all-path rule, including errors; its actual
-host behavior remains a post-deployment verification item. Next's real 404s,
+apps. Production `vercel.json` has an all-path rule, including errors; its host
+behavior belongs to the live checks in [operations.md](operations.md). Next's
+real 404s,
 including unknown social-image paths, are checked locally.
 
 Giscus's script, stylesheet link, iframe, resizing and unauthenticated comments
@@ -167,18 +165,19 @@ UI load under the parent CSP. Firefox blocks the public iframe's access to the
 local custom-theme URL under Local Network Access protection. The CSS endpoint
 and its CORS header are checked over HTTP; this local browser restriction is
 not bypassed. No comment was posted, no GitHub authorization was granted, and
-an authenticated round trip was not performed. Production custom-theme loading
-must be rechecked after an authorized deployment.
+an authenticated round trip was not performed locally. Production custom-theme
+loading belongs to the Giscus live checks in [operations.md](operations.md).
 
 No visual or content changes are intended. Browser smoke checks cover gallery
 hydration, sound, navigation, search, article rendering, copy controls and Lab
 interactions, including keyboard and mobile checks. These are not an exhaustive
 accessibility audit or a cross-browser certification. Theme switching,
 Starlight behavior and hydrated Astro React islands are absent from the
-checkpoint and are not claimed as tested features.
+apps and are not claimed as tested features.
 
-No securityheaders.com, Mozilla Observatory, deployment or rollout validation
-is claimed. Node emits a non-failing module-type inference warning for the
+This page claims no securityheaders.com, Mozilla Observatory or rollout result;
+live checks are recorded in [operations.md](operations.md). Node emits a
+non-failing module-type inference warning for the
 shared TypeScript configuration, as it already does for the design package.
 
 ## Effective production document headers

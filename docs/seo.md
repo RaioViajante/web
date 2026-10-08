@@ -1,7 +1,7 @@
 # SEO metadata and structured data
 
-Checked against local production builds of all four apps (67 sitemap
-documents, plus the four search pages that are deliberately not in them). Nothing was submitted to a search engine, and hosting redirects
+Checked against local production builds of all four apps (every sitemap
+document, plus the four search pages that are deliberately not in them). Nothing was submitted to a search engine, and hosting redirects
 were not touched.
 
 ## What every page has
@@ -10,7 +10,7 @@ Title, description, canonical URL on the production host, `og:*` and
 `twitter:*` tags with a generated social card that exists at its URL, `lang="en"`,
 icon links and the manifest, and `theme-color` (the page background token,
 read from `styles/tokens.css`). Titles and descriptions are unique across all
-71 pages. Root and Dump use Next metadata; Docs and Lab use `seo/SeoHead.astro`. The
+pages. Root and Dump use Next metadata; Docs and Lab use `seo/SeoHead.astro`. The
 pieces that repeat live in `seo/metadata.ts`.
 
 ## Identity
@@ -137,11 +137,12 @@ two ways. There is no list of pages: the inventory is each app's own
   It needs the apps built with `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com`
   and no sockets.
 - `pnpm seo:verify`: starts (or reuses) the four built apps and checks every
-  sitemap document over local HTTP, all 67 today, plus each search page (200,
+  sitemap document over local HTTP, plus each search page (200,
   `noindex, follow`, one bare canonical, also with `?q=` and tracking
   parameters), content types, social image and icon URLs, missing routes and
   the Dump RSS cross-check against each post. Exit code 2 means the apps
-  could not start and nothing was verified. Phase 10 can wire it into CI.
+  could not start and nothing was verified. CI runs it in the blocking `quality`
+  job ([ci.md](ci.md)).
 
 Per page it enforces: one `<title>`, meta description, canonical (absolute
 HTTPS, own production host, no query, equal to the sitemap URL), `lang="en"`,

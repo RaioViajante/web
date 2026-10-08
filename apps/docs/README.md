@@ -37,7 +37,7 @@ See [`docs/architecture.md`](docs/architecture.md) and [`AGENTS.md`](AGENTS.md) 
 - Plain Astro content collection, with the shared design system
 - TypeScript
 - pnpm
-- Markdown / MDX
+- Markdown
 - The shared client-side search over a static index
 - Vercel
 
@@ -61,6 +61,7 @@ pnpm dev       # start the local development server
 pnpm build     # production build
 pnpm preview   # serve the production build locally
 pnpm check     # run Astro/TypeScript diagnostics
+pnpm test      # run the Node unit tests
 ```
 
 See [`docs/development.md`](docs/development.md) for more detail.

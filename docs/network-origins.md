@@ -150,6 +150,6 @@ Exit code 2 means Firefox or a build was missing and nothing was verified.
   with `target="_top"` followed by redirects, with no popup or `window.opener`
   (from its published source), so the policy does not apply to it; the real
   flow was not exercised.
-- It runs against local production builds, not Vercel. Anything the platform
-  adds at the edge, and the real deployed hosts, still need a post-deploy
-  check. No platform host is allowed in the policy.
+- It runs against local production builds, not Vercel. What the platform adds
+  at the edge and the deployed hosts are covered by the live checks in
+  [operations.md](operations.md). No platform host is allowed in the policy.

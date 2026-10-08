@@ -76,14 +76,15 @@ uncommitted edits, including playground edits.
 
 ## Validation and Git
 
-| App  | Scripts with `pnpm --filter @raioviajante/<app>`     |
-| ---- | ---------------------------------------------------- |
-| root | `format:check`, `lint`, `typecheck`, `build`         |
-| dump | `format:check`, `lint`, `typecheck`, `test`, `build` |
-| docs | `typecheck`, `build`                                 |
-| lab  | `format:check`, `lint`, `typecheck`, `test`, `build` |
+| Package | Scripts with `pnpm --filter @raioviajante/<package>` |
+| ------- | ---------------------------------------------------- |
+| root    | `format:check`, `lint`, `typecheck`, `build`         |
+| dump    | `format:check`, `lint`, `typecheck`, `test`, `build` |
+| docs    | `typecheck`, `test`, `build`                         |
+| lab     | `format:check`, `lint`, `typecheck`, `test`, `build` |
+| design  | `format:check`, `typecheck`, `test`                  |
 
-Docs has no lint, format or test scripts. Shared/workspace changes require:
+Docs has no lint or format scripts. Shared/workspace changes require:
 
 ```sh
 NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate

@@ -8,12 +8,12 @@ of `pnpm validate`.
 
 ## What is crawled
 
-Every sitemap page of the four apps plus each app's `/search` page (71
-documents). Links on any of the four production hosts are mapped to the
-matching local server, so `https://docs.raioviajante.com/...` is checked against
-the local docs build. The 404 pages are not crawl targets.
+Every sitemap page of the four apps plus each app's `/search` page. Links on
+any of the four production hosts are mapped to the matching local server, so
+`https://docs.raioviajante.com/...` is checked against the local docs build. The
+404 pages are not crawl targets.
 
-## Internal links, 1,066 of 1,378 today
+## Internal links
 
 Each distinct destination must answer 200. Fails: a 404, a malformed URL, a
 `localhost`, private-address or `*.vercel.app` URL, a non-https external link,
@@ -21,9 +21,9 @@ an unsupported scheme, a `mailto:` that is not an address, and a **redirect**:
 an internal link must point at the destination, not at something that
 redirects, including a missing or extra trailing slash (the Next apps redirect
 `/x/` to `/x`; the Astro apps use `/x/`, so their links must end in a slash).
-Fragments are checked against the real target document, same page or another
-(193 checks): a docs heading link or the dump "on this page" list that points at
-an id that does not exist fails. 79 `mailto:` links are syntax-checked.
+Fragments are checked against the real target document, same page or another:
+a docs heading link or the dump "on this page" list that points at an id that
+does not exist fails. `mailto:` links are syntax-checked.
 
 ## Known redirects
 
@@ -44,7 +44,7 @@ the pages actually reference.
 ## External links
 
 The deterministic gate only validates their syntax (absolute `https`, public
-host). `pnpm links:external` also requests each one (27 today) with a timeout,
+host). `pnpm links:external` also requests each one with a timeout,
 reports 2xx as ok, 403/429/999 as "blocked or rate limited", 404/410 as "likely
 broken" and anything else as unexpected, and **never fails the run**: remote
 availability is not ours to gate on.

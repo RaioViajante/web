@@ -8,7 +8,7 @@ One visual identity for four sites with four different jobs.
 | ---------------- | ----------------------- | --------------------------------------------------------------------- |
 | raioviajante.com | index: who, what, where | projects, latest writing, gallery                                     |
 | dump             | reading                 | series, related posts, comments, code walkthroughs                    |
-| docs             | reference               | left nav + "on this page", search, callouts, CLI reference, changelog |
+| docs             | reference               | left nav + "on this page", search, callouts, CLI reference            |
 | lab              | running things          | benches, fidelity, notebook                                           |
 
 The frame never changes between sites: sound toggle, sidebar, centered page header, numbered sections, footer. Only what lives inside the frame does.
@@ -81,8 +81,9 @@ Syntax: keyword `#d8bd84` · type `#bfa6d9` · function `#8fb8d6` · string `#a8
 
 ## 3. Typography
 
-These are the root site's original values, restored in Phase 4a after a
-before/after comparison. The root is the reference for the system.
+These are the root site's original values, restored after a before/after
+comparison during the design migration. The root is the reference for the
+system.
 
 | role         | size / weight                              | where                                     |
 | ------------ | ------------------------------------------ | ----------------------------------------- |
@@ -107,12 +108,12 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 ## 4. Structure (shared by all sites)
 
 - **Sound toggle** — `SOUND ON` at the top center of the **content column** (not the page), exactly like the root.
-- **Sidebar** — caps group labels; items numbered `00.`, `01.`; the current item has a 1px `--fg-2` rule on its left. Groups: PAGES, ON THIS PAGE where useful, EXPERIMENTS on lab. **No SITES group** — the footer links the sites. Search is the last item of PAGES: `03. search ····· (avatar) ⌘K` — see `dump/search-brand.html`.
+- **Sidebar** — caps group labels; items numbered `00.`, `01.`; the current item has a 1px `--fg-2` rule on its left. Groups: PAGES, ON THIS PAGE where useful, EXPERIMENTS on lab. **No SITES group** — the footer links the sites. Search is the last item of PAGES, numbered after the site's last top-level page: `NN. search ····· (avatar) ⌘K`.
 - **Page header** — centered: caps label (or breadcrumb in caps on docs), title, one line, meta row separated by middots. The first meta item is the status word in `--fg`.
-- **Numbered sections** — `01.`, `01.1`, `01.2`. The same numbers appear in "on this page" and in search results.
+- **Numbered sections** — `01.`, `01.1`, `01.2`. The same numbers appear in "on this page".
 - **Dotted leader** — `name ····· value` for lists, metadata, statuses, tags, related links.
 - **Soft blocks** — callouts NOTE / IMPORTANT on `#212121`; WARNING outlined 1px `--fg-2`; DEPRECATED dotted. Quotes keep a 2px left rule.
-- **Related rows** — `title ····· site ↗`. Every post, docs page and experiment links to its siblings on the other sites.
+- **Related rows** — `title ····· site ↗`, linking to pages about the same thing on the other sites. Today every experiment lists its related posts and docs; a post links its Lab experiment where one exists ("try it"); the Sweep guide links its experiment and posts from its own "try it and read more" section. Not every post or docs page has such links.
 - **Prev / next** — caps label above title, no box.
 - **Footer** — identical everywhere: four sites (none marked as current), email, CNPJ, and that site's own Terms of Use and Privacy Policy.
 - **Index header** — avatar (112px circle), site name, one line — like the root.
@@ -126,7 +127,7 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 - Index: latest post featured, posts by month, series, follow along (RSS, GitHub).
 - Post: reading progress line, "on this page" in the sidebar, numbered sections, code blocks (file name, language, copy, line numbers, highlighted lines), notes, metadata leaders, prev/next, related by tag, **try it in the lab**, comments (giscus with a custom theme built from these tokens).
 - Archive and tags as leader lists; tags split into recurring / once.
-- Search: numbered sidebar item `04. search  /`, opens the shared search page.
+- Search: numbered sidebar item `03. search  /`, opens the shared search page.
 - The separate About page was removed; the root About covers it.
 
 ### docs
@@ -135,7 +136,7 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 - Two columns: sidebar (pages and "on this page") and content.
 - Guide pages: breadcrumb label, status, steps, tables, callouts, **try it and read more**, last updated and edit on GitHub. Last updated comes only from explicit ISO-date `lastUpdated` frontmatter (never git history) and is omitted when absent.
 - Reference pages render verified commands and behavior. Unknown versions, exit codes and changelogs are omitted. Tabs and file trees are shared capabilities, used only where content needs them.
-- Search: numbered sidebar item `03. search  /`, the only search entry point (the docs home has no search line of its own). It opens a full search page (no icon, no box, no key chips): caps label, plain input, results as numbered leader rows, selected result marked with the sidebar rule. Finds docs sections and dump posts from one shared index. Shortcut `/` on every site.
+- Search: the sidebar item after the last top-level page (`NN. search  /`), the only search entry point (the docs home has no search line of its own). It opens a full search page (no icon, no box, no key chips): caps label, plain input, results as numbered leader rows, selected result marked with the sidebar rule. "This site" searches docs pages and their sections; "everywhere" adds the indexes of the other three sites. Shortcut `/` on every site.
 - **Design language** page rewritten for this system (the old one described a purple accent and serif prose).
 - Callout and code styles: see `blocks/` (soft direction) — same rules on docs.
 
@@ -149,7 +150,7 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 
 ### Shared extras
 
-- **404** — one design for all four sites (`404.html` for the root, `dump/404.html`, `docs/404.html`, `lab/404.html`): the "404 page not found" sticker floating gently, "I looked everywhere.", a line in the site's voice, the requested path in a soft block, "Try instead" leaders for that site, and "ask RaioViajante ⌘K". Build it **once** as a shared component; each site only passes its line and its links.
+- **404** — one design for all four sites (Next's not-found page on root and dump, `404.html` on docs and lab): the "404 page not found" sticker floating gently, "I looked everywhere.", a line in the site's voice, the requested path in a soft block, "Try instead" leaders for that site, and "ask RaioViajante ⌘K". Build it **once** as a shared component; each site only passes its line and its links.
 
 ## 5b. Sound
 
@@ -181,21 +182,22 @@ Static React renders the initial state; plain TypeScript Astro scripts run the b
 
 Implementation: Shiki with a custom theme mapped to the syntax tokens (`packages/design/blocks/`), a build-time static search index per site merged client-side for "everywhere" (implemented), and `@raioviajante/design` imported by all four apps.
 
-## 7. To verify before shipping
+## 7. Verified facts and omissions
+
+The handoff's open checks, as they stand:
 
 - `[CHECK]` values in `tokens.css`: resolved (see section 2).
 - Orbit rules are verified: start from QUEUED; succeed/fail from RUNNING; cancel from QUEUED/RUNNING.
 - Boot source and notes are verified at `e966889`; the original `[NOTE FROM LEARNING NOTES]` placeholders are not published.
-- Placeholders: `[VERSION]`, `[DATE]`, `[REVISION]`, `[COMMIT]`, exit codes, changelog entries, install commands.
+- Placeholders such as `[VERSION]`, `[DATE]`, `[REVISION]`, `[COMMIT]`, exit codes, changelog entries and install commands are never rendered; an unknown fact is omitted.
 - Dump series derive from real posts; reading time is computed at 220 words per minute.
-
-- Legal pages: every `[CONFIRM]` and placeholder (license, host, analytics, retention, governing law). This is a template, not legal advice — have it reviewed.
-- Artwork: done. The shared package ships the original artwork.
+- Legal pages: every `[CONFIRM]` fact (license, host, analytics, retention, governing law) is omitted until the owner supplies it ([operations.md](operations.md), "Deferred and accepted"). The template is not legal advice.
+- Artwork: the shared package ships the original artwork.
 
 ## 8. Metadata, accessibility and delivery
 
 Every indexable page has its own title, description, canonical URL and 1200×630
-PNG for Open Graph and Twitter. `seo.ts` owns URL and metadata conventions;
+PNG for Open Graph and Twitter. `seo/metadata.ts` owns URL and metadata conventions;
 `social-image.tsx` owns the shared avatar/site/title composition and reads token
 colors at build time. Apps own their route inventories. Sitemaps include search
 and legal pages but exclude 404 and image endpoints; robots points at the

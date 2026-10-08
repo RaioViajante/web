@@ -25,8 +25,8 @@ requests from forks.
 
 ## Jobs
 
-**`quality`: the blocking gate.** Require this exact check name in branch
-protection (see "After the first push"). Deterministic, under repository control,
+**`quality`: the blocking gate.** Branch protection requires this exact check
+name (see "Required checks"). Deterministic, under repository control,
 30-minute timeout, no retries. In order:
 
 1. `pnpm validate`: format, lint, typecheck, tests, the build of all four apps,
@@ -143,14 +143,13 @@ blocking commands also passed in an Ubuntu 24.04 container (arm64, Node 24.20.0,
 pnpm 12.8.1, Playwright's Chromium with its system packages, and the Firefox
 157.0.1 tarball). That run found a real Linux problem, now fixed: Node cannot
 resolve `*.localhost` names (Firefox can), and `verify-http` expected servers to
-be started already. **Not verified until the workflow runs on GitHub:** the
-x64 runner image, the setup actions (including that `setup-firefox`'s download
-finds the GTK libraries the runner image ships), `--with-deps` on that image,
-and real timings.
+be started already. What only a GitHub-hosted run can show (the x64 runner
+image, the setup actions including `setup-firefox`'s GTK libraries,
+`--with-deps` on that image, and real timings) is covered by the workflow's
+runs on GitHub; the current state is recorded in [operations.md](operations.md).
 
-## After the first push (manual, remote)
+## Required checks
 
-Mark the checks named **`quality`** and **`dependency-audit`** as required
-(branch protection or a ruleset).
-Leave `observational (non-blocking)` and CodeQL unrequired for now. The full
-first-push and settings checklist is in [operations.md](operations.md).
+A ruleset on `main` requires the checks named **`quality`** and
+**`dependency-audit`**. `observational (non-blocking)` and CodeQL are not
+required. The full settings checklist is in [operations.md](operations.md).
