@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { siteOrigins } from "../site/sites.ts";
+import { checkSecurityTxt, securityTxtPath } from "../security/security-txt.ts";
+import { renderLlmsTxt } from "./llms.ts";
 import { ports, startServers } from "../security/local-servers.mjs";
 import { auditSite, expectedThemeColor } from "./audit.mjs";
 import {
@@ -57,8 +59,25 @@ async function text(site, path, contentType) {
 const allPages = [];
 const images = new Map();
 const assets = new Map();
+const discoveryLinks = new Set();
 let documents = 0;
 for (const site of sites) {
+  const security = await text(site, securityTxtPath, /^text\/plain\b/);
+  problems.push(
+    ...checkSecurityTxt(site, security).map(
+      (p) => `app ${site} security.txt: ${p}`,
+    ),
+  );
+  // Astro preview serves emitted .txt files without a charset; Next keeps it.
+  const plainText =
+    site === "docs" || site === "lab"
+      ? /^text\/plain(?:;\s*charset=utf-8)?$/i
+      : /^text\/plain;\s*charset=utf-8$/i;
+  const llms = await text(site, "/llms.txt", plainText);
+  if (llms !== renderLlmsTxt(site))
+    fail(`app ${site} llms.txt: does not match the curated discovery index`);
+  for (const match of llms.matchAll(/\]\(([^)]+)\)/g))
+    discoveryLinks.add(match[1]);
   const files = {
     sitemap: await text(site, "/sitemap.xml", /xml/),
     robots: await text(site, "/robots.txt", /^text\/plain/),
@@ -161,6 +180,14 @@ for (const site of sites) {
 }
 
 problems.push(...checkUniqueness(allPages));
+
+const publicUrls = new Set(
+  allPages.map(({ site, path }) => new URL(path, siteOrigins[site]).href),
+);
+publicUrls.add(`${siteOrigins.dump}/rss.xml`);
+for (const url of discoveryLinks)
+  if (!publicUrls.has(url))
+    fail(`llms.txt: ${url} is not a verified public sitemap page or feed`);
 
 for (const [url, where] of images) {
   const target = localFor(url);
