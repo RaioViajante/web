@@ -85,6 +85,23 @@ add it; git dates and build times never do.
 
 ## Indexing decisions
 
+Each host also serves `/llms.txt`: a concise, curated discovery index in English.
+It is optional documentation for readers and tools, not an SEO requirement,
+crawler policy or replacement for robots.txt and sitemaps. `seo/llms.ts` owns
+the renderer and discovery copy, using canonical origins from `site/sites.ts`.
+Root points to identity, projects and the other sites; Dump to writing indexes
+and RSS; Docs to its public documentation; Lab to its experiment index.
+Next.js uses static route handlers; Astro emits the endpoints at build time.
+No full-content mirror or additional crawler files are generated.
+
+`pnpm seo:verify` checks all four llms.txt responses and their content types,
+then requires every discovery link to be a verified sitemap page or the Dump
+feed. It also checks each `/.well-known/security.txt` response against the
+shared security policy (including expiration and host-specific canonical).
+Astro preview serves emitted `.txt` files without a charset, so the local check
+accepts `text/plain` there. Production security.txt must include UTF-8,
+as described in [security-txt.md](security-txt.md).
+
 Terms and privacy pages are indexable and in the sitemaps.
 
 The four `/search` pages are `noindex, follow` and not in any sitemap. They
