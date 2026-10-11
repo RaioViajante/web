@@ -5,16 +5,50 @@ export interface GearItem {
 }
 
 export const gear: GearItem[] = [
-  { name: "MacBook Air M2 · 16 GB", category: "laptop" },
-  { name: "Desktop · Ryzen 9 9950X3D / RTX 5070 / 32 GB", category: "desktop" },
+  {
+    name: "MacBook Air M5 · 24 GB / 1 TB",
+    category: "laptop",
+    url: "https://meli.la/2R6XZ9W",
+  },
+  {
+    name: "LG UltraGear 34-inch · 160 Hz",
+    category: "monitor",
+    url: "https://meli.la/14oybLi",
+  },
   { name: "Alienware 24.5-inch · 360 Hz", category: "monitor" },
-  { name: "LG UltraGear ultrawide · 180 Hz", category: "monitor" },
-  { name: "Razer Huntsman V3 Pro TKL", category: "keyboard" },
-  { name: "Logitech G Pro X Superlight", category: "mouse" },
+  {
+    name: "Logitech MX Keys Mini",
+    category: "keyboard",
+    url: "https://meli.la/18eBFdX",
+  },
+  {
+    name: "Apple Magic Mouse",
+    category: "mouse",
+    url: "https://meli.la/2XY7b3z",
+  },
+  {
+    name: "Apple AirPods Pro 3",
+    category: "earbuds",
+    url: "https://meli.la/2Gfr7QH",
+  },
+  { name: "Shure MV6", category: "microphone" },
   { name: "Logitech C920s", category: "webcam" },
-  { name: "QCY H3 Pro", category: "headphones" },
-  { name: "PlayStation 5 Disc Edition", category: "console" },
-  { name: "Nintendo Switch 2", category: "console" },
+  {
+    name: "Anker 8-in-1 Dual Monitor Hub",
+    category: "hub",
+    url: "https://meli.la/2JQoEdC",
+  },
+  {
+    name: "PlayStation 5 Disc Edition",
+    category: "console",
+    url: "https://meli.la/26HmpkF",
+  },
+  {
+    name: "Nintendo Switch 2",
+    category: "console",
+    url: "https://meli.la/2oPasc5",
+  },
   { name: "PlayStation 3 Final Fantasy XIII", category: "console" },
   { name: "PlayStation 2 Fat", category: "console" },
+  { name: "Rozini RX220", category: "acoustic guitar" },
 ];

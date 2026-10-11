@@ -83,6 +83,39 @@ html {
   color: var(--fg-3);
 }
 
+.setup-gear {
+  margin-bottom: 38.72px;
+}
+
+.setup-gear .rv-leader {
+  margin-bottom: 0;
+  font-weight: 700;
+}
+
+.rv-section p.setup-gear__link {
+  margin: 8.8px 0 0;
+  color: var(--fg-2);
+  font-size: var(--size-body);
+  overflow-wrap: anywhere;
+}
+
+.setup-gear__link strong {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.setup-gear__link a {
+  color: var(--inline-link);
+  text-decoration: underline;
+  text-underline-offset: 3.52px;
+  transition: color var(--ease-link) ease;
+}
+
+.setup-gear__link a:hover,
+.setup-gear__link a:focus-visible {
+  color: var(--hover-inline);
+}
+
 /* projects page */
 .project-entry {
   margin-bottom: 38.72px;
@@ -121,7 +154,8 @@ html {
 
 @media (prefers-reduced-motion: reduce) {
   .home-feed-note a,
-  .project-entry .project-detail a {
+  .project-entry .project-detail a,
+  .setup-gear__link a {
     transition: none;
   }
   .row-preview {
