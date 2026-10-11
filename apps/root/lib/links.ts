@@ -3,6 +3,7 @@ import { identity } from "../../../seo/structured-data";
 
 export interface PrimaryLink {
   label: string;
+  galleryLabel?: string;
   href: string;
   category: string;
   description: string;
@@ -21,31 +22,36 @@ const github: PrimaryLink = {
 export const socialLinks: PrimaryLink[] = [
   {
     label: "X / Twitter",
+    galleryLabel: "X",
     href: "https://x.com/semrollback",
     rel: "me",
     category: "posts",
     description:
-      "Daily updates on what I'm working on. Probably my most active profile.",
+      "Daily updates on the projects I'm building. This is where I'll be most active.",
   },
   {
     label: "YouTube / @semrollback",
+    galleryLabel: "YouTube",
     href: "https://www.youtube.com/@semrollback",
     rel: "me",
     category: "channel",
-    description: "Animations and videos about programming.",
+    description:
+      "Animations and videos about programming, from concepts to things I'm building.",
   },
   {
     label: "TikTok",
+    galleryLabel: "TikTok",
     href: "https://www.tiktok.com/@semrollback",
     rel: "me",
     category: "shorts",
-    description: "Animations and quick takes on programming.",
+    description: "Short animations and quick takes on programming ideas.",
   },
 ];
 
 export const profileLinks: PrimaryLink[] = [github, ...socialLinks];
 
 export const primaryLinks: PrimaryLink[] = [
+  ...socialLinks,
   github,
   {
     label: CONTACT.email,
@@ -53,5 +59,4 @@ export const primaryLinks: PrimaryLink[] = [
     category: "email",
     description: "Write to me about an idea, question or collaboration.",
   },
-  ...socialLinks,
 ];

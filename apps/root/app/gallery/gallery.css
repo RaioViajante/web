@@ -293,8 +293,6 @@
 .gallery-profile-links a:hover,
 .gallery-profile-links a:focus-visible {
   color: var(--fg);
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 .gallery-collage {
   display: flex;

@@ -81,7 +81,7 @@ function ProfileLinks({ artwork }: { artwork: Artwork }) {
         <span key={link.href}>
           {index > 0 && <span aria-hidden="true"> · </span>}
           <a href={link.href} rel={link.rel} data-sound="nav">
-            {link.label}
+            {link.galleryLabel ?? link.label}
           </a>
         </span>
       ))}
