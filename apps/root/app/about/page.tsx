@@ -1,6 +1,8 @@
 import { metadataFor } from "../../lib/seo";
+import { quickSnapshot } from "../../lib/about";
 import { PageHeader, Section } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
+import "./about.css";
 
 export const metadata = metadataFor("/about");
 
@@ -20,7 +22,17 @@ export default function About() {
           from.
         </p>
       </Section>
-      <Section number="01.1" title="Why I build" id="building-heading">
+      <Section number="01.1" title="Quick snapshot" id="snapshot-heading">
+        <dl className="about-snapshot">
+          {quickSnapshot.map(({ label, value }) => (
+            <div className="about-snapshot__item" key={label}>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+      <Section number="01.2" title="Why I build" id="building-heading">
         <p>
           Programming gives me a way to follow that curiosity: take an idea
           apart, understand a little more, and build a version of it myself. I
@@ -29,7 +41,7 @@ export default function About() {
           personal projects give me room to explore beyond them.
         </p>
       </Section>
-      <Section number="01.2" title="RaioViajante" id="raioviajante-heading">
+      <Section number="01.3" title="RaioViajante" id="raioviajante-heading">
         <p>
           RaioViajante is the place where I bring together projects, writing,
           documentation and things I discover along the way. Some ideas become
@@ -48,7 +60,7 @@ export default function About() {
           .
         </p>
       </Section>
-      <Section number="01.3" title="Outside the code" id="outside-heading">
+      <Section number="01.4" title="Outside the code" id="outside-heading">
         <p>
           I like music and playing guitar, and I make time for films, books and
           games. They are part of my world even when they have nothing to do
