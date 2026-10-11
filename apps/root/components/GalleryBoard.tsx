@@ -70,6 +70,25 @@ function Picture({
   );
 }
 
+function ProfileLinks({ artwork }: { artwork: Artwork }) {
+  if (!artwork.links) return null;
+  return (
+    <nav
+      className="gallery-profile-links"
+      aria-label={`${artwork.title} profiles`}
+    >
+      {artwork.links.map((link, index) => (
+        <span key={link.href}>
+          {index > 0 && <span aria-hidden="true"> · </span>}
+          <a href={link.href} rel={link.rel} data-sound="nav">
+            {link.label}
+          </a>
+        </span>
+      ))}
+    </nav>
+  );
+}
+
 function GalleryDialog({
   titleId,
   onDismiss,
@@ -459,6 +478,7 @@ export function GalleryBoard() {
                         <div>
                           {item.title}
                           {item.use && <small>{item.use}</small>}
+                          <ProfileLinks artwork={item} />
                         </div>
                       </div>
                     ) : (
@@ -548,6 +568,7 @@ export function GalleryBoard() {
                   <span>{view.use}</span>
                 </div>
               )}
+              <ProfileLinks artwork={view} />
             </div>
             {view.download && (
               <a

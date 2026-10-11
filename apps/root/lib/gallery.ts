@@ -1,4 +1,5 @@
 import { gallery, galleryBranding } from "@raioviajante/design/gallery";
+import { profileLinks, type PrimaryLink } from "./links";
 
 export const categories = [
   {
@@ -29,6 +30,7 @@ export type Artwork = {
   category: Category;
   alt: string;
   use?: string;
+  links?: readonly PrimaryLink[];
   image?: Asset;
   cell?: number;
   download?: { src: string; filename: string };
@@ -86,6 +88,7 @@ function piece(
   image: Asset,
   alt: string,
   use?: string,
+  links?: readonly PrimaryLink[],
 ): Artwork {
   return {
     id,
@@ -94,6 +97,7 @@ function piece(
     image,
     alt,
     use,
+    links,
     download: {
       src: image.src,
       filename: `raioviajante-${category}-${slug(title)}.${category === "profiles" ? "png" : "webp"}`,
@@ -115,7 +119,8 @@ export const artworks: readonly Artwork[] = [
     "profiles",
     galleryBranding.profileLaptop,
     "RaioViajante scratching his head at a laptop, two question marks beside him",
-    "YouTube · GitHub · X · Instagram",
+    undefined,
+    profileLinks,
   ),
   piece(
     "profile-hmm",
