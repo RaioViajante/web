@@ -1,5 +1,4 @@
 import { metadataFor } from "../../lib/seo";
-import Link from "next/link";
 import {
   LeaderRow,
   PageHeader,
@@ -23,13 +22,21 @@ export default function Setup() {
           <p className="setup-empty">I&apos;m putting the list together.</p>
         ) : (
           gear.map((item) => (
-            <LeaderRow
-              linkComponent={Link}
-              key={item.name}
-              label={item.name}
-              value={item.category}
-              href={item.url}
-            />
+            <div className="setup-gear" key={item.name}>
+              <LeaderRow label={item.name} value={item.category} />
+              <p className="setup-gear__link">
+                {item.url ? (
+                  <>
+                    <strong>Link:</strong>{" "}
+                    <a href={item.url} rel="sponsored">
+                      {item.url.replace(/^https:\/\//, "")}
+                    </a>
+                  </>
+                ) : (
+                  "No trusted link available."
+                )}
+              </p>
+            </div>
           ))
         )}
       </Section>
