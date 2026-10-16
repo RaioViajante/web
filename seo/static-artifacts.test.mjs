@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { checkUniqueness } from "./metadata-policy.ts";
+import {
+  checkAlternateReciprocity,
+  checkEntityLanguages,
+  checkUniqueness,
+} from "./metadata-policy.ts";
 import { auditSite, expectedThemeColor } from "./audit.mjs";
 
 // Deterministic, no sockets: the public build output of the static apps. Docs
@@ -30,6 +34,7 @@ const html = (site) => async (path) => {
 };
 
 const pages = [];
+const alternatePages = [];
 for (const site of ["docs", "lab"])
   test(`${site}: build output satisfies the SEO contract`, async () => {
     const result = await auditSite({
@@ -43,9 +48,23 @@ for (const site of ["docs", "lab"])
       themeColor: await expectedThemeColor(),
     });
     pages.push(...result.pages);
+    alternatePages.push(...result.alternatePages);
     assert.deepEqual(result.problems, []);
     assert.ok(result.entries.length > 0);
   });
+
+test("alternates are reciprocal and host-level entities state one language set", () => {
+  for (const site of ["docs", "lab"]) {
+    assert.deepEqual(
+      checkAlternateReciprocity(alternatePages.filter((p) => p.site === site)),
+      [],
+    );
+    assert.deepEqual(
+      checkEntityLanguages(pages.filter((p) => p.site === site)),
+      [],
+    );
+  }
+});
 
 test("titles and descriptions are unique across the static documents", () => {
   for (const site of ["docs", "lab"])

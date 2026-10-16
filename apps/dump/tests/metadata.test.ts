@@ -140,7 +140,7 @@ describe("blogPostingJsonLd", () => {
       description: "An example description.",
       datePublished: "2026-01-15",
       url,
-      mainEntityOfPage: { "@type": "WebPage", "@id": url },
+      mainEntityOfPage: { "@type": "WebPage", "@id": url, inLanguage: "en" },
       author: PERSON,
       inLanguage: "en",
       isPartOf: { "@id": `${PRODUCTION_ORIGIN}/#blog` },

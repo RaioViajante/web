@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { alternatesFor, site } from "@/lib/site";
 import { Behavior } from "@raioviajante/design/behavior-react";
 import { themeColor } from "@raioviajante/design/theme-color";
+import { localeById } from "../../../site/locales";
 
 import "@raioviajante/design/styles.css";
 import "./globals.css";
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
-    locale: "en_US",
+    locale: localeById("en").openGraphLocale,
   },
   // A generated OG image now exists on every page (site default, or a
   // per-post one) — large-image is the correct card type for that.

@@ -1,4 +1,14 @@
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  LOCALE_IDS,
+  localeOfPath,
+  localizedPath,
+  stripLocalePrefix,
+  type LocaleId,
+} from "../site/locales.ts";
 import { siteOrigins, type SiteId as Site } from "../site/sites.ts";
+import { isNotFoundPath } from "./metadata.ts";
 import { identity } from "./structured-data.ts";
 
 // The SEO contract of the four sites, as pure checks over strings. Nothing
@@ -36,7 +46,12 @@ export interface ParsedDocument {
   titles: string[];
   meta: Map<string, string[]>; // name= or property= -> contents
   canonicals: string[];
-  links: Array<{ rel: string; href: string; type?: string }>;
+  links: Array<{
+    rel: string;
+    href: string;
+    type?: string;
+    hreflang?: string;
+  }>;
   jsonLd: Array<{ json?: any; error?: string }>;
   meLinks: string[];
 }
@@ -56,6 +71,7 @@ export function parseDocument(html: string): ParsedDocument {
     rel: attribute(tag, "rel") ?? "",
     href: attribute(tag, "href") ?? "",
     type: attribute(tag, "type"),
+    hreflang: attribute(tag, "hreflang"),
   }));
   return {
     lang: /<html\b[^>]*\slang="([^"]*)"/.exec(html)?.[1],
@@ -101,6 +117,143 @@ export interface PageContext {
   loc: string;
   html: string;
   themeColor: string;
+  /** The rendered locale; by default the one the path belongs to. */
+  locale?: LocaleId;
+}
+
+const byHreflang = new Map<string, LocaleId>(
+  LOCALE_IDS.map((id) => [LOCALES[id].hreflang, id]),
+);
+
+/**
+ * The locale facts of one document: its alternate cluster is either absent or
+ * complete (itself, every counterpart once, and `x-default` on the English
+ * member), and `og:locale:alternate` names exactly the counterparts' locales.
+ * Reciprocity between documents is `checkAlternateReciprocity`.
+ */
+function checkAlternates(
+  site: Site,
+  at: string,
+  doc: ParsedDocument,
+  locale: LocaleId,
+  canonical: string | undefined,
+): Problems {
+  const p: Problems = [];
+  const links = doc.links.filter(
+    (l) => l.rel === "alternate" && l.hreflang !== undefined,
+  );
+  const alternates = doc.meta.get("og:locale:alternate") ?? [];
+  const values = links.map((l) => l.hreflang!);
+  for (const value of new Set(values))
+    if (values.filter((v) => v === value).length > 1)
+      p.push(`${at}: duplicate hreflang "${value}"`);
+  if (links.length === 0) {
+    if (alternates.length)
+      p.push(`${at}: og:locale:alternate without an hreflang cluster`);
+    return p;
+  }
+  const self = LOCALES[locale].hreflang;
+  const own = links.find((l) => l.hreflang === self);
+  if (!own) p.push(`${at}: hreflang cluster lacks the page's own "${self}"`);
+  else if (canonical && norm(own.href) !== norm(canonical))
+    p.push(
+      `${at}: hreflang "${self}" ${own.href} differs from canonical ${canonical}`,
+    );
+  if (links.length < 2 || (links.length === 2 && values.includes("x-default")))
+    p.push(`${at}: an hreflang cluster needs a real counterpart`);
+  const members: LocaleId[] = [];
+  for (const link of links) {
+    if (/[?#]/.test(link.href) || !/^https:\/\//.test(link.href))
+      p.push(
+        `${at}: hreflang "${link.hreflang}" ${link.href} is not a bare absolute https URL`,
+      );
+    if (link.hreflang === "x-default") continue;
+    const member = byHreflang.get(link.hreflang!);
+    if (!member) {
+      p.push(`${at}: hreflang "${link.hreflang}" is not a supported locale`);
+      continue;
+    }
+    members.push(member);
+    if (new URL(link.href, "https://x.invalid").origin !== siteOrigins[site])
+      p.push(
+        `${at}: hreflang "${link.hreflang}" ${link.href} is not on ${siteOrigins[site]}`,
+      );
+    let destination: LocaleId | undefined;
+    try {
+      destination = localeOfPath(new URL(link.href).pathname);
+    } catch {}
+    if (destination !== member)
+      p.push(
+        `${at}: hreflang "${link.hreflang}" points at ${link.href}, which belongs to ${destination}`,
+      );
+  }
+  const fallback = links.find((l) => l.hreflang === "x-default");
+  const english = links.find(
+    (l) => l.hreflang === LOCALES[DEFAULT_LOCALE].hreflang,
+  );
+  if (english && !fallback)
+    p.push(`${at}: the cluster has an English member but no x-default`);
+  if (fallback && (!english || norm(fallback.href) !== norm(english.href)))
+    p.push(`${at}: x-default ${fallback.href} is not the English member`);
+  const wanted = members
+    .filter((id) => id !== locale)
+    .map((id) => LOCALES[id].openGraphLocale)
+    .sort();
+  if (JSON.stringify([...alternates].sort()) !== JSON.stringify(wanted))
+    p.push(
+      `${at}: og:locale:alternate is [${alternates}], expected [${wanted}] (the counterparts' locales)`,
+    );
+  return p;
+}
+
+/**
+ * Across the documents of one app: every alternate must be a checked document
+ * of that app, in the locale it is declared at, carrying the same cluster. This
+ * is the check that an alternate is a real, public, reciprocal page.
+ */
+export function checkAlternateReciprocity(
+  pages: Array<{ site: Site; path: string; html: string }>,
+): Problems {
+  const p: Problems = [];
+  const clusters = new Map<
+    string,
+    { at: string; key: string; docs: ParsedDocument }
+  >();
+  const keyOf = (doc: ParsedDocument) =>
+    doc.links
+      .filter((l) => l.rel === "alternate" && l.hreflang !== undefined)
+      .map((l) => `${l.hreflang} ${norm(l.href)}`)
+      .sort()
+      .join("\n");
+  for (const page of pages) {
+    const doc = parseDocument(page.html);
+    const canonical = doc.canonicals[0];
+    if (canonical && keyOf(doc))
+      clusters.set(norm(canonical), {
+        at: where(page.site, page.path),
+        key: keyOf(doc),
+        docs: doc,
+      });
+  }
+  for (const [url, { at, key, docs }] of clusters)
+    for (const link of docs.links) {
+      if (
+        link.rel !== "alternate" ||
+        !link.hreflang ||
+        link.hreflang === "x-default"
+      )
+        continue;
+      const target = clusters.get(norm(link.href));
+      if (!target)
+        p.push(
+          `${at}: alternate ${link.href} is not a checked page with the same cluster`,
+        );
+      else if (target.key !== key)
+        p.push(
+          `${at}: alternate ${link.href} declares a different cluster than ${url}`,
+        );
+    }
+  return p;
 }
 
 const where = (site: Site, path: string) => `app ${site} page ${path}`;
@@ -112,6 +265,7 @@ export function checkDocument({
   loc,
   html,
   themeColor,
+  locale = localeOfPath(path),
 }: PageContext) {
   const p: Problems = [];
   const at = where(site, path);
@@ -127,8 +281,10 @@ export function checkDocument({
   };
   const m = (key: string) => doc.meta.get(key) ?? [];
 
-  if (doc.lang !== "en")
-    p.push(`${at}: <html lang> is ${JSON.stringify(doc.lang)}, expected "en"`);
+  if (doc.lang !== LOCALES[locale].htmlLang)
+    p.push(
+      `${at}: <html lang> is ${JSON.stringify(doc.lang)}, expected "${LOCALES[locale].htmlLang}"`,
+    );
   one("<title>", doc.titles);
   one("meta description", m("description"));
 
@@ -160,9 +316,17 @@ export function checkDocument({
     p.push(`${at}: og:url ${ogUrl} differs from canonical ${canonical}`);
   const ogType = og("type");
   const expectedType =
-    site === "dump" && path.startsWith("/posts/") ? "article" : "website";
+    site === "dump" && stripLocalePrefix(path).startsWith("/posts/")
+      ? "article"
+      : "website";
   if (ogType && ogType !== expectedType)
     p.push(`${at}: og:type is "${ogType}", expected "${expectedType}"`);
+  const ogLocaleValue = og("locale");
+  if (ogLocaleValue && ogLocaleValue !== LOCALES[locale].openGraphLocale)
+    p.push(
+      `${at}: og:locale is "${ogLocaleValue}", expected "${LOCALES[locale].openGraphLocale}"`,
+    );
+  p.push(...checkAlternates(site, at, doc, locale, canonical));
   const ogImage = og("image");
   if (
     ogImage &&
@@ -227,20 +391,33 @@ export const searchPaths: Record<Site, string> = {
   lab: "/search/",
 };
 
+/** Where a host serves its search page in a locale (`/search`, `/pt/search`; Astro hosts end with `/`). */
+export function searchPathFor(site: Site, locale: LocaleId = DEFAULT_LOCALE) {
+  return localizedPath(site, locale, searchPaths[site]);
+}
+
 /**
  * The search page is reachable and crawlable but deliberately not indexed:
  * `noindex, follow`, one canonical equal to the bare production URL (so `?q=`
  * and tracking parameters never create another identity), and absent from the
- * sitemap (checked by the caller with the sitemap entries).
+ * sitemap (checked by the caller with the sitemap entries). It is noindex, not
+ * unlocalized: its Open Graph locale and any `hreflang` cluster (a real EN/PT
+ * pair when both pages exist) are checked like any document's, and the
+ * caller adds the page to `checkAlternateReciprocity`.
  */
 export function checkSearchPage(
   site: Site,
   html: string,
   requested = searchPaths[site],
+  locale: LocaleId = DEFAULT_LOCALE,
 ) {
   const p: Problems = [];
   const at = where(site, requested);
   const doc = parseDocument(html);
+  if (doc.lang !== LOCALES[locale].htmlLang)
+    p.push(
+      `${at}: <html lang> is ${JSON.stringify(doc.lang)}, expected "${LOCALES[locale].htmlLang}"`,
+    );
   const robots = doc.meta.get("robots") ?? [];
   if (robots.length !== 1)
     p.push(`${at}: expected one robots meta tag, found ${robots.length}`);
@@ -248,11 +425,59 @@ export function checkSearchPage(
     p.push(
       `${at}: robots is ${JSON.stringify(robots[0])}, expected "noindex, follow"`,
     );
-  const want = `${siteOrigins[site]}${searchPaths[site]}`;
+  const want = `${siteOrigins[site]}${searchPathFor(site, locale)}`;
   if (doc.canonicals.length !== 1 || doc.canonicals[0] !== want)
     p.push(
       `${at}: canonical is ${JSON.stringify(doc.canonicals)}, expected ${want}`,
     );
+  const ogLocales = doc.meta.get("og:locale") ?? [];
+  if (
+    ogLocales.length !== 1 ||
+    ogLocales[0] !== LOCALES[locale].openGraphLocale
+  )
+    p.push(
+      `${at}: og:locale is ${JSON.stringify(ogLocales)}, expected "${LOCALES[locale].openGraphLocale}"`,
+    );
+  p.push(...checkAlternates(site, at, doc, locale, want));
+  return p;
+}
+
+/**
+ * A 404 in either language: a real HTTP 404, `noindex`, no canonical, no
+ * `hreflang`, no `og:locale:alternate`, and `<html lang>` equal to the language
+ * of the copy it renders (`lang`, stated by the caller who knows the copy).
+ * It never appears in the sitemap (`sitemapPaths`, when given).
+ */
+export function checkNotFoundPage(
+  site: Site,
+  input: {
+    path: string;
+    status: number;
+    html: string;
+    /** The locale of the copy the page renders; its `<html lang>` must equal it. */
+    lang: LocaleId;
+    sitemapPaths?: string[];
+  },
+) {
+  const p: Problems = [];
+  const at = where(site, input.path);
+  const doc = parseDocument(input.html);
+  if (input.status !== 404)
+    p.push(`${at}: missing page answered HTTP ${input.status}, expected 404`);
+  if (!(doc.meta.get("robots") ?? []).some((v) => /noindex/.test(v)))
+    p.push(`${at}: 404 page is not noindex`);
+  if (doc.canonicals.length)
+    p.push(`${at}: 404 page declares a canonical ${doc.canonicals[0]}`);
+  if (doc.links.some((l) => l.rel === "alternate" && l.hreflang !== undefined))
+    p.push(`${at}: 404 page declares hreflang`);
+  if (doc.meta.has("og:locale:alternate"))
+    p.push(`${at}: 404 page declares og:locale:alternate`);
+  if (doc.lang !== LOCALES[input.lang].htmlLang)
+    p.push(
+      `${at}: 404 <html lang> is ${JSON.stringify(doc.lang)}, expected "${LOCALES[input.lang].htmlLang}" for the copy it renders`,
+    );
+  if (input.sitemapPaths?.includes(input.path))
+    p.push(`${at}: the sitemap contains the missing page`);
   return p;
 }
 
@@ -303,6 +528,12 @@ export function checkSitemap(site: Site, xml: string, now = new Date()) {
     lastmod: /<lastmod>\s*([^<]*?)\s*<\/lastmod>/.exec(m[1]!)?.[1],
   }));
   if (!entries.length) p.push(`${at}: no URLs`);
+  // Alternates live in the HTML head; a second copy here would need a second
+  // consistency check (docs/i18n.md, "Sitemap").
+  if (/xhtml:link/.test(xml))
+    p.push(
+      `${at}: contains xhtml:link alternates; they belong in the HTML head`,
+    );
   const seen = new Set<string>();
   for (const { loc, lastmod } of entries) {
     let url: URL | undefined;
@@ -316,8 +547,7 @@ export function checkSitemap(site: Site, xml: string, now = new Date()) {
       p.push(`${at}: ${loc} is not on ${siteOrigins[site]}`);
     if (url.search || url.hash || loc.includes("#"))
       p.push(`${at}: ${loc} has a query or fragment`);
-    if (/^\/404(\.html|\/)?$/.test(url.pathname))
-      p.push(`${at}: ${loc} is a 404 page`);
+    if (isNotFoundPath(url.pathname)) p.push(`${at}: ${loc} is a 404 page`);
     if (seen.has(url.href)) p.push(`${at}: duplicate ${loc}`);
     seen.add(url.href);
     if (lastmod !== undefined) {
@@ -331,7 +561,8 @@ export function checkSitemap(site: Site, xml: string, now = new Date()) {
       // Only an explicit modification date, and only where content can have one:
       // dump posts and docs pages (none has one today).
       const allowed =
-        (site === "dump" && url.pathname.startsWith("/posts/")) ||
+        (site === "dump" &&
+          stripLocalePrefix(url.pathname).startsWith("/posts/")) ||
         site === "docs";
       if (!allowed)
         p.push(
@@ -486,20 +717,104 @@ export interface JsonLdContext {
 
 /** What each page class publishes; other pages need none. */
 export function expectedTypes(site: Site, path: string): string[] | undefined {
-  if (path === "/")
+  const neutral = stripLocalePrefix(path);
+  // A localized home may carry the full WebSite/Blog node or reference the
+  // English one by @id (docs/i18n.md, "Structured data"); the app slice that
+  // ships the locale chooses, so the node set is not fixed here. The language
+  // of whatever it emits is still checked.
+  if (neutral === "/" && localeOfPath(path) !== DEFAULT_LOCALE)
+    return undefined;
+  if (neutral === "/")
     return {
       root: ["Person", "WebSite"],
       dump: ["WebSite", "Blog"],
       docs: ["WebSite"],
       lab: ["WebSite"],
     }[site];
-  if (site === "dump" && path.startsWith("/posts/")) return ["BlogPosting"];
-  if (site === "docs" && !["/search/", "/terms/", "/privacy/"].includes(path))
+  if (site === "dump" && neutral.startsWith("/posts/")) return ["BlogPosting"];
+  if (
+    site === "docs" &&
+    !["/search/", "/terms/", "/privacy/"].includes(neutral)
+  )
     return ["TechArticle", "BreadcrumbList"];
   return undefined;
 }
 
 const urlKeys = new Set(["@id", "url", "item", "image", "sameAs"]);
+
+const inLanguages = new Set<string>(
+  LOCALE_IDS.map((id) => LOCALES[id].inLanguage),
+);
+const languagesOf = (node: any): string[] | undefined =>
+  node.inLanguage === undefined
+    ? undefined
+    : [node.inLanguage].flat().map(String);
+
+/**
+ * `inLanguage` by node type (docs/i18n.md, "Structured data"): content nodes
+ * (`WebPage` included, wherever it is nested) state the rendered locale;
+ * breadcrumbs and identity nodes state none; the host-level `WebSite` and
+ * `Blog` state a set of shipped locales, never the page's own locale as such.
+ * The whole object graph is walked, so no nested node escapes. A reference
+ * that is only an `@id` states no language and is fine.
+ */
+function checkNodeLanguages(
+  at: string,
+  nodes: any[],
+  locale: LocaleId,
+): Problems {
+  const p: Problems = [];
+  const wanted = LOCALES[locale].inLanguage;
+  const visit = (value: any) => {
+    if (Array.isArray(value)) return value.forEach(visit);
+    if (!value || typeof value !== "object") return;
+    const type = value["@type"];
+    const languages = languagesOf(value);
+    if (["BlogPosting", "TechArticle", "WebPage"].includes(type)) {
+      if (languages === undefined) p.push(`${at}: ${type} has no inLanguage`);
+      else if (languages.length !== 1 || languages[0] !== wanted)
+        p.push(
+          `${at}: ${type} inLanguage is ${JSON.stringify(value.inLanguage)}, expected "${wanted}"`,
+        );
+    } else if (["WebSite", "Blog"].includes(type)) {
+      for (const language of languages ?? [])
+        if (!inLanguages.has(language))
+          p.push(
+            `${at}: ${type} inLanguage "${language}" is not a registry value`,
+          );
+    } else if (languages !== undefined)
+      p.push(`${at}: ${type ?? "an untyped node"} must not state inLanguage`);
+    for (const child of Object.values(value)) visit(child);
+  };
+  visit(nodes);
+  return p;
+}
+
+/**
+ * One `@id` never carries contradictory languages across the pages of an app:
+ * every page that emits a full host-level node states the same shipped set.
+ */
+export function checkEntityLanguages(
+  pages: Array<{ site: Site; path: string; html: string }>,
+): Problems {
+  const p: Problems = [];
+  const seen = new Map<string, { at: string; value: string }>();
+  for (const page of pages)
+    for (const block of parseDocument(page.html).jsonLd)
+      for (const node of block.json?.["@graph"] ?? []) {
+        const languages = languagesOf(node);
+        if (!node["@id"] || !languages) continue;
+        const value = JSON.stringify([...languages].sort());
+        const previous = seen.get(node["@id"]);
+        if (!previous)
+          seen.set(node["@id"], { at: where(page.site, page.path), value });
+        else if (previous.value !== value)
+          p.push(
+            `${where(page.site, page.path)}: ${node["@id"]} states inLanguage ${value}, but ${previous.at} states ${previous.value}`,
+          );
+      }
+  return p;
+}
 
 export function checkJsonLd(ctx: JsonLdContext) {
   const { site, path, loc, lastmod } = ctx;
@@ -543,6 +858,8 @@ export function checkJsonLd(ctx: JsonLdContext) {
       for (const [k, v] of Object.entries(value)) walk(v, k);
   };
   walk(nodes);
+
+  p.push(...checkNodeLanguages(at, nodes, localeOfPath(path)));
 
   const person = (node: any, label: string) => {
     if (

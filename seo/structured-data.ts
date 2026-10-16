@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE, LOCALES, type LocaleId } from "../site/locales.ts";
 import { siteOrigins } from "../site/sites.ts";
 
 // Shared public identity and JSON-LD builders for the four sites. Plain
@@ -31,6 +32,34 @@ export function personJsonLd() {
   return { ...personRef(), sameAs: [identity.github] };
 }
 
+/**
+ * `inLanguage` of a content node (`WebPage`, `BlogPosting`, `TechArticle`) is
+ * the rendered locale. Identity nodes (`Person`) and `BreadcrumbList` carry none.
+ */
+export function inLanguageOf(locale: LocaleId) {
+  return LOCALES[locale].inLanguage;
+}
+
+/**
+ * The `inLanguage` of a host-level node (`WebSite`, `Blog`): the locales the
+ * host has actually shipped, English until it ships another. One value or a list.
+ */
+export function shippedLanguages(
+  locales: readonly LocaleId[] = [DEFAULT_LOCALE],
+) {
+  const languages = locales.map(inLanguageOf);
+  return languages.length === 1 ? languages[0]! : languages;
+}
+
+/** The `WebPage` a content node is the main entity of: the rendered locale's language. */
+export function webPageRef(url: string, locale: LocaleId = DEFAULT_LOCALE) {
+  return {
+    "@type": "WebPage" as const,
+    "@id": url,
+    inLanguage: inLanguageOf(locale),
+  };
+}
+
 export function websiteId(origin: string) {
   return new URL("/#website", origin).href;
 }
@@ -42,7 +71,15 @@ export function websiteJsonLd(
   origin: string,
   name: string,
   description: string,
-  options: { author?: boolean } = {},
+  options: {
+    author?: boolean;
+    /**
+     * The locales the host has actually shipped. The same set must be stated
+     * by every page that emits this node; it is English until a host ships
+     * another locale.
+     */
+    languages?: readonly LocaleId[];
+  } = {},
 ) {
   return {
     "@type": "WebSite" as const,
@@ -50,7 +87,7 @@ export function websiteJsonLd(
     name,
     description,
     url: new URL("/", origin).href,
-    inLanguage: "en",
+    inLanguage: shippedLanguages(options.languages),
     ...(options.author ? { author: personRef() } : {}),
   };
 }

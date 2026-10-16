@@ -1,8 +1,19 @@
+import { DEFAULT_LOCALE, LOCALES, type LocaleId } from "../site/locales.ts";
+import { alternateCluster, ogLocale, type Counterpart } from "./locale.ts";
+
 /** Framework-neutral metadata and URL conventions. Never include search queries. */
 export interface PageSeo {
   path: string;
   title: string;
   description: string;
+  /** The rendered locale; English when omitted. `path` must belong to it. */
+  locale?: LocaleId;
+  /**
+   * Real, public pages in other locales that this page is a counterpart of,
+   * declared by the app. Omit it when there is none: a page alone emits no
+   * `hreflang` and no `og:locale:alternate`. Nothing is inferred from `path`.
+   */
+  counterparts?: readonly Counterpart[];
 }
 
 export function socialKey(path: string) {
@@ -21,18 +32,42 @@ export function socialUrl(origin: string, path: string) {
  * could not see the noindex.
  */
 export function isSearchPath(path: string) {
-  return /^\/search\/?$/.test(path);
+  return localeRooted("search").test(path);
+}
+
+/** `/<name>` or `/<name>/`, also under any locale prefix (`/pt/search`). */
+function localeRooted(name: string) {
+  const prefixes = Object.values(LOCALES)
+    .map((locale) => locale.urlPrefix)
+    .filter(Boolean)
+    .map((prefix) => prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  return new RegExp(`^(?:${prefixes.join("|")})?/${name}/?$`);
 }
 
 export function pageMetadata(origin: string, site: string, page: PageSeo) {
-  const title = page.path === "/" ? page.title : `${page.title} — ${site}`;
+  const locale = page.locale ?? DEFAULT_LOCALE;
+  const cluster = alternateCluster(origin, { ...page, locale });
+  // `page.path` is the locale's own home ("/" or "/pt") or a page below it.
+  const isHome =
+    page.path === "/" ||
+    page.path.replace(/\/$/, "") === LOCALES[locale].urlPrefix;
+  const title = isHome ? page.title : `${page.title} — ${site}`;
   const images = [
     { url: socialUrl(origin, page.path), width: 1200, height: 630, alt: title },
   ];
   return {
     title: { absolute: title },
     description: page.description,
-    alternates: { canonical: page.path },
+    alternates: {
+      canonical: page.path,
+      ...(cluster
+        ? {
+            languages: Object.fromEntries(
+              cluster.links.map((link) => [link.hreflang, link.href]),
+            ),
+          }
+        : {}),
+    },
     ...(isSearchPath(page.path)
       ? { robots: { index: false, follow: true } }
       : {}),
@@ -42,6 +77,8 @@ export function pageMetadata(origin: string, site: string, page: PageSeo) {
       title,
       description: page.description,
       url: new URL(page.path, origin).href,
+      locale: ogLocale(locale),
+      ...(cluster ? { alternateLocale: cluster.ogAlternates } : {}),
       images,
     },
     twitter: {
@@ -98,13 +135,20 @@ export const notFoundSeo: PageSeo = {
   title: "404 — not found",
   description: "This page could not be found.",
 };
-/** Astro builds its 404 as `/404.html` but renders it with `/404/`. */
+/** Astro builds its 404 as `/404.html` but renders it with `/404/`; also under a locale prefix. */
 export function isNotFoundPath(path: string) {
-  return /^\/404(?:\.html|\/)?$/.test(path);
+  return localeRooted("404").test(path.replace(/\.html$/, ""));
 }
-export function notFoundMetadata(origin: string, site: string) {
+export function notFoundMetadata(
+  origin: string,
+  site: string,
+  locale: LocaleId = DEFAULT_LOCALE,
+) {
   const metadata = pageMetadata(origin, site, {
     ...notFoundSeo,
+    // The 404 of the locale whose copy is rendered; it is never part of a cluster.
+    path: `${LOCALES[locale].urlPrefix}${notFoundSeo.path}`,
+    locale,
     description: `This page could not be found on ${new URL(origin).host}.`,
   });
   // Next.js documents injecting `noindex` on 404 responses, and does so for a

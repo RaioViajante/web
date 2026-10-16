@@ -52,9 +52,10 @@ export function getSeoPages(): PageSeo[] {
   ];
 }
 export function metadataFor(page: PageSeo) {
+  const metadata = pageMetadata(site.url, site.name, page);
   return {
-    ...pageMetadata(site.url, site.name, page),
-    alternates: alternatesFor(page.path),
+    ...metadata,
+    alternates: alternatesFor(page.path, metadata.alternates.languages),
   };
 }
 export function staticMetadata(path: string) {
