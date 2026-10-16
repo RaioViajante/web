@@ -17,6 +17,8 @@ export interface SiteBaseline {
   endpoints: string[];
   searchIndex: {
     path: string;
+    /** The media type it is served as, without parameters such as charset. */
+    mediaType: string;
     /** Fields every entry of the index carries today. */
     fields: string[];
     /** Page pathnames (no fragments) the index lists, sorted. */
@@ -57,6 +59,20 @@ export function checkBaselineSitemap(
   );
 }
 
+/** The search index must keep being served as its recorded media type. */
+export function checkBaselineSearchIndexType(
+  site: Site,
+  baseline: SiteBaseline,
+  contentType: string | null | undefined,
+): Problems {
+  const mediaType = (contentType ?? "").split(";")[0]!.trim().toLowerCase();
+  return mediaType === baseline.searchIndex.mediaType
+    ? []
+    : [
+        `app ${site} ${baseline.searchIndex.path}: served as ${JSON.stringify(contentType ?? "")}, expected ${baseline.searchIndex.mediaType}`,
+      ];
+}
+
 /** The search index must keep its fields and every recorded English page. */
 export function checkBaselineSearchIndex(
   site: Site,
@@ -88,6 +104,7 @@ export function describeBaseline(
     endpoints: string[];
     searchPath: string;
     searchEntries: IndexEntry[];
+    searchContentType: string | null;
   },
 ): SiteBaseline {
   const sorted = (items: Iterable<string>) => [...new Set(items)].sort();
@@ -97,6 +114,10 @@ export function describeBaseline(
     endpoints: sorted(input.endpoints),
     searchIndex: {
       path: input.searchPath,
+      mediaType: (input.searchContentType ?? "")
+        .split(";")[0]!
+        .trim()
+        .toLowerCase(),
       fields: sorted(
         fields[0]?.filter((k) => fields.every((f) => f.includes(k))) ?? [],
       ),

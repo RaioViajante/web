@@ -21,6 +21,7 @@
     ],
     "searchIndex": {
       "path": "/search-index.json",
+      "mediaType": "application/json",
       "fields": [
         "description",
         "href",
@@ -98,6 +99,7 @@
     ],
     "searchIndex": {
       "path": "/search-index.json",
+      "mediaType": "application/json",
       "fields": [
         "body",
         "date",
@@ -142,6 +144,7 @@
     ],
     "searchIndex": {
       "path": "/search-index.json",
+      "mediaType": "application/json",
       "fields": [
         "description",
         "href",
@@ -175,6 +178,7 @@
     ],
     "searchIndex": {
       "path": "/search-index.json",
+      "mediaType": "application/json",
       "fields": [
         "body",
         "description",

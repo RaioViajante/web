@@ -36,11 +36,13 @@ try {
       await (await get(site, "/sitemap.xml")).text(),
     );
     for (const path of endpoints(site)) await get(site, path);
+    const index = await get(site, "/search-index.json");
     baseline[site] = describeBaseline(site, {
       sitemapLocs: sitemap.entries.map((e) => e.loc),
       endpoints: endpoints(site),
       searchPath: "/search-index.json",
-      searchEntries: await (await get(site, "/search-index.json")).json(),
+      searchContentType: index.headers.get("content-type"),
+      searchEntries: await index.json(),
     });
   }
 } finally {

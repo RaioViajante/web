@@ -111,7 +111,8 @@ function requirePath(pathname: string): void {
   if (
     typeof pathname !== "string" ||
     !pathname.startsWith("/") ||
-    pathname.startsWith("//")
+    pathname.startsWith("//") ||
+    /[?#]/.test(pathname)
   )
     throw new RangeError(
       `Expected an absolute path, received ${JSON.stringify(pathname)}`,

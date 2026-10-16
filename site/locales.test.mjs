@@ -193,6 +193,26 @@ test("paths that are not absolute are rejected, not guessed", () => {
   assert.throws(() => localizedPath("root", "pt-BR", "about"), RangeError);
 });
 
+test("helpers take pathnames only: a query or fragment is rejected, not interpreted", () => {
+  for (const path of [
+    "/pt?x=1",
+    "/pt#section",
+    "/pt/about?x=1",
+    "/pt/about#section",
+    "/about?x=1",
+    "/about#section",
+  ]) {
+    for (const fn of [localeOfPath, isReservedPath, stripLocalePrefix])
+      assert.throws(() => fn(path), RangeError, `${fn.name}(${path})`);
+    for (const locale of LOCALE_IDS)
+      assert.throws(
+        () => localizedPath("root", locale, path),
+        RangeError,
+        `localizedPath(${locale}, ${path})`,
+      );
+  }
+});
+
 test("stripLocalePrefix returns the locale-neutral path and keeps the host form", () => {
   assert.equal(stripLocalePrefix("/pt"), "/");
   assert.equal(stripLocalePrefix("/pt/"), "/");

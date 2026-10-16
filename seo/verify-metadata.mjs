@@ -7,6 +7,7 @@ import { ports, startServers } from "../security/local-servers.mjs";
 import { auditSite, expectedThemeColor } from "./audit.mjs";
 import {
   checkBaselineSearchIndex,
+  checkBaselineSearchIndexType,
   checkBaselineSitemap,
 } from "./english-baseline.ts";
 import {
@@ -128,6 +129,13 @@ for (const site of sites) {
       );
   }
   const index = await get(site, recorded.searchIndex.path);
+  problems.push(
+    ...checkBaselineSearchIndexType(
+      site,
+      recorded,
+      index.response.headers.get("content-type"),
+    ),
+  );
   problems.push(
     ...checkBaselineSearchIndex(
       site,

@@ -6,6 +6,7 @@ import { isReservedPath } from "../site/locales.ts";
 import { SITES, siteOrigins } from "../site/sites.ts";
 import {
   checkBaselineSearchIndex,
+  checkBaselineSearchIndexType,
   checkBaselineSitemap,
 } from "./english-baseline.ts";
 import { checkSitemap } from "./metadata-policy.ts";
@@ -39,6 +40,25 @@ test("the baseline covers the four hosts and only English, unprefixed URLs", () 
   assert.ok(baseline.dump.endpoints.includes("/rss.xml"));
   for (const site of ["root", "docs", "lab"])
     assert.equal(baseline[site].endpoints.includes("/rss.xml"), false, site);
+});
+
+test("every host serves its search index as JSON, and another type fails", () => {
+  for (const site of Object.keys(baseline)) {
+    const recorded = baseline[site];
+    assert.equal(recorded.searchIndex.mediaType, "application/json", site);
+    for (const ok of ["application/json", "Application/JSON; charset=utf-8"])
+      assert.deepEqual(checkBaselineSearchIndexType(site, recorded, ok), []);
+    for (const wrong of [
+      "text/plain",
+      "text/plain; charset=utf-8",
+      "text/html",
+      "",
+      null,
+    ])
+      assert.deepEqual(checkBaselineSearchIndexType(site, recorded, wrong), [
+        `app ${site} /search-index.json: served as ${JSON.stringify(wrong ?? "")}, expected application/json`,
+      ]);
+  }
 });
 
 test("a missing English sitemap page fails, an added one does not", () => {
