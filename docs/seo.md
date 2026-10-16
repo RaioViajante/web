@@ -124,6 +124,40 @@ first production deploy). Root and Dump therefore also declare
 `seo/metadata.ts`). Where Next also injects its own tag the page carries two
 identical `noindex` tags, which is harmless. The status was always a real 404.
 
+## Locale-aware metadata
+
+`seo/` serializes locale facts that apps supply and validates them; it never
+discovers a translation. The registry in `site/locales.ts` provides every
+spelling ([i18n.md](i18n.md)). Today only English pages exist, so the visible
+change is one tag: `og:locale` (`en_US`) on every page, which Root, Docs and Lab
+gained.
+
+- `PageSeo` (and `SeoHead`) take an optional `locale` (default English) and
+  `counterparts`: real, public pages in other locales, as `{ locale, path }`
+  in the host's own form. A page without counterparts emits no `hreflang`
+  (not even a self-reference) and no `og:locale:alternate`. Nothing is
+  inferred from paths, slugs, titles or filenames.
+- A localized page canonicalizes to itself. A cluster lists the page, every
+  counterpart and `x-default` on the English member. Contradictory facts
+  (a path outside its locale, a repeated locale) throw instead of publishing.
+- `checkLocaleInventory` validates an app's inventory of public localized
+  routes: every counterpart is a declared route in its own locale and lists the
+  page back, and paths follow the host's trailing-slash form.
+- `checkDocument` checks `lang` and `og:locale` against the page's locale and
+  each cluster. `checkAlternateReciprocity` and `checkEntityLanguages` run over
+  all of an app's documents in `seo:check` (Docs, Lab) and `seo:verify`.
+- Search (`/search`, `/pt/search`) stays `noindex, follow` with one bare
+  canonical and out of the sitemap. A 404 in either language is a real 404,
+  `noindex`, with no canonical or `hreflang`, and its `lang` must match the copy
+  it renders (`checkNotFoundPage`).
+- Structured data: `BlogPosting`, `TechArticle` and `WebPage` state the rendered
+  locale; `BreadcrumbList` and `Person` state none; `WebSite` and `Blog` state
+  the set of shipped locales, the same on every page that emits them.
+- Sitemaps stay one per host with plain entries. `xhtml:link` alternates are
+  rejected, and `lastmod` still comes only from an explicit `updatedAt`.
+- Singular on purpose: one manifest, one English `/llms.txt`, one `robots.txt`
+  and one `security.txt` per host.
+
 ## Manifest
 
 Name, start URL, icons and the background color. `display` is `browser`: the

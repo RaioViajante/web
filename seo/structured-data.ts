@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE, LOCALES, type LocaleId } from "../site/locales.ts";
 import { siteOrigins } from "../site/sites.ts";
 
 // Shared public identity and JSON-LD builders for the four sites. Plain
@@ -31,6 +32,14 @@ export function personJsonLd() {
   return { ...personRef(), sameAs: [identity.github] };
 }
 
+/**
+ * `inLanguage` of a content node (`WebPage`, `BlogPosting`, `TechArticle`) is
+ * the rendered locale. Identity nodes (`Person`) and `BreadcrumbList` carry none.
+ */
+export function inLanguageOf(locale: LocaleId) {
+  return LOCALES[locale].inLanguage;
+}
+
 export function websiteId(origin: string) {
   return new URL("/#website", origin).href;
 }
@@ -42,15 +51,24 @@ export function websiteJsonLd(
   origin: string,
   name: string,
   description: string,
-  options: { author?: boolean } = {},
+  options: {
+    author?: boolean;
+    /**
+     * The locales the host has actually shipped. The same set must be stated
+     * by every page that emits this node; it is English until a host ships
+     * another locale.
+     */
+    languages?: readonly LocaleId[];
+  } = {},
 ) {
+  const languages = (options.languages ?? [DEFAULT_LOCALE]).map(inLanguageOf);
   return {
     "@type": "WebSite" as const,
     "@id": websiteId(origin),
     name,
     description,
     url: new URL("/", origin).href,
-    inLanguage: "en",
+    inLanguage: languages.length === 1 ? languages[0]! : languages,
     ...(options.author ? { author: personRef() } : {}),
   };
 }

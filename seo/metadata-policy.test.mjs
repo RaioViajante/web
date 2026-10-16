@@ -40,6 +40,7 @@ function html({
     ogdesc: `<meta property="og:description" content="About foo."/>`,
     ogurl: `<meta property="og:url" content="${canonical}"/>`,
     ogtype: `<meta property="og:type" content="article"/>`,
+    oglocale: `<meta property="og:locale" content="en_US"/>`,
     ogimage: `<meta property="og:image" content="https://dump.raioviajante.com/og/posts/foo.png"/>`,
     published: `<meta property="article:published_time" content="2026-01-15T00:00:00.000Z"/>`,
     card: `<meta name="twitter:card" content="summary_large_image"/>`,
@@ -229,7 +230,7 @@ test("robots rules", () => {
 
 test("the search page is noindex, follow, with one bare canonical", () => {
   const page = (robots, canonical) =>
-    `<html><head>${robots}${canonical}</head></html>`;
+    `<html lang="en"><head>${robots}${canonical}</head></html>`;
   const good = page(
     '<meta name="robots" content="noindex, follow"/>',
     '<link rel="canonical" href="https://docs.raioviajante.com/search/"/>',

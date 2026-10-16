@@ -45,9 +45,13 @@ export function absoluteUrl(path: string): string {
  * `alternates` field (root layout included) through this one function so
  * that can't happen by omission.
  */
-export function alternatesFor(canonicalPath?: string) {
+export function alternatesFor(
+  canonicalPath?: string,
+  languages?: Record<string, string>,
+) {
   return {
     ...(canonicalPath ? { canonical: canonicalPath } : {}),
+    ...(languages ? { languages } : {}),
     types: {
       "application/rss+xml": [{ url: "/rss.xml", title: `${site.name} RSS` }],
     },

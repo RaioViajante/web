@@ -1,9 +1,12 @@
 ---
+import { DEFAULT_LOCALE, type LocaleId } from "../site/locales";
+import { alternateCluster, ogLocale, type Counterpart } from "./locale";
 import { isSearchPath, socialUrl } from "./metadata";
 
 // The head tags every static (Astro) page needs: canonical, robots, theme color,
 // Open Graph and Twitter. Root and Dump use Next's metadata API with the same
-// values from ./metadata. The search page is noindex but keeps its bare canonical;
+// values from ./metadata. `locale` and `counterparts` are facts the app supplies
+// (see ./locale): no counterpart, no hreflang and no og:locale:alternate. The search page is noindex but keeps its bare canonical;
 // the 404 page is noindex and has none.
 interface Props {
 	origin: string;
@@ -13,8 +16,22 @@ interface Props {
 	description: string;
 	noindex?: boolean;
 	themeColor?: string;
+	locale?: LocaleId;
+	counterparts?: readonly Counterpart[];
 }
-const { origin, site, path, title, description, noindex = false, themeColor } = Astro.props;
+const {
+	origin,
+	site,
+	path,
+	title,
+	description,
+	noindex = false,
+	themeColor,
+	locale = DEFAULT_LOCALE,
+	counterparts,
+} = Astro.props;
+// An error page is never part of a cluster.
+const cluster = noindex ? undefined : alternateCluster(origin, { locale, path, counterparts });
 const image = socialUrl(origin, path);
 const url = new URL(path, origin).href;
 ---
@@ -22,11 +39,14 @@ const url = new URL(path, origin).href;
 {!noindex && <link rel="canonical" href={url} />}
 {(noindex || isSearchPath(path)) && <meta name="robots" content="noindex, follow" />}
 {themeColor && <meta name="theme-color" content={themeColor} />}
+{cluster?.links.map((link) => <link rel="alternate" hreflang={link.hreflang} href={link.href} />)}
 <meta property="og:site_name" content={site} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={url} />
 <meta property="og:type" content="website" />
+<meta property="og:locale" content={ogLocale(locale)} />
+{cluster?.ogAlternates.map((alternate) => <meta property="og:locale:alternate" content={alternate} />)}
 <meta property="og:image" content={image} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
