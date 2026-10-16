@@ -34,7 +34,8 @@ Each post starts with frontmatter:
 ---
 title: "Post title"
 description: "One or two sentences. Used for previews, meta tags, and the feed."
-date: "2026-01-30"
+publishedAt: "2026-01-30"
+updatedAt: "2026-02-14"
 tags:
   - a-tag
   - another-tag
@@ -42,9 +43,11 @@ draft: false
 ---
 ```
 
-`title`, `description`, and `date` are required; `tags` and `draft` are not. A
-`draft: true` post stays out of production — listings, tags, feed, sitemap — and
-404s there, but still renders locally for previewing.
+`title`, `description`, and `publishedAt` are required; `updatedAt`, `tags`, and
+`draft` are not. `publishedAt` is the original publication date. Add
+`updatedAt` only for a later meaningful editorial or factual revision. A
+`draft: true` post stays out of production — listings, tags, feed, sitemap —
+and 404s there, but still renders locally for previewing.
 
 See `content/README.md` for the rest.
 

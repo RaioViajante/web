@@ -21,7 +21,7 @@ function item(post: Post): string {
     `      <title>${escapeXml(post.title)}</title>`,
     `      <link>${escapeXml(url)}</link>`,
     `      <guid isPermaLink="true">${escapeXml(url)}</guid>`,
-    `      <pubDate>${toRfc822(post.date)}</pubDate>`,
+    `      <pubDate>${toRfc822(post.publishedAt)}</pubDate>`,
     `      <description>${escapeXml(post.description)}</description>`,
     ...post.tags.map((tag) => `      <category>${escapeXml(tag)}</category>`),
     "    </item>",

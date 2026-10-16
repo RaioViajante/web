@@ -65,6 +65,18 @@ describe("metadata, RSS, and sitemap under the canonical production origin", () 
     for (const entry of urls) {
       expect(entry.url.startsWith(`${PRODUCTION_ORIGIN}/`)).toBe(true);
     }
+    expect(
+      urls.find((entry) =>
+        entry.url.endsWith(
+          "/posts/split-my-internet-into-four-different-kinds-of-place",
+        ),
+      ),
+    ).toMatchObject({ lastModified: "2026-10-05" });
+    expect(
+      urls.find((entry) =>
+        entry.url.endsWith("/posts/there-is-no-printf-down-here"),
+      ),
+    ).toMatchObject({ lastModified: "2026-09-05" });
   });
 
   it("builds the RSS channel and item links from the canonical origin", async () => {
@@ -75,7 +87,7 @@ describe("metadata, RSS, and sitemap under the canonical production origin", () 
         slug: "example",
         title: "Example",
         description: "An example post.",
-        date: "2026-01-01",
+        publishedAt: "2026-01-01",
         tags: [],
         draft: false,
       },

@@ -15,11 +15,15 @@ interface PostMonth {
 export function groupPostsByMonth(posts: readonly Post[]): PostMonth[] {
   const months = new Map<string, PostMonth>();
   for (const post of sortPostsNewestFirst(posts)) {
-    const key = post.date.slice(0, 7);
+    const key = post.publishedAt.slice(0, 7);
     const month = months.get(key);
     if (month) month.posts.push(post);
     else
-      months.set(key, { key, name: formatPostMonth(post.date), posts: [post] });
+      months.set(key, {
+        key,
+        name: formatPostMonth(post.publishedAt),
+        posts: [post],
+      });
   }
   return [...months.values()];
 }
@@ -53,7 +57,7 @@ export function HomePostList({
           <span>{latest.description}</span>
         </Link>
         <p className="post-meta">
-          <time dateTime={latest.date}>{latest.date}</time>
+          <time dateTime={latest.publishedAt}>{latest.publishedAt}</time>
           <span aria-hidden="true"> · </span>
           {latestMinutes ? (
             <>
@@ -77,7 +81,11 @@ export function HomePostList({
               <li className="month-post" key={post.slug}>
                 <LeaderRow
                   label={post.title}
-                  value={<time dateTime={post.date}>{post.date.slice(5)}</time>}
+                  value={
+                    <time dateTime={post.publishedAt}>
+                      {post.publishedAt.slice(5)}
+                    </time>
+                  }
                   href={`/posts/${post.slug}`}
                   linkComponent={Link}
                 />

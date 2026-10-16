@@ -13,13 +13,17 @@ export function formatArchiveDate(date: string): string {
 export function groupPostsByYear(posts: readonly Post[]): PostYear[] {
   const years = new Map<string, PostYear>();
   for (const post of sortPostsNewestFirst(posts)) {
-    const year = post.date.slice(0, 4);
+    const year = post.publishedAt.slice(0, 4);
     const group = years.get(year) ?? { year, months: [], posts: [] };
     group.posts.push(post);
-    const month = post.date.slice(5, 7);
+    const month = post.publishedAt.slice(5, 7);
     let monthGroup = group.months.find((item) => item.month === month);
     if (!monthGroup) {
-      monthGroup = { month, name: formatPostMonth(post.date), posts: [] };
+      monthGroup = {
+        month,
+        name: formatPostMonth(post.publishedAt),
+        posts: [],
+      };
       group.months.push(monthGroup);
     }
     monthGroup.posts.push(post);
@@ -49,8 +53,11 @@ export function ArchivePostList({ posts }: { posts: Post[] }) {
                     <LeaderRow
                       label={
                         <span className="archive-label">
-                          <time className="archive-date" dateTime={post.date}>
-                            {formatArchiveDate(post.date)}
+                          <time
+                            className="archive-date"
+                            dateTime={post.publishedAt}
+                          >
+                            {formatArchiveDate(post.publishedAt)}
                           </time>
                           <span>{post.title}</span>
                         </span>

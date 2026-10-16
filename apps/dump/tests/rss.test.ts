@@ -6,7 +6,8 @@ const posts: Post[] = [
     slug: "second",
     title: "Second & Newest",
     description: 'Has an ampersand and a "quote".',
-    date: "2026-05-20",
+    publishedAt: "2026-05-20",
+    updatedAt: "2026-06-01",
     tags: ["osdev"],
     draft: false,
   },
@@ -14,7 +15,7 @@ const posts: Post[] = [
     slug: "first",
     title: "First Post",
     description: "Plain description.",
-    date: "2026-01-15",
+    publishedAt: "2026-01-15",
     tags: [],
     draft: false,
   },
@@ -42,6 +43,11 @@ describe("renderRssFeed", () => {
     expect(feed).toContain("<pubDate>Wed, 20 May 2026 00:00:00 GMT</pubDate>");
     expect(feed).toContain('<guid isPermaLink="true">');
     expect(feed).toContain("/posts/first</link>");
+  });
+
+  it("keeps publication as pubDate when a post has been updated", () => {
+    expect(feed).toContain("<pubDate>Wed, 20 May 2026 00:00:00 GMT</pubDate>");
+    expect(feed).not.toContain("Mon, 01 Jun 2026 00:00:00 GMT");
   });
 
   it("keeps items in the order they were given (already sorted upstream)", () => {

@@ -18,7 +18,7 @@ export default function ArchivePage() {
         title="Everything"
         line={
           first
-            ? `${posts.length} ${posts.length === 1 ? "post" : "posts"} since ${first.date}.`
+            ? `${posts.length} ${posts.length === 1 ? "post" : "posts"} since ${first.publishedAt}.`
             : "Every post, newest first."
         }
       />

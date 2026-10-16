@@ -19,7 +19,8 @@ const post: Post = {
   slug: "article",
   title: "Article title",
   description: "Article description.",
-  date: "2026-09-03",
+  publishedAt: "2026-09-03",
+  updatedAt: "2026-10-05",
   tags: ["testing"],
   draft: false,
 };
@@ -37,6 +38,7 @@ describe("<PostArticle />", () => {
       screen.getByRole("heading", { level: 1, name: "Article title" }),
     ).toBeInTheDocument();
     expect(screen.getAllByText("2026-09-03")).toHaveLength(2);
+    expect(screen.getByText("2026-10-05")).toBeInTheDocument();
     expect(screen.getByText("Article description.")).toBeInTheDocument();
     expect(screen.getByText("Article body.")).toBeInTheDocument();
   });

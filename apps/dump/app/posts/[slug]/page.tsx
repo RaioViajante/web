@@ -36,7 +36,12 @@ export async function generateMetadata({
     openGraph: {
       ...metadata.openGraph,
       type: "article",
-      publishedTime: new Date(`${post.date}T00:00:00Z`).toISOString(),
+      publishedTime: new Date(`${post.publishedAt}T00:00:00Z`).toISOString(),
+      ...(post.updatedAt
+        ? {
+            modifiedTime: new Date(`${post.updatedAt}T00:00:00Z`).toISOString(),
+          }
+        : {}),
       tags: post.tags,
     },
   };

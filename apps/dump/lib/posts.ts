@@ -9,8 +9,10 @@ export interface PostFrontmatter {
   title: string;
   /** One or two sentences; used for previews, `<meta>` description, and RSS. */
   description: string;
-  /** Publication date as `YYYY-MM-DD`. */
-  date: string;
+  /** Original publication date as `YYYY-MM-DD`. */
+  publishedAt: string;
+  /** Date of the latest meaningful revision, when one exists. */
+  updatedAt?: string;
   /** Lowercase, URL-safe topic tags. May be empty. */
   tags: string[];
   /** When true, the post is hidden from listings and from production builds. */
@@ -46,6 +48,16 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function isValidDate(value: unknown): value is string {
+  if (typeof value !== "string" || !DATE_PATTERN.test(value)) return false;
+  if (value.startsWith("0000-")) return false;
+  const parsed = new Date(`${value}T00:00:00Z`);
+  return (
+    !Number.isNaN(parsed.getTime()) &&
+    parsed.toISOString().slice(0, 10) === value
+  );
+}
+
 /**
  * Validate raw parsed YAML into a typed `PostFrontmatter`. Throws a
  * `FrontmatterError` with an actionable message on any problem, so a broken
@@ -59,7 +71,7 @@ export function parseFrontmatter(data: unknown, slug: string): PostFrontmatter {
     );
   }
 
-  const { title, description, date, tags, draft } = data;
+  const { title, description, publishedAt, updatedAt, tags, draft } = data;
 
   if (typeof title !== "string" || title.trim() === "") {
     throw new FrontmatterError(
@@ -73,14 +85,22 @@ export function parseFrontmatter(data: unknown, slug: string): PostFrontmatter {
       "`description` is required and must be a non-empty string",
     );
   }
-  if (
-    typeof date !== "string" ||
-    !DATE_PATTERN.test(date) ||
-    Number.isNaN(Date.parse(date))
-  ) {
+  if (!isValidDate(publishedAt)) {
     throw new FrontmatterError(
       slug,
-      "`date` is required and must be a valid `YYYY-MM-DD` string",
+      "`publishedAt` is required and must be a valid `YYYY-MM-DD` string",
+    );
+  }
+  if (updatedAt !== undefined && !isValidDate(updatedAt)) {
+    throw new FrontmatterError(
+      slug,
+      "`updatedAt` must be a valid `YYYY-MM-DD` string",
+    );
+  }
+  if (updatedAt !== undefined && updatedAt <= publishedAt) {
+    throw new FrontmatterError(
+      slug,
+      "`updatedAt` must be later than `publishedAt`",
     );
   }
 
@@ -109,7 +129,8 @@ export function parseFrontmatter(data: unknown, slug: string): PostFrontmatter {
   return {
     title,
     description,
-    date,
+    publishedAt,
+    ...(updatedAt ? { updatedAt } : {}),
     tags: normalizedTags,
     draft: draft === true,
   };
@@ -145,14 +166,15 @@ export function readPost(directory: string, filename: string): Post {
 }
 
 /** Newest first; ties broken by title for a stable order. */
-function byDateDesc(a: Post, b: Post): number {
-  if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+function byPublicationDateDesc(a: Post, b: Post): number {
+  if (a.publishedAt !== b.publishedAt)
+    return a.publishedAt < b.publishedAt ? 1 : -1;
   return a.title.localeCompare(b.title);
 }
 
 /** Return a new, canonically ordered post array without mutating the input. */
 export function sortPostsNewestFirst(posts: readonly Post[]): Post[] {
-  return [...posts].sort(byDateDesc);
+  return [...posts].sort(byPublicationDateDesc);
 }
 
 /** Every post on disk, drafts included, sorted newest first. */

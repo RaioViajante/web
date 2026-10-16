@@ -36,9 +36,7 @@ export function homeJsonLd() {
 
 /**
  * Article-level `BlogPosting` for a published post. Only fields the project
- * genuinely has: `datePublished` is the frontmatter date; there is no
- * modification date, so no `dateModified`, and no publisher, logo or other
- * invented data. The image is the post's generated social card.
+ * genuinely has. The image is the post's generated social card.
  */
 export function blogPostingJsonLd(post: Post) {
   const url = absoluteUrl(`/posts/${post.slug}`);
@@ -46,7 +44,8 @@ export function blogPostingJsonLd(post: Post) {
     "@type": "BlogPosting" as const,
     headline: post.title,
     description: post.description,
-    datePublished: post.date,
+    datePublished: post.publishedAt,
+    ...(post.updatedAt ? { dateModified: post.updatedAt } : {}),
     url,
     mainEntityOfPage: { "@type": "WebPage" as const, "@id": url },
     author: personRef(),
