@@ -139,7 +139,8 @@ gained.
   inferred from paths, slugs, titles or filenames.
 - A localized page canonicalizes to itself. A cluster lists the page, every
   counterpart and `x-default` on the English member. Contradictory facts
-  (a path outside its locale, a repeated locale) throw instead of publishing.
+  (a path outside its locale, a repeated locale) throw instead of publishing;
+  a page's own locale and path are checked even when it has no counterpart.
 - `checkLocaleInventory` validates an app's inventory of public localized
   routes: every counterpart is a declared route in its own locale and lists the
   page back, and paths follow the host's trailing-slash form.
@@ -147,11 +148,16 @@ gained.
   each cluster. `checkAlternateReciprocity` and `checkEntityLanguages` run over
   all of an app's documents in `seo:check` (Docs, Lab) and `seo:verify`.
 - Search (`/search`, `/pt/search`) stays `noindex, follow` with one bare
-  canonical and out of the sitemap. A 404 in either language is a real 404,
+  canonical and out of the sitemap. Its `og:locale` and any `hreflang` cluster
+  are checked like a document's, and real search pages take part in
+  `checkAlternateReciprocity`. A 404 in either language is a real 404,
   `noindex`, with no canonical or `hreflang`, and its `lang` must match the copy
-  it renders (`checkNotFoundPage`).
-- Structured data: `BlogPosting`, `TechArticle` and `WebPage` state the rendered
-  locale; `BreadcrumbList` and `Person` state none; `WebSite` and `Blog` state
+  it renders (`checkNotFoundPage`, where the language is always required). The
+  one exception is the missing Dump post, whose generic Next error document has
+  no `lang`; `seo/verify-metadata.mjs` tolerates only that, until the Dump 404
+  slice fixes it.
+- Structured data: `BlogPosting`, `TechArticle` and `WebPage` (also when nested
+  as `mainEntityOfPage`) state the rendered locale; `BreadcrumbList` and `Person` state none; `WebSite` and `Blog` state
   the set of shipped locales, the same on every page that emits them.
 - Sitemaps stay one per host with plain entries. `xhtml:link` alternates are
   rejected, and `lastmod` still comes only from an explicit `updatedAt`.

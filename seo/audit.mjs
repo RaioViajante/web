@@ -81,13 +81,26 @@ export async function auditSite({
         }),
       );
     }
+  // Real search documents are not sitemap pages but do join alternate
+  // reciprocity. A localized search page is added here once its app ships it.
+  const searchPages = [];
   if (html) {
     const document = await html(search);
     if (document === undefined)
       problems.push(`app ${site} page ${search}: document could not be read`);
-    else problems.push(...checkSearchPage(site, document));
+    else {
+      problems.push(...checkSearchPage(site, document));
+      searchPages.push({ site, path: search, html: document });
+    }
   }
-  return { problems, pages, entries: sitemap.entries, rssItems };
+  return {
+    problems,
+    pages,
+    searchPages,
+    alternatePages: [...pages, ...searchPages],
+    entries: sitemap.entries,
+    rssItems,
+  };
 }
 
 export { siteOrigins };

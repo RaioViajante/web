@@ -57,8 +57,9 @@ function assertPlacement(route: LocalizedRoute) {
 /**
  * The `hreflang` cluster of a page, or undefined when it has no declared
  * counterpart: a page alone in its cluster emits nothing, not even a
- * self-reference. Throws when the supplied facts contradict themselves, since
- * serializing them would publish a wrong cluster.
+ * self-reference. Throws when the supplied facts contradict themselves (the
+ * page's own locale and path included, counterparts or not), since serializing
+ * them would publish wrong metadata.
  *
  * `x-default` is the English member. With the two supported locales every
  * cluster has one; a future locale mix without an English member gets none
@@ -68,9 +69,11 @@ export function alternateCluster(
   origin: string,
   page: LocalizedRoute,
 ): AlternateCluster | undefined {
+  // The URL is the authority for the rendered locale: a page's own placement
+  // is validated whether or not it has a counterpart.
+  assertPlacement(page);
   const counterparts = page.counterparts ?? [];
   if (counterparts.length === 0) return undefined;
-  assertPlacement(page);
   const members = [{ locale: page.locale, path: page.path }];
   for (const counterpart of counterparts) {
     assertPlacement(counterpart);

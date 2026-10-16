@@ -34,6 +34,7 @@ const html = (site) => async (path) => {
 };
 
 const pages = [];
+const alternatePages = [];
 for (const site of ["docs", "lab"])
   test(`${site}: build output satisfies the SEO contract`, async () => {
     const result = await auditSite({
@@ -47,15 +48,21 @@ for (const site of ["docs", "lab"])
       themeColor: await expectedThemeColor(),
     });
     pages.push(...result.pages);
+    alternatePages.push(...result.alternatePages);
     assert.deepEqual(result.problems, []);
     assert.ok(result.entries.length > 0);
   });
 
 test("alternates are reciprocal and host-level entities state one language set", () => {
   for (const site of ["docs", "lab"]) {
-    const own = pages.filter((p) => p.site === site);
-    assert.deepEqual(checkAlternateReciprocity(own), []);
-    assert.deepEqual(checkEntityLanguages(own), []);
+    assert.deepEqual(
+      checkAlternateReciprocity(alternatePages.filter((p) => p.site === site)),
+      [],
+    );
+    assert.deepEqual(
+      checkEntityLanguages(pages.filter((p) => p.site === site)),
+      [],
+    );
   }
 });
 

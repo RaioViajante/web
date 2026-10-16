@@ -132,6 +132,7 @@ const byHreflang = new Map<string, LocaleId>(
  * Reciprocity between documents is `checkAlternateReciprocity`.
  */
 function checkAlternates(
+  site: Site,
   at: string,
   doc: ParsedDocument,
   locale: LocaleId,
@@ -173,6 +174,10 @@ function checkAlternates(
       continue;
     }
     members.push(member);
+    if (new URL(link.href, "https://x.invalid").origin !== siteOrigins[site])
+      p.push(
+        `${at}: hreflang "${link.hreflang}" ${link.href} is not on ${siteOrigins[site]}`,
+      );
     let destination: LocaleId | undefined;
     try {
       destination = localeOfPath(new URL(link.href).pathname);
@@ -321,7 +326,7 @@ export function checkDocument({
     p.push(
       `${at}: og:locale is "${ogLocaleValue}", expected "${LOCALES[locale].openGraphLocale}"`,
     );
-  p.push(...checkAlternates(at, doc, locale, canonical));
+  p.push(...checkAlternates(site, at, doc, locale, canonical));
   const ogImage = og("image");
   if (
     ogImage &&
@@ -395,7 +400,10 @@ export function searchPathFor(site: Site, locale: LocaleId = DEFAULT_LOCALE) {
  * The search page is reachable and crawlable but deliberately not indexed:
  * `noindex, follow`, one canonical equal to the bare production URL (so `?q=`
  * and tracking parameters never create another identity), and absent from the
- * sitemap (checked by the caller with the sitemap entries).
+ * sitemap (checked by the caller with the sitemap entries). It is noindex, not
+ * unlocalized: its Open Graph locale and any `hreflang` cluster (a real EN/PT
+ * pair when both pages exist) are checked like any document's, and the
+ * caller adds the page to `checkAlternateReciprocity`.
  */
 export function checkSearchPage(
   site: Site,
@@ -422,6 +430,15 @@ export function checkSearchPage(
     p.push(
       `${at}: canonical is ${JSON.stringify(doc.canonicals)}, expected ${want}`,
     );
+  const ogLocales = doc.meta.get("og:locale") ?? [];
+  if (
+    ogLocales.length !== 1 ||
+    ogLocales[0] !== LOCALES[locale].openGraphLocale
+  )
+    p.push(
+      `${at}: og:locale is ${JSON.stringify(ogLocales)}, expected "${LOCALES[locale].openGraphLocale}"`,
+    );
+  p.push(...checkAlternates(site, at, doc, locale, want));
   return p;
 }
 
@@ -437,11 +454,8 @@ export function checkNotFoundPage(
     path: string;
     status: number;
     html: string;
-    /**
-     * The locale of the copy the page renders. Omitted only for a miss that is
-     * known to render no document language at all (see seo/verify-metadata.mjs).
-     */
-    lang?: LocaleId;
+    /** The locale of the copy the page renders; its `<html lang>` must equal it. */
+    lang: LocaleId;
     sitemapPaths?: string[];
   },
 ) {
@@ -458,7 +472,7 @@ export function checkNotFoundPage(
     p.push(`${at}: 404 page declares hreflang`);
   if (doc.meta.has("og:locale:alternate"))
     p.push(`${at}: 404 page declares og:locale:alternate`);
-  if (input.lang && doc.lang !== LOCALES[input.lang].htmlLang)
+  if (doc.lang !== LOCALES[input.lang].htmlLang)
     p.push(
       `${at}: 404 <html lang> is ${JSON.stringify(doc.lang)}, expected "${LOCALES[input.lang].htmlLang}" for the copy it renders`,
     );
@@ -738,9 +752,11 @@ const languagesOf = (node: any): string[] | undefined =>
 
 /**
  * `inLanguage` by node type (docs/i18n.md, "Structured data"): content nodes
- * state the rendered locale; breadcrumbs and identity nodes state none; the
- * host-level `WebSite` and `Blog` state a set of shipped locales, never the
- * page's own locale as such.
+ * (`WebPage` included, wherever it is nested) state the rendered locale;
+ * breadcrumbs and identity nodes state none; the host-level `WebSite` and
+ * `Blog` state a set of shipped locales, never the page's own locale as such.
+ * The whole object graph is walked, so no nested node escapes. A reference
+ * that is only an `@id` states no language and is fine.
  */
 function checkNodeLanguages(
   at: string,
@@ -749,28 +765,28 @@ function checkNodeLanguages(
 ): Problems {
   const p: Problems = [];
   const wanted = LOCALES[locale].inLanguage;
-  const visit = (node: any) => {
-    const type = node["@type"];
-    const languages = languagesOf(node);
+  const visit = (value: any) => {
+    if (Array.isArray(value)) return value.forEach(visit);
+    if (!value || typeof value !== "object") return;
+    const type = value["@type"];
+    const languages = languagesOf(value);
     if (["BlogPosting", "TechArticle", "WebPage"].includes(type)) {
-      if (languages === undefined) {
-        if (type !== "WebPage") p.push(`${at}: ${type} has no inLanguage`);
-      } else if (languages.length !== 1 || languages[0] !== wanted)
+      if (languages === undefined) p.push(`${at}: ${type} has no inLanguage`);
+      else if (languages.length !== 1 || languages[0] !== wanted)
         p.push(
-          `${at}: ${type} inLanguage is ${JSON.stringify(node.inLanguage)}, expected "${wanted}"`,
+          `${at}: ${type} inLanguage is ${JSON.stringify(value.inLanguage)}, expected "${wanted}"`,
         );
     } else if (["WebSite", "Blog"].includes(type)) {
-      for (const value of languages ?? [])
-        if (!inLanguages.has(value))
+      for (const language of languages ?? [])
+        if (!inLanguages.has(language))
           p.push(
-            `${at}: ${type} inLanguage "${value}" is not a registry value`,
+            `${at}: ${type} inLanguage "${language}" is not a registry value`,
           );
     } else if (languages !== undefined)
-      p.push(`${at}: ${type} must not state inLanguage`);
-    if (node.mainEntityOfPage && typeof node.mainEntityOfPage === "object")
-      visit(node.mainEntityOfPage);
+      p.push(`${at}: ${type ?? "an untyped node"} must not state inLanguage`);
+    for (const child of Object.values(value)) visit(child);
   };
-  for (const node of nodes) visit(node);
+  visit(nodes);
   return p;
 }
 

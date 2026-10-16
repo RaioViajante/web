@@ -26,6 +26,7 @@ import {
   inLanguageOf,
   jsonLdScript,
   personRef,
+  webPageRef,
   websiteJsonLd,
 } from "./structured-data.ts";
 
@@ -289,7 +290,7 @@ test("search paths are built per host and locale", () => {
 
 test("the search page check follows the locale: one bare canonical and its lang", () => {
   const search = (lang, canonical) =>
-    `<html lang="${lang}"><head><meta name="robots" content="noindex, follow"/><link rel="canonical" href="${canonical}"/></head></html>`;
+    `<html lang="${lang}"><head><meta name="robots" content="noindex, follow"/><link rel="canonical" href="${canonical}"/><meta property="og:locale" content="${lang === "en" ? "en_US" : "pt_BR"}"/></head></html>`;
   assert.deepEqual(
     checkSearchPage(
       "docs",
@@ -786,7 +787,7 @@ const article = (locale, extra = {}) => ({
   headline: "T",
   description: "D",
   url: `${DOCS}/guide/`,
-  mainEntityOfPage: { "@type": "WebPage", "@id": `${DOCS}/guide/` },
+  mainEntityOfPage: webPageRef(`${DOCS}/guide/`, locale),
   inLanguage: inLanguageOf(locale),
   isPartOf: { "@id": `${DOCS}/#website` },
   image: `${DOCS}/og/x.png`,
@@ -914,4 +915,300 @@ test("structured data: localized homes are not forced into one node layout", () 
   ]);
   assert.equal(expectedTypes("docs", "/pt/search/"), undefined);
   assert.deepEqual(expectedTypes("dump", "/pt/posts/ola"), ["BlogPosting"]);
+});
+
+// ------------------------------------------- revision: close validation gaps
+
+test("own locale and path agree whether or not the page has counterparts", () => {
+  for (const counterparts of [undefined, []]) {
+    for (const [locale, path] of [
+      ["pt-BR", "/about"],
+      ["en", "/pt/about"],
+    ]) {
+      const page = { locale, path, counterparts };
+      assert.throws(() => alternateCluster(DUMP, page), RangeError, path);
+      assert.throws(
+        () =>
+          pageMetadata(DUMP, "dump", { ...page, title: "t", description: "d" }),
+        RangeError,
+        path,
+      );
+    }
+    // Untranslated but consistent pages stay valid and emit no cluster.
+    assert.equal(
+      alternateCluster(DUMP, { locale: "en", path: "/about", counterparts }),
+      undefined,
+    );
+    assert.equal(
+      alternateCluster(DUMP, {
+        locale: "pt-BR",
+        path: "/pt/about",
+        counterparts,
+      }),
+      undefined,
+    );
+    const meta = pageMetadata(DUMP, "dump", {
+      locale: "pt-BR",
+      path: "/pt/about",
+      counterparts,
+      title: "t",
+      description: "d",
+    });
+    assert.ok(!("languages" in meta.alternates));
+  }
+});
+
+const webPage = (url, inLanguage) => ({
+  "@type": "WebPage",
+  "@id": url,
+  ...(inLanguage ? { inLanguage } : {}),
+});
+const withPage = (locale, page, extra = {}) =>
+  article(locale, { mainEntityOfPage: page, ...extra });
+
+test("structured data: WebPage must state the rendered locale", () => {
+  const url = `${DOCS}/guide/`;
+  const run = (path, locale, page) =>
+    jsonLd(
+      path,
+      "docs",
+      ld(document({ path }), withPage(locale, page), crumbs),
+    );
+  assert.match(run("/guide/", "en", webPage(url)), /WebPage has no inLanguage/);
+  assert.doesNotMatch(
+    run("/guide/", "en", webPageRef(url, "en")),
+    /WebPage|inLanguage/,
+  );
+  assert.doesNotMatch(
+    run("/pt/guide/", "pt-BR", webPageRef(`${DOCS}/pt/guide/`, "pt-BR")),
+    /WebPage|inLanguage/,
+  );
+  assert.match(
+    run("/guide/", "en", webPage(url, "pt-BR")),
+    /WebPage inLanguage is "pt-BR", expected "en"/,
+  );
+});
+
+test("structured data: identity nodes are inspected wherever they nest", () => {
+  const top = { ...personRef(), inLanguage: "en" };
+  const nested = withPage("en", webPageRef(`${DOCS}/guide/`), {
+    author: { ...personRef(), inLanguage: "en" },
+  });
+  assert.match(
+    jsonLd("/guide/", "docs", ld(document({}), article("en"), crumbs, top)),
+    /Person must not state inLanguage/,
+  );
+  assert.match(
+    jsonLd("/guide/", "docs", ld(document({}), nested, crumbs)),
+    /Person must not state inLanguage/,
+  );
+  const deep = article("en", {
+    isPartOf: {
+      "@id": `${DOCS}/#website`,
+      about: [{ "@type": "Person", inLanguage: "en" }],
+    },
+  });
+  assert.match(
+    jsonLd("/guide/", "docs", ld(document({}), deep, crumbs)),
+    /Person must not state inLanguage/,
+  );
+  // An @id-only reference states no language and is fine.
+  const reference = article("en", { author: { "@id": personRef()["@id"] } });
+  assert.doesNotMatch(
+    jsonLd("/guide/", "docs", ld(document({}), reference, crumbs)),
+    /inLanguage/,
+  );
+});
+
+test("structured data: the shipped WebSite and Blog language set is English today", async () => {
+  const { shippedLanguages } = await import("./structured-data.ts");
+  assert.equal(shippedLanguages(), "en");
+  assert.equal(websiteJsonLd(DOCS, "docs", "d").inLanguage, "en");
+  assert.deepEqual(shippedLanguages(["en", "pt-BR"]), ["en", "pt-BR"]);
+  // Contradictory sets for one @id still fail.
+  const node = (languages) => websiteJsonLd(DOCS, "docs", "d", { languages });
+  const page = (path, n) => ({
+    site: "docs",
+    path,
+    html: ld(document({ path }), n),
+  });
+  assert.match(
+    checkEntityLanguages([
+      page("/", node(["en"])),
+      page("/guide/", node(["en", "pt-BR"])),
+    ]).join(),
+    /states inLanguage/,
+  );
+});
+
+test("the shared 404 check always requires the rendered language", () => {
+  const page = (lang) =>
+    `<html${lang ? ` lang="${lang}"` : ""}><head><meta name="robots" content="noindex"/></head></html>`;
+  const run = (locale, html) =>
+    checkNotFoundPage("root", {
+      path: "/x",
+      status: 404,
+      html,
+      lang: locale,
+    }).join();
+  assert.equal(run("en", page("en")), "");
+  assert.equal(run("pt-BR", page("pt-BR")), "");
+  assert.match(
+    run("en", page()),
+    /404 <html lang> is undefined, expected "en"/,
+  );
+  assert.match(run("pt-BR", page()), /expected "pt-BR"/);
+  assert.match(run("en", page("pt-BR")), /expected "en"/);
+  // Omitting the expectation is a caller error, not a way to skip the check.
+  assert.throws(() =>
+    checkNotFoundPage("root", { path: "/x", status: 404, html: page("en") }),
+  );
+});
+
+test("search pages: locale metadata and alternates are verified like any document", () => {
+  const SEARCH = (site) => (site === "docs" ? "/search/" : "/search");
+  const search = ({
+    site = "docs",
+    lang = "en",
+    ogLocale = lang === "en" ? "en_US" : "pt_BR",
+    robots = "noindex, follow",
+    alternates = [],
+    ogAlternates = [],
+    path = lang === "en" ? SEARCH(site) : `/pt${SEARCH(site)}`,
+  } = {}) => {
+    const origin = site === "docs" ? DOCS : DUMP;
+    return `<html lang="${lang}"><head><meta name="robots" content="${robots}"/><link rel="canonical" href="${origin}${path}"/><meta property="og:locale" content="${ogLocale}"/>${ogAlternates
+      .map((a) => `<meta property="og:locale:alternate" content="${a}"/>`)
+      .join("")}${alternates
+      .map(
+        ([h, href]) => `<link rel="alternate" hreflang="${h}" href="${href}"/>`,
+      )
+      .join("")}</head></html>`;
+  };
+  const run = (html, locale = "en", requested) =>
+    checkSearchPage("docs", html, requested, locale).join("\n");
+  const en = [
+    ["en", `${DOCS}/search/`],
+    ["pt-BR", `${DOCS}/pt/search/`],
+    ["x-default", `${DOCS}/search/`],
+  ];
+  // Today: the English page alone.
+  assert.equal(run(search()), "");
+  assert.equal(run(search(), "en", "/search/?q=a&utm_source=x"), "");
+  // A correct fixture pair.
+  assert.equal(run(search({ alternates: en, ogAlternates: ["pt_BR"] })), "");
+  assert.equal(
+    run(
+      search({ lang: "pt-BR", alternates: en, ogAlternates: ["en_US"] }),
+      "pt-BR",
+    ),
+    "",
+  );
+  // Rules that must fail.
+  assert.match(run(search({ ogLocale: "pt_BR" })), /og:locale is/);
+  assert.match(
+    run(
+      search({
+        alternates: [...en, ["en", `${DOCS}/search/`]],
+        ogAlternates: ["pt_BR"],
+      }),
+    ),
+    /duplicate hreflang "en"/,
+  );
+  assert.match(
+    run(search({ alternates: en.slice(0, 2), ogAlternates: ["pt_BR"] })),
+    /no x-default/,
+  );
+  assert.match(
+    run(
+      search({
+        alternates: [en[0], en[1], ["x-default", `${DOCS}/pt/search/`]],
+        ogAlternates: ["pt_BR"],
+      }),
+    ),
+    /x-default .* is not the English member/,
+  );
+  assert.match(
+    run(search({ alternates: en, ogAlternates: [] })),
+    /og:locale:alternate is/,
+  );
+  assert.match(
+    run(
+      search({
+        alternates: [en[0], ["pt-BR", `${DOCS}/search/`], en[2]],
+        ogAlternates: ["pt_BR"],
+      }),
+    ),
+    /which belongs to en/,
+  );
+  assert.match(
+    run(
+      search({
+        alternates: [
+          en[0],
+          ["pt-BR", "https://raioviajante.com/pt/search/"],
+          en[2],
+        ],
+        ogAlternates: ["pt_BR"],
+      }),
+    ),
+    /pt-BR" .* is not on https:\/\/docs\.raioviajante\.com/,
+  );
+  assert.match(
+    run(
+      search({
+        alternates: en,
+        ogAlternates: ["pt_BR"],
+        robots: "index, follow",
+      }),
+    ),
+    /expected "noindex, follow"/,
+  );
+});
+
+test("search pages join alternate reciprocity without joining the sitemap", () => {
+  const html = (lang, path, alternates, ogAlternates) =>
+    `<html lang="${lang}"><head><meta name="robots" content="noindex, follow"/><link rel="canonical" href="${DOCS}${path}"/>${ogAlternates}${alternates}</head></html>`;
+  const cluster = (hrefs) =>
+    hrefs
+      .map(
+        ([h, p]) =>
+          `<link rel="alternate" hreflang="${h}" href="${DOCS}${p}"/>`,
+      )
+      .join("");
+  const both = cluster([
+    ["en", "/search/"],
+    ["pt-BR", "/pt/search/"],
+    ["x-default", "/search/"],
+  ]);
+  const enPage = {
+    site: "docs",
+    path: "/search/",
+    html: html("en", "/search/", both, ""),
+  };
+  const ptPage = {
+    site: "docs",
+    path: "/pt/search/",
+    html: html("pt-BR", "/pt/search/", both, ""),
+  };
+  assert.deepEqual(checkAlternateReciprocity([enPage, ptPage]), []);
+  // The English page names a Portuguese search page that was never fetched.
+  assert.match(
+    checkAlternateReciprocity([enPage]).join(),
+    /alternate .*\/pt\/search\/ is not a checked page/,
+  );
+  // A Portuguese page declaring another cluster is not reciprocal.
+  const other = {
+    ...ptPage,
+    html: html("pt-BR", "/pt/search/", cluster([["pt-BR", "/pt/search/"]]), ""),
+  };
+  assert.match(
+    checkAlternateReciprocity([enPage, other]).join(),
+    /different cluster/,
+  );
+  // Search stays out of the sitemap whatever it declares.
+  assert.ok(!isSearchPath("/guide/"));
+  assert.ok(isSearchPath("/search/") && isSearchPath("/pt/search/"));
+  const xml = sitemapResponse(DOCS, ["/", "/search/", "/pt/search/"]);
+  return xml.text().then((text) => assert.ok(!text.includes("search")));
 });

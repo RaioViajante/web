@@ -68,6 +68,7 @@ async function text(site, path, contentType) {
 }
 
 const allPages = [];
+const alternatePages = [];
 const images = new Map();
 const assets = new Map();
 const discoveryLinks = new Set();
@@ -147,6 +148,7 @@ for (const site of sites) {
     ),
   );
   allPages.push(...result.pages);
+  alternatePages.push(...result.alternatePages);
   documents += result.pages.length;
 
   for (const page of result.pages) {
@@ -196,18 +198,24 @@ for (const site of sites) {
       ? ["/seo-missing-check", "/posts/seo-missing-check"]
       : ["/seo-missing-check"]) {
       const { response, text: body } = await get(site, path);
+      // TEMPORARY LEGACY EXCEPTION, this one call site only. A missing dump
+      // post is answered with Next's generic error document, which has no
+      // `<html lang>`. That predates the multilingual work and is owned by the
+      // later Dump routing/404 slice, which removes this exemption. Only the
+      // absence of `lang` is tolerated here; a wrong `lang` still fails, and
+      // `checkNotFoundPage` itself always requires the language.
+      const legacyDumpMiss =
+        site === "dump" &&
+        path === "/posts/seo-missing-check" &&
+        parseDocument(body).lang === undefined;
       problems.push(
         ...checkNotFoundPage(site, {
           path,
           status: response.status,
           html: body,
-          // A missing dump post is answered with Next's generic error
-          // document, which has no `<html lang>` today. That predates the
-          // multilingual work and belongs to the Dump 404 slice; the other
-          // misses are English and must say so.
-          lang: path.startsWith("/posts/") ? undefined : "en",
+          lang: "en",
           sitemapPaths,
-        }),
+        }).filter((p) => !(legacyDumpMiss && p.includes("404 <html lang>"))),
       );
     }
   else {
@@ -234,7 +242,9 @@ for (const site of sites) {
 for (const site of sites) {
   const pages = allPages.filter((page) => page.site === site);
   problems.push(
-    ...checkAlternateReciprocity(pages),
+    ...checkAlternateReciprocity(
+      alternatePages.filter((page) => page.site === site),
+    ),
     ...checkEntityLanguages(pages),
   );
 }

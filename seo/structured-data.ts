@@ -40,6 +40,26 @@ export function inLanguageOf(locale: LocaleId) {
   return LOCALES[locale].inLanguage;
 }
 
+/**
+ * The `inLanguage` of a host-level node (`WebSite`, `Blog`): the locales the
+ * host has actually shipped, English until it ships another. One value or a list.
+ */
+export function shippedLanguages(
+  locales: readonly LocaleId[] = [DEFAULT_LOCALE],
+) {
+  const languages = locales.map(inLanguageOf);
+  return languages.length === 1 ? languages[0]! : languages;
+}
+
+/** The `WebPage` a content node is the main entity of: the rendered locale's language. */
+export function webPageRef(url: string, locale: LocaleId = DEFAULT_LOCALE) {
+  return {
+    "@type": "WebPage" as const,
+    "@id": url,
+    inLanguage: inLanguageOf(locale),
+  };
+}
+
 export function websiteId(origin: string) {
   return new URL("/#website", origin).href;
 }
@@ -61,14 +81,13 @@ export function websiteJsonLd(
     languages?: readonly LocaleId[];
   } = {},
 ) {
-  const languages = (options.languages ?? [DEFAULT_LOCALE]).map(inLanguageOf);
   return {
     "@type": "WebSite" as const,
     "@id": websiteId(origin),
     name,
     description,
     url: new URL("/", origin).href,
-    inLanguage: languages.length === 1 ? languages[0]! : languages,
+    inLanguage: shippedLanguages(options.languages),
     ...(options.author ? { author: personRef() } : {}),
   };
 }

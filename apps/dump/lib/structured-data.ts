@@ -1,6 +1,10 @@
+import { DEFAULT_LOCALE } from "../../../site/locales";
 import { socialUrl } from "../../../seo/metadata";
 import {
+  inLanguageOf,
   personRef,
+  shippedLanguages,
+  webPageRef,
   websiteId,
   websiteJsonLd,
 } from "../../../seo/structured-data";
@@ -27,7 +31,7 @@ export function homeJsonLd() {
       name: site.name,
       description: site.description,
       url: absoluteUrl("/"),
-      inLanguage: site.locale,
+      inLanguage: shippedLanguages(),
       author: personRef(),
       isPartOf: { "@id": websiteId(site.url) },
     },
@@ -47,9 +51,9 @@ export function blogPostingJsonLd(post: Post) {
     datePublished: post.publishedAt,
     ...(post.updatedAt ? { dateModified: post.updatedAt } : {}),
     url,
-    mainEntityOfPage: { "@type": "WebPage" as const, "@id": url },
+    mainEntityOfPage: webPageRef(url),
     author: personRef(),
-    inLanguage: site.locale,
+    inLanguage: inLanguageOf(DEFAULT_LOCALE),
     isPartOf: { "@id": blogId() },
     ...(post.tags.length ? { keywords: post.tags.join(", ") } : {}),
     image: socialUrl(site.url, `/posts/${post.slug}`),

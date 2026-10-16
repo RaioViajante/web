@@ -1,5 +1,12 @@
 import { socialUrl } from "../../../../seo/metadata";
-import { breadcrumbJsonLd, websiteId, websiteJsonLd } from "../../../../seo/structured-data";
+import { DEFAULT_LOCALE } from "../../../../site/locales";
+import {
+	breadcrumbJsonLd,
+	inLanguageOf,
+	webPageRef,
+	websiteId,
+	websiteJsonLd,
+} from "../../../../seo/structured-data";
 import { getPages, pathOf, type DocEntry } from "./docs";
 import { parentIndex } from "./nav";
 import { origin } from "./seo";
@@ -37,8 +44,8 @@ export async function pageJsonLd(entry: DocEntry) {
 			headline: entry.data.title,
 			description: entry.data.description,
 			url,
-			mainEntityOfPage: { "@type": "WebPage", "@id": url },
-			inLanguage: "en",
+			mainEntityOfPage: webPageRef(url),
+			inLanguage: inLanguageOf(DEFAULT_LOCALE),
 			isPartOf: { "@id": websiteId(origin) },
 			image: socialUrl(origin, path),
 			...(modified ? { dateModified: modified } : {}),

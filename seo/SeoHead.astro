@@ -30,8 +30,9 @@ const {
 	locale = DEFAULT_LOCALE,
 	counterparts,
 } = Astro.props;
-// An error page is never part of a cluster.
-const cluster = noindex ? undefined : alternateCluster(origin, { locale, path, counterparts });
+// An error page is never part of a cluster, but its own locale and path still have to agree.
+const own = alternateCluster(origin, { locale, path, counterparts });
+const cluster = noindex ? undefined : own;
 const image = socialUrl(origin, path);
 const url = new URL(path, origin).href;
 ---
