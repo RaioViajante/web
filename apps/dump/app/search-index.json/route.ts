@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { siteOrigins } from "../../../../site/sites";
 import type { SearchEntry } from "@raioviajante/design/search";
 import { getPublishedPosts } from "@/lib/posts";
@@ -9,6 +10,7 @@ export const dynamic = "force-static";
 export function GET() {
   const entries: SearchEntry[] = getPublishedPosts().map((post) => ({
     site: "dump",
+    locale: DEFAULT_LOCALE,
     title: post.title,
     href: `${siteOrigins.dump}/posts/${post.slug}`,
     description: post.description,

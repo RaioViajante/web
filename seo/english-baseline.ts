@@ -28,6 +28,13 @@ export interface SiteBaseline {
 
 export type EnglishBaseline = Record<Site, SiteBaseline>;
 
+/**
+ * Fields the multilingual work adds to the English index. They are additive
+ * and checked by their own rule (`seo/search-index.ts`); the baseline records
+ * only what existed before, so regenerating it never turns one into a floor.
+ */
+const ADDED_FIELDS = new Set(["locale"]);
+
 export interface IndexEntry {
   href?: unknown;
   [field: string]: unknown;
@@ -119,7 +126,9 @@ export function describeBaseline(
         .trim()
         .toLowerCase(),
       fields: sorted(
-        fields[0]?.filter((k) => fields.every((f) => f.includes(k))) ?? [],
+        fields[0]?.filter(
+          (k) => !ADDED_FIELDS.has(k) && fields.every((f) => f.includes(k)),
+        ) ?? [],
       ),
       pages: sorted(
         input.searchEntries.flatMap((entry) =>

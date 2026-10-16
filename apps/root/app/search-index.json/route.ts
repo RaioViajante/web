@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { siteOrigins } from "../../../../site/sites";
 import type { SearchEntry } from "@raioviajante/design/search";
 import { projects } from "../../lib/projects";
@@ -16,6 +17,7 @@ export function GET() {
     ["setup", "/setup", "Tools and setup"],
   ].map(([title, href, description], index) => ({
     site: "root",
+    locale: DEFAULT_LOCALE,
     title,
     href: base + href,
     description,
@@ -23,6 +25,7 @@ export function GET() {
   }));
   const projectEntries: SearchEntry[] = projects.map((project, index) => ({
     site: "root",
+    locale: DEFAULT_LOCALE,
     title: project.name,
     href: base + "/projects",
     description: project.description,

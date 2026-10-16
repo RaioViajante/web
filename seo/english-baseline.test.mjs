@@ -5,6 +5,7 @@ import test from "node:test";
 import { isReservedPath } from "../site/locales.ts";
 import { SITES, siteOrigins } from "../site/sites.ts";
 import {
+  describeBaseline,
   checkBaselineSearchIndex,
   checkBaselineSearchIndexType,
   checkBaselineSitemap,
@@ -155,3 +156,26 @@ for (const site of ["docs", "lab"])
       [],
     );
   });
+
+test("regenerating the baseline never records an additive locale field as a floor", () => {
+  const entry = (path) => ({
+    site: "docs",
+    locale: "en",
+    title: path,
+    description: "d",
+    href: `${siteOrigins.docs}${path}`,
+  });
+  const described = describeBaseline("docs", {
+    sitemapLocs: [`${siteOrigins.docs}/`],
+    endpoints: ["/search-index.json"],
+    searchPath: "/search-index.json",
+    searchContentType: "application/json",
+    searchEntries: [entry("/"), entry("/guide/")],
+  });
+  assert.deepEqual(described.searchIndex.fields, [
+    "description",
+    "href",
+    "site",
+    "title",
+  ]);
+});
