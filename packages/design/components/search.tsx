@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { Art, art } from "./art";
 import { SiteLink, type LinkComponent } from "./link";
+import type { LocaleId } from "../../../site/locales";
 import { SITES, type SiteId } from "../../../site/sites";
 
 /** Searches that find something on each site, offered when nothing matched. */
@@ -60,6 +61,12 @@ function Suggestions({
 
 export interface SearchEntry {
   site: SiteId;
+  /**
+   * The index's locale. Producers publish it; it stays optional here because
+   * readers must keep accepting an English entry without it until every
+   * production index carries it (docs/i18n.md, "Search").
+   */
+  locale?: LocaleId;
   title: string;
   href: string;
   description: string;

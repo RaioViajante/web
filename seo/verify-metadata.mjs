@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { siteOrigins } from "../site/sites.ts";
 import { checkSecurityTxt, securityTxtPath } from "../security/security-txt.ts";
 import { renderLlmsTxt } from "./llms.ts";
+import { checkEnglishIndexLocale } from "./search-index.ts";
 import { ports, startServers } from "../security/local-servers.mjs";
 import { auditSite, expectedThemeColor } from "./audit.mjs";
 import {
@@ -140,12 +141,11 @@ for (const site of sites) {
       index.response.headers.get("content-type"),
     ),
   );
+  const indexEntries = index.text ? JSON.parse(index.text) : undefined;
   problems.push(
-    ...checkBaselineSearchIndex(
-      site,
-      recorded,
-      index.text ? JSON.parse(index.text) : undefined,
-    ),
+    ...checkBaselineSearchIndex(site, recorded, indexEntries),
+    // Producer migration (#42): every English entry states locale "en".
+    ...checkEnglishIndexLocale(site, recorded.searchIndex.path, indexEntries),
   );
   allPages.push(...result.pages);
   alternatePages.push(...result.alternatePages);

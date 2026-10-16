@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { siteOrigins } from "../../../../site/sites";
 import type { APIRoute } from "astro";
 import { getCollection, render } from "astro:content";
@@ -16,6 +17,7 @@ export const GET: APIRoute = async () => {
         const title = String(doc.data.title);
         const page: SearchEntry = {
           site: "docs",
+          locale: DEFAULT_LOCALE,
           title,
           href: base,
           description: String(doc.data.description ?? ""),
@@ -25,6 +27,7 @@ export const GET: APIRoute = async () => {
           .filter((heading) => heading.depth === 2 || heading.depth === 3)
           .map((heading): SearchEntry => ({
             site: "docs",
+            locale: DEFAULT_LOCALE,
             title: heading.text,
             href: `${base}#${heading.slug}`,
             description: title,

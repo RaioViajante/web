@@ -30,6 +30,8 @@ test("a cold-cache production build keeps semantic headings in the search index"
     );
     assert.equal(section?.title, "Classification");
     assert.ok(entries.every(({ title }) => !/^\d{2}\./.test(title)), "no numbered titles");
+    assert.ok(entries.length > 0);
+    assert.ok(entries.every(({ locale }) => locale === "en"), "every entry states the English locale id");
   } finally {
     rmSync(outDir, { recursive: true, force: true });
   }
