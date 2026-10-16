@@ -47,12 +47,12 @@ framework.
 
 Four shared locations sit beside the apps. Each answers one question.
 
-| Location          | Holds                                                                                   |
-| ----------------- | --------------------------------------------------------------------------------------- |
-| `site/`           | Neutral site identity: the four production origins and contact/company constants        |
-| `packages/design` | Visual language and shared user-facing behavior: tokens, styles, artwork, components, sound, search UI, the social-image renderer, theme color |
-| `seo/`            | Metadata, sitemap, robots and manifest helpers, `SeoHead.astro`, JSON-LD, SEO checks    |
-| `security/`       | HTTP security policy (CSP, headers), network-origin and `security.txt` tooling          |
+| Location          | Holds                                                                                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `site/`           | Neutral site identity: the four production origins, contact/company constants, and the locale registry with per-app locale participation ([i18n.md](i18n.md)) |
+| `packages/design` | Visual language and shared user-facing behavior: tokens, styles, artwork, components, sound, search UI, the social-image renderer, theme color                |
+| `seo/`            | Metadata, sitemap, robots and manifest helpers, `SeoHead.astro`, JSON-LD, SEO checks                                                                          |
+| `security/`       | HTTP security policy (CSP, headers), network-origin and `security.txt` tooling                                                                                |
 
 Dependency direction (enforced by `security/boundaries.test.mjs`):
 

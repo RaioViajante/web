@@ -30,7 +30,7 @@ name (see "Required checks"). Deterministic, under repository control,
 30-minute timeout, no retries. In order:
 
 1. `pnpm validate`: format, lint, typecheck, tests, the build of all four apps,
-   `pnpm security:check` (headers, security.txt, storage, origin policy, site
+   `pnpm site:check` (locale registry), `pnpm security:check` (headers, security.txt, storage, origin policy, site
    origins, **workflow policy**) and `pnpm seo:check`. The next steps use these builds.
 2. `pnpm browser:check`: Playwright and axe in Chromium, 1440 and 390 px.
 3. `pnpm seo:verify`: the SEO contract over HTTP.
