@@ -10,6 +10,7 @@ import {
   getPublishedPosts,
   parseFrontmatter,
   slugFromFilename,
+  sortPostsNewestFirst,
 } from "@/lib/posts";
 
 const FIXTURES = path.join(__dirname, "fixtures", "posts");
@@ -19,7 +20,7 @@ describe("parseFrontmatter", () => {
   const valid = {
     title: "A Title",
     description: "A description.",
-    date: "2026-09-03",
+    publishedAt: "2026-09-03",
     tags: ["OSDev", " x86 "],
   };
 
@@ -27,7 +28,7 @@ describe("parseFrontmatter", () => {
     expect(parseFrontmatter(valid, "x")).toEqual({
       title: "A Title",
       description: "A description.",
-      date: "2026-09-03",
+      publishedAt: "2026-09-03",
       tags: ["osdev", "x86"],
       draft: false,
     });
@@ -42,14 +43,40 @@ describe("parseFrontmatter", () => {
     ["missing title", { ...valid, title: undefined }],
     ["empty title", { ...valid, title: "  " }],
     ["missing description", { ...valid, description: undefined }],
-    ["malformed date", { ...valid, date: "Sept 3 2026" }],
-    ["impossible date", { ...valid, date: "2026-13-40" }],
+    ["missing publication date", { ...valid, publishedAt: undefined }],
+    [
+      "legacy date without publication date",
+      { ...valid, publishedAt: undefined, date: "2026-09-03" },
+    ],
+    ["malformed publication date", { ...valid, publishedAt: "Sept 3 2026" }],
+    ["impossible month", { ...valid, publishedAt: "2026-13-01" }],
+    ["impossible day", { ...valid, publishedAt: "2026-02-29" }],
+    ["year zero", { ...valid, publishedAt: "0000-01-01" }],
+    ["malformed update date", { ...valid, updatedAt: "October 5, 2026" }],
+    ["impossible update date", { ...valid, updatedAt: "2026-02-30" }],
+    ["update on publication date", { ...valid, updatedAt: "2026-09-03" }],
+    ["update before publication", { ...valid, updatedAt: "2026-09-02" }],
     ["non-string tags", { ...valid, tags: "osdev" }],
     ["tag that is not URL-safe", { ...valid, tags: ["c++"] }],
     ["non-boolean draft", { ...valid, draft: "yes" }],
     ["not an object", "nope"],
   ])("throws on %s", (_label, input) => {
     expect(() => parseFrontmatter(input, "broken")).toThrow(/broken\.mdx/);
+  });
+
+  it("accepts an optional update date later than publication", () => {
+    expect(
+      parseFrontmatter({ ...valid, updatedAt: "2026-10-05" }, "x"),
+    ).toMatchObject({
+      publishedAt: "2026-09-03",
+      updatedAt: "2026-10-05",
+    });
+  });
+
+  it("accepts a real leap day", () => {
+    expect(
+      parseFrontmatter({ ...valid, publishedAt: "2028-02-29" }, "x"),
+    ).toHaveProperty("publishedAt", "2028-02-29");
   });
 });
 
@@ -78,6 +105,52 @@ describe("post collection", () => {
       "hidden-post",
       "second-post",
       "first-post",
+    ]);
+  });
+
+  it("preserves same-day ordering by title", () => {
+    const posts = [
+      { ...getAllPosts(FIXTURES)[0]!, title: "Zulu", slug: "zulu" },
+      { ...getAllPosts(FIXTURES)[0]!, title: "Alpha", slug: "alpha" },
+    ];
+    expect(sortPostsNewestFirst(posts).map((post) => post.slug)).toEqual([
+      "alpha",
+      "zulu",
+    ]);
+  });
+
+  it("preserves every published slug and historical publication date", () => {
+    expect(
+      Object.fromEntries(
+        getPublishedPosts().map((post) => [post.slug, post.publishedAt]),
+      ),
+    ).toEqual({
+      "a-toml-file-changed-what-sweep-was": "2026-09-27",
+      "an-execution-is-more-than-a-row-in-a-database": "2026-09-13",
+      "apparently-moving-a-file-has-edge-cases": "2026-09-12",
+      "building-orbit": "2026-09-07",
+      "gave-one-operation-more-than-one-deadline": "2026-09-27",
+      "kept-building-and-stopped-writing-it-down": "2026-09-27",
+      "maybe-this-can-be-something-someday": "2026-09-04",
+      "my-project-cards-were-getting-ahead-of-my-projects": "2026-09-27",
+      "split-my-internet-into-four-different-kinds-of-place": "2026-09-13",
+      "started-designing-a-language-before-i-could-compile-one": "2026-09-13",
+      "started-writing-down-the-failures-before-the-features": "2026-09-27",
+      "there-is-no-printf-down-here": "2026-09-05",
+    });
+  });
+
+  it("records only the verified historical content update", () => {
+    const posts = getPublishedPosts();
+    expect(
+      posts
+        .filter((post) => post.updatedAt)
+        .map(({ slug, updatedAt }) => ({ slug, updatedAt })),
+    ).toEqual([
+      {
+        slug: "split-my-internet-into-four-different-kinds-of-place",
+        updatedAt: "2026-10-05",
+      },
     ]);
   });
 

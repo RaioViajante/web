@@ -44,8 +44,8 @@ export function PostArticle({
           title={post.title}
           line={post.description}
           meta={[
-            <time key="date" dateTime={post.date}>
-              {post.date}
+            <time key="published" dateTime={post.publishedAt}>
+              {post.publishedAt}
             </time>,
             `${details.minutes} min read`,
             <span key="tags" className="post-tags">
@@ -65,8 +65,14 @@ export function PostArticle({
         <div className="post-end">
           <LeaderRow
             label="published"
-            value={<time dateTime={post.date}>{post.date}</time>}
+            value={<time dateTime={post.publishedAt}>{post.publishedAt}</time>}
           />
+          {post.updatedAt && (
+            <LeaderRow
+              label="updated"
+              value={<time dateTime={post.updatedAt}>{post.updatedAt}</time>}
+            />
+          )}
           <LeaderRow
             label="tags"
             wrapValue
@@ -124,7 +130,7 @@ export function PostArticle({
                     <LeaderRow
                       key={item.slug}
                       label={item.title}
-                      value={item.date.slice(5)}
+                      value={item.publishedAt.slice(5)}
                       href={`/posts/${item.slug}`}
                       linkComponent={Link}
                     />

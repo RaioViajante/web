@@ -61,7 +61,11 @@ export function TagPostList({ posts }: { posts: Post[] }) {
         <li key={post.slug}>
           <LeaderRow
             label={post.title}
-            value={<time dateTime={post.date}>{post.date.slice(5)}</time>}
+            value={
+              <time dateTime={post.publishedAt}>
+                {post.publishedAt.slice(5)}
+              </time>
+            }
             href={`/posts/${post.slug}`}
             linkComponent={Link}
           />

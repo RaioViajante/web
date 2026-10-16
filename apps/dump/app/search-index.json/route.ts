@@ -12,7 +12,7 @@ export function GET() {
     title: post.title,
     href: `${siteOrigins.dump}/posts/${post.slug}`,
     description: post.description,
-    date: post.date,
+    date: post.publishedAt,
     body: fs
       .readFileSync(
         path.join(process.cwd(), "content/posts", `${post.slug}.mdx`),

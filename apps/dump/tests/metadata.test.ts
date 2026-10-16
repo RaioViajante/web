@@ -126,7 +126,7 @@ describe("blogPostingJsonLd", () => {
     slug: "example-post",
     title: "Example Post",
     description: "An example description.",
-    date: "2026-01-15",
+    publishedAt: "2026-01-15",
     tags: ["osdev", "x86"],
     draft: false,
   };
@@ -149,10 +149,22 @@ describe("blogPostingJsonLd", () => {
     });
   });
 
-  it("does not invent dateModified, a publisher, or breadcrumbs", async () => {
+  it("omits dateModified without explicit update metadata", async () => {
     const { blogPostingJsonLd } = await import("@/lib/structured-data");
     const data = blogPostingJsonLd(post);
     expect(data).not.toHaveProperty("dateModified");
+  });
+
+  it("emits an explicit update as dateModified", async () => {
+    const { blogPostingJsonLd } = await import("@/lib/structured-data");
+    expect(
+      blogPostingJsonLd({ ...post, updatedAt: "2026-02-01" }),
+    ).toHaveProperty("dateModified", "2026-02-01");
+  });
+
+  it("does not invent a publisher or breadcrumbs", async () => {
+    const { blogPostingJsonLd } = await import("@/lib/structured-data");
+    const data = blogPostingJsonLd(post);
     expect(data).not.toHaveProperty("publisher");
     expect(data).not.toHaveProperty("breadcrumb");
   });
@@ -179,6 +191,20 @@ describe("dynamic route pages keep canonical and RSS together", () => {
       canonical: `/posts/${firstPost.slug}`,
       types: RSS_TYPES,
     });
+  });
+
+  it("post page: exposes explicit publication and modification dates", async () => {
+    const { generateMetadata } = await import("@/app/posts/[slug]/page");
+    const slug = "split-my-internet-into-four-different-kinds-of-place";
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ slug }),
+    });
+
+    expect(metadata.openGraph).toMatchObject({
+      publishedTime: "2026-09-13T00:00:00.000Z",
+      modifiedTime: "2026-10-05T00:00:00.000Z",
+    });
+    expect(metadata.alternates).toMatchObject({ canonical: `/posts/${slug}` });
   });
 
   it("tag page: canonical tag URL", async () => {

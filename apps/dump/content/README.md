@@ -23,7 +23,8 @@ A filename outside that rule fails the build.
 ---
 title: "I Wrote 512 Bytes and Somehow It Booted"
 description: "My first steps into x86 real mode and boot sectors."
-date: "2026-09-03"
+publishedAt: "2026-09-03"
+updatedAt: "2026-10-05"
 tags:
   - osdev
   - x86
@@ -32,15 +33,19 @@ draft: false
 ---
 ```
 
-| Field         | Required | Notes                                                        |
-| ------------- | -------- | ----------------------------------------------------------- |
-| `title`       | yes      | Non-empty string.                                           |
-| `description` | yes      | One or two sentences. Used in previews, `<meta>`, and RSS.  |
-| `date`        | yes      | `YYYY-MM-DD`. Treated as UTC, so it never shifts by a day.  |
-| `tags`        | no       | Lowercase letters, digits, hyphens. Lowercased for you. []. |
-| `draft`       | no       | `true` hides the post everywhere and 404s it in production. |
+| Field         | Required | Notes                                                                 |
+| ------------- | -------- | --------------------------------------------------------------------- |
+| `title`       | yes      | Non-empty string.                                                     |
+| `description` | yes      | One or two sentences. Used in previews, `<meta>`, and RSS.            |
+| `publishedAt` | yes      | Original publication date, `YYYY-MM-DD`.                              |
+| `updatedAt`   | no       | Meaningful revision date, `YYYY-MM-DD`, later than `publishedAt`.     |
+| `tags`        | no       | Lowercase letters, digits, hyphens. Lowercased for you. `[]` is fine. |
+| `draft`       | no       | `true` hides the post everywhere and 404s it in production.           |
 
 Invalid frontmatter fails the build with a message naming the file and field.
+Dates are explicit content metadata: builds and Git history never supply or
+replace them. `publishedAt` remains the authority for ordering and RSS;
+`updatedAt` is used only for revision-aware article and sitemap metadata.
 
 ### Drafts
 
