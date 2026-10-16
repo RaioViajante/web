@@ -14,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const postRoutes = posts.map((post) => ({
     url: absoluteUrl(`/posts/${post.slug}`),
-    lastModified: post.updatedAt ?? post.publishedAt,
+    ...(post.updatedAt ? { lastModified: post.updatedAt } : {}),
   }));
 
   const tagRoutes = getAllTags().map(({ tag }) => ({

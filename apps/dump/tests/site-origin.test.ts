@@ -76,7 +76,7 @@ describe("metadata, RSS, and sitemap under the canonical production origin", () 
       urls.find((entry) =>
         entry.url.endsWith("/posts/there-is-no-printf-down-here"),
       ),
-    ).toMatchObject({ lastModified: "2026-09-05" });
+    ).not.toHaveProperty("lastModified");
   });
 
   it("builds the RSS channel and item links from the canonical origin", async () => {
