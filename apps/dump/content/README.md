@@ -47,6 +47,19 @@ Dates are explicit content metadata: builds and Git history never supply or
 replace them. `publishedAt` remains the authority for ordering and RSS;
 `updatedAt` is used only for revision-aware article and sitemap metadata.
 
+### Date authority
+
+`publishedAt` is the canonical editorial record of when an article was first
+made public. A commit, author, or filesystem timestamp records repository
+activity, which may happen before or after publication, so it is not an
+alternative publication date. Correct `publishedAt` only when independent
+publication evidence supports the change; otherwise preserve the recorded
+date rather than infer or redistribute dates.
+
+Use `updatedAt` for a later meaningful change to the article's facts or prose.
+Metadata cleanup, taxonomy changes, repository migrations, and automated
+changes do not establish a content update on their own.
+
 ### Drafts
 
 A `draft: true` post is excluded from the homepage, archive, tag pages, RSS, and
