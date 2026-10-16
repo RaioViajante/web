@@ -1,0 +1,193 @@
+{
+  "root": {
+    "sitemap": [
+      "/",
+      "/about",
+      "/contact",
+      "/gallery",
+      "/privacy",
+      "/projects",
+      "/setup",
+      "/terms",
+      "/this-site"
+    ],
+    "endpoints": [
+      "/.well-known/security.txt",
+      "/llms.txt",
+      "/manifest.webmanifest",
+      "/robots.txt",
+      "/search-index.json",
+      "/sitemap.xml"
+    ],
+    "searchIndex": {
+      "path": "/search-index.json",
+      "fields": [
+        "description",
+        "href",
+        "number",
+        "site",
+        "title"
+      ],
+      "pages": [
+        "/",
+        "/about",
+        "/contact",
+        "/gallery",
+        "/projects",
+        "/setup",
+        "/this-site"
+      ]
+    }
+  },
+  "dump": {
+    "sitemap": [
+      "/",
+      "/archive",
+      "/posts/a-toml-file-changed-what-sweep-was",
+      "/posts/an-execution-is-more-than-a-row-in-a-database",
+      "/posts/apparently-moving-a-file-has-edge-cases",
+      "/posts/building-orbit",
+      "/posts/gave-one-operation-more-than-one-deadline",
+      "/posts/kept-building-and-stopped-writing-it-down",
+      "/posts/maybe-this-can-be-something-someday",
+      "/posts/my-project-cards-were-getting-ahead-of-my-projects",
+      "/posts/split-my-internet-into-four-different-kinds-of-place",
+      "/posts/started-designing-a-language-before-i-could-compile-one",
+      "/posts/started-writing-down-the-failures-before-the-features",
+      "/posts/there-is-no-printf-down-here",
+      "/privacy",
+      "/tags",
+      "/tags/architecture",
+      "/tags/assembly",
+      "/tags/automation",
+      "/tags/cli",
+      "/tags/compilers",
+      "/tags/distributed-systems",
+      "/tags/dump",
+      "/tags/java",
+      "/tags/language-design",
+      "/tags/mcp",
+      "/tags/meta",
+      "/tags/osdev",
+      "/tags/personal",
+      "/tags/programming-languages",
+      "/tags/projects",
+      "/tags/pytest",
+      "/tags/python",
+      "/tags/reliability",
+      "/tags/security",
+      "/tags/spring",
+      "/tags/sweep",
+      "/tags/time",
+      "/tags/toml",
+      "/tags/typescript",
+      "/tags/web",
+      "/tags/workflow",
+      "/tags/writing",
+      "/tags/x86",
+      "/terms"
+    ],
+    "endpoints": [
+      "/.well-known/security.txt",
+      "/llms.txt",
+      "/manifest.webmanifest",
+      "/robots.txt",
+      "/rss.xml",
+      "/search-index.json",
+      "/sitemap.xml"
+    ],
+    "searchIndex": {
+      "path": "/search-index.json",
+      "fields": [
+        "body",
+        "date",
+        "description",
+        "href",
+        "site",
+        "title"
+      ],
+      "pages": [
+        "/posts/a-toml-file-changed-what-sweep-was",
+        "/posts/an-execution-is-more-than-a-row-in-a-database",
+        "/posts/apparently-moving-a-file-has-edge-cases",
+        "/posts/building-orbit",
+        "/posts/gave-one-operation-more-than-one-deadline",
+        "/posts/kept-building-and-stopped-writing-it-down",
+        "/posts/maybe-this-can-be-something-someday",
+        "/posts/my-project-cards-were-getting-ahead-of-my-projects",
+        "/posts/split-my-internet-into-four-different-kinds-of-place",
+        "/posts/started-designing-a-language-before-i-could-compile-one",
+        "/posts/started-writing-down-the-failures-before-the-features",
+        "/posts/there-is-no-printf-down-here"
+      ]
+    }
+  },
+  "docs": {
+    "sitemap": [
+      "/",
+      "/privacy/",
+      "/projects/sweep/",
+      "/projects/sweep/cli/",
+      "/raioviajante/design-language/",
+      "/raioviajante/repository-conventions/",
+      "/terms/"
+    ],
+    "endpoints": [
+      "/.well-known/security.txt",
+      "/llms.txt",
+      "/manifest.webmanifest",
+      "/robots.txt",
+      "/search-index.json",
+      "/sitemap.xml"
+    ],
+    "searchIndex": {
+      "path": "/search-index.json",
+      "fields": [
+        "description",
+        "href",
+        "site",
+        "title"
+      ],
+      "pages": [
+        "/projects/sweep/",
+        "/projects/sweep/cli/",
+        "/raioviajante/design-language/",
+        "/raioviajante/repository-conventions/"
+      ]
+    }
+  },
+  "lab": {
+    "sitemap": [
+      "/",
+      "/experiments/boot-sector/",
+      "/experiments/execution-states/",
+      "/experiments/filename-classifier/",
+      "/privacy/",
+      "/terms/"
+    ],
+    "endpoints": [
+      "/.well-known/security.txt",
+      "/llms.txt",
+      "/manifest.webmanifest",
+      "/robots.txt",
+      "/search-index.json",
+      "/sitemap.xml"
+    ],
+    "searchIndex": {
+      "path": "/search-index.json",
+      "fields": [
+        "body",
+        "description",
+        "href",
+        "number",
+        "site",
+        "title"
+      ],
+      "pages": [
+        "/experiments/boot-sector/",
+        "/experiments/execution-states/",
+        "/experiments/filename-classifier/"
+      ]
+    }
+  }
+}

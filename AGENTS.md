@@ -21,6 +21,12 @@ explicit task instructions take precedence. `CLAUDE.md` mirrors this file.
   may import `site/`. No re-export shims. See `docs/architecture.md`.
 - Use English for repository content, identifiers, comments, commits and GitHub
   metadata. Do not rewrite unrelated existing content just to enforce this.
+  Portuguese is allowed only as an intentional public localized artifact:
+  translated copy and content, localized metadata, catalog values, slugs and
+  tag labels, reviewed legal copy, and tests or fixtures asserting Portuguese
+  output. Code, identifiers, config keys, comments, docs, commits, PRs, issues
+  and stable internal ids (`contentId`, route keys) stay English. See
+  `docs/i18n.md`.
 - Inspect relevant code and docs before editing. Preserve unrelated owner edits.
 - pnpm 12.8.1 only, Node 24 from `.nvmrc`. One workspace and root lockfile;
   change the lockfile only through pnpm. Prefer named filters from the root.

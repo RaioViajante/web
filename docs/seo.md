@@ -161,6 +161,13 @@ two ways. There is no list of pages: the inventory is each app's own
   could not start and nothing was verified. CI runs it in the blocking `quality`
   job ([ci.md](ci.md)).
 
+Both also hold the English baseline, `seo/english-baseline.json`: every
+recorded sitemap page, discovery endpoint and search-index page must still be
+served, and the index keeps its fields. It is a floor, so added pages (including
+localized ones) never fail it. `pnpm seo:baseline` regenerates it from the
+built apps; use it only for a deliberate English change and review the diff.
+RSS item identity is not part of it.
+
 Per page it enforces: one `<title>`, meta description, canonical (absolute
 HTTPS, own production host, no query, equal to the sitemap URL), `lang="en"`,
 no `noindex`, one of each `og:*` and `twitter:*` tag, the theme color token,

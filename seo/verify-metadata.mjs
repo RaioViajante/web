@@ -6,6 +6,10 @@ import { renderLlmsTxt } from "./llms.ts";
 import { ports, startServers } from "../security/local-servers.mjs";
 import { auditSite, expectedThemeColor } from "./audit.mjs";
 import {
+  checkBaselineSearchIndex,
+  checkBaselineSitemap,
+} from "./english-baseline.ts";
+import {
   checkSearchPage,
   checkUniqueness,
   parseDocument,
@@ -19,6 +23,9 @@ import {
 // https://dump.raioviajante.com). Not part of `pnpm validate`: it needs local
 // sockets. Exit codes: 0 pass, 1 contract violation, 2 apps could not start.
 const sites = Object.keys(ports);
+const baseline = JSON.parse(
+  await readFile(new URL("./english-baseline.json", import.meta.url), "utf8"),
+);
 const local = (site, path) => `http://127.0.0.1:${ports[site]}${path}`;
 const localFor = (url) => {
   const { origin, pathname, search } = new URL(url);
@@ -103,6 +110,31 @@ for (const site of sites) {
     },
   });
   problems.push(...result.problems);
+  // The English baseline (seo/english-baseline.json): nothing recorded may
+  // disappear. Additions, including localized pages, are not a problem.
+  const recorded = baseline[site];
+  problems.push(
+    ...checkBaselineSitemap(
+      site,
+      recorded,
+      result.entries.map((e) => e.loc),
+    ),
+  );
+  for (const path of recorded.endpoints) {
+    const { response } = await get(site, path);
+    if (response.status !== 200)
+      fail(
+        `app ${site} ${path}: English baseline endpoint answered HTTP ${response.status}`,
+      );
+  }
+  const index = await get(site, recorded.searchIndex.path);
+  problems.push(
+    ...checkBaselineSearchIndex(
+      site,
+      recorded,
+      index.text ? JSON.parse(index.text) : undefined,
+    ),
+  );
   allPages.push(...result.pages);
   documents += result.pages.length;
 

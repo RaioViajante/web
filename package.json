@@ -13,6 +13,7 @@
     "test": "pnpm -r --if-present test",
     "format:check": "pnpm -r --if-present format:check",
     "security:origins": "node security/verify-origins.mjs",
+    "site:check": "node --test site/*.test.mjs",
     "seo:check": "node --test seo/*.test.mjs",
     "browser:check": "playwright test --config e2e/playwright.config.ts",
     "audit:check": "node security/audit-check.mjs",
@@ -25,8 +26,9 @@
     "hooks:uninstall": "git config --unset core.hooksPath",
     "links:external": "node links/check.mjs --external",
     "seo:verify": "node seo/verify-metadata.mjs",
+    "seo:baseline": "node seo/english-baseline.mjs",
     "security:check": "node --test security/*.test.mjs && node security/sync-vercel.mjs --check",
-    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm security:check && pnpm seo:check && pnpm commits:test"
+    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm site:check && pnpm security:check && pnpm seo:check && pnpm commits:test"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

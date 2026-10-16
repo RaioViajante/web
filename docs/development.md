@@ -42,8 +42,8 @@ NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate
 
 `validate` (the script in the root [`package.json`](../package.json)) runs
 `format:check`, `lint`, `typecheck`, `test` and `build` across the workspace,
-each only in the packages that define it, then `pnpm security:check`,
-`pnpm seo:check` and `pnpm commits:test`. Which package defines which script is
+each only in the packages that define it, then `pnpm site:check`,
+`pnpm security:check`, `pnpm seo:check` and `pnpm commits:test`. Which package defines which script is
 the table in [`AGENTS.md`](../AGENTS.md#validation-and-git). docs and lab run
 `typecheck` through `astro check`. CI runs the same install and `pnpm validate`,
 then the browser, HTTP, performance and link checks, on pull requests and pushes
