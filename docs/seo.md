@@ -210,8 +210,10 @@ RSS item identity is not part of it.
 
 The English search indexes also carry the additive `locale: "en"` on every
 entry (`seo/search-index.ts`, checked over HTTP for all four hosts and on the
-Docs/Lab build output). It is not recorded in the baseline: readers still
-accept entries without it until all four production indexes have shipped it.
+Docs/Lab build output). The committed baseline stays the historical floor and
+does not require it: readers still accept entries without it until all four
+production indexes have shipped it. A deliberate `pnpm seo:baseline`
+regeneration describes current output and may include it.
 
 Per page it enforces: one `<title>`, meta description, canonical (absolute
 HTTPS, own production host, no query, equal to the sitemap URL), `lang="en"`,

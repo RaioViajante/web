@@ -51,7 +51,7 @@ test("the index must be a non-empty array", () => {
   assert.match(check([]).join(), /no entries/);
 });
 
-test("the English baseline is a floor: an entry with or without locale satisfies it", () => {
+test("the committed #40 baseline is a historical floor: entries with or without locale satisfy it", () => {
   for (const site of Object.keys(baseline)) {
     const recorded = baseline[site].searchIndex;
     const entries = recorded.pages.map((page) =>

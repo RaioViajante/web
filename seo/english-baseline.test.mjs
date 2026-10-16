@@ -157,22 +157,31 @@ for (const site of ["docs", "lab"])
     );
   });
 
-test("regenerating the baseline never records an additive locale field as a floor", () => {
-  const entry = (path) => ({
+test("the generator describes current output, locale included when every entry carries it", () => {
+  const entry = (path, extra = {}) => ({
     site: "docs",
-    locale: "en",
     title: path,
     description: "d",
     href: `${siteOrigins.docs}${path}`,
+    ...extra,
   });
-  const described = describeBaseline("docs", {
-    sitemapLocs: [`${siteOrigins.docs}/`],
-    endpoints: ["/search-index.json"],
-    searchPath: "/search-index.json",
-    searchContentType: "application/json",
-    searchEntries: [entry("/"), entry("/guide/")],
-  });
-  assert.deepEqual(described.searchIndex.fields, [
+  const describe = (entries) =>
+    describeBaseline("docs", {
+      sitemapLocs: [`${siteOrigins.docs}/`],
+      endpoints: ["/search-index.json"],
+      searchPath: "/search-index.json",
+      searchContentType: "application/json",
+      searchEntries: entries,
+    }).searchIndex.fields;
+  assert.deepEqual(
+    describe([
+      entry("/", { locale: "en" }),
+      entry("/guide/", { locale: "en" }),
+    ]),
+    ["description", "href", "locale", "site", "title"],
+  );
+  // A field only some entries carry is not a floor.
+  assert.deepEqual(describe([entry("/", { locale: "en" }), entry("/guide/")]), [
     "description",
     "href",
     "site",
