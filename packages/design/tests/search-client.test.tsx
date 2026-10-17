@@ -144,3 +144,50 @@ it.each([
   );
   expect(document.querySelector("[data-search-result]")).toBeNull();
 });
+
+it.each(["root", "dump", "docs", "lab"] as const)(
+  "never fetches an index for %s in a locale it does not participate in",
+  async (site) => {
+    document.body.innerHTML = renderToStaticMarkup(
+      <SearchPage site={site} locale="pt-BR" />,
+    );
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    stop = attachSearch();
+    const page = document.querySelector<HTMLElement>("[data-search-page]")!;
+    await vi.waitFor(() => expect(page.dataset.searchState).toBe("skipped"));
+    // Everywhere must not probe either: no host participates in pt-BR.
+    document
+      .querySelector<HTMLButtonElement>('[data-search-scope="everywhere"]')!
+      .click();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(page.dataset.searchState).toBe("skipped");
+    expect(
+      document.querySelector("[data-search-bubble]")?.textContent,
+    ).not.toBe("search is unavailable right now.");
+  },
+);
+
+it("states ready for an active empty index and unavailable for a failed one", async () => {
+  document.body.innerHTML = renderToStaticMarkup(
+    <SearchPage site="docs" locale="en" />,
+  );
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({ ok: true, json: async () => [] }),
+  );
+  stop = attachSearch();
+  const page = document.querySelector<HTMLElement>("[data-search-page]")!;
+  await vi.waitFor(() => expect(page.dataset.searchState).toBe("ready"));
+  stop();
+  document.body.innerHTML = renderToStaticMarkup(
+    <SearchPage site="docs" locale="en" />,
+  );
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+  stop = attachSearch();
+  const failed = document.querySelector<HTMLElement>("[data-search-page]")!;
+  await vi.waitFor(() =>
+    expect(failed.dataset.searchState).toBe("unavailable"),
+  );
+});

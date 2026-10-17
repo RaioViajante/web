@@ -1,7 +1,12 @@
 import { isLocaleId, type LocaleId } from "../../../site/locales";
 import { SITES, type SiteId } from "../../../site/sites";
 import type { SearchEntry } from "../components/search";
-import { loadEverywhere, searchEntries, unavailableNote } from "./engine";
+import {
+  loadEverywhere,
+  loadSiteIndex,
+  searchEntries,
+  unavailableNote,
+} from "./engine";
 import { formatSearchDate, searchIndexPath, validateIndex } from "./locale";
 
 const localPorts: Record<SiteId, readonly number[]> = {
@@ -183,16 +188,21 @@ function mountPage(page: HTMLElement) {
     render();
   }
 
-  void readIndex(site, site, locale)
-    .then((entries) => {
-      own = entries;
-      all = entries;
-      if (scope === "everywhere") void loadAll();
-      else render();
-    })
-    .catch(() => {
-      bubble.textContent = "search is unavailable right now.";
-    });
+  // Participation is checked before any request, for this host too. The
+  // state is exposed for the catalog slice to word; no copy is added here.
+  void loadSiteIndex(site, locale, () => readIndex(site, site, locale)).then(
+    (index) => {
+      page.dataset.searchState = index.state;
+      if (index.state === "ready") {
+        own = index.entries;
+        all = index.entries;
+        if (scope === "everywhere") void loadAll();
+        else render();
+      } else if (index.state === "unavailable") {
+        bubble.textContent = "search is unavailable right now.";
+      }
+    },
+  );
 
   input.addEventListener("input", render);
   input.addEventListener("keydown", (event) => {

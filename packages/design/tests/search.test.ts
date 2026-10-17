@@ -4,6 +4,7 @@ import type { SiteId } from "../../../site/sites";
 import type { LocaleId } from "../../../site/locales";
 import {
   loadEverywhere,
+  loadSiteIndex,
   searchEntries,
   unavailableNote,
 } from "../search/engine";
@@ -138,19 +139,128 @@ describe("loadEverywhere", () => {
     expect(loaded.entries.map((e) => e.site)).toEqual(["docs", "dump"]);
   });
 
-  it("does not let an active host inject another locale", async () => {
+  it("marks a host that returns another locale unavailable, without merging it", async () => {
     const loaded = await loadEverywhere(
       "docs",
       "pt-BR",
-      [],
-      async (site) => validateIndex([entry(site, "w")], site, "pt-BR"),
+      [entry("docs", "own", undefined, "pt-BR")],
+      async (site) =>
+        site === "dump"
+          ? [entry("dump", "injected", undefined, "en")]
+          : [entry(site, "ok", undefined, "pt-BR")],
       all,
     );
+    expect(loaded.unavailable).toEqual(["dump"]);
+    expect(loaded.entries.map((e) => e.title)).toEqual(["own", "ok", "ok"]);
+  });
+
+  it("marks a host that returns another site's entries unavailable", async () => {
+    const loaded = await loadEverywhere(
+      "root",
+      "pt-BR",
+      [],
+      async (site) =>
+        site === "docs"
+          ? [entry("lab", "injected", undefined, "pt-BR")]
+          : [entry(site, "ok", undefined, "pt-BR")],
+      all,
+    );
+    expect(loaded.unavailable).toEqual(["docs"]);
+    expect(loaded.entries.map((e) => e.title)).not.toContain("injected");
+    expect(loaded.entries).toHaveLength(2);
+  });
+
+  it.each([
+    ["missing locale", { ...entry("dump", "x"), locale: undefined }],
+    ["unsupported locale", { ...entry("dump", "x"), locale: "fr" }],
+  ])("marks a host with %s unavailable", async (_name, bad) => {
+    const loaded = await loadEverywhere(
+      "root",
+      "en",
+      [],
+      async (site) => (site === "dump" ? [bad as never] : []),
+      all,
+    );
+    expect(loaded.unavailable).toEqual(["dump"]);
     expect(loaded.entries).toEqual([]);
-    expect(loaded.unavailable).toEqual(["root", "dump", "lab"]);
+  });
+
+  it("marks a non-array response unavailable and keeps the others", async () => {
+    const loaded = await loadEverywhere(
+      "root",
+      "en",
+      own,
+      async (site) => (site === "lab" ? ({} as never) : [entry(site, "ok")]),
+      all,
+    );
+    expect(loaded.unavailable).toEqual(["lab"]);
+    expect(loaded.entries).toHaveLength(4);
+  });
+
+  it("refuses an invalid own collection instead of merging it", async () => {
+    const read = vi.fn(async () => []);
+    await expect(
+      loadEverywhere(
+        "docs",
+        "pt-BR",
+        [entry("docs", "own", undefined, "en")],
+        read,
+        all,
+      ),
+    ).rejects.toThrow();
+    await expect(
+      loadEverywhere("docs", "en", [entry("lab", "own")], read, all),
+    ).rejects.toThrow();
+    expect(read).not.toHaveBeenCalled();
   });
 
   it("gives no note when every site answered", () => {
     expect(unavailableNote([])).toBe("");
+  });
+});
+
+describe("loadSiteIndex", () => {
+  it("never reads a host that does not participate, the current host included", async () => {
+    const read = vi.fn(async (site: SiteId) => [
+      entry(site, "x", undefined, "pt-BR"),
+    ]);
+    for (const site of ["root", "dump", "docs", "lab"] as const)
+      expect(await loadSiteIndex(site, "pt-BR", read)).toEqual({
+        state: "skipped",
+      });
+    expect(read).not.toHaveBeenCalled();
+  });
+
+  it("is ready with entries, ready with a valid empty index, unavailable on failure or invalid data", async () => {
+    expect(
+      await loadSiteIndex("docs", "en", async () => [entry("docs", "a")], all),
+    ).toEqual({ state: "ready", entries: [entry("docs", "a")] });
+    expect(await loadSiteIndex("docs", "en", async () => [], all)).toEqual({
+      state: "ready",
+      entries: [],
+    });
+    expect(
+      await loadSiteIndex(
+        "docs",
+        "en",
+        async () => Promise.reject(new Error("x")),
+        all,
+      ),
+    ).toEqual({ state: "unavailable" });
+    expect(
+      await loadSiteIndex(
+        "docs",
+        "en",
+        async () => [entry("docs", "a", undefined, "pt-BR")],
+        all,
+      ),
+    ).toEqual({ state: "unavailable" });
+  });
+
+  it("with real participation, English hosts are read", async () => {
+    const read = vi.fn(async (site: SiteId) => [entry(site, "x")]);
+    for (const site of ["root", "dump", "docs", "lab"] as const)
+      expect((await loadSiteIndex(site, "en", read)).state).toBe("ready");
+    expect(read).toHaveBeenCalledTimes(4);
   });
 });

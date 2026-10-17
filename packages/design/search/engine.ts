@@ -1,7 +1,7 @@
 import { participates, type LocaleId } from "../../../site/locales";
 import { SITES, type SiteId } from "../../../site/sites";
 import type { SearchEntry } from "../components/search";
-import { normalizeSearchText } from "./locale";
+import { normalizeSearchText, validateIndex } from "./locale";
 
 /** Every word of the query must appear in the title, description or body. */
 export function matches(entry: SearchEntry, words: string[], locale: LocaleId) {
@@ -41,13 +41,45 @@ export interface EverywhereIndex {
   skipped: SiteId[];
 }
 
+/** How one host's index stands in a locale; #44 renders the words. */
+export type SiteIndex =
+  | { state: "ready"; entries: SearchEntry[] }
+  /** Participating, but the fetch failed or the response was invalid. */
+  | { state: "unavailable" }
+  /** Not participating in the locale: never read. */
+  | { state: "skipped" };
+
+/**
+ * Read one host's index for a locale. Participation is checked first, for the
+ * current host as much as any other, so a non-participating host is never
+ * requested. A participating host's response is validated against that host
+ * and locale before it counts; an empty array is a valid `ready` index.
+ */
+export async function loadSiteIndex(
+  site: SiteId,
+  locale: LocaleId,
+  read: (site: SiteId) => Promise<SearchEntry[]>,
+  isParticipating: (site: SiteId, locale: LocaleId) => boolean = participates,
+): Promise<SiteIndex> {
+  if (!isParticipating(site, locale)) return { state: "skipped" };
+  try {
+    return {
+      state: "ready",
+      entries: validateIndex(await read(site), site, locale),
+    };
+  } catch {
+    return { state: "unavailable" };
+  }
+}
+
 /**
  * Merge this site's index with every other participating site's, within one
- * locale. A participating site that cannot be reached, or that answers with
- * the wrong site or locale (`read` throws), is reported, never thrown: the rest
- * still searches. A participating site with an empty index succeeded. A site
- * that does not participate in the locale is skipped without a request;
- * participation, not probing, decides.
+ * locale. `own` is validated against this site and the locale (a wrong one
+ * throws: it is a caller error, not data). Every other host goes through
+ * `loadSiteIndex`: a participating host that cannot be reached, or answers
+ * with the wrong site or locale, is reported, never thrown, and the rest still
+ * searches; an empty index succeeded; a host that does not participate is
+ * skipped without a request. Participation, not probing, decides.
  */
 export async function loadEverywhere(
   currentSite: SiteId,
@@ -56,17 +88,18 @@ export async function loadEverywhere(
   read: (site: SiteId) => Promise<SearchEntry[]>,
   isParticipating: (site: SiteId, locale: LocaleId) => boolean = participates,
 ): Promise<EverywhereIndex> {
+  const entries = [...validateIndex(own, currentSite, locale)];
   const others = SITES.filter((item) => item.id !== currentSite);
-  const skipped = others
-    .filter((item) => !isParticipating(item.id, locale))
-    .map((item) => item.id);
-  const active = others.filter((item) => !skipped.includes(item.id));
-  const settled = await Promise.allSettled(active.map((item) => read(item.id)));
-  const entries = [...own];
+  const loaded = await Promise.all(
+    others.map((item) => loadSiteIndex(item.id, locale, read, isParticipating)),
+  );
   const unavailable: SiteId[] = [];
-  settled.forEach((result, index) => {
-    if (result.status === "fulfilled") entries.push(...result.value);
-    else if (active[index]) unavailable.push(active[index].id);
+  const skipped: SiteId[] = [];
+  loaded.forEach((index, i) => {
+    const id = others[i]!.id;
+    if (index.state === "ready") entries.push(...index.entries);
+    else if (index.state === "skipped") skipped.push(id);
+    else unavailable.push(id);
   });
   return { entries, unavailable, skipped };
 }
