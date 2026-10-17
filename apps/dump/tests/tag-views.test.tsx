@@ -31,6 +31,9 @@ const mockGetPostsByTag = jest.mocked(getPostsByTag);
 const posts: Post[] = [
   {
     slug: "older",
+    contentId: "older",
+    locale: "en",
+    originalLocale: "en",
     title: "Older post",
     description: "Synthetic test data.",
     publishedAt: "2025-12-18",
@@ -39,6 +42,9 @@ const posts: Post[] = [
   },
   {
     slug: "newer",
+    contentId: "newer",
+    locale: "en",
+    originalLocale: "en",
     title: "Newer post",
     description: "Synthetic test data.",
     publishedAt: "2026-09-03",
@@ -52,8 +58,8 @@ describe("<TagIndex />", () => {
     render(
       <TagIndex
         tags={[
-          { tag: "osdev", count: 4 },
-          { tag: "x86", count: 3 },
+          { id: "osdev", label: "osdev", slug: "osdev", count: 4 },
+          { id: "x86", label: "x86", slug: "x86", count: 3 },
         ]}
       />,
     );
@@ -120,8 +126,8 @@ describe("tag routes", () => {
 
   it("generates one static param per known tag", () => {
     const tags: TagCount[] = [
-      { tag: "osdev", count: 2 },
-      { tag: "x86", count: 1 },
+      { id: "osdev", label: "osdev", slug: "osdev", count: 2 },
+      { id: "x86", label: "x86", slug: "x86", count: 1 },
     ];
     mockGetAllTags.mockReturnValue(tags);
 

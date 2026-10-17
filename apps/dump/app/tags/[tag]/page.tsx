@@ -4,7 +4,9 @@ import { PageHeader } from "@raioviajante/design/parts";
 
 import { DumpShell } from "@/components/DumpShell";
 import { TagPostList, tagHref } from "@/components/TagViews";
+import { DEFAULT_LOCALE } from "../../../../../site/locales";
 import { getAllTags, getPostsByTag } from "@/lib/posts";
+import { tagFromSlug } from "@/lib/tags";
 import { metadataFor } from "@/lib/seo";
 
 export const dynamicParams = false;
@@ -14,30 +16,32 @@ interface PageProps {
 }
 
 export function generateStaticParams() {
-  return getAllTags().map(({ tag }) => ({ tag }));
+  return getAllTags(DEFAULT_LOCALE).map(({ slug }) => ({ tag: slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { tag } = await params;
+  const label = tagFromSlug(DEFAULT_LOCALE, tag)?.label ?? tag;
   return metadataFor({
     path: tagHref(tag),
-    title: `Posts tagged "${tag}"`,
-    description: `Technical writing and project notes tagged "${tag}" on dump.`,
+    title: `Posts tagged "${label}"`,
+    description: `Technical writing and project notes tagged "${label}" on dump.`,
   });
 }
 
 export default async function TagPage({ params }: PageProps) {
   const { tag } = await params;
-  const posts = getPostsByTag(tag);
+  const posts = getPostsByTag(DEFAULT_LOCALE, tag);
   if (posts.length === 0) notFound();
+  const label = tagFromSlug(DEFAULT_LOCALE, tag)?.label ?? tag;
 
   return (
     <DumpShell current="/tags">
       <PageHeader
         label="Tag"
-        title={tag}
+        title={label}
         line={`${posts.length} ${posts.length === 1 ? "post" : "posts"}`}
       />
       <TagPostList posts={posts} />

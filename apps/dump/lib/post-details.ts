@@ -9,21 +9,28 @@ import {
   type Post,
 } from "@/lib/posts";
 
+/**
+ * Series are authored by `contentId`: membership and order belong to the
+ * underlying work, so every localized version of a part is in its series.
+ */
 export const series = [
   {
     name: "jobs-mcp",
-    slugs: [
+    contentIds: [
       "started-writing-down-the-failures-before-the-features",
       "gave-one-operation-more-than-one-deadline",
     ],
   },
   {
     name: "orbit",
-    slugs: ["building-orbit", "an-execution-is-more-than-a-row-in-a-database"],
+    contentIds: [
+      "building-orbit",
+      "an-execution-is-more-than-a-row-in-a-database",
+    ],
   },
   {
     name: "sweep",
-    slugs: [
+    contentIds: [
       "apparently-moving-a-file-has-edge-cases",
       "a-toml-file-changed-what-sweep-was",
     ],
@@ -52,6 +59,46 @@ export function headingSlug(text: string) {
     .replace(/ /g, "-");
 }
 
+/** The series a work belongs to, by `contentId`: every localized version of a part is in it. */
+export function seriesOf(post: Post, list: typeof series = series) {
+  return list.find((item) => item.contentIds.includes(post.contentId));
+}
+
+/**
+ * Posts that share a tag with `post`, most shared first. Only published posts
+ * of the post's own language, and never another version of the same work: a
+ * counterpart is not "related", and no language is substituted for another.
+ */
+export function relatedPosts(post: Post, published: readonly Post[]) {
+  const shared = (item: Post) =>
+    item.tags.filter((tag) => post.tags.includes(tag)).length;
+  return published
+    .filter(
+      (item) =>
+        item.locale === post.locale &&
+        !item.draft &&
+        item.contentId !== post.contentId &&
+        shared(item) > 0,
+    )
+    .sort((a, b) => shared(b) - shared(a))
+    .slice(0, 3);
+}
+
+/** Chronological Previous/Next within the post's language, published only. Not series navigation. */
+export function chronologicalNeighbours(
+  post: Post,
+  published: readonly Post[],
+) {
+  const posts = sortPostsNewestFirst(
+    published.filter((item) => item.locale === post.locale && !item.draft),
+  );
+  const index = posts.findIndex((item) => item.contentId === post.contentId);
+  return {
+    previous: posts[index + 1] ?? null,
+    next: posts[index - 1] ?? null,
+  };
+}
+
 export function getPostDetails(post: Post) {
   const raw = fs.readFileSync(
     path.join(process.cwd(), "content", "posts", `${post.slug}.mdx`),
@@ -74,21 +121,10 @@ export function getPostDetails(post: Post) {
     .replace(/```[\s\S]*?```/g, "")
     .trim()
     .split(/\s+/).length;
-  const posts = sortPostsNewestFirst(getPublishedPosts());
-  const index = posts.findIndex((item) => item.slug === post.slug);
-  const related = posts
-    .filter(
-      (item) =>
-        item.slug !== post.slug &&
-        item.tags.some((tag) => post.tags.includes(tag)),
-    )
-    .sort((a, b) => {
-      const score = (item: Post) =>
-        item.tags.filter((tag) => post.tags.includes(tag)).length;
-      return score(b) - score(a);
-    })
-    .slice(0, 3);
-  const currentSeries = series.find((item) => item.slugs.includes(post.slug));
+  const posts = sortPostsNewestFirst(getPublishedPosts(post.locale));
+  const related = relatedPosts(post, posts);
+  const { previous, next } = chronologicalNeighbours(post, posts);
+  const currentSeries = seriesOf(post);
   const lab = post.tags.includes("osdev")
     ? {
         title: "Boot sector",
@@ -109,8 +145,8 @@ export function getPostDetails(post: Post) {
     headings,
     minutes: Math.max(1, Math.ceil(words / 220)),
     related,
-    previous: posts[index + 1] ?? null,
-    next: posts[index - 1] ?? null,
+    previous,
+    next,
     currentSeries,
     lab,
   };

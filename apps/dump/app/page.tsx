@@ -7,13 +7,14 @@ import { homeJsonLd } from "@/lib/structured-data";
 import { DumpShell } from "@/components/DumpShell";
 import { HomePostList } from "@/components/HomePostList";
 import { getPostDetails } from "@/lib/post-details";
+import { DEFAULT_LOCALE } from "../../../site/locales";
 import { getPublishedPosts } from "@/lib/posts";
 
 export const metadata = staticMetadata("/");
 
 export default async function HomePage() {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
-  const posts = getPublishedPosts();
+  const posts = getPublishedPosts(DEFAULT_LOCALE);
   const latest = posts[0];
 
   return (

@@ -21,6 +21,9 @@ A filename outside that rule fails the build.
 
 ```yaml
 ---
+contentId: "booting-512-bytes"
+locale: "en"
+originalLocale: "en"
 title: "I Wrote 512 Bytes and Somehow It Booted"
 description: "My first steps into x86 real mode and boot sectors."
 publishedAt: "2026-09-03"
@@ -33,19 +36,45 @@ draft: false
 ---
 ```
 
-| Field         | Required | Notes                                                                 |
-| ------------- | -------- | --------------------------------------------------------------------- |
+| Field            | Required | Notes                                                                                           |
+| ---------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `contentId`      | yes      | Stable, immutable identity of the work: lowercase letters, digits, hyphens. Declared, never derived. |
+| `locale`         | yes      | The language of this version (`en`, `pt-BR`).                                                   |
+| `originalLocale` | yes      | The language the work was first written in. Identical on every version of the work.             |
 | `title`       | yes      | Non-empty string.                                                     |
 | `description` | yes      | One or two sentences. Used in previews, `<meta>`, and RSS.            |
 | `publishedAt` | yes      | Original publication date, `YYYY-MM-DD`.                              |
 | `updatedAt`   | no       | Meaningful revision date, `YYYY-MM-DD`, later than `publishedAt`.     |
-| `tags`        | no       | Lowercase letters, digits, hyphens. Lowercased for you. `[]` is fine. |
+| `tags`        | no       | Stable tag ids (see Tags). Lowercase letters, digits, hyphens. `[]` is fine. |
 | `draft`       | no       | `true` hides the post everywhere and 404s it in production.           |
 
 Invalid frontmatter fails the build with a message naming the file and field.
 Dates are explicit content metadata: builds and Git history never supply or
 replace them. `publishedAt` remains the authority for ordering and RSS;
 `updatedAt` is used only for revision-aware article and sitemap metadata.
+
+### Content identity
+
+- `contentId` is the identity of the work, not of a file or URL. All versions
+  of one work (the original and any translations) share it. It never changes,
+  even if the slug, title or filename does, and nothing derives it from them.
+  The current English posts use their original slug as their `contentId`; that
+  is a one-time migration value, not a rule for future posts.
+- `originalLocale` never changes and every version carries the same value.
+  Exactly one version must be in that locale, so provenance is always on
+  record. That version may be `draft: true`: withdrawing or hiding an original
+  keeps its provenance, and a published translation stays valid.
+- A work needs no translation in every locale. English-only and
+  Portuguese-only works are valid. Two versions of one work may not share a
+  `locale`, and the build fails with a message naming the `contentId`, the
+  locale and the files involved.
+- The filename currently determines a version's slug (and so its URL). The
+  slug is route identity only; it is never used to decide that two versions are
+  the same work. A translation has its own filename and slug.
+- `publishedAt`, `updatedAt` and `draft` belong to each localized version.
+  They are never copied between versions or inferred from Git, the filesystem
+  or the build. Only English routes exist today; Portuguese routes are added by
+  a later slice.
 
 ### Date authority
 
@@ -59,6 +88,22 @@ date rather than infer or redistribute dates.
 Use `updatedAt` for a later meaningful change to the article's facts or prose.
 Metadata cleanup, taxonomy changes, repository migrations, and automated
 changes do not establish a content update on their own.
+
+### Tags
+
+Frontmatter `tags` are stable tag ids defined in `lib/tags.ts`. Each id has,
+per locale, a display label and a URL slug (today only English, where both
+equal the id, so `/tags/<id>` is unchanged). A post's tags must each have a
+presentation in the post's own locale, or the build fails; there is no English
+fallback. Filtering uses the id; a localized slug only routes to it, and no
+slug identifies a tag. Adding a tag, or localizing one, means editing the
+definition in `lib/tags.ts`.
+
+### Series
+
+Series (`lib/post-details.ts`) list `contentIds` in reading order, so every
+localized version of a part belongs to its series. Series are not derived from
+tags. The reader UI belongs to a later issue.
 
 ### Drafts
 

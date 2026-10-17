@@ -1,5 +1,6 @@
 import path from "node:path";
 
+import { createTaxonomy, tagDefinitions } from "@/lib/tags";
 import {
   formatPostDate,
   getAllPosts,
@@ -13,11 +14,19 @@ import {
   sortPostsNewestFirst,
 } from "@/lib/posts";
 
+/** The production taxonomy plus the one tag only the fixtures use. */
+const TAXONOMY = createTaxonomy([
+  ...tagDefinitions,
+  { id: "testing", locales: { en: { label: "testing", slug: "testing" } } },
+]);
 const FIXTURES = path.join(__dirname, "fixtures", "posts");
 const EMPTY = path.join(__dirname, "fixtures", "no-such-directory");
 
 describe("parseFrontmatter", () => {
   const valid = {
+    contentId: "a-title",
+    locale: "en",
+    originalLocale: "en",
     title: "A Title",
     description: "A description.",
     publishedAt: "2026-09-03",
@@ -26,6 +35,9 @@ describe("parseFrontmatter", () => {
 
   it("normalizes tags to trimmed lowercase and defaults draft to false", () => {
     expect(parseFrontmatter(valid, "x")).toEqual({
+      contentId: "a-title",
+      locale: "en",
+      originalLocale: "en",
       title: "A Title",
       description: "A description.",
       publishedAt: "2026-09-03",
@@ -40,6 +52,12 @@ describe("parseFrontmatter", () => {
   });
 
   it.each([
+    ["missing contentId", { ...valid, contentId: undefined }],
+    ["contentId that is not an identifier", { ...valid, contentId: "A Title" }],
+    ["missing locale", { ...valid, locale: undefined }],
+    ["unsupported locale", { ...valid, locale: "fr" }],
+    ["missing originalLocale", { ...valid, originalLocale: undefined }],
+    ["unsupported originalLocale", { ...valid, originalLocale: "fr" }],
     ["missing title", { ...valid, title: undefined }],
     ["empty title", { ...valid, title: "  " }],
     ["missing description", { ...valid, description: undefined }],
@@ -101,7 +119,7 @@ describe("slugFromFilename", () => {
 
 describe("post collection", () => {
   it("returns every file, newest first", () => {
-    expect(getAllPosts(FIXTURES).map((p) => p.slug)).toEqual([
+    expect(getAllPosts(FIXTURES, TAXONOMY).map((p) => p.slug)).toEqual([
       "hidden-post",
       "second-post",
       "first-post",
@@ -110,8 +128,8 @@ describe("post collection", () => {
 
   it("preserves same-day ordering by title", () => {
     const posts = [
-      { ...getAllPosts(FIXTURES)[0]!, title: "Zulu", slug: "zulu" },
-      { ...getAllPosts(FIXTURES)[0]!, title: "Alpha", slug: "alpha" },
+      { ...getAllPosts(FIXTURES, TAXONOMY)[0]!, title: "Zulu", slug: "zulu" },
+      { ...getAllPosts(FIXTURES, TAXONOMY)[0]!, title: "Alpha", slug: "alpha" },
     ];
     expect(sortPostsNewestFirst(posts).map((post) => post.slug)).toEqual([
       "alpha",
@@ -122,7 +140,7 @@ describe("post collection", () => {
   it("preserves every published slug and historical publication date", () => {
     expect(
       Object.fromEntries(
-        getPublishedPosts().map((post) => [post.slug, post.publishedAt]),
+        getPublishedPosts("en").map((post) => [post.slug, post.publishedAt]),
       ),
     ).toEqual({
       "a-toml-file-changed-what-sweep-was": "2026-09-27",
@@ -141,7 +159,7 @@ describe("post collection", () => {
   });
 
   it("records only the verified historical content update", () => {
-    const posts = getPublishedPosts();
+    const posts = getPublishedPosts("en");
     expect(
       posts
         .filter((post) => post.updatedAt)
@@ -155,52 +173,57 @@ describe("post collection", () => {
   });
 
   it("derives the slug from the filename", () => {
-    expect(getPostBySlug("first-post", FIXTURES)?.title).toBe("First Post");
-    expect(getPostBySlug("does-not-exist", FIXTURES)).toBeNull();
+    expect(getPostBySlug("en", "first-post", FIXTURES, TAXONOMY)?.title).toBe(
+      "First Post",
+    );
+    expect(
+      getPostBySlug("en", "does-not-exist", FIXTURES, TAXONOMY),
+    ).toBeNull();
   });
 
   it("excludes drafts from the published set", () => {
-    expect(getPublishedPosts(FIXTURES).map((p) => p.slug)).toEqual([
-      "second-post",
-      "first-post",
-    ]);
+    expect(
+      getPublishedPosts("en", FIXTURES, TAXONOMY).map((p) => p.slug),
+    ).toEqual(["second-post", "first-post"]);
   });
 
   it("keeps drafts prerenderable outside production so they can be previewed", () => {
-    expect(getPostSlugs(FIXTURES)).toContain("hidden-post");
+    expect(getPostSlugs("en", FIXTURES, TAXONOMY)).toContain("hidden-post");
   });
 
   it("drops drafts from the production prerender set", () => {
     const nodeEnv = jest.replaceProperty(process.env, "NODE_ENV", "production");
     try {
-      expect(getPostSlugs(FIXTURES)).toEqual(["second-post", "first-post"]);
+      expect(getPostSlugs("en", FIXTURES, TAXONOMY)).toEqual([
+        "second-post",
+        "first-post",
+      ]);
     } finally {
       nodeEnv.restore();
     }
   });
 
   it("treats a missing content directory as no posts", () => {
-    expect(getAllPosts(EMPTY)).toEqual([]);
-    expect(getPublishedPosts(EMPTY)).toEqual([]);
-    expect(getAllTags(EMPTY)).toEqual([]);
-    expect(getPostBySlug("anything", EMPTY)).toBeNull();
+    expect(getAllPosts(EMPTY, TAXONOMY)).toEqual([]);
+    expect(getPublishedPosts("en", EMPTY)).toEqual([]);
+    expect(getAllTags("en", EMPTY)).toEqual([]);
+    expect(getPostBySlug("en", "anything", EMPTY)).toBeNull();
   });
 });
 
 describe("tags", () => {
   it("counts tags across published posts only, most used first", () => {
-    expect(getAllTags(FIXTURES)).toEqual([
-      { tag: "osdev", count: 2 },
-      { tag: "testing", count: 1 },
-      { tag: "x86", count: 1 },
+    expect(getAllTags("en", FIXTURES, TAXONOMY)).toEqual([
+      { id: "osdev", label: "osdev", slug: "osdev", count: 2 },
+      { id: "testing", label: "testing", slug: "testing", count: 1 },
+      { id: "x86", label: "x86", slug: "x86", count: 1 },
     ]);
   });
 
   it("looks posts up by tag, newest first, drafts excluded", () => {
-    expect(getPostsByTag("osdev", FIXTURES).map((p) => p.slug)).toEqual([
-      "second-post",
-      "first-post",
-    ]);
+    expect(
+      getPostsByTag("en", "osdev", FIXTURES, TAXONOMY).map((p) => p.slug),
+    ).toEqual(["second-post", "first-post"]);
   });
 });
 

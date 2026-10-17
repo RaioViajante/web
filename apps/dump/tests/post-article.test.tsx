@@ -17,11 +17,14 @@ jest.mock("../lib/post-details", () => ({
 
 const post: Post = {
   slug: "article",
+  contentId: "article",
+  locale: "en",
+  originalLocale: "en",
   title: "Article title",
   description: "Article description.",
   publishedAt: "2026-09-03",
   updatedAt: "2026-10-05",
-  tags: ["testing"],
+  tags: ["meta"],
   draft: false,
 };
 

@@ -4,6 +4,7 @@ import { IndexHeader, LeaderRow, Section } from "@raioviajante/design/parts";
 import { identity } from "../../../seo/structured-data";
 
 import { series } from "@/lib/post-details";
+import { tagPresentation } from "@/lib/tags";
 import { formatPostMonth, sortPostsNewestFirst, type Post } from "@/lib/posts";
 
 interface PostMonth {
@@ -11,6 +12,10 @@ interface PostMonth {
   name: string;
   posts: Post[];
 }
+
+/** A post's tags in its own language, as shown. */
+const tagLabels = (post: Post) =>
+  post.tags.map((tag) => tagPresentation(tag, post.locale).label).join(" · ");
 
 export function groupPostsByMonth(posts: readonly Post[]): PostMonth[] {
   const months = new Map<string, PostMonth>();
@@ -65,7 +70,7 @@ export function HomePostList({
               <span aria-hidden="true"> · </span>
             </>
           ) : null}
-          {latest.tags.join(" · ")}
+          {tagLabels(latest)}
         </p>
       </Section>
       {months.map((month, index) => (
@@ -90,7 +95,7 @@ export function HomePostList({
                   linkComponent={Link}
                 />
                 <p>{post.description}</p>
-                <span className="post-tags">{post.tags.join(" · ")}</span>
+                <span className="post-tags">{tagLabels(post)}</span>
               </li>
             ))}
           </ol>
@@ -103,8 +108,10 @@ export function HomePostList({
         index
       >
         {series.map((item) => {
-          const parts = item.slugs
-            .map((slug) => posts.find((post) => post.slug === slug))
+          const parts = item.contentIds
+            .map((contentId) =>
+              posts.find((post) => post.contentId === contentId),
+            )
             .filter((post): post is Post => Boolean(post));
           return parts.length > 0 ? (
             <LeaderRow

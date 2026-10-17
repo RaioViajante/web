@@ -3,8 +3,8 @@ import { LeaderRow, Section } from "@raioviajante/design/parts";
 
 import { sortPostsNewestFirst, type Post, type TagCount } from "@/lib/posts";
 
-export function tagHref(tag: string): string {
-  return `/tags/${encodeURIComponent(tag)}`;
+export function tagHref(slug: string): string {
+  return `/tags/${encodeURIComponent(slug)}`;
 }
 export function formatTagPostDate(date: string): string {
   return date.slice(2);
@@ -37,12 +37,12 @@ export function TagIndex({ tags }: { tags: TagCount[] }) {
               label === "Recurring" ? "tag-index" : "tag-index tag-index--two"
             }
           >
-            {items.map(({ tag, count }) => (
-              <li className="tag-index-item" key={tag}>
+            {items.map(({ id, label, slug, count }) => (
+              <li className="tag-index-item" key={id}>
                 <LeaderRow
-                  label={tag}
+                  label={label}
                   value={count}
-                  href={tagHref(tag)}
+                  href={tagHref(slug)}
                   linkComponent={Link}
                 />
               </li>

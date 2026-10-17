@@ -1,4 +1,5 @@
 import { pageMetadata, notFoundSeo, type PageSeo } from "../../../seo/metadata";
+import { DEFAULT_LOCALE } from "../../../site/locales";
 import { getPublishedPosts, getAllTags } from "./posts";
 import { site, alternatesFor } from "./site";
 export const staticPages: PageSeo[] = [
@@ -39,15 +40,15 @@ export function getSeoPages(): PageSeo[] {
   return [
     ...staticPages,
     notFoundSeo,
-    ...getPublishedPosts().map((post) => ({
+    ...getPublishedPosts(DEFAULT_LOCALE).map((post) => ({
       path: `/posts/${post.slug}`,
       title: post.title,
       description: post.description,
     })),
-    ...getAllTags().map(({ tag }) => ({
-      path: `/tags/${encodeURIComponent(tag)}`,
-      title: `Posts tagged "${tag}"`,
-      description: `Technical writing and project notes tagged "${tag}" on dump.`,
+    ...getAllTags(DEFAULT_LOCALE).map(({ slug, label }) => ({
+      path: `/tags/${encodeURIComponent(slug)}`,
+      title: `Posts tagged "${label}"`,
+      description: `Technical writing and project notes tagged "${label}" on dump.`,
     })),
   ];
 }

@@ -6,6 +6,9 @@ import type { Post } from "@/lib/posts";
 const posts: Post[] = [
   {
     slug: "older-month",
+    contentId: "older-month",
+    locale: "en",
+    originalLocale: "en",
     title: "Older month",
     description: "An older synthetic post.",
     publishedAt: "2025-12-20",
@@ -14,14 +17,20 @@ const posts: Post[] = [
   },
   {
     slug: "newer-day",
+    contentId: "newer-day",
+    locale: "en",
+    originalLocale: "en",
     title: "Newer day",
     description: "The newest synthetic post.",
     publishedAt: "2026-01-15",
-    tags: ["testing", "x86"],
+    tags: ["meta", "x86"],
     draft: false,
   },
   {
     slug: "older-day",
+    contentId: "older-day",
+    locale: "en",
+    originalLocale: "en",
     title: "Older day",
     description: "An earlier synthetic post in the same month.",
     publishedAt: "2026-01-03",
