@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { staticMetadata } from "@/lib/seo";
 import { SearchPage } from "@raioviajante/design/search";
 
@@ -8,7 +9,7 @@ export const metadata = staticMetadata("/search");
 export default function Page() {
   return (
     <DumpShell current="/search">
-      <SearchPage site="dump" />
+      <SearchPage site="dump" locale={DEFAULT_LOCALE} />
     </DumpShell>
   );
 }

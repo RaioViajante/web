@@ -19,8 +19,15 @@ it.each([
   async (site, title, number) => {
     await mount(
       [
-        { site, title: "Other", href: "/other", description: "", number: "99" },
-        { site, title, href: "/target", description: "", number },
+        {
+          site,
+          locale: "en",
+          title: "Other",
+          href: "/other",
+          description: "",
+          number: "99",
+        },
+        { site, locale: "en", title, href: "/target", description: "", number },
       ],
       title,
     );
@@ -34,15 +41,23 @@ it.each([
 it("falls back to the filtered result position without supplied numbers", async () => {
   await mount(
     [
-      { site: "docs", title: "Other", href: "/other", description: "" },
       {
         site: "docs",
+        locale: "en",
+        title: "Other",
+        href: "/other",
+        description: "",
+      },
+      {
+        site: "docs",
+        locale: "en",
         title: "Classification",
         href: "/sweep/#classification",
         description: "Sweep",
       },
       {
         site: "docs",
+        locale: "en",
         title: "Classification rules",
         href: "/rules",
         description: "Sweep",
@@ -59,7 +74,7 @@ it("falls back to the filtered result position without supplied numbers", async 
 
 async function mount(entries: SearchEntry[], query: string) {
   document.body.innerHTML = renderToStaticMarkup(
-    <SearchPage site={entries[0]!.site} />,
+    <SearchPage site={entries[0]!.site} locale="en" />,
   );
   vi.stubGlobal(
     "fetch",
@@ -76,3 +91,56 @@ async function mount(entries: SearchEntry[], query: string) {
     expect(document.querySelector("[data-search-result]")).not.toBeNull(),
   );
 }
+
+it("fetches only the English index of its own site and shows dates in the page locale", async () => {
+  await mount(
+    [
+      {
+        site: "dump",
+        locale: "en",
+        title: "Post",
+        href: "/p",
+        description: "",
+        date: "2026-09-03",
+      },
+    ],
+    "post",
+  );
+  expect(vi.mocked(fetch).mock.calls.map(([url]) => url)).toEqual([
+    "/search-index.json",
+  ]);
+  expect(document.querySelector(".rv-result__note")?.textContent).toBe(
+    "September 3, 2026",
+  );
+  expect(
+    document
+      .querySelector("[data-search-page]")
+      ?.getAttribute("data-search-locale"),
+  ).toBe("en");
+});
+
+it.each([
+  ["no locale", { site: "docs" }],
+  ["another locale", { site: "docs", locale: "pt-BR" }],
+  ["another site", { site: "lab", locale: "en" }],
+])("rejects an index whose entry has %s", async (_name, extra) => {
+  document.body.innerHTML = renderToStaticMarkup(
+    <SearchPage site="docs" locale="en" />,
+  );
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [
+        { title: "Sweep", href: "/s", description: "", ...extra },
+      ],
+    }),
+  );
+  stop = attachSearch();
+  await vi.waitFor(() =>
+    expect(document.querySelector("[data-search-bubble]")?.textContent).toBe(
+      "search is unavailable right now.",
+    ),
+  );
+  expect(document.querySelector("[data-search-result]")).toBeNull();
+});

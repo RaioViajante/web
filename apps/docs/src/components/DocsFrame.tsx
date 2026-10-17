@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Shell, type NavItem } from "@raioviajante/design/shell";
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { SearchNavItem } from "@raioviajante/design/search";
 
 /** The shared shell with docs' pages. Rendered statically; nothing hydrates. */
@@ -24,7 +25,7 @@ export function DocsFrame({
 			pages={pages}
 			currentPage={current}
 			toc={toc}
-			pagesExtra={<SearchNavItem number={searchNumber} href="/search/" current={current === "/search/"} />}
+			pagesExtra={<SearchNavItem number={searchNumber} site="docs" locale={DEFAULT_LOCALE} current={current === "/search/"} />}
 		>
 			{children}
 		</Shell>

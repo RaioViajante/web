@@ -1,4 +1,5 @@
 ---
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SearchPage } from "@raioviajante/design/search";
 ---
@@ -7,5 +8,5 @@ import { SearchPage } from "@raioviajante/design/search";
   pageTitle="search"
   description="Ask RaioViajante — search lab experiments and the ecosystem."
 >
-  <SearchPage site="lab" />
+  <SearchPage site="lab" locale={DEFAULT_LOCALE} />
 </BaseLayout>

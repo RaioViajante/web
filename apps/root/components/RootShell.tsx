@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Shell, type NavItem } from "@raioviajante/design/components";
+import { DEFAULT_LOCALE } from "../../../site/locales";
 import { SearchNavItem } from "@raioviajante/design/search";
 
 const pages: NavItem[] = [
@@ -29,6 +30,8 @@ export function RootShell({
       pagesExtra={
         <SearchNavItem
           number="06."
+          site="root"
+          locale={DEFAULT_LOCALE}
           current={current === "/search"}
           linkComponent={Link}
         />

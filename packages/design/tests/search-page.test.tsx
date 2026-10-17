@@ -31,7 +31,7 @@ const lines = (html: string) =>
 
 describe("empty search suggestions", () => {
   it("offers this site's own terms first and the other sites' for everywhere", () => {
-    const html = renderToStaticMarkup(<SearchPage site="docs" />);
+    const html = renderToStaticMarkup(<SearchPage site="docs" locale="en" />);
     expect(lines(html)).toEqual({
       site: { hidden: false, text: "try sweep, cli, tokens or commits." },
       everywhere: {
@@ -49,7 +49,7 @@ describe("empty search suggestions", () => {
       lab: "classifier",
     } as const;
     for (const site of ["root", "dump", "docs", "lab"] as const) {
-      const html = renderToStaticMarkup(<SearchPage site={site} />);
+      const html = renderToStaticMarkup(<SearchPage site={site} locale="en" />);
       const terms = lines(html)
         .everywhere!.text.slice(4, -1)
         .split(/, | or /);

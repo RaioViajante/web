@@ -1,8 +1,9 @@
 import { Fragment } from "react";
 import { Art, art } from "./art";
 import { SiteLink, type LinkComponent } from "./link";
-import type { LocaleId } from "../../../site/locales";
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 import { SITES, type SiteId } from "../../../site/sites";
+import { searchPagePath } from "../search/locale";
 
 /** Searches that find something on each site, offered when nothing matched. */
 const SUGGESTIONS: Record<SiteId, readonly string[]> = {
@@ -61,12 +62,8 @@ function Suggestions({
 
 export interface SearchEntry {
   site: SiteId;
-  /**
-   * The index's locale. Producers publish it; it stays optional here because
-   * readers must keep accepting an English entry without it until every
-   * production index carries it (docs/i18n.md, "Search").
-   */
-  locale?: LocaleId;
+  /** The index's locale: every production producer publishes it (#42) and readers require it. */
+  locale: LocaleId;
   title: string;
   href: string;
   description: string;
@@ -85,12 +82,17 @@ const prompts: Record<SiteId, string> = {
 export function SearchNavItem({
   number,
   current = false,
-  href = "/search",
+  site,
+  locale = DEFAULT_LOCALE,
+  href = site ? searchPagePath(site, locale) : "/search",
   label = "search",
   linkComponent,
 }: {
   number: string;
   current?: boolean;
+  /** With `site`, the default `href` is that host's search page in `locale`. */
+  site?: SiteId;
+  locale?: LocaleId;
   href?: string;
   label?: string;
   linkComponent?: LinkComponent;
@@ -119,12 +121,20 @@ export function SearchNavItem({
   );
 }
 
-export function SearchPage({ site }: { site: SiteId }) {
+export function SearchPage({
+  site,
+  locale,
+}: {
+  site: SiteId;
+  /** The rendered locale: the route states it, the client never infers it. */
+  locale: LocaleId;
+}) {
   return (
     <section
       className="rv-search-page"
       data-search-page
       data-search-site={site}
+      data-search-locale={locale}
     >
       <header className="rv-search-page__header">
         <p className="rv-label">ASK RAIOVIAJANTE</p>
