@@ -1,8 +1,14 @@
+import { isLocaleId, type LocaleId } from "../../../site/locales";
 import { SITES, type SiteId } from "../../../site/sites";
 import type { SearchEntry } from "../components/search";
-import { loadEverywhere, searchEntries, unavailableNote } from "./engine";
+import {
+  loadEverywhere,
+  loadSiteIndex,
+  searchEntries,
+  unavailableNote,
+} from "./engine";
+import { formatSearchDate, searchIndexPath, validateIndex } from "./locale";
 
-const indexPath = "/search-index.json";
 const localPorts: Record<SiteId, readonly number[]> = {
   root: [3000, 3002],
   dump: [3000, 3001],
@@ -18,21 +24,25 @@ function isTyping(target: EventTarget | null) {
   );
 }
 
-function indexHref(site: SiteId) {
-  return SITES.find((item) => item.id === site)!.href + indexPath;
+function indexHref(site: SiteId, locale: LocaleId) {
+  return (
+    SITES.find((item) => item.id === site)!.href + searchIndexPath(site, locale)
+  );
 }
 
 function localHost() {
   return location.hostname === "localhost" || location.hostname === "127.0.0.1";
 }
 
-async function fetchIndex(url: string, site: SiteId, localOrigin?: string) {
+async function fetchIndex(
+  url: string,
+  site: SiteId,
+  locale: LocaleId,
+  localOrigin?: string,
+) {
   const response = await fetch(url, { mode: "cors" });
   if (!response.ok) throw new Error(`Search index unavailable: ${site}`);
-  const entries = (await response.json()) as SearchEntry[];
-  if (!Array.isArray(entries) || entries.some((entry) => entry.site !== site)) {
-    throw new Error(`Unexpected search index: ${site}`);
-  }
+  const entries = validateIndex(await response.json(), site, locale);
   const canonicalOrigin = SITES.find((item) => item.id === site)!.href;
   return localOrigin
     ? entries.map((entry) => ({
@@ -45,11 +55,14 @@ async function fetchIndex(url: string, site: SiteId, localOrigin?: string) {
 async function readIndex(
   site: SiteId,
   currentSite: SiteId,
+  locale: LocaleId,
 ): Promise<SearchEntry[]> {
+  const path = searchIndexPath(site, locale);
   if (site === currentSite) {
     return fetchIndex(
-      indexPath,
+      path,
       site,
+      locale,
       localHost() ? location.origin : undefined,
     );
   }
@@ -57,16 +70,16 @@ async function readIndex(
     for (const port of localPorts[site]) {
       const origin = `${location.protocol}//${location.hostname}:${port}`;
       try {
-        return await fetchIndex(origin + indexPath, site, origin);
+        return await fetchIndex(origin + path, site, locale, origin);
       } catch {
         // Try another local port before the deployed index.
       }
     }
   }
-  return fetchIndex(indexHref(site), site);
+  return fetchIndex(indexHref(site, locale), site, locale);
 }
 
-function resultRow(entry: SearchEntry, index: number) {
+function resultRow(entry: SearchEntry, index: number, locale: LocaleId) {
   const row = document.createElement("a");
   row.className = "rv-result";
   row.href = entry.href;
@@ -84,13 +97,18 @@ function resultRow(entry: SearchEntry, index: number) {
   dots.setAttribute("aria-hidden", "true");
   const note = document.createElement("span");
   note.className = "rv-result__note";
-  note.textContent = entry.date ?? entry.site;
+  note.textContent = entry.date
+    ? formatSearchDate(entry.date, locale)
+    : entry.site;
   row.append(number, label, dots, note);
   return row;
 }
 
 function mountPage(page: HTMLElement) {
   const site = page.dataset.searchSite as SiteId;
+  const stated = page.dataset.searchLocale;
+  if (!isLocaleId(stated)) throw new Error("Search page states no locale");
+  const locale: LocaleId = stated;
   const input = page.querySelector<HTMLInputElement>("[data-search-input]")!;
   const bubble = page.querySelector<HTMLElement>("[data-search-bubble]")!;
   const results = page.querySelector<HTMLElement>("[data-search-results]")!;
@@ -135,7 +153,7 @@ function mountPage(page: HTMLElement) {
       bubble.textContent = initialPrompt;
       return;
     }
-    const found = searchEntries(scope === "site" ? own : all, query);
+    const found = searchEntries(scope === "site" ? own : all, query, locale);
     if (scope === "everywhere" && unavailable.length) {
       note.textContent = unavailableNote(unavailable);
       note.hidden = false;
@@ -155,31 +173,36 @@ function mountPage(page: HTMLElement) {
       heading.textContent = groupSite.label;
       section.append(
         heading,
-        ...group.map((entry) => resultRow(entry, rowIndex++)),
+        ...group.map((entry) => resultRow(entry, rowIndex++, locale)),
       );
       results.append(section);
     }
   }
 
   async function loadAll() {
-    const loaded = await loadEverywhere(site, own, (other) =>
-      readIndex(other, site),
+    const loaded = await loadEverywhere(site, locale, own, (other) =>
+      readIndex(other, site, locale),
     );
     all = loaded.entries;
     unavailable = loaded.unavailable;
     render();
   }
 
-  void readIndex(site, site)
-    .then((entries) => {
-      own = entries;
-      all = entries;
-      if (scope === "everywhere") void loadAll();
-      else render();
-    })
-    .catch(() => {
-      bubble.textContent = "search is unavailable right now.";
-    });
+  // Participation is checked before any request, for this host too. The
+  // state is exposed for the catalog slice to word; no copy is added here.
+  void loadSiteIndex(site, locale, () => readIndex(site, site, locale)).then(
+    (index) => {
+      page.dataset.searchState = index.state;
+      if (index.state === "ready") {
+        own = index.entries;
+        all = index.entries;
+        if (scope === "everywhere") void loadAll();
+        else render();
+      } else if (index.state === "unavailable") {
+        bubble.textContent = "search is unavailable right now.";
+      }
+    },
+  );
 
   input.addEventListener("input", render);
   input.addEventListener("keydown", (event) => {

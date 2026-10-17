@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Shell } from "@raioviajante/design/shell";
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { SearchNavItem } from "@raioviajante/design/search";
 import { experiments } from "../data/experiments";
 
@@ -29,7 +30,8 @@ export function LabFrame({
       pagesExtra={
         <SearchNavItem
           number="02."
-          href="/search/"
+          site="lab"
+          locale={DEFAULT_LOCALE}
           current={current === "/search/"}
         />
       }

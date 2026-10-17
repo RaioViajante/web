@@ -1,4 +1,5 @@
 import { NotFoundPage } from "@raioviajante/design/templates";
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { SearchNavItem } from "@raioviajante/design/search";
 export function LabNotFound() {
   return (
@@ -23,7 +24,14 @@ export function LabNotFound() {
           href: "https://raioviajante.com",
         },
       ]}
-      ask={<SearchNavItem number="" label="ask RaioViajante" href="/search/" />}
+      ask={
+        <SearchNavItem
+          number=""
+          label="ask RaioViajante"
+          site="lab"
+          locale={DEFAULT_LOCALE}
+        />
+      }
     />
   );
 }
