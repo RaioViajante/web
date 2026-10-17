@@ -1,0 +1,335 @@
+{
+  "posts": [
+    {
+      "slug": "a-toml-file-changed-what-sweep-was",
+      "title": "A TOML File Changed What Sweep Was",
+      "publishedAt": "2026-09-27",
+      "updatedAt": null,
+      "tags": [
+        "python",
+        "toml",
+        "cli",
+        "sweep"
+      ],
+      "bodyLength": 5154
+    },
+    {
+      "slug": "gave-one-operation-more-than-one-deadline",
+      "title": "I Gave One Operation More Than One Deadline",
+      "publishedAt": "2026-09-27",
+      "updatedAt": null,
+      "tags": [
+        "typescript",
+        "reliability",
+        "time",
+        "mcp"
+      ],
+      "bodyLength": 7340
+    },
+    {
+      "slug": "kept-building-and-stopped-writing-it-down",
+      "title": "I Kept Building and Stopped Writing It Down",
+      "publishedAt": "2026-09-27",
+      "updatedAt": null,
+      "tags": [
+        "personal",
+        "meta",
+        "writing",
+        "workflow"
+      ],
+      "bodyLength": 3605
+    },
+    {
+      "slug": "started-writing-down-the-failures-before-the-features",
+      "title": "I Started Writing Down the Failures Before the Features",
+      "publishedAt": "2026-09-27",
+      "updatedAt": null,
+      "tags": [
+        "architecture",
+        "reliability",
+        "security",
+        "mcp"
+      ],
+      "bodyLength": 6569
+    },
+    {
+      "slug": "my-project-cards-were-getting-ahead-of-my-projects",
+      "title": "My Project Cards Were Getting Ahead of My Projects",
+      "publishedAt": "2026-09-27",
+      "updatedAt": null,
+      "tags": [
+        "personal",
+        "meta",
+        "projects",
+        "web"
+      ],
+      "bodyLength": 3813
+    },
+    {
+      "slug": "an-execution-is-more-than-a-row-in-a-database",
+      "title": "An Execution Is More Than a Row in a Database",
+      "publishedAt": "2026-09-13",
+      "updatedAt": null,
+      "tags": [
+        "java",
+        "spring",
+        "distributed-systems"
+      ],
+      "bodyLength": 12481
+    },
+    {
+      "slug": "split-my-internet-into-four-different-kinds-of-place",
+      "title": "I Split My Internet Into Four Different Kinds of Place",
+      "publishedAt": "2026-09-13",
+      "updatedAt": "2026-10-05",
+      "tags": [
+        "meta",
+        "dump",
+        "personal"
+      ],
+      "bodyLength": 9417
+    },
+    {
+      "slug": "started-designing-a-language-before-i-could-compile-one",
+      "title": "I Started Designing a Language Before I Could Compile One",
+      "publishedAt": "2026-09-13",
+      "updatedAt": null,
+      "tags": [
+        "programming-languages",
+        "language-design",
+        "compilers"
+      ],
+      "bodyLength": 9878
+    },
+    {
+      "slug": "apparently-moving-a-file-has-edge-cases",
+      "title": "Apparently Moving a File Has Edge Cases",
+      "publishedAt": "2026-09-12",
+      "updatedAt": null,
+      "tags": [
+        "python",
+        "pytest",
+        "automation",
+        "sweep"
+      ],
+      "bodyLength": 8388
+    },
+    {
+      "slug": "building-orbit",
+      "title": "I Got Bored of CRUD, So I'm Building a Scheduler",
+      "publishedAt": "2026-09-07",
+      "updatedAt": null,
+      "tags": [
+        "java",
+        "spring",
+        "distributed-systems"
+      ],
+      "bodyLength": 16409
+    },
+    {
+      "slug": "there-is-no-printf-down-here",
+      "title": "There Is No printf Down Here",
+      "publishedAt": "2026-09-05",
+      "updatedAt": null,
+      "tags": [
+        "osdev",
+        "assembly",
+        "x86"
+      ],
+      "bodyLength": 8125
+    },
+    {
+      "slug": "maybe-this-can-be-something-someday",
+      "title": "Maybe This Can Be Something Someday",
+      "publishedAt": "2026-09-04",
+      "updatedAt": null,
+      "tags": [
+        "personal",
+        "meta",
+        "dump"
+      ],
+      "bodyLength": 1298
+    }
+  ],
+  "tags": [
+    {
+      "tag": "meta",
+      "count": 4
+    },
+    {
+      "tag": "personal",
+      "count": 4
+    },
+    {
+      "tag": "distributed-systems",
+      "count": 2
+    },
+    {
+      "tag": "dump",
+      "count": 2
+    },
+    {
+      "tag": "java",
+      "count": 2
+    },
+    {
+      "tag": "mcp",
+      "count": 2
+    },
+    {
+      "tag": "python",
+      "count": 2
+    },
+    {
+      "tag": "reliability",
+      "count": 2
+    },
+    {
+      "tag": "spring",
+      "count": 2
+    },
+    {
+      "tag": "sweep",
+      "count": 2
+    },
+    {
+      "tag": "architecture",
+      "count": 1
+    },
+    {
+      "tag": "assembly",
+      "count": 1
+    },
+    {
+      "tag": "automation",
+      "count": 1
+    },
+    {
+      "tag": "cli",
+      "count": 1
+    },
+    {
+      "tag": "compilers",
+      "count": 1
+    },
+    {
+      "tag": "language-design",
+      "count": 1
+    },
+    {
+      "tag": "osdev",
+      "count": 1
+    },
+    {
+      "tag": "programming-languages",
+      "count": 1
+    },
+    {
+      "tag": "projects",
+      "count": 1
+    },
+    {
+      "tag": "pytest",
+      "count": 1
+    },
+    {
+      "tag": "security",
+      "count": 1
+    },
+    {
+      "tag": "time",
+      "count": 1
+    },
+    {
+      "tag": "toml",
+      "count": 1
+    },
+    {
+      "tag": "typescript",
+      "count": 1
+    },
+    {
+      "tag": "web",
+      "count": 1
+    },
+    {
+      "tag": "workflow",
+      "count": 1
+    },
+    {
+      "tag": "writing",
+      "count": 1
+    },
+    {
+      "tag": "x86",
+      "count": 1
+    }
+  ],
+  "tagUrls": [
+    "/tags/meta",
+    "/tags/personal",
+    "/tags/distributed-systems",
+    "/tags/dump",
+    "/tags/java",
+    "/tags/mcp",
+    "/tags/python",
+    "/tags/reliability",
+    "/tags/spring",
+    "/tags/sweep",
+    "/tags/architecture",
+    "/tags/assembly",
+    "/tags/automation",
+    "/tags/cli",
+    "/tags/compilers",
+    "/tags/language-design",
+    "/tags/osdev",
+    "/tags/programming-languages",
+    "/tags/projects",
+    "/tags/pytest",
+    "/tags/security",
+    "/tags/time",
+    "/tags/toml",
+    "/tags/typescript",
+    "/tags/web",
+    "/tags/workflow",
+    "/tags/writing",
+    "/tags/x86"
+  ],
+  "postUrls": [
+    "/posts/a-toml-file-changed-what-sweep-was",
+    "/posts/gave-one-operation-more-than-one-deadline",
+    "/posts/kept-building-and-stopped-writing-it-down",
+    "/posts/started-writing-down-the-failures-before-the-features",
+    "/posts/my-project-cards-were-getting-ahead-of-my-projects",
+    "/posts/an-execution-is-more-than-a-row-in-a-database",
+    "/posts/split-my-internet-into-four-different-kinds-of-place",
+    "/posts/started-designing-a-language-before-i-could-compile-one",
+    "/posts/apparently-moving-a-file-has-edge-cases",
+    "/posts/building-orbit",
+    "/posts/there-is-no-printf-down-here",
+    "/posts/maybe-this-can-be-something-someday"
+  ],
+  "series": [
+    {
+      "name": "jobs-mcp",
+      "slugs": [
+        "started-writing-down-the-failures-before-the-features",
+        "gave-one-operation-more-than-one-deadline"
+      ]
+    },
+    {
+      "name": "orbit",
+      "slugs": [
+        "building-orbit",
+        "an-execution-is-more-than-a-row-in-a-database"
+      ]
+    },
+    {
+      "name": "sweep",
+      "slugs": [
+        "apparently-moving-a-file-has-edge-cases",
+        "a-toml-file-changed-what-sweep-was"
+      ]
+    }
+  ]
+}

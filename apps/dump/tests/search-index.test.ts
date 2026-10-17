@@ -7,7 +7,7 @@ describe("search-index.json", () => {
     const response = GET();
     expect(response.headers.get("content-type")).toMatch(/^application\/json/);
     const entries = (await response.json()) as Array<Record<string, unknown>>;
-    const posts = getPublishedPosts();
+    const posts = getPublishedPosts("en");
 
     expect(entries.length).toBeGreaterThan(0);
     expect(entries).toHaveLength(posts.length);

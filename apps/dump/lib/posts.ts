@@ -3,30 +3,50 @@ import path from "node:path";
 
 import matter from "gray-matter";
 
+import { isLocaleId, type LocaleId } from "../../../site/locales";
+import {
+  taxonomy as defaultTaxonomy,
+  tagPresentation,
+  type TagId,
+  type Taxonomy,
+} from "@/lib/tags";
+
 /** Frontmatter every post file must declare (see `content/README.md`). */
 export interface PostFrontmatter {
+  /**
+   * Immutable, locale-neutral identity of the work. Every version of one work
+   * (original and translations) shares it. It is declared, never derived from
+   * a slug, filename, title or date.
+   */
+  contentId: string;
+  /** The language of this version. */
+  locale: LocaleId;
+  /** The language the work was first written in; the same on every version. */
+  originalLocale: LocaleId;
   /** Human title, used verbatim in headings and metadata. */
   title: string;
   /** One or two sentences; used for previews, `<meta>` description, and RSS. */
   description: string;
-  /** Original publication date as `YYYY-MM-DD`. */
+  /** This version's original publication date as `YYYY-MM-DD`. */
   publishedAt: string;
-  /** Date of the latest meaningful revision, when one exists. */
+  /** Date of this version's latest meaningful revision, when one exists. */
   updatedAt?: string;
-  /** Lowercase, URL-safe topic tags. May be empty. */
-  tags: string[];
-  /** When true, the post is hidden from listings and from production builds. */
+  /** Stable tag ids (see `lib/tags.ts`). May be empty. */
+  tags: TagId[];
+  /** When true, this version is hidden from listings and from production builds. */
   draft: boolean;
 }
 
-/** A post's frontmatter plus its URL slug (the filename without extension). */
+/** A post version's frontmatter plus its URL slug (the filename without extension). */
 export interface Post extends PostFrontmatter {
   slug: string;
 }
 
-/** A tag together with how many published posts carry it. */
+/** A tag, in one locale, with how many published posts of that locale carry it. */
 export interface TagCount {
-  tag: string;
+  id: TagId;
+  label: string;
+  slug: string;
   count: number;
 }
 
@@ -34,7 +54,7 @@ export const POSTS_DIRECTORY = path.join(process.cwd(), "content", "posts");
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-/** Lowercase letters/digits in hyphen-separated groups. Used for slugs and tags. */
+/** Lowercase letters/digits in hyphen-separated groups. Used for slugs, tag ids and content ids. */
 const KEBAB_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 class FrontmatterError extends Error {
@@ -71,8 +91,36 @@ export function parseFrontmatter(data: unknown, slug: string): PostFrontmatter {
     );
   }
 
-  const { title, description, publishedAt, updatedAt, tags, draft } = data;
+  const {
+    contentId,
+    locale,
+    originalLocale,
+    title,
+    description,
+    publishedAt,
+    updatedAt,
+    tags,
+    draft,
+  } = data;
 
+  if (typeof contentId !== "string" || !KEBAB_PATTERN.test(contentId)) {
+    throw new FrontmatterError(
+      slug,
+      "`contentId` is required: lowercase letters, digits and hyphens, declared explicitly (not inferred from the filename)",
+    );
+  }
+  if (!isLocaleId(locale)) {
+    throw new FrontmatterError(
+      slug,
+      `\`locale\` is required and must be a supported locale (got ${JSON.stringify(locale)})`,
+    );
+  }
+  if (!isLocaleId(originalLocale)) {
+    throw new FrontmatterError(
+      slug,
+      `\`originalLocale\` is required and must be a supported locale (got ${JSON.stringify(originalLocale)})`,
+    );
+  }
   if (typeof title !== "string" || title.trim() === "") {
     throw new FrontmatterError(
       slug,
@@ -127,6 +175,9 @@ export function parseFrontmatter(data: unknown, slug: string): PostFrontmatter {
   }
 
   return {
+    contentId,
+    locale,
+    originalLocale,
     title,
     description,
     publishedAt,
@@ -134,6 +185,77 @@ export function parseFrontmatter(data: unknown, slug: string): PostFrontmatter {
     tags: normalizedTags,
     draft: draft === true,
   };
+}
+
+/**
+ * The collection-level identity rules. For every work (`contentId`): one
+ * version per locale, every version agreeing on `originalLocale`, and a
+ * provenance record in that locale (which may be a draft). Missing
+ * translations are fine. Every tag a post uses must exist and have a
+ * presentation in the post's own locale. Throws one error naming every
+ * conflict; nothing is inferred or repaired.
+ */
+export function validatePostCollection(
+  posts: readonly Post[],
+  taxonomy: Taxonomy = defaultTaxonomy,
+): void {
+  const problems: string[] = [];
+  const at = (post: Post) =>
+    `"${post.slug}" (${post.contentId}, ${post.locale})`;
+  const works = new Map<string, Post[]>();
+  const slugs = new Map<string, Post>();
+  for (const post of posts) {
+    if (!KEBAB_PATTERN.test(post.contentId))
+      problems.push(`${at(post)}: invalid contentId "${post.contentId}"`);
+    if (!isLocaleId(post.locale))
+      problems.push(`${at(post)}: unsupported locale "${post.locale}"`);
+    if (!isLocaleId(post.originalLocale))
+      problems.push(
+        `${at(post)}: unsupported originalLocale "${post.originalLocale}"`,
+      );
+    const slugKey = `${post.locale} ${post.slug}`;
+    const sameSlug = slugs.get(slugKey);
+    if (sameSlug)
+      problems.push(
+        `slug "${post.slug}" in ${post.locale} is used by both ${at(sameSlug)} and ${at(post)}`,
+      );
+    slugs.set(slugKey, post);
+    works.set(post.contentId, [...(works.get(post.contentId) ?? []), post]);
+    for (const tag of post.tags)
+      if (!taxonomy.presentation(tag, post.locale))
+        problems.push(
+          `${at(post)}: tag "${tag}" is not defined for locale ${post.locale}`,
+        );
+  }
+  for (const [contentId, versions] of works) {
+    const seen = new Map<LocaleId, Post>();
+    for (const version of versions) {
+      const duplicate = seen.get(version.locale);
+      if (duplicate)
+        problems.push(
+          `contentId "${contentId}" has two ${version.locale} versions: "${duplicate.slug}" and "${version.slug}"`,
+        );
+      seen.set(version.locale, version);
+    }
+    const originals = new Set(
+      versions.map((version) => version.originalLocale),
+    );
+    if (originals.size > 1)
+      problems.push(
+        `contentId "${contentId}" versions disagree on originalLocale: ${versions
+          .map((version) => `"${version.slug}" says ${version.originalLocale}`)
+          .join(", ")}`,
+      );
+    else {
+      const [original] = originals;
+      if (original && !seen.has(original))
+        problems.push(
+          `contentId "${contentId}" claims originalLocale ${original} but has no ${original} version (provenance record; it may be a draft)`,
+        );
+    }
+  }
+  if (problems.length)
+    throw new Error(`Invalid post collection:\n- ${problems.join("\n- ")}`);
 }
 
 /**
@@ -149,6 +271,17 @@ export function slugFromFilename(filename: string): string {
     );
   }
   return base;
+}
+
+/**
+ * A post file's text without the identity frontmatter lines (`contentId`,
+ * `locale`, `originalLocale`). The search index has always searched the file
+ * text; identity metadata is not content and must not become searchable words.
+ */
+export function withoutIdentityFrontmatter(raw: string): string {
+  return raw.replace(/^---\n[\s\S]*?\n---/, (frontmatter) =>
+    frontmatter.replace(/^(?:contentId|locale|originalLocale):.*\n/gm, ""),
+  );
 }
 
 /** Whether a directory entry is a post. Dot- and underscore-prefixed files
@@ -177,64 +310,135 @@ export function sortPostsNewestFirst(posts: readonly Post[]): Post[] {
   return [...posts].sort(byPublicationDateDesc);
 }
 
-/** Every post on disk, drafts included, sorted newest first. */
-export function getAllPosts(directory: string = POSTS_DIRECTORY): Post[] {
+/**
+ * Every post version on disk, in every locale, drafts included, newest first.
+ * This is the validated authoring view: pages must use the locale-explicit
+ * queries below so languages never mix. An inconsistent collection throws.
+ */
+export function getAllPosts(
+  directory: string = POSTS_DIRECTORY,
+  taxonomy: Taxonomy = defaultTaxonomy,
+): Post[] {
   if (!fs.existsSync(directory)) return [];
   const posts = fs
     .readdirSync(directory)
     .filter(isPostFile)
     .map((filename) => readPost(directory, filename));
+  validatePostCollection(posts, taxonomy);
   return sortPostsNewestFirst(posts);
 }
 
-/** Posts safe to show anywhere: drafts removed. */
-export function getPublishedPosts(directory: string = POSTS_DIRECTORY): Post[] {
-  return getAllPosts(directory).filter((post) => !post.draft);
+/** Published posts of one locale: drafts and other languages removed. */
+export function getPublishedPosts(
+  locale: LocaleId,
+  directory: string = POSTS_DIRECTORY,
+  taxonomy: Taxonomy = defaultTaxonomy,
+): Post[] {
+  return getAllPosts(directory, taxonomy).filter(
+    (post) => post.locale === locale && !post.draft,
+  );
 }
 
 /**
- * Slugs to prerender. Production builds only the published set, so a draft
- * 404s once deployed; `next dev` serves drafts so they can be previewed.
+ * The version of a work in a locale, found by `contentId` and `locale` only:
+ * never by slug, never falling back to another language. Drafts are returned
+ * (check `draft`); undefined when that version does not exist.
  */
-export function getPostSlugs(directory: string = POSTS_DIRECTORY): string[] {
+export function findPostVersion(
+  posts: readonly Post[],
+  contentId: string,
+  locale: LocaleId,
+): Post | undefined {
+  return posts.find(
+    (post) => post.contentId === contentId && post.locale === locale,
+  );
+}
+
+export function getPostVersion(
+  contentId: string,
+  locale: LocaleId,
+  directory: string = POSTS_DIRECTORY,
+  taxonomy: Taxonomy = defaultTaxonomy,
+): Post | undefined {
+  return findPostVersion(getAllPosts(directory, taxonomy), contentId, locale);
+}
+
+/**
+ * Slugs of one locale to prerender. Production builds only the published set,
+ * so a draft 404s once deployed; `next dev` serves drafts so they can be
+ * previewed.
+ */
+export function getPostSlugs(
+  locale: LocaleId,
+  directory: string = POSTS_DIRECTORY,
+  taxonomy: Taxonomy = defaultTaxonomy,
+): string[] {
   const posts =
     process.env.NODE_ENV === "production"
-      ? getPublishedPosts(directory)
-      : getAllPosts(directory);
+      ? getPublishedPosts(locale, directory, taxonomy)
+      : getAllPosts(directory, taxonomy).filter(
+          (post) => post.locale === locale,
+        );
   return posts.map((post) => post.slug);
 }
 
+/** A post of this locale by its slug; a slug that exists only in another locale is not found. */
 export function getPostBySlug(
+  locale: LocaleId,
   slug: string,
   directory: string = POSTS_DIRECTORY,
+  taxonomy: Taxonomy = defaultTaxonomy,
 ): Post | null {
   if (!KEBAB_PATTERN.test(slug)) return null;
-  const filename = `${slug}.mdx`;
-  if (!fs.existsSync(path.join(directory, filename))) return null;
-  return readPost(directory, filename);
+  return (
+    getAllPosts(directory, taxonomy).find(
+      (post) => post.locale === locale && post.slug === slug,
+    ) ?? null
+  );
 }
 
-/** Distinct tags across published posts, most used first. */
-export function getAllTags(directory: string = POSTS_DIRECTORY): TagCount[] {
-  const counts = new Map<string, number>();
-  for (const post of getPublishedPosts(directory)) {
+/** Distinct tags across one locale's published posts, most used first, in that locale's words. */
+export function getAllTags(
+  locale: LocaleId,
+  directory: string = POSTS_DIRECTORY,
+  taxonomy: Taxonomy = defaultTaxonomy,
+): TagCount[] {
+  const counts = new Map<TagId, number>();
+  for (const post of getPublishedPosts(locale, directory, taxonomy)) {
     for (const tag of post.tags) {
       counts.set(tag, (counts.get(tag) ?? 0) + 1);
     }
   }
   return [...counts.entries()]
-    .map(([tag, count]) => ({ tag, count }))
-    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+    .map(([id, count]) => ({
+      id,
+      ...tagPresentation(id, locale, taxonomy),
+      count,
+    }))
+    .sort((a, b) => b.count - a.count || a.id.localeCompare(b.id));
 }
 
-export function getPostsByTag(
-  tag: string,
+/** One locale's published posts that carry a tag, by stable tag id. */
+export function getPostsByTagId(
+  locale: LocaleId,
+  tagId: TagId,
   directory: string = POSTS_DIRECTORY,
+  taxonomy: Taxonomy = defaultTaxonomy,
 ): Post[] {
-  const wanted = tag.toLowerCase();
-  return getPublishedPosts(directory).filter((post) =>
-    post.tags.includes(wanted),
+  return getPublishedPosts(locale, directory, taxonomy).filter((post) =>
+    post.tags.includes(tagId),
   );
+}
+
+/** The route form: a locale's tag slug resolves to the tag, then to its posts. */
+export function getPostsByTag(
+  locale: LocaleId,
+  tagSlug: string,
+  directory: string = POSTS_DIRECTORY,
+  taxonomy: Taxonomy = defaultTaxonomy,
+): Post[] {
+  const id = taxonomy.idForSlug(locale, tagSlug.toLowerCase());
+  return id ? getPostsByTagId(locale, id, directory, taxonomy) : [];
 }
 
 /** e.g. "2026-09-03" -> "September 3, 2026". Timezone-independent. */

@@ -4,6 +4,9 @@ import type { Post } from "@/lib/posts";
 const posts: Post[] = [
   {
     slug: "second",
+    contentId: "second",
+    locale: "en",
+    originalLocale: "en",
     title: "Second & Newest",
     description: 'Has an ampersand and a "quote".',
     publishedAt: "2026-05-20",
@@ -13,6 +16,9 @@ const posts: Post[] = [
   },
   {
     slug: "first",
+    contentId: "first",
+    locale: "en",
+    originalLocale: "en",
     title: "First Post",
     description: "Plain description.",
     publishedAt: "2026-01-15",

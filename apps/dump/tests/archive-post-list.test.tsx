@@ -10,6 +10,9 @@ import type { Post } from "@/lib/posts";
 const posts: Post[] = [
   {
     slug: "oldest",
+    contentId: "oldest",
+    locale: "en",
+    originalLocale: "en",
     title: "Oldest post",
     description: "Synthetic test data.",
     publishedAt: "2025-12-18",
@@ -18,6 +21,9 @@ const posts: Post[] = [
   },
   {
     slug: "newest",
+    contentId: "newest",
+    locale: "en",
+    originalLocale: "en",
     title: "Newest post",
     description: "Synthetic test data.",
     publishedAt: "2026-09-03",
@@ -26,6 +32,9 @@ const posts: Post[] = [
   },
   {
     slug: "middle",
+    contentId: "middle",
+    locale: "en",
+    originalLocale: "en",
     title: "Middle post",
     description: "Synthetic test data.",
     publishedAt: "2026-07-07",

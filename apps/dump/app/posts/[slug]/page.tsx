@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import type { Metadata } from "next";
 
 import { PostArticle } from "@/components/PostArticle";
+import { DEFAULT_LOCALE } from "../../../../../site/locales";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
 import { renderPost } from "@/lib/render-post";
 import { metadataFor } from "@/lib/seo";
@@ -16,14 +17,14 @@ interface PageProps {
 }
 
 export function generateStaticParams() {
-  return getPostSlugs().map((slug) => ({ slug }));
+  return getPostSlugs(DEFAULT_LOCALE).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = getPostBySlug(DEFAULT_LOCALE, slug);
   if (!post) return {};
 
   const metadata = metadataFor({
@@ -49,7 +50,7 @@ export async function generateMetadata({
 
 export default async function PostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = getPostBySlug(DEFAULT_LOCALE, slug);
   if (!post) notFound();
 
   const Content = await renderPost(slug);

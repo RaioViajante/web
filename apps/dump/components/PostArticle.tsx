@@ -12,6 +12,7 @@ import {
 import { Comments } from "@/components/Comments";
 import { DumpShell } from "@/components/DumpShell";
 import { getPostDetails } from "@/lib/post-details";
+import { tagPresentation } from "@/lib/tags";
 import type { Post } from "@/lib/posts";
 
 const REPOSITORY_EDIT_URL =
@@ -41,7 +42,7 @@ export function PostArticle({
       <div className="rv-progress" data-reading-progress aria-hidden="true" />
       <article className="post-article">
         <PageHeader
-          label={`Post · ${post.tags[0] ?? "dump"}`}
+          label={`Post · ${post.tags[0] ? tagPresentation(post.tags[0], post.locale).label : "dump"}`}
           title={post.title}
           line={post.description}
           meta={[
@@ -50,15 +51,18 @@ export function PostArticle({
             </time>,
             `${details.minutes} min read`,
             <span key="tags" className="post-tags">
-              {post.tags.map((tag) => (
-                <Link
-                  key={tag}
-                  href={`/tags/${encodeURIComponent(tag)}`}
-                  data-sound="nav"
-                >
-                  {tag}
-                </Link>
-              ))}
+              {post.tags.map((tag) => {
+                const { label, slug } = tagPresentation(tag, post.locale);
+                return (
+                  <Link
+                    key={tag}
+                    href={`/tags/${encodeURIComponent(slug)}`}
+                    data-sound="nav"
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
             </span>,
           ]}
         />
@@ -79,15 +83,18 @@ export function PostArticle({
             wrapValue
             value={
               <span className="post-tags">
-                {post.tags.map((tag) => (
-                  <Link
-                    key={tag}
-                    href={`/tags/${encodeURIComponent(tag)}`}
-                    data-sound="nav"
-                  >
-                    {tag}
-                  </Link>
-                ))}
+                {post.tags.map((tag) => {
+                  const { label, slug } = tagPresentation(tag, post.locale);
+                  return (
+                    <Link
+                      key={tag}
+                      href={`/tags/${encodeURIComponent(slug)}`}
+                      data-sound="nav"
+                    >
+                      {label}
+                    </Link>
+                  );
+                })}
               </span>
             }
           />

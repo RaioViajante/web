@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LeaderRow, Section } from "@raioviajante/design/parts";
 
+import { tagPresentation } from "@/lib/tags";
 import { formatPostMonth, sortPostsNewestFirst, type Post } from "@/lib/posts";
 
 type PostMonthGroup = { month: string; name: string; posts: Post[] };
@@ -62,7 +63,11 @@ export function ArchivePostList({ posts }: { posts: Post[] }) {
                           <span>{post.title}</span>
                         </span>
                       }
-                      value={post.tags[0]}
+                      value={
+                        post.tags[0]
+                          ? tagPresentation(post.tags[0], post.locale).label
+                          : undefined
+                      }
                       href={`/posts/${post.slug}`}
                       linkComponent={Link}
                     />

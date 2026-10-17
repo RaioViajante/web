@@ -124,6 +124,9 @@ describe("homeJsonLd", () => {
 describe("blogPostingJsonLd", () => {
   const post: Post = {
     slug: "example-post",
+    contentId: "example-post",
+    locale: "en",
+    originalLocale: "en",
     title: "Example Post",
     description: "An example description.",
     publishedAt: "2026-01-15",

@@ -3,12 +3,13 @@ import { PageHeader } from "@raioviajante/design/parts";
 
 import { DumpShell } from "@/components/DumpShell";
 import { TagIndex } from "@/components/TagViews";
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { getAllTags } from "@/lib/posts";
 
 export const metadata = staticMetadata("/tags");
 
 export default function TagsPage() {
-  const tags = getAllTags();
+  const tags = getAllTags(DEFAULT_LOCALE);
 
   return (
     <DumpShell current="/tags">

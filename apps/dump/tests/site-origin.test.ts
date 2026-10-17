@@ -85,6 +85,9 @@ describe("metadata, RSS, and sitemap under the canonical production origin", () 
     const posts: Post[] = [
       {
         slug: "example",
+        contentId: "example",
+        locale: "en",
+        originalLocale: "en",
         title: "Example",
         description: "An example post.",
         publishedAt: "2026-01-01",
