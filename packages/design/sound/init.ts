@@ -3,12 +3,19 @@
  * Rendering stays static; the label is set from the shared preference after
  * load, and nothing plays until the visitor interacts.
  */
+import { isLocaleId } from "../../../site/locales";
+import { catalogFor } from "../catalog";
 import { getSoundPlayer } from "./player";
 
 function paint(button: Element, enabled: boolean) {
+  // The words come from the locale the server rendered the toggle in; there is
+  // no English fallback and nothing is read from the browser.
+  const locale = (button as HTMLElement).dataset.soundLocale;
+  if (!isLocaleId(locale)) return;
+  const { sound } = catalogFor(locale);
   const pressed = String(enabled);
-  const label = `Sound ${enabled ? "on" : "off"}. Click to ${enabled ? "mute" : "enable"}.`;
-  const text = enabled ? "ON" : "OFF";
+  const label = sound.aria(enabled);
+  const text = enabled ? sound.on : sound.off;
   if (button.getAttribute("aria-pressed") !== pressed)
     button.setAttribute("aria-pressed", pressed);
   if (button.getAttribute("aria-label") !== label)

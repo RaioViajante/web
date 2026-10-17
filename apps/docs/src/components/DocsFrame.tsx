@@ -22,6 +22,8 @@ export function DocsFrame({
 			termsHref="/terms/"
 			privacyHref="/privacy/"
 			site="docs"
+			locale={DEFAULT_LOCALE}
+			language={{ search: current === "/search/" }}
 			pages={pages}
 			currentPage={current}
 			toc={toc}

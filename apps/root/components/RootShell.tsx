@@ -24,6 +24,8 @@ export function RootShell({
   return (
     <Shell
       site="root"
+      locale={DEFAULT_LOCALE}
+      language={{ search: current === "/search" }}
       linkComponent={Link}
       pages={pages}
       currentPage={current}

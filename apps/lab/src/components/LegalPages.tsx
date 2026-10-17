@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { LegalPage } from "@raioviajante/design/templates";
 import { Pager } from "@raioviajante/design/parts";
 export function TermsPage() {
@@ -56,6 +57,7 @@ export function TermsPage() {
         ]}
       />
       <Pager
+        locale={DEFAULT_LOCALE}
         prev={{ label: "← Back", title: "lab", href: "/" }}
         next={{ label: "Also →", title: "Privacy Policy", href: "/privacy/" }}
       />
@@ -127,6 +129,7 @@ export function PrivacyPage() {
         ]}
       />
       <Pager
+        locale={DEFAULT_LOCALE}
         prev={{ label: "← Back", title: "lab", href: "/" }}
         next={{ label: "Also →", title: "Terms of Use", href: "/terms/" }}
       />

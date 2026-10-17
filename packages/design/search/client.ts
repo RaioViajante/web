@@ -1,3 +1,4 @@
+import { catalogFor } from "../catalog";
 import { isLocaleId, type LocaleId } from "../../../site/locales";
 import { SITES, type SiteId } from "../../../site/sites";
 import type { SearchEntry } from "../components/search";
@@ -5,6 +6,7 @@ import {
   loadEverywhere,
   loadSiteIndex,
   searchEntries,
+  skippedNote,
   unavailableNote,
 } from "./engine";
 import { formatSearchDate, searchIndexPath, validateIndex } from "./locale";
@@ -109,6 +111,7 @@ function mountPage(page: HTMLElement) {
   const stated = page.dataset.searchLocale;
   if (!isLocaleId(stated)) throw new Error("Search page states no locale");
   const locale: LocaleId = stated;
+  const text = catalogFor(locale).search;
   const input = page.querySelector<HTMLInputElement>("[data-search-input]")!;
   const bubble = page.querySelector<HTMLElement>("[data-search-bubble]")!;
   const results = page.querySelector<HTMLElement>("[data-search-results]")!;
@@ -123,6 +126,9 @@ function mountPage(page: HTMLElement) {
   let own: SearchEntry[] = [];
   let all: SearchEntry[] = [];
   let unavailable: SiteId[] = [];
+  let skipped: SiteId[] = [];
+  // The current host does not publish this locale: say so, not "unavailable".
+  let currentSkipped = false;
 
   function setSelected(next: number) {
     const rows = [
@@ -150,17 +156,25 @@ function mountPage(page: HTMLElement) {
         line.hidden = line.dataset.searchSuggestions !== scope;
       });
     if (!query) {
-      bubble.textContent = initialPrompt;
+      bubble.textContent = currentSkipped
+        ? text.skipped(catalogFor(locale).lang.names[locale])
+        : initialPrompt;
       return;
     }
     const found = searchEntries(scope === "site" ? own : all, query, locale);
-    if (scope === "everywhere" && unavailable.length) {
-      note.textContent = unavailableNote(unavailable);
-      note.hidden = false;
+    if (scope === "everywhere") {
+      const notes = [
+        unavailableNote(unavailable, locale),
+        skippedNote(skipped, locale),
+      ].filter(Boolean);
+      if (notes.length) {
+        note.textContent = notes.join(" ");
+        note.hidden = false;
+      }
     }
     bubble.textContent = found.length
-      ? `found ${found.length} ${found.length === 1 ? "thing" : "things"} about “${query}”!`
-      : "hmm… nothing yet.";
+      ? text.found(found.length, query)
+      : text.nothing;
     empty.hidden = found.length > 0;
     let rowIndex = 0;
     for (const groupSite of SITES) {
@@ -185,6 +199,7 @@ function mountPage(page: HTMLElement) {
     );
     all = loaded.entries;
     unavailable = loaded.unavailable;
+    skipped = loaded.skipped;
     render();
   }
 
@@ -199,7 +214,10 @@ function mountPage(page: HTMLElement) {
         if (scope === "everywhere") void loadAll();
         else render();
       } else if (index.state === "unavailable") {
-        bubble.textContent = "search is unavailable right now.";
+        bubble.textContent = text.unavailable;
+      } else {
+        currentSkipped = true;
+        render();
       }
     },
   );
@@ -246,6 +264,30 @@ function mountPage(page: HTMLElement) {
   requestAnimationFrame(() => input.focus());
 }
 
+/**
+ * Progressive enhancement for `LANG` on a search page: the server renders a
+ * real link to the other locale's search page; this adds `q`, and only `q`,
+ * from the live input (or the URL). Without it the link still navigates.
+ */
+function carryQuery() {
+  const input = document.querySelector<HTMLInputElement>("[data-search-input]");
+  const q = (
+    input?.value ??
+    new URLSearchParams(location.search).get("q") ??
+    ""
+  ).trim();
+  document
+    .querySelectorAll<HTMLAnchorElement>("a[data-lang-search]")
+    .forEach((link) => {
+      link.dataset.langSearchBase ??= link.getAttribute("href") ?? "";
+      const base = link.dataset.langSearchBase;
+      link.setAttribute(
+        "href",
+        q ? `${base}?${new URLSearchParams({ q })}` : base,
+      );
+    });
+}
+
 export function attachSearch() {
   document
     .querySelectorAll<HTMLElement>("[data-search-key]")
@@ -261,6 +303,7 @@ export function attachSearch() {
       mountedPage = page;
       mountPage(page);
     }
+    carryQuery();
   };
   mountCurrentPage();
   const observer = new MutationObserver(mountCurrentPage);
@@ -284,8 +327,10 @@ export function attachSearch() {
         "/search";
   };
   document.addEventListener("keydown", onKey);
+  document.addEventListener("input", carryQuery);
   return () => {
     observer.disconnect();
+    document.removeEventListener("input", carryQuery);
     document.removeEventListener("keydown", onKey);
   };
 }

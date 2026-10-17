@@ -99,7 +99,7 @@ describe("loadEverywhere", () => {
     );
     expect(loaded.unavailable).toEqual(["docs", "lab"]);
     expect(searchEntries(loaded.entries, "gallery", "en")).toHaveLength(1);
-    expect(unavailableNote(loaded.unavailable)).toBe(
+    expect(unavailableNote(loaded.unavailable, "en")).toBe(
       "couldn't reach docs, lab: showing the rest.",
     );
   });
@@ -215,7 +215,7 @@ describe("loadEverywhere", () => {
   });
 
   it("gives no note when every site answered", () => {
-    expect(unavailableNote([])).toBe("");
+    expect(unavailableNote([], "en")).toBe("");
   });
 });
 

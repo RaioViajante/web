@@ -1,4 +1,5 @@
 import { notFoundMetadata } from "../../../seo/metadata";
+import { DEFAULT_LOCALE } from "../../../site/locales";
 import Link from "next/link";
 import { NotFoundPage } from "@raioviajante/design/components";
 import { RootShell } from "../components/RootShell";
@@ -13,6 +14,7 @@ export default function NotFound() {
     <RootShell>
       <NotFoundPage
         site="root"
+        locale={DEFAULT_LOCALE}
         linkComponent={Link}
         line="this page moved, never existed, or I haven't built it yet."
         tryInstead={[

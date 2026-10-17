@@ -1,11 +1,13 @@
 ---
 import { NotFoundPage } from "@raioviajante/design/templates";
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import DocsShell from "../layouts/DocsShell.astro";
 ---
 
 <DocsShell title="404 — not found" description="This page moved, never existed, or has not been written yet.">
 	<NotFoundPage
 		site="docs"
+		locale={DEFAULT_LOCALE}
 		line="this page moved, never existed, or I haven't documented it yet."
 		tryInstead={[
 			{ label: "docs", value: "start over", href: "/" },

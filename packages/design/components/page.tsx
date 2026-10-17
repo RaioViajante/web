@@ -1,7 +1,9 @@
 import { Fragment, type ReactNode } from "react";
 import { Art } from "./art";
 import { SiteLink, type LinkComponent } from "./link";
+import type { LocaleId } from "../../../site/locales";
 import { siteById, type SiteId } from "../../../site/sites";
+import { catalogFor } from "../catalog";
 
 /** Index header: avatar, site name, one line. */
 export function IndexHeader({
@@ -181,24 +183,29 @@ export function LeaderRow({
 }
 
 export interface PagerLink {
-  label: string;
+  /** An app-owned label; by default the locale's shared "Previous" / "Next". */
+  label?: string;
   title: string;
   href: string;
 }
 
 /** Previous / next: caps label above the title, no box. */
 export function Pager({
+  locale,
   prev,
   next,
   linkComponent,
 }: {
+  /** The rendered locale: the language of the shared labels. */
+  locale: LocaleId;
   prev?: PagerLink;
   next?: PagerLink;
   linkComponent?: LinkComponent;
 }) {
   if (!prev && !next) return null;
+  const { pager } = catalogFor(locale);
   return (
-    <nav className="rv-pager" aria-label="Previous and next">
+    <nav className="rv-pager" aria-label={pager.aria}>
       {prev ? (
         <SiteLink
           linkComponent={linkComponent}
@@ -206,7 +213,7 @@ export function Pager({
           rel="prev"
           data-sound="nav"
         >
-          <span className="rv-label">{prev.label}</span>
+          <span className="rv-label">{prev.label ?? pager.previous}</span>
           <span>{prev.title}</span>
         </SiteLink>
       ) : (
@@ -219,7 +226,7 @@ export function Pager({
           rel="next"
           data-sound="nav"
         >
-          <span className="rv-label">{next.label}</span>
+          <span className="rv-label">{next.label ?? pager.next}</span>
           <span>{next.title}</span>
         </SiteLink>
       ) : null}

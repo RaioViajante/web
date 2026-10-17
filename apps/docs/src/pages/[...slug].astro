@@ -1,5 +1,6 @@
 ---
 import { render } from "astro:content";
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import { Pager, Prose } from "@raioviajante/design/parts";
 import { getSectionHeadings } from "@raioviajante/design/sections";
 import { DocHeader } from "../components/DocHeader";
@@ -57,5 +58,5 @@ const next = neighbor(pages[index + 1], "Next →");
 		{updated && <span>last updated {updated}</span>}
 		<a href={editUrl(entry)}>edit this page on GitHub ↗</a>
 	</div>
-	<Pager prev={previous} next={next} />
+	<Pager locale={DEFAULT_LOCALE} prev={previous} next={next} />
 </DocsShell>

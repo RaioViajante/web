@@ -26,6 +26,8 @@ export function DumpShell({
   return (
     <Shell
       site="dump"
+      locale={DEFAULT_LOCALE}
+      language={{ search: current === "/search" }}
       linkComponent={Link}
       pages={pages}
       currentPage={current}

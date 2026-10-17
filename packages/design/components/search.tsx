@@ -3,6 +3,7 @@ import { Art, art } from "./art";
 import { SiteLink, type LinkComponent } from "./link";
 import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 import { SITES, type SiteId } from "../../../site/sites";
+import { catalogFor } from "../catalog";
 import { searchPagePath } from "../search/locale";
 
 /** Searches that find something on each site, offered when nothing matched. */
@@ -22,10 +23,12 @@ const SIGNATURE: Record<SiteId, string> = {
 
 /** "try a, b or c." with each term as a button that fills the query. */
 function Suggestions({
+  locale,
   scope,
   terms,
   hidden = false,
 }: {
+  locale: LocaleId;
   scope: "site" | "everywhere";
   terms: readonly string[];
   hidden?: boolean;
@@ -36,7 +39,7 @@ function Suggestions({
       data-search-suggestions={scope}
       hidden={hidden}
     >
-      try{" "}
+      {catalogFor(locale).search.tryPrefix}{" "}
       {terms.map((term, index) => {
         const last = index === terms.length - 1;
         // Punctuation stays on the word's line; lines break only at spaces.
@@ -52,7 +55,11 @@ function Suggestions({
               </button>
               {last ? "." : index < terms.length - 2 ? "," : ""}
             </span>
-            {last ? "" : index === terms.length - 2 ? " or " : " "}
+            {last
+              ? ""
+              : index === terms.length - 2
+                ? ` ${catalogFor(locale).search.or} `
+                : " "}
           </Fragment>
         );
       })}
@@ -72,20 +79,13 @@ export interface SearchEntry {
   body?: string;
 }
 
-const prompts: Record<SiteId, string> = {
-  root: "what are you looking for?",
-  dump: "what are you curious about?",
-  docs: "what do you need to look up?",
-  lab: "what do you want to poke at?",
-};
-
 export function SearchNavItem({
   number,
   current = false,
   site,
   locale = DEFAULT_LOCALE,
   href = site ? searchPagePath(site, locale) : "/search",
-  label = "search",
+  label = catalogFor(locale).search.navLabel,
   linkComponent,
 }: {
   number: string;
@@ -129,6 +129,7 @@ export function SearchPage({
   /** The rendered locale: the route states it, the client never infers it. */
   locale: LocaleId;
 }) {
+  const { search } = catalogFor(locale);
   return (
     <section
       className="rv-search-page"
@@ -137,12 +138,12 @@ export function SearchPage({
       data-search-locale={locale}
     >
       <header className="rv-search-page__header">
-        <p className="rv-label">ASK RAIOVIAJANTE</p>
-        <h1>search</h1>
+        <p className="rv-label">{search.eyebrow}</p>
+        <h1>{search.heading}</h1>
         <div className="rv-ask">
           <Art
             name="searchCharacter"
-            alt="RaioViajante wondering, with a hand on his chin"
+            alt={search.characterAlt}
             width={150}
             height={150}
             priority
@@ -153,30 +154,34 @@ export function SearchPage({
             aria-live="polite"
             data-search-bubble
           >
-            {prompts[site]}
+            {search.prompts[site]}
           </p>
         </div>
       </header>
       <label className="rv-label" htmlFor="rv-search-input">
-        SEARCH
+        {search.inputLabel}
       </label>
       <input
         id="rv-search-input"
         className="rv-search-input"
         type="search"
         autoComplete="off"
-        placeholder="type to search"
+        placeholder={search.placeholder}
         data-search-input
         data-sound="typing"
       />
-      <div className="rv-search-scope" role="group" aria-label="Search scope">
+      <div
+        className="rv-search-scope"
+        role="group"
+        aria-label={search.scopeAria}
+      >
         <button
           type="button"
           data-search-scope="site"
           aria-pressed="true"
           data-sound="tab"
         >
-          this site
+          {search.thisSite}
         </button>
         <span aria-hidden="true"> · </span>
         <button
@@ -185,7 +190,7 @@ export function SearchPage({
           aria-pressed="false"
           data-sound="tab"
         >
-          everywhere
+          {search.everywhere}
         </button>
       </div>
       <div data-search-results aria-live="polite" />
@@ -193,13 +198,14 @@ export function SearchPage({
       <div className="rv-search-empty" data-search-empty hidden>
         <Art
           name="searchNotFound"
-          alt="RaioViajante and a cat looking through a pile of notes"
+          alt={search.emptyArtAlt}
           width={180}
           height={180}
         />
-        <p>maybe I haven&apos;t built it yet.</p>
-        <Suggestions scope="site" terms={SUGGESTIONS[site]} />
+        <p>{search.empty}</p>
+        <Suggestions locale={locale} scope="site" terms={SUGGESTIONS[site]} />
         <Suggestions
+          locale={locale}
           scope="everywhere"
           terms={SITES.filter((other) => other.id !== site).map(
             (other) => SIGNATURE[other.id],

@@ -1,6 +1,7 @@
 import { participates, type LocaleId } from "../../../site/locales";
 import { SITES, type SiteId } from "../../../site/sites";
 import type { SearchEntry } from "../components/search";
+import { catalogFor } from "../catalog";
 import { normalizeSearchText, validateIndex } from "./locale";
 
 /** Every word of the query must appear in the title, description or body. */
@@ -104,10 +105,31 @@ export async function loadEverywhere(
   return { entries, unavailable, skipped };
 }
 
-export function unavailableNote(unavailable: readonly SiteId[]) {
-  if (!unavailable.length) return "";
-  const labels = SITES.filter((item) => unavailable.includes(item.id)).map(
-    (item) => item.label,
-  );
-  return `couldn't reach ${labels.join(", ")}: showing the rest.`;
+/** Site labels, in registry order, for the given ids. */
+const labelsOf = (ids: readonly SiteId[]) =>
+  SITES.filter((item) => ids.includes(item.id))
+    .map((item) => item.label)
+    .join(", ");
+
+/** The note for hosts that could not be reached; empty when there are none. */
+export function unavailableNote(
+  unavailable: readonly SiteId[],
+  locale: LocaleId,
+) {
+  return unavailable.length
+    ? catalogFor(locale).search.unreachable(labelsOf(unavailable))
+    : "";
+}
+
+/**
+ * The note for hosts that do not publish the locale yet: stated apart from
+ * unreachable hosts, since nothing failed.
+ */
+export function skippedNote(skipped: readonly SiteId[], locale: LocaleId) {
+  return skipped.length
+    ? catalogFor(locale).search.notPublished(
+        labelsOf(skipped),
+        catalogFor(locale).lang.names[locale],
+      )
+    : "";
 }
