@@ -37,6 +37,7 @@ const pages = [
 describe("Shell", () => {
   const html = renderToStaticMarkup(
     <Shell
+      locale="en"
       site="dump"
       pages={pages}
       currentPage="/archive"
@@ -85,6 +86,7 @@ describe("Shell", () => {
   it("places the search slot last inside PAGES", () => {
     const withSearch = renderToStaticMarkup(
       <Shell
+        locale="en"
         site="lab"
         pages={pages}
         pagesExtra={
@@ -118,7 +120,7 @@ describe("Shell", () => {
     expect(toc.indexOf("</summary>")).toBeLessThan(toc.indexOf('href="#code"'));
     expect(html.match(/<details/g)).toHaveLength(1);
     const withoutToc = renderToStaticMarkup(
-      <Shell site="root" pages={pages}>
+      <Shell locale="en" site="root" pages={pages}>
         x
       </Shell>,
     );
@@ -153,6 +155,7 @@ describe("page parts", () => {
   it("pager shows caps label above title", () => {
     const html = renderToStaticMarkup(
       <Pager
+        locale="en"
         prev={{ label: "PREVIOUS", title: "A", href: "/a" }}
         next={{ label: "NEXT", title: "B", href: "/b" }}
       />,
@@ -223,6 +226,7 @@ describe("templates", () => {
   it("404 page: sticker, requested path slot, try instead", () => {
     const html = renderToStaticMarkup(
       <NotFoundPage
+        locale="en"
         site="docs"
         line="this page moved"
         tryInstead={[{ label: "docs home", value: "start over", href: "/" }]}
@@ -241,6 +245,7 @@ describe("styles", () => {
     const html = [
       renderToStaticMarkup(
         <Shell
+          locale="en"
           site="lab"
           pages={pages}
           toc={[{ label: "x", href: "#x" }]}
@@ -257,8 +262,8 @@ describe("styles", () => {
               b
             </ActionButton>
           </LabBench>
-          <NotFoundPage site="lab" line="l" tryInstead={[]} />
-          <Pager next={{ label: "NEXT", title: "t", href: "/" }} />
+          <NotFoundPage locale="en" site="lab" line="l" tryInstead={[]} />
+          <Pager locale="en" next={{ label: "NEXT", title: "t", href: "/" }} />
         </Shell>,
       ),
     ].join("");

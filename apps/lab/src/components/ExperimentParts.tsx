@@ -4,6 +4,7 @@ import {
   LeaderRow,
   RelatedRows,
 } from "@raioviajante/design/parts";
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import type { Experiment } from "../data/experiments";
 import { experiments } from "../data/experiments";
 
@@ -126,10 +127,10 @@ export function ExperimentPager({ experiment: e }: { experiment: Experiment }) {
   const next = ordered[index + 1];
   return (
     <Pager
+      locale={DEFAULT_LOCALE}
       prev={
         prev
           ? {
-              label: "← Previous",
               title: `${prev.id} ${prev.title}`,
               href: `/experiments/${prev.slug}/`,
             }
@@ -138,7 +139,6 @@ export function ExperimentPager({ experiment: e }: { experiment: Experiment }) {
       next={
         next
           ? {
-              label: "Next →",
               title: `${next.id} ${next.title}`,
               href: `/experiments/${next.slug}/`,
             }

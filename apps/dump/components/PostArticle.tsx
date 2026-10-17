@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE } from "../../../site/locales";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -101,11 +102,11 @@ export function PostArticle({
         </div>
         <Section number="02." title="Keep reading" id="keep-reading">
           <Pager
+            locale={DEFAULT_LOCALE}
             linkComponent={Link}
             prev={
               details.previous
                 ? {
-                    label: "← Previous",
                     title: details.previous.title,
                     href: `/posts/${details.previous.slug}`,
                   }
@@ -114,7 +115,6 @@ export function PostArticle({
             next={
               details.next
                 ? {
-                    label: "Next →",
                     title: details.next.title,
                     href: `/posts/${details.next.slug}`,
                   }

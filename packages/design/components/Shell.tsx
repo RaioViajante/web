@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
 import { SiteLink, type LinkComponent } from "./link";
+import { LanguageControl } from "./lang";
+import { catalogFor } from "../catalog";
+import { DEFAULT_LOCALE, LOCALES, type LocaleId } from "../../../site/locales";
 import { CONTACT, SITES, type SiteId } from "../../../site/sites";
 
 export interface NavItem {
@@ -17,6 +20,8 @@ export interface NavGroupProps {
   /** The item whose `href` equals this value is current. */
   current?: string;
   ariaLabel?: string;
+  /** A stable hook for styles, independent of the localized label. */
+  nav?: string;
   /** Rendered inside the group after the items (the search menu item). */
   extra?: ReactNode;
   /**
@@ -34,6 +39,7 @@ export function NavGroup({
   items,
   current,
   ariaLabel,
+  nav,
   extra,
   collapsible,
   linkComponent,
@@ -52,7 +58,11 @@ export function NavGroup({
     </SiteLink>
   ));
   return (
-    <nav className="rv-nav" aria-label={ariaLabel ?? label.toLowerCase()}>
+    <nav
+      className="rv-nav"
+      aria-label={ariaLabel ?? label.toLowerCase()}
+      data-nav={nav}
+    >
       {collapsible ? (
         <>
           <div className="rv-label rv-nav__heading">{label}</div>
@@ -74,45 +84,84 @@ export function NavGroup({
   );
 }
 
-export function SoundToggle() {
+/** The sound button. Its words come from the page locale's catalog and are repainted from it, never from English. */
+export function SoundToggle({ locale }: { locale: LocaleId }) {
+  const { sound } = catalogFor(locale);
   return (
-    <header className="rv-sound">
-      <button
-        type="button"
-        data-sound-toggle=""
-        data-sound="toggle"
-        aria-pressed="false"
-        aria-label="Sound off. Click to enable."
-      >
-        SOUND <span aria-hidden="true">OFF</span>
-      </button>
-    </header>
+    <button
+      type="button"
+      data-sound-toggle=""
+      data-sound-locale={locale}
+      data-sound="toggle"
+      aria-pressed="false"
+      aria-label={sound.aria(false)}
+    >
+      {sound.label} <span aria-hidden="true">{sound.off}</span>
+    </button>
   );
 }
 
 export interface FooterProps {
   site: SiteId;
+  /** The rendered locale: the language of the shared labels. */
+  locale: LocaleId;
   /** This site's own legal pages. */
   termsHref?: string;
   privacyHref?: string;
+  /**
+   * The language of a legal page when it differs from `locale` (a Portuguese
+   * page linking English legal text). The link then names that language and
+   * carries `hreflang`.
+   */
+  termsLocale?: LocaleId;
+  privacyLocale?: LocaleId;
   linkComponent?: LinkComponent;
 }
 
 export function Footer({
   site,
+  locale,
   termsHref = "/terms",
   privacyHref = "/privacy",
+  termsLocale = locale,
+  privacyLocale = locale,
   linkComponent,
 }: FooterProps) {
+  const { footer, lang } = catalogFor(locale);
+  // Another host's pages are English today: say so on a non-English render.
+  const siteLocale = DEFAULT_LOCALE;
+  const crossLanguage = locale !== siteLocale;
+  const legal = (href: string, label: string, destination: LocaleId) => (
+    <SiteLink
+      linkComponent={linkComponent}
+      href={href}
+      data-sound="nav"
+      {...(destination !== locale
+        ? { hrefLang: LOCALES[destination].hreflang }
+        : {})}
+    >
+      {label}
+      {destination !== locale
+        ? ` (${footer.inLanguage(lang.names[destination])})`
+        : ""}
+    </SiteLink>
+  );
   return (
     <footer className="rv-footer">
-      <nav aria-label="RaioViajante sites">
+      <nav aria-label={footer.sitesAria}>
         {SITES.map((item, index) => (
           <span key={item.id}>
             {index > 0 ? <span aria-hidden="true"> · </span> : null}
-            <a href={item.href} data-sound="nav">
+            <a
+              href={item.href}
+              data-sound="nav"
+              {...(crossLanguage
+                ? { hrefLang: LOCALES[siteLocale].hreflang }
+                : {})}
+            >
               {item.label}
             </a>
+            {crossLanguage ? ` (${LOCALES[siteLocale].label})` : null}
           </span>
         ))}
       </nav>
@@ -122,22 +171,10 @@ export function Footer({
         </a>
       </div>
       <div>CNPJ: {CONTACT.cnpj}</div>
-      <nav aria-label="Legal">
-        <SiteLink
-          linkComponent={linkComponent}
-          href={termsHref}
-          data-sound="nav"
-        >
-          Terms of Use
-        </SiteLink>
+      <nav aria-label={footer.legalAria}>
+        {legal(termsHref, footer.terms, termsLocale)}
         <span aria-hidden="true"> · </span>
-        <SiteLink
-          linkComponent={linkComponent}
-          href={privacyHref}
-          data-sound="nav"
-        >
-          Privacy Policy
-        </SiteLink>
+        {legal(privacyHref, footer.privacy, privacyLocale)}
       </nav>
     </footer>
   );
@@ -155,6 +192,8 @@ export interface ShellProps extends FooterProps {
   /** Lab: EXPERIMENTS. */
   experiments?: NavItem[];
   currentExperiment?: string;
+  /** The `LANG` facts the app knows: this page's real counterpart, or that this is the search page. */
+  language?: { counterpart?: string; search?: boolean };
   children: ReactNode;
 }
 
@@ -170,20 +209,27 @@ export function Shell({
   currentToc,
   experiments,
   currentExperiment,
+  language,
   children,
   ...footer
 }: ShellProps) {
-  const { linkComponent } = footer;
+  const { linkComponent, locale, site } = footer;
+  const { shell } = catalogFor(locale);
   return (
     <>
       <a className="rv-skip" href="#main">
-        Skip to content
+        {shell.skip}
       </a>
       <div className="rv-shell">
-        <SoundToggle />
+        <header className="rv-sound">
+          <LanguageControl site={site} locale={locale} {...language} />
+          <SoundToggle locale={locale} />
+        </header>
         <aside className="rv-sidebar">
           <NavGroup
-            label="PAGES"
+            label={shell.pages}
+            ariaLabel={shell.pagesAria}
+            nav="pages"
             items={pages}
             current={currentPage}
             extra={pagesExtra}
@@ -191,17 +237,18 @@ export function Shell({
           />
           {toc?.length ? (
             <NavGroup
-              label="ON THIS PAGE"
+              label={shell.onThisPage}
               items={toc}
               current={currentToc}
-              ariaLabel="on this page"
+              ariaLabel={shell.onThisPageAria}
               collapsible
               linkComponent={linkComponent}
             />
           ) : null}
           {experiments?.length ? (
             <NavGroup
-              label="EXPERIMENTS"
+              label={shell.experiments}
+              ariaLabel={shell.experimentsAria}
               items={experiments}
               current={currentExperiment}
               linkComponent={linkComponent}

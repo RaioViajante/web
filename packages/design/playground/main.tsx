@@ -104,7 +104,7 @@ function App() {
   };
 
   return (
-    <Shell
+    <Shell locale="en"
       site="lab"
       pages={[
         { label: "experiments", href: "#experiments" },
@@ -126,7 +126,7 @@ function App() {
         </button>
       </div>
       {view === "404" ? (
-        <NotFoundPage
+        <NotFoundPage locale="en"
           site="lab"
           line="this page moved, never existed, or I haven't built it yet."
           tryInstead={[{ label: "experiments", value: "start over", href: "#" }]}
@@ -194,7 +194,7 @@ function App() {
               </BenchBand>
             </LabBench>
           </Section>
-          <Pager
+          <Pager locale="en"
             prev={{ label: "PREVIOUS", title: "Filename classifier", href: "#" }}
             next={{ label: "NEXT", title: "Boot sector", href: "#" }}
           />

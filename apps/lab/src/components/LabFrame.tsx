@@ -14,6 +14,8 @@ export function LabFrame({
   return (
     <Shell
       site="lab"
+      locale={DEFAULT_LOCALE}
+      language={{ search: current === "/search/" }}
       termsHref="/terms/"
       privacyHref="/privacy/"
       pages={[

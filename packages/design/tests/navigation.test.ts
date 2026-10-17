@@ -4,7 +4,7 @@ import { startBehavior } from "../behavior";
 import { getSoundPlayer } from "../sound/player";
 
 const toggle = (label = "OFF") =>
-  `<div class="rv-sound"><button data-sound-toggle aria-pressed="false">SOUND <span>${label}</span></button></div>`;
+  `<div class="rv-sound"><button data-sound-toggle data-sound-locale="en" aria-pressed="false">SOUND <span>${label}</span></button></div>`;
 
 afterEach(() => {
   document.body.innerHTML = "";

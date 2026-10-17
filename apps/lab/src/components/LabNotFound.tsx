@@ -5,6 +5,7 @@ export function LabNotFound() {
   return (
     <NotFoundPage
       site="lab"
+      locale={DEFAULT_LOCALE}
       line="this page moved, never existed, or the experiment broke. things may break."
       tryInstead={[
         { label: "all experiments", value: "index", href: "/" },

@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { Art } from "./art";
 import { type LinkComponent } from "./link";
 import { LeaderRow, PageHeader, Section } from "./page";
+import type { LocaleId } from "../../../site/locales";
 import { siteById, type SiteId } from "../../../site/sites";
+import { catalogFor } from "../catalog";
 
 export interface LegalSection {
   title: string;
@@ -69,12 +71,16 @@ export interface TryInstead {
  */
 export function NotFoundPage({
   site,
+  locale,
   line,
   tryInstead,
   ask,
   linkComponent,
 }: {
   site: SiteId;
+  /** The rendered locale: the language of the shared 404 copy. */
+  locale: LocaleId;
+  /** The app's own voice line. */
   line: string;
   tryInstead: TryInstead[];
   /** "ask RaioViajante" row, from the search menu item component. */
@@ -82,24 +88,21 @@ export function NotFoundPage({
   linkComponent?: LinkComponent;
 }) {
   const host = siteById(site).label;
+  const { notFound } = catalogFor(locale);
   return (
     <>
-      <PageHeader
-        label="404 · NOT FOUND"
-        title="I looked everywhere."
-        line={line}
-      >
+      <PageHeader label={notFound.label} title={notFound.title} line={line}>
         <Art
           name="notFound"
-          alt="RaioViajante shrugging, surrounded by question marks, under a sign that reads 404 page not found"
+          alt={notFound.art}
           width={300}
           className="rv-404-art"
         />
       </PageHeader>
       <div className="block rv-requested">
         <div className="block__meta">
-          <span className="block__file">requested</span>
-          <span>not found</span>
+          <span className="block__file">{notFound.requested}</span>
+          <span>{notFound.requestedState}</span>
         </div>
         <div className="block__body">
           <pre tabIndex={0}>
@@ -116,7 +119,7 @@ export function NotFoundPage({
           </pre>
         </div>
       </div>
-      <Section number="00." title="Try instead">
+      <Section number="00." title={notFound.tryInstead}>
         {tryInstead.map((row) => (
           <LeaderRow
             key={row.href}
@@ -128,7 +131,7 @@ export function NotFoundPage({
         ))}
       </Section>
       {ask ? (
-        <Section number="00.1" title="Or just ask">
+        <Section number="00.1" title={notFound.ask}>
           {ask}
         </Section>
       ) : null}
