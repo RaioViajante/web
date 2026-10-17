@@ -35,8 +35,6 @@ export interface SharedCatalog {
     aria: (enabled: boolean) => string;
   };
   lang: {
-    /** The compact label before the current language (`LANG EN`). */
-    label: string;
     /** Accessible name of the control while it is only a status. */
     statusAria: (current: string) => string;
     /** Accessible name of the navigation holding the choice. */
@@ -114,7 +112,6 @@ export const catalogs = {
         `Sound ${enabled ? "on" : "off"}. Click to ${enabled ? "mute" : "enable"}.`,
     },
     lang: {
-      label: "LANG",
       statusAria: (current) => `Language: ${current}`,
       navAria: (current) => `Language. Current: ${current}`,
       names: { en: "English", "pt-BR": "Portuguese" },
@@ -190,7 +187,6 @@ export const catalogs = {
         `Som ${enabled ? "ligado" : "desligado"}. Clique para ${enabled ? "silenciar" : "ativar"}.`,
     },
     lang: {
-      label: "IDIOMA",
       statusAria: (current) => `Idioma: ${current}`,
       navAria: (current) => `Idioma. Atual: ${current}`,
       names: { en: "inglês", "pt-BR": "português" },

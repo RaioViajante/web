@@ -9,6 +9,13 @@ import type { SiteId } from "../../../site/sites";
 import { catalogFor } from "../catalog";
 import { searchLocaleHref } from "../search/locale";
 
+/**
+ * The compact identity is fixed in every locale: `LANG EN`, `LANG PT`
+ * (docs/i18n.md, "Language selector"). It is a control name, not translatable
+ * copy; the language itself is the registry's compact label.
+ */
+const LANG_TOKEN = "LANG";
+
 export interface LanguageControlProps {
   site: SiteId;
   /** The rendered locale; the route states it. */
@@ -44,7 +51,7 @@ export function LanguageControl({
   const target = LOCALE_IDS.find((id) => id !== locale);
   const compact = (
     <span>
-      {catalog.lang.label} <span lang={current.htmlLang}>{current.label}</span>
+      {LANG_TOKEN} <span lang={current.htmlLang}>{current.label}</span>
     </span>
   );
   if (

@@ -2,7 +2,13 @@ import type { ReactNode } from "react";
 import { SiteLink, type LinkComponent } from "./link";
 import { LanguageControl } from "./lang";
 import { catalogFor } from "../catalog";
-import { DEFAULT_LOCALE, LOCALES, type LocaleId } from "../../../site/locales";
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  localizedPath,
+  participates,
+  type LocaleId,
+} from "../../../site/locales";
 import { CONTACT, SITES, type SiteId } from "../../../site/sites";
 
 export interface NavItem {
@@ -115,7 +121,34 @@ export interface FooterProps {
    */
   termsLocale?: LocaleId;
   privacyLocale?: LocaleId;
+  /** Participation lookup for cross-site destinations; the registry by default. */
+  isParticipating?: (site: SiteId, locale: LocaleId) => boolean;
   linkComponent?: LinkComponent;
+}
+
+/**
+ * Where a footer link to another RaioViajante host goes. A localized
+ * destination needs the rollout to permit it: the rendered app AND the target
+ * host both participate in the locale (publish before advertise). Otherwise it
+ * is the English public destination. Nothing is probed.
+ */
+export function footerDestination(
+  currentSite: SiteId,
+  target: (typeof SITES)[number],
+  locale: LocaleId,
+  isParticipating: (site: SiteId, locale: LocaleId) => boolean = participates,
+): { locale: LocaleId; href: string } {
+  const localized =
+    locale !== DEFAULT_LOCALE &&
+    isParticipating(currentSite, locale) &&
+    isParticipating(target.id, locale);
+  const destination: LocaleId = localized ? locale : DEFAULT_LOCALE;
+  return {
+    locale: destination,
+    href: localized
+      ? new URL(localizedPath(target.id, destination, "/"), target.href).href
+      : target.href,
+  };
 }
 
 export function Footer({
@@ -125,12 +158,10 @@ export function Footer({
   privacyHref = "/privacy",
   termsLocale = locale,
   privacyLocale = locale,
+  isParticipating,
   linkComponent,
 }: FooterProps) {
   const { footer, lang } = catalogFor(locale);
-  // Another host's pages are English today: say so on a non-English render.
-  const siteLocale = DEFAULT_LOCALE;
-  const crossLanguage = locale !== siteLocale;
   const legal = (href: string, label: string, destination: LocaleId) => (
     <SiteLink
       linkComponent={linkComponent}
@@ -149,21 +180,26 @@ export function Footer({
   return (
     <footer className="rv-footer">
       <nav aria-label={footer.sitesAria}>
-        {SITES.map((item, index) => (
-          <span key={item.id}>
-            {index > 0 ? <span aria-hidden="true"> · </span> : null}
-            <a
-              href={item.href}
-              data-sound="nav"
-              {...(crossLanguage
-                ? { hrefLang: LOCALES[siteLocale].hreflang }
-                : {})}
-            >
-              {item.label}
-            </a>
-            {crossLanguage ? ` (${LOCALES[siteLocale].label})` : null}
-          </span>
-        ))}
+        {SITES.map((item, index) => {
+          const to = footerDestination(site, item, locale, isParticipating);
+          return (
+            <span key={item.id}>
+              {index > 0 ? <span aria-hidden="true"> · </span> : null}
+              <a
+                href={to.href}
+                data-sound="nav"
+                {...(locale !== DEFAULT_LOCALE
+                  ? { hrefLang: LOCALES[to.locale].hreflang }
+                  : {})}
+              >
+                {item.label}
+                {to.locale !== locale
+                  ? ` (${footer.inLanguage(lang.names[to.locale])})`
+                  : ""}
+              </a>
+            </span>
+          );
+        })}
       </nav>
       <div>
         <a href={`mailto:${CONTACT.email}`} data-sound="nav">

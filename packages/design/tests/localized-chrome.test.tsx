@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Shell, SoundToggle } from "../components/Shell";
+import { Footer, Shell, SoundToggle } from "../components/Shell";
 import { Pager } from "../components/page";
 import { NotFoundPage } from "../components/templates";
 import { SearchPage } from "../components/search";
@@ -142,8 +142,14 @@ describe("Shell", () => {
         "footer nav[aria-label='Sites do RaioViajante'] a",
       ),
     ];
+    // pt-BR does not participate: every cross-site link is English, and says so.
     expect(sites.every((a) => a.getAttribute("hreflang") === "en")).toBe(true);
-    expect(body.querySelector("footer nav")?.textContent).toContain("(EN)");
+    expect(sites.map((a) => a.textContent)).toEqual([
+      "raioviajante.com (em inglês)",
+      "dump (em inglês)",
+      "docs (em inglês)",
+      "lab (em inglês)",
+    ]);
   });
 
   it("English footer links carry no language qualifier", () => {
@@ -395,5 +401,76 @@ describe("LANG search query carrying", () => {
     input.dispatchEvent(new Event("input", { bubbles: true }));
     expect(link.getAttribute("href")).toBe("/pt/search/");
     stop();
+  });
+});
+
+describe("footer cross-site destinations", () => {
+  const sitesOf = (
+    site: "root" | "dump" | "docs" | "lab",
+    locale: "en" | "pt-BR",
+    participating: (site: string, locale: string) => boolean,
+  ) => {
+    const body = html(
+      <Footer
+        site={site}
+        locale={locale}
+        isParticipating={participating as never}
+      />,
+    );
+    return [...body.querySelectorAll("footer nav:first-of-type a")].map((a) => [
+      a.getAttribute("href"),
+      a.getAttribute("hreflang"),
+      a.textContent,
+    ]);
+  };
+  const partial = (site: string, locale: string) =>
+    locale === "en" || site === "root" || site === "docs";
+
+  it("A: an English render keeps today's destinations, unqualified", () => {
+    expect(sitesOf("docs", "en", () => true)).toEqual([
+      ["https://raioviajante.com", null, "raioviajante.com"],
+      ["https://dump.raioviajante.com", null, "dump"],
+      ["https://docs.raioviajante.com", null, "docs"],
+      ["https://lab.raioviajante.com", null, "lab"],
+    ]);
+  });
+
+  it("B: a Portuguese render whose own app does not participate links English, labelled", () => {
+    const none = (_site: string, locale: string) => locale === "en";
+    expect(sitesOf("root", "pt-BR", none)).toEqual([
+      ["https://raioviajante.com", "en", "raioviajante.com (em inglês)"],
+      ["https://dump.raioviajante.com", "en", "dump (em inglês)"],
+      ["https://docs.raioviajante.com", "en", "docs (em inglês)"],
+      ["https://lab.raioviajante.com", "en", "lab (em inglês)"],
+    ]);
+    // A target participating is not enough while the current app is not.
+    const onlyTargets = (site: string, locale: string) =>
+      locale === "en" || site !== "root";
+    expect(
+      sitesOf("root", "pt-BR", onlyTargets).every(([, lang]) => lang === "en"),
+    ).toBe(true);
+  });
+
+  it("C/G/F: with both participating, the localized home in the host's slash form", () => {
+    expect(sitesOf("root", "pt-BR", () => true)).toEqual([
+      ["https://raioviajante.com/pt", "pt-BR", "raioviajante.com"],
+      ["https://dump.raioviajante.com/pt", "pt-BR", "dump"],
+      ["https://docs.raioviajante.com/pt/", "pt-BR", "docs"],
+      ["https://lab.raioviajante.com/pt/", "pt-BR", "lab"],
+    ]);
+  });
+
+  it("D/E: each target is decided on its own (Root PT page; Root and Docs participate)", () => {
+    expect(sitesOf("root", "pt-BR", partial)).toEqual([
+      ["https://raioviajante.com/pt", "pt-BR", "raioviajante.com"],
+      ["https://dump.raioviajante.com", "en", "dump (em inglês)"],
+      ["https://docs.raioviajante.com/pt/", "pt-BR", "docs"],
+      ["https://lab.raioviajante.com", "en", "lab (em inglês)"],
+    ]);
+  });
+
+  it("uses the registry by default: today a Portuguese render links no Portuguese host", () => {
+    const body = html(<Footer site="docs" locale="pt-BR" />);
+    expect(body.innerHTML).not.toMatch(/\/pt/);
   });
 });

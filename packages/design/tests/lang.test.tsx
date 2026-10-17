@@ -32,7 +32,7 @@ describe("LANG: participation first", () => {
   it("B: a directly visited pre-activation Portuguese page is LANG PT, noninteractive", () => {
     const body = render({ locale: "pt-BR", counterpart: "/about/" });
     expect(state(body)).toBe("status");
-    expect(body.textContent).toContain("IDIOMA PT");
+    expect(body.textContent).toContain("LANG PT");
     expect(body.querySelector("a, details, summary")).toBeNull();
   });
 
