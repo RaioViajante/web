@@ -1,10 +1,10 @@
 import { createSocialImage } from "@raioviajante/design/social-image";
-import { socialKey, notFoundSeo } from "../../../../../seo/metadata";
-import { allPages, origin } from "../../../lib/seo";
+import { socialKey } from "../../../../../seo/metadata";
+import { allPages, notFoundPages, origin } from "../../../lib/seo";
 export const dynamic = "force-static";
 export const dynamicParams = false;
 export function generateStaticParams() {
-  return [...allPages, notFoundSeo].map((page) => ({
+  return [...allPages, ...notFoundPages].map((page) => ({
     slug: socialKey(page.path).split("/"),
   }));
 }
@@ -13,7 +13,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string[] }> },
 ) {
   const { slug } = await params;
-  const page = [...allPages, notFoundSeo].find(
+  const page = [...allPages, ...notFoundPages].find(
     (page) => socialKey(page.path) === slug.join("/"),
   );
   if (!page) return new Response("Not found", { status: 404 });

@@ -1,7 +1,7 @@
-import { pageMetadata, type PageSeo } from "../../../seo/metadata";
-import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
+import { notFoundSeo, pageMetadata, type PageSeo } from "../../../seo/metadata";
+import { DEFAULT_LOCALE, LOCALES, type LocaleId } from "../../../site/locales";
 import { siteOrigins } from "../../../site/sites";
-import { ptPageSeo } from "./pt";
+import { ptNotFound, ptPageSeo } from "./pt";
 import { counterpartsOf, declaredPages, routes, type RouteKey } from "./routes";
 export const origin = siteOrigins.root;
 
@@ -76,6 +76,17 @@ export const allPages: PageSeo[] = declaredPages().map(
 export const pages: PageSeo[] = allPages.filter(
   (page) => page.locale === DEFAULT_LOCALE,
 );
+
+/** Social-card records for the localized 404 documents Root publishes. */
+export const notFoundPages: PageSeo[] = [
+  { ...notFoundSeo, locale: DEFAULT_LOCALE },
+  {
+    ...notFoundSeo,
+    ...ptNotFound.metadata,
+    path: `${LOCALES["pt-BR"].urlPrefix}${notFoundSeo.path}`,
+    locale: "pt-BR",
+  },
+];
 
 export function metadataFor(path: string) {
   const page = allPages.find((page) => page.path === path);

@@ -1,12 +1,21 @@
 import { test, expect } from "@playwright/test";
 import { audit } from "./audit";
 import {
+  expectedDocumentLocale,
   inventory,
   missingPath,
   searchPath,
   sites,
   viewports,
 } from "./support";
+
+test("missing-page language policy is host-specific", () => {
+  expect(expectedDocumentLocale("root", "/pt/e2e-missing-page")).toBe("pt-BR");
+  expect(expectedDocumentLocale("dump", "/pt/e2e-missing-page")).toBe("pt-BR");
+  expect(expectedDocumentLocale("docs", "/pt/e2e-missing-page")).toBe("en");
+  expect(expectedDocumentLocale("lab", "/pt/e2e-missing-page")).toBe("en");
+  expect(expectedDocumentLocale("docs", "/pt/guide/")).toBe("pt-BR");
+});
 
 // Every sitemap document, every search page and one missing route of each app,
 // at both viewports: axe, browser health, horizontal overflow and broken images

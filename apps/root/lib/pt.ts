@@ -142,16 +142,19 @@ export const ptNotFound = {
       label: "dump",
       value: "textos (em inglês)",
       href: "https://dump.raioviajante.com",
+      hrefLang: "en",
     },
     {
       label: "docs",
       value: "documentação (em inglês)",
       href: "https://docs.raioviajante.com",
+      hrefLang: "en",
     },
     {
       label: "lab",
       value: "experimentos (em inglês)",
       href: "https://lab.raioviajante.com",
+      hrefLang: "en",
     },
   ],
 };

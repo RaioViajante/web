@@ -803,10 +803,24 @@ export function checkEntityLanguages(
 ): Problems {
   const p: Problems = [];
   const seen = new Map<string, { at: string; value: string }>();
+  const published = JSON.stringify(
+    [
+      ...new Set(
+        pages.map((page) => LOCALES[localeOfPath(page.path)].inLanguage),
+      ),
+    ].sort(),
+  );
   for (const page of pages)
     for (const block of parseDocument(page.html).jsonLd)
       for (const node of block.json?.["@graph"] ?? []) {
         const languages = languagesOf(node);
+        if (["WebSite", "Blog"].includes(node["@type"])) {
+          const stated = languages && JSON.stringify([...languages].sort());
+          if (stated !== published)
+            p.push(
+              `${where(page.site, page.path)}: ${node["@type"]} inLanguage is ${stated ?? "missing"}, expected published sitemap languages ${published}`,
+            );
+        }
         if (!node["@id"] || !languages) continue;
         const value = JSON.stringify([...languages].sort());
         const previous = seen.get(node["@id"]);

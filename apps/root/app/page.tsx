@@ -18,6 +18,7 @@ import { RootShell } from "../components/RootShell";
 import { primaryLinks } from "../lib/links";
 import { projects } from "../lib/projects";
 import { getRecentPosts } from "../lib/writing";
+import { publishedLocales } from "../lib/routes";
 
 export const metadata = metadataFor("/");
 
@@ -35,6 +36,7 @@ export default async function Home() {
             personJsonLd(),
             websiteJsonLd(origin, "raioviajante", pages[0]!.description, {
               author: true,
+              languages: publishedLocales(),
             }),
           ),
         }}

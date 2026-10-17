@@ -1,5 +1,6 @@
 import type { ConsoleMessage, Page } from "@playwright/test";
 import { ports } from "../security/local-servers.mjs";
+import { DEFAULT_LOCALE, localeOfPath, type LocaleId } from "../site/locales";
 
 export type Site = "root" | "dump" | "docs" | "lab";
 export const sites = Object.keys(ports) as Site[];
@@ -20,6 +21,13 @@ export const searchPath: Record<Site, string> = {
 export const missingPath = "/e2e-missing-page";
 /** A missing page under any locale prefix (`/pt/e2e-missing-page`) counts as missing. */
 export const isMissingPath = (path: string) => path.endsWith(missingPath);
+
+/** The language each host intentionally renders for a URL, including misses. */
+export function expectedDocumentLocale(site: Site, path: string): LocaleId {
+  if (isMissingPath(path) && (site === "docs" || site === "lab"))
+    return DEFAULT_LOCALE;
+  return localeOfPath(path.split("?")[0]!);
+}
 
 /** Every document in the app's own sitemap, plus its search page. No second route list. */
 export async function inventory(site: Site) {

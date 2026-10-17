@@ -55,6 +55,22 @@ describe("linkComponent", () => {
     );
   });
 
+  it("uses full-document links for same-host legal destinations in another language", () => {
+    const html = renderToStaticMarkup(
+      <Footer
+        locale="pt-BR"
+        site="root"
+        termsLocale="en"
+        privacyLocale="en"
+        linkComponent={Link}
+      />,
+    );
+    for (const href of ["/terms", "/privacy"]) {
+      expect(html).toContain(`<a href="${href}" data-sound`);
+      expect(html).not.toContain(`href="${href}" data-app-link`);
+    }
+  });
+
   it("uses plain anchors when the app passes none", () => {
     const html = renderToStaticMarkup(
       <Pager
@@ -78,5 +94,20 @@ describe("linkComponent", () => {
       />,
     );
     expect(html).toContain('<a href="/" data-app-link=""');
+  });
+
+  it("passes hreflang through 404 recovery rows", () => {
+    const html = renderToStaticMarkup(
+      <NotFoundPage
+        locale="pt-BR"
+        site="root"
+        line="x"
+        tryInstead={[
+          { label: "docs", value: "em inglês", href: "/docs", hrefLang: "en" },
+        ]}
+      />,
+    );
+    expect(html).toContain('href="/docs"');
+    expect(html).toContain('hrefLang="en"');
   });
 });

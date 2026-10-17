@@ -1,8 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page } from "@playwright/test";
-import { LOCALES, localeOfPath } from "../site/locales";
+import { LOCALES } from "../site/locales";
 import {
   base,
+  expectedDocumentLocale,
   isMissingPath,
   isolate,
   watchHealth,
@@ -44,9 +45,10 @@ export async function audit(
         `${at}: axe ${violation.id} (${violation.impact}): ${node.target.join(" ")} — ${violation.help}`,
       );
 
-  // The document language is the language of the URL's tree, misses included.
+  // Root and Dump localize Portuguese misses. Docs and Lab intentionally serve
+  // their English static 404 until their own locale work ships.
   const lang = await page.evaluate(() => document.documentElement.lang);
-  const wantedLang = LOCALES[localeOfPath(path.split("?")[0]!)].htmlLang;
+  const wantedLang = LOCALES[expectedDocumentLocale(site, path)].htmlLang;
   if (lang !== wantedLang)
     problems.push(`${at}: <html lang> is "${lang}", expected "${wantedLang}"`);
 

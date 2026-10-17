@@ -79,6 +79,14 @@ const alternatePages = [];
 const images = new Map();
 const assets = new Map();
 const discoveryLinks = new Set();
+const collectSocialImages = (site, path, html) => {
+  const doc = parseDocument(html);
+  for (const key of ["og:image", "twitter:image"]) {
+    const url = doc.meta.get(key)?.[0];
+    if (url) images.set(url, `app ${site} page ${path}`);
+  }
+  return doc;
+};
 let documents = 0;
 for (const site of sites) {
   const security = await text(site, securityTxtPath, /^text\/plain\b/);
@@ -122,6 +130,7 @@ for (const site of sites) {
     },
   });
   problems.push(...result.problems);
+  const sitemapPaths = result.entries.map((e) => new URL(e.loc).pathname);
   // The English baseline (seo/english-baseline.json): nothing recorded may
   // disappear. Additions, including localized pages, are not a problem.
   const recorded = baseline[site];
@@ -151,18 +160,19 @@ for (const site of sites) {
   problems.push(
     ...checkBaselineSearchIndex(site, recorded, indexEntries),
     // Producer migration (#42): every English entry states locale "en".
-    ...checkEnglishIndexLocale(site, recorded.searchIndex.path, indexEntries),
+    ...checkEnglishIndexLocale(
+      site,
+      recorded.searchIndex.path,
+      indexEntries,
+      sitemapPaths,
+    ),
   );
   allPages.push(...result.pages);
   alternatePages.push(...result.alternatePages);
   documents += result.pages.length;
 
   for (const page of result.pages) {
-    const doc = parseDocument(page.html);
-    for (const key of ["og:image", "twitter:image"]) {
-      const url = doc.meta.get(key)?.[0];
-      if (url) images.set(url, `app ${site} page ${page.path}`);
-    }
+    const doc = collectSocialImages(site, page.path, page.html);
     for (const link of doc.links)
       if (
         /^(icon|apple-touch-icon|manifest)$/.test(link.rel) ||
@@ -206,6 +216,7 @@ for (const site of sites) {
       if (response.status !== 200)
         fail(`app ${site} ${search}${query}: HTTP ${response.status}`);
       problems.push(...checkSearchPage(site, searched, search + query, locale));
+      collectSocialImages(site, search + query, searched);
     }
     // Another locale's index: JSON, a valid array, every entry that locale's.
     if (locale !== DEFAULT_LOCALE) {
@@ -225,15 +236,14 @@ for (const site of sites) {
           indexPath,
           published_.text ? JSON.parse(published_.text) : undefined,
           locale,
+          sitemapPaths,
         ),
       );
     }
   }
 
   // Missing routes: 404, noindex, no canonical, no hreflang, not in the
-  // sitemap, and `lang` equal to the copy rendered (English for every miss
-  // today; the Portuguese miss checks arrive with the apps that serve them).
-  const sitemapPaths = result.entries.map((e) => new URL(e.loc).pathname);
+  // sitemap, and `lang` equal to the copy rendered.
   if (site === "root" || site === "dump")
     for (const { path, lang } of [
       ...(site === "dump"
@@ -271,6 +281,7 @@ for (const site of sites) {
           sitemapPaths,
         }).filter((p) => !(legacyDumpMiss && p.includes("404 <html lang>"))),
       );
+      collectSocialImages(site, path, body);
     }
   else {
     // Astro preview does not serve 404.html for unknown paths, so read the
@@ -288,6 +299,7 @@ for (const site of sites) {
         sitemapPaths,
       }),
     );
+    collectSocialImages(site, "/404.html", built);
   }
 }
 

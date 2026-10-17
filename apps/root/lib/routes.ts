@@ -68,3 +68,8 @@ export function declaredPages() {
     ),
   );
 }
+
+/** Locales with at least one published Root page, derived from the registry. */
+export function publishedLocales(): LocaleId[] {
+  return [...new Set(declaredPages().map(({ locale }) => locale))];
+}

@@ -11,9 +11,11 @@ import {
 import {
   counterpartsOf,
   declaredPages,
+  publishedLocales,
   routeOfPath,
   routes,
 } from "../lib/routes.ts";
+import { ptNotFound } from "../lib/pt.ts";
 
 // Root's route registry is the one record of which pages exist in which
 // locale. These checks keep it honest in both directions (docs/i18n.md, "Route
@@ -103,6 +105,7 @@ test("the shipped Portuguese pages are exactly Home, About and Search", () => {
       .sort(),
     ["/pt", "/pt/about", "/pt/search"],
   );
+  assert.deepEqual(publishedLocales(), ["en", "pt-BR"]);
 });
 
 test("a path resolves to its route and locale, and an undeclared one does not", () => {
@@ -112,4 +115,19 @@ test("a path resolves to its route and locale, and an undeclared one does not", 
 
 test("publishing Portuguese routes does not activate Portuguese participation", () => {
   assert.equal(participates("root", "pt-BR"), false);
+});
+
+test("Portuguese 404 recovery links identify deliberate English destinations", () => {
+  const english = ptNotFound.tryInstead.filter(({ href }) =>
+    href.startsWith("https://"),
+  );
+  assert.equal(english.length, 3);
+  assert.equal(
+    english.every(({ hrefLang }) => hrefLang === "en"),
+    true,
+  );
+  assert.equal(
+    english.every(({ value }) => value.includes("(em inglês)")),
+    true,
+  );
 });

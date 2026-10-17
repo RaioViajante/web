@@ -1022,7 +1022,7 @@ test("structured data: identity nodes are inspected wherever they nest", () => {
   );
 });
 
-test("structured data: the shipped WebSite and Blog language set is English today", async () => {
+test("structured data: host language declarations match sitemap coverage", async () => {
   const { shippedLanguages } = await import("./structured-data.ts");
   assert.equal(shippedLanguages(), "en");
   assert.equal(websiteJsonLd(DOCS, "docs", "d").inLanguage, "en");
@@ -1034,6 +1034,20 @@ test("structured data: the shipped WebSite and Blog language set is English toda
     path,
     html: ld(document({ path }), n),
   });
+  assert.equal(
+    checkEntityLanguages([
+      page("/", node(["en", "pt-BR"])),
+      page("/pt/", node(["en", "pt-BR"])),
+    ]).join(),
+    "",
+  );
+  assert.match(
+    checkEntityLanguages([
+      page("/", node(["en"])),
+      page("/pt/", node(["en"])),
+    ]).join(),
+    /expected published sitemap languages \["en","pt-BR"\]/,
+  );
   assert.match(
     checkEntityLanguages([
       page("/", node(["en"])),
