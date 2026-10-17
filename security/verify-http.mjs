@@ -3,6 +3,12 @@ import { createHash } from "node:crypto";
 import { contentSecurityPolicy, securityHeaders } from "./headers.ts";
 import { isJsonLd, scriptOpenTags } from "./html-scripts.mjs";
 import { ports, startServers } from "./local-servers.mjs";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_IDS,
+  localeOfPath,
+  localizedPath,
+} from "../site/locales.ts";
 
 // Run against the built apps (`pnpm -r build`): Next start (3002/3001) and
 // Astro preview (4321/4322), reused if already running and otherwise started
@@ -51,6 +57,13 @@ for (const [site, port] of Object.entries(ports)) {
       await response.arrayBuffer();
     }
   }
+  // A locale the app publishes pages in has its own static search index.
+  for (const locale of LOCALE_IDS)
+    if (
+      locale !== DEFAULT_LOCALE &&
+      paths.some((path) => localeOfPath(path) === locale)
+    )
+      resources.add(localizedPath(site, locale, "/search-index.json"));
   if (site === "dump") resources.add("/rss.xml").add("/giscus.css");
 
   for (const path of paths) {

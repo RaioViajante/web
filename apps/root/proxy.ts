@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { contentSecurityPolicy } from "../../security/headers";
+import { localeOfPath } from "../../site/locales";
 
 export function proxy(request: NextRequest) {
   const nonce = randomBytes(16).toString("base64");
@@ -11,6 +12,9 @@ export function proxy(request: NextRequest) {
   );
   const headers = new Headers(request.headers);
   headers.set("x-nonce", nonce);
+  // The URL is the only authority for the rendered locale. This overwrites any
+  // client-supplied value, and the layout and not-found page read it.
+  headers.set("x-locale", localeOfPath(request.nextUrl.pathname));
   // Next extracts the nonce from this request header for its own script tags.
   headers.set("Content-Security-Policy", csp);
   const response = NextResponse.next({ request: { headers } });
@@ -22,6 +26,6 @@ export const config = {
   // Include HTML errors and RSC/prefetch requests; exclude only actual assets
   // and metadata endpoints, which keep their existing caching behavior.
   matcher: [
-    "/((?!_next/static|_next/image|favicon\\.ico$|icon\\.png$|apple-touch-icon\\.png$|apple-icon\\.png$|icon-192\\.png$|icon-maskable\\.png$|manifest\\.webmanifest$|robots\\.txt$|sitemap\\.xml$|search-index\\.json$).*)",
+    "/((?!_next/static|_next/image|favicon\\.ico$|icon\\.png$|apple-touch-icon\\.png$|apple-icon\\.png$|icon-192\\.png$|icon-maskable\\.png$|manifest\\.webmanifest$|robots\\.txt$|sitemap\\.xml$|search-index\\.json$|pt/search-index\\.json$).*)",
   ],
 };

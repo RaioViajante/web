@@ -84,7 +84,7 @@ uncommitted edits, including playground edits.
 
 | Package | Scripts with `pnpm --filter @raioviajante/<package>` |
 | ------- | ---------------------------------------------------- |
-| root    | `format:check`, `lint`, `typecheck`, `build`         |
+| root    | `format:check`, `lint`, `typecheck`, `test`, `build` |
 | dump    | `format:check`, `lint`, `typecheck`, `test`, `build` |
 | docs    | `typecheck`, `test`, `build`                         |
 | lab     | `format:check`, `lint`, `typecheck`, `test`, `build` |

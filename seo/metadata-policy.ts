@@ -35,7 +35,8 @@ const decode = (value: string) =>
   value.replace(/&(?:amp|lt|gt|quot|apos|#x27|#39);/g, (e) => entities[e] ?? e);
 
 function attribute(tag: string, name: string) {
-  const match = new RegExp(`\\s${name}="([^"]*)"`).exec(tag);
+  // HTML attribute names are case-insensitive (React and Next emit `hrefLang`).
+  const match = new RegExp(`\\s${name}="([^"]*)"`, "i").exec(tag);
   return match ? decode(match[1]!) : undefined;
 }
 const tagsOf = (html: string, name: string) =>
@@ -490,17 +491,20 @@ export function checkUniqueness(
     ["title", (d: ParsedDocument) => d.titles[0]],
     ["description", (d: ParsedDocument) => d.meta.get("description")?.[0]],
   ] as const) {
+    // Unique within a language: the same brand title may head a page and its
+    // translation.
     const seen = new Map<string, string>();
     for (const page of pages) {
       const value = read(parseDocument(page.html));
       if (!value) continue;
       const here = `${siteOrigins[page.site]}${page.path}`;
-      const first = seen.get(value);
+      const key = `${localeOfPath(page.path)} ${value}`;
+      const first = seen.get(key);
       if (first)
         p.push(
           `duplicate ${label}: ${first} and ${here} => ${JSON.stringify(value)}`,
         );
-      else seen.set(value, here);
+      else seen.set(key, here);
     }
   }
   return p;

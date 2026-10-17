@@ -5,7 +5,7 @@ import test from "node:test";
 import { isReservedPath } from "../site/locales.ts";
 import { siteOrigins } from "../site/sites.ts";
 import { checkBaselineSearchIndex } from "./english-baseline.ts";
-import { checkEnglishIndexLocale } from "./search-index.ts";
+import { checkEnglishIndexLocale, checkIndexLocale } from "./search-index.ts";
 
 const baseline = JSON.parse(
   await readFile(new URL("./english-baseline.json", import.meta.url), "utf8"),
@@ -108,3 +108,42 @@ for (const site of ["docs", "lab"])
         assert.ok(field in entry, `${entry.href} lacks ${field}`);
     }
   });
+
+test("a Portuguese index states pt-BR, the host and Portuguese pages", () => {
+  const pt = (extra = {}) => ({
+    site: "root",
+    locale: "pt-BR",
+    title: "início",
+    href: "https://raioviajante.com/pt",
+    description: "d",
+    ...extra,
+  });
+  const check = (entries) =>
+    checkIndexLocale("root", "/pt/search-index.json", entries, "pt-BR");
+  assert.deepEqual(
+    check([pt(), pt({ href: "https://raioviajante.com/pt/about" })]),
+    [],
+  );
+  assert.match(
+    check([pt({ locale: "en" })]).join(),
+    /locale "en", expected "pt-BR"/,
+  );
+  assert.match(check([pt({ locale: undefined })]).join(), /missing/);
+  assert.match(check([pt({ site: "docs" })]).join(), /not site "root"/);
+  assert.match(
+    check([pt({ href: "https://raioviajante.com/about" })]).join(),
+    /do not link to a pt-BR page/,
+  );
+  assert.match(
+    check([pt({ href: "https://docs.raioviajante.com/pt/" })]).join(),
+    /do not link to a pt-BR page/,
+  );
+  assert.match(check([]).join(), /no entries/);
+  // An English index must not link into the Portuguese tree.
+  assert.match(
+    checkEnglishIndexLocale("root", "/search-index.json", [
+      { site: "root", locale: "en", href: "https://raioviajante.com/pt/about" },
+    ]).join(),
+    /do not link to a en page/,
+  );
+});

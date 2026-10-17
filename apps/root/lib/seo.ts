@@ -1,70 +1,86 @@
 import { pageMetadata, type PageSeo } from "../../../seo/metadata";
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 import { siteOrigins } from "../../../site/sites";
+import { ptPageSeo } from "./pt";
+import { counterpartsOf, declaredPages, routes, type RouteKey } from "./routes";
 export const origin = siteOrigins.root;
-export const pages: PageSeo[] = [
-  {
-    path: "/",
+
+/** The English title and description of every Root page. */
+const english: Record<RouteKey, { title: string; description: string }> = {
+  home: {
     title: "raioviajante",
     description:
       "Personal home of RaioViajante: projects, technical writing, artwork and things built out of curiosity.",
   },
-  {
-    path: "/about",
+  about: {
     title: "about",
     description:
       "About RaioViajante, curiosity, computing and building things independently.",
   },
-  {
-    path: "/projects",
+  projects: {
     title: "projects",
     description:
       "Software projects and experiments by RaioViajante, from tools to programming languages.",
   },
-  {
-    path: "/contact",
+  contact: {
     title: "contact",
     description:
       "Get in touch with RaioViajante by email and find public profiles.",
   },
-  {
-    path: "/gallery",
+  gallery: {
     title: "gallery",
     description:
       "A personal collection of character artwork, illustrations and visual experiments.",
   },
-  {
-    path: "/this-site",
+  "this-site": {
     title: "this site",
     description:
       "How raioviajante.com is built, designed and connected to dump, docs and lab.",
   },
-  {
-    path: "/setup",
+  setup: {
     title: "setup",
     description:
       "The computers, tools and software in RaioViajante\u2019s working setup.",
   },
-  {
-    path: "/terms",
+  terms: {
     title: "terms of use",
     description:
       "Terms of Use for raioviajante.com: scope, content, code and external destinations.",
   },
-  {
-    path: "/privacy",
+  privacy: {
     title: "privacy policy",
     description:
       "Privacy Policy for raioviajante.com: preferences, data, contact and your rights.",
   },
-  {
-    path: "/search",
+  search: {
     title: "Search",
     description:
       "Search RaioViajante\u2019s pages, projects and the wider ecosystem.",
   },
-];
+};
+
+const content = (key: RouteKey, locale: LocaleId) =>
+  locale === DEFAULT_LOCALE ? english[key] : ptPageSeo[key];
+
+/** Every declared page, in every locale it exists, with its real counterparts. */
+export const allPages: PageSeo[] = declaredPages().map(
+  ({ key, locale, path, counterparts }) => {
+    const copy = content(key, locale);
+    if (!copy)
+      throw new Error(`Route "${key}" is declared in ${locale} without copy`);
+    return { path, ...copy, locale, counterparts };
+  },
+);
+
+/** The English pages (with the Portuguese counterparts that exist). */
+export const pages: PageSeo[] = allPages.filter(
+  (page) => page.locale === DEFAULT_LOCALE,
+);
+
 export function metadataFor(path: string) {
-  const page = pages.find((page) => page.path === path);
+  const page = allPages.find((page) => page.path === path);
   if (!page) throw new Error(`Unknown page: ${path}`);
   return pageMetadata(origin, "raioviajante", page);
 }
+
+export { counterpartsOf, routes };

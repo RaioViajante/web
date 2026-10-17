@@ -1,6 +1,13 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page } from "@playwright/test";
-import { base, isolate, missingPath, watchHealth, type Site } from "./support";
+import { LOCALES, localeOfPath } from "../site/locales";
+import {
+  base,
+  isMissingPath,
+  isolate,
+  watchHealth,
+  type Site,
+} from "./support";
 
 export async function audit(
   page: Page,
@@ -13,14 +20,14 @@ export async function audit(
   const at = `[${site}] ${path} [${width}px]`;
   const health = watchHealth(
     page,
-    path === missingPath ? base(site) + path : undefined,
+    isMissingPath(path) ? base(site) + path : undefined,
   );
   const external: string[] = [];
   await isolate(page, external);
   await beforeGoto?.(page);
 
   const response = await page.goto(base(site) + path, { waitUntil: "load" });
-  const missing = path === missingPath;
+  const missing = isMissingPath(path);
   if (missing ? response?.status() !== 404 : response?.status() !== 200)
     // Astro's preview answers an unknown path with its own 404; Next serves the app's.
     problems.push(
@@ -36,6 +43,12 @@ export async function audit(
       problems.push(
         `${at}: axe ${violation.id} (${violation.impact}): ${node.target.join(" ")} — ${violation.help}`,
       );
+
+  // The document language is the language of the URL's tree, misses included.
+  const lang = await page.evaluate(() => document.documentElement.lang);
+  const wantedLang = LOCALES[localeOfPath(path.split("?")[0]!)].htmlLang;
+  if (lang !== wantedLang)
+    problems.push(`${at}: <html lang> is "${lang}", expected "${wantedLang}"`);
 
   // One h1 and a main landmark on real pages (the 404 and search included).
   const structure = await page.evaluate(() => ({

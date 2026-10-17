@@ -3,7 +3,13 @@ import { fileURLToPath } from "node:url";
 import { siteOrigins } from "../site/sites.ts";
 import { checkSecurityTxt, securityTxtPath } from "../security/security-txt.ts";
 import { renderLlmsTxt } from "./llms.ts";
-import { checkEnglishIndexLocale } from "./search-index.ts";
+import { checkEnglishIndexLocale, checkIndexLocale } from "./search-index.ts";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_IDS,
+  localeOfPath,
+  localizedPath,
+} from "../site/locales.ts";
 import { ports, startServers } from "../security/local-servers.mjs";
 import { auditSite, expectedThemeColor } from "./audit.mjs";
 import {
@@ -18,7 +24,7 @@ import {
   checkSearchPage,
   checkUniqueness,
   parseDocument,
-  searchPaths,
+  searchPathFor,
 } from "./metadata-policy.ts";
 
 // Runtime SEO verification of the four built apps over local HTTP. Every
@@ -177,16 +183,51 @@ for (const site of sites) {
 
   // Search: not in the sitemap (audited above), but explicitly visited: 200,
   // noindex/follow and one bare canonical, whatever the query string.
-  const search = searchPaths[site];
-  for (const query of [
-    "",
-    "?q=seo%20check",
-    "?q=a&utm_source=x&utm_campaign=y",
-  ]) {
-    const { response, text: searched } = await get(site, search + query);
-    if (response.status !== 200)
-      fail(`app ${site} ${search}${query}: HTTP ${response.status}`);
-    problems.push(...checkSearchPage(site, searched, search + query));
+  // Every locale the app publishes pages in (its sitemap says which) has its
+  // own search page and index; English always does.
+  const published = [
+    DEFAULT_LOCALE,
+    ...LOCALE_IDS.filter(
+      (locale) =>
+        locale !== DEFAULT_LOCALE &&
+        result.entries.some(
+          (e) => localeOfPath(new URL(e.loc).pathname) === locale,
+        ),
+    ),
+  ];
+  for (const locale of published) {
+    const search = searchPathFor(site, locale);
+    for (const query of [
+      "",
+      "?q=seo%20check",
+      "?q=a&utm_source=x&utm_campaign=y",
+    ]) {
+      const { response, text: searched } = await get(site, search + query);
+      if (response.status !== 200)
+        fail(`app ${site} ${search}${query}: HTTP ${response.status}`);
+      problems.push(...checkSearchPage(site, searched, search + query, locale));
+    }
+    // Another locale's index: JSON, a valid array, every entry that locale's.
+    if (locale !== DEFAULT_LOCALE) {
+      const indexPath = localizedPath(site, locale, "/search-index.json");
+      const published_ = await get(site, indexPath);
+      if (published_.response.status !== 200)
+        fail(`app ${site} ${indexPath}: HTTP ${published_.response.status}`);
+      if (
+        !/^application\/json\b/.test(
+          published_.response.headers.get("content-type") ?? "",
+        )
+      )
+        fail(`app ${site} ${indexPath}: not served as application/json`);
+      problems.push(
+        ...checkIndexLocale(
+          site,
+          indexPath,
+          published_.text ? JSON.parse(published_.text) : undefined,
+          locale,
+        ),
+      );
+    }
   }
 
   // Missing routes: 404, noindex, no canonical, no hreflang, not in the
@@ -194,9 +235,22 @@ for (const site of sites) {
   // today; the Portuguese miss checks arrive with the apps that serve them).
   const sitemapPaths = result.entries.map((e) => new URL(e.loc).pathname);
   if (site === "root" || site === "dump")
-    for (const path of site === "dump"
-      ? ["/seo-missing-check", "/posts/seo-missing-check"]
-      : ["/seo-missing-check"]) {
+    for (const { path, lang } of [
+      ...(site === "dump"
+        ? ["/seo-missing-check", "/posts/seo-missing-check"]
+        : ["/seo-missing-check"]
+      ).map((path) => ({
+        path,
+        lang: DEFAULT_LOCALE,
+      })),
+      // A published locale answers its own misses in its own language.
+      ...published
+        .filter((locale) => locale !== DEFAULT_LOCALE)
+        .map((locale) => ({
+          path: localizedPath(site, locale, "/seo-missing-check"),
+          lang: locale,
+        })),
+    ]) {
       const { response, text: body } = await get(site, path);
       // TEMPORARY LEGACY EXCEPTION, this one call site only. A missing dump
       // post is answered with Next's generic error document, which has no
@@ -213,7 +267,7 @@ for (const site of sites) {
           path,
           status: response.status,
           html: body,
-          lang: "en",
+          lang,
           sitemapPaths,
         }).filter((p) => !(legacyDumpMiss && p.includes("404 <html lang>"))),
       );

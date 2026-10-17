@@ -18,7 +18,9 @@ import {
   checkNotFoundPage,
   checkSearchPage,
   checkSitemap,
+  checkUniqueness,
   expectedTypes,
+  parseDocument,
   searchPathFor,
 } from "./metadata-policy.ts";
 import {
@@ -1211,4 +1213,46 @@ test("search pages join alternate reciprocity without joining the sitemap", () =
   assert.ok(isSearchPath("/search/") && isSearchPath("/pt/search/"));
   const xml = sitemapResponse(DOCS, ["/", "/search/", "/pt/search/"]);
   return xml.text().then((text) => assert.ok(!text.includes("search")));
+});
+
+// ------------------------------------------ revision: Root Portuguese pages
+
+test("uniqueness is per language: a page and its translation may share a brand title", () => {
+  const page = (path, title) => ({
+    site: "docs",
+    path,
+    html: `<html><head><title>${title}</title></head></html>`,
+  });
+  assert.deepEqual(
+    checkUniqueness([page("/", "brand"), page("/pt/", "brand")]),
+    [],
+  );
+  assert.match(
+    checkUniqueness([page("/", "brand"), page("/guide/", "brand")]).join(),
+    /duplicate title/,
+  );
+  assert.match(
+    checkUniqueness([page("/pt/", "marca"), page("/pt/guia/", "marca")]).join(),
+    /duplicate title/,
+  );
+});
+
+test("hreflang is read whatever the attribute's case (React and Next emit hrefLang)", () => {
+  const html = `<html lang="en"><head><link rel="alternate" hrefLang="pt-BR" href="https://docs.raioviajante.com/pt/"/></head></html>`;
+  assert.equal(parseDocument(html).links[0].hreflang, "pt-BR");
+});
+
+test("a non-English 404 can carry its own title and description, still noindex with no canonical", () => {
+  const meta = notFoundMetadata(DUMP, "root", "pt-BR", {
+    title: "404 — não encontrada",
+    description: "Esta página não foi encontrada.",
+  });
+  assert.equal(meta.title.absolute, "404 — não encontrada — root");
+  assert.equal(meta.description, "Esta página não foi encontrada.");
+  assert.deepEqual(meta.robots, { index: false });
+  assert.deepEqual(meta.alternates, {});
+  assert.equal(
+    notFoundMetadata(DUMP, "dump").description,
+    "This page could not be found on dump.raioviajante.com.",
+  );
 });

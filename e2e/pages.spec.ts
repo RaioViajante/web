@@ -14,14 +14,21 @@ import {
 for (const site of sites)
   for (const [name, { width, height }] of Object.entries(viewports))
     test(`${site} pages at ${width}px (${name})`, async ({ browser }) => {
-      const { paths, search } = await inventory(site);
+      const { paths, search, searches, missing } = await inventory(site);
       const context = await browser.newContext({
         viewport: { width, height },
         deviceScaleFactor: 1,
       });
       const page = await context.newPage();
       const problems: string[] = [];
-      const targets = [...paths, search, `${search}?q=sweep`, missingPath];
+      const targets = [
+        ...paths,
+        search,
+        `${search}?q=sweep`,
+        missingPath,
+        ...searches,
+        ...missing,
+      ];
       for (const path of new Set(targets))
         problems.push(...(await audit(page, site, path, width)));
       await context.close();

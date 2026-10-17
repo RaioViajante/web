@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { connection } from "next/server";
 import type { ReactNode } from "react";
+import { DEFAULT_LOCALE, LOCALES, isLocaleId } from "../../../site/locales";
 import { siteOrigins } from "../../../site/sites";
 import localFont from "next/font/local";
 import { Behavior } from "@raioviajante/design/behavior-react";
@@ -55,8 +57,11 @@ export default async function RootLayout({
 }) {
   // Nonces must be generated for each document, never at prerender time.
   await connection();
+  // The proxy derives the locale from the URL; nothing else decides it.
+  const stated = (await headers()).get("x-locale");
+  const locale = isLocaleId(stated) ? stated : DEFAULT_LOCALE;
   return (
-    <html lang="en" className={mono.variable}>
+    <html lang={LOCALES[locale].htmlLang} className={mono.variable}>
       <body>
         {children}
         <Behavior />
