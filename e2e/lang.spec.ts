@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import {
   mountLanguageControl,
-  renderLanguageControl,
+  renderLanguageControls,
   tabTo,
 } from "./lang-fixtures";
 import { base, isolate, searchPath, sites, viewports } from "./support";
@@ -51,6 +51,19 @@ async function axeClean(page: Page) {
   ).toEqual([]);
 }
 
+// Real LanguageControl markup, rendered once per state (see lang-fixtures.ts).
+let controls: Awaited<ReturnType<typeof renderControls>>;
+const renderControls = () =>
+  renderLanguageControls({
+    link: { counterpart: "/pt/guia/" },
+    disclosure: {},
+    ptDisclosure: { locale: "pt-BR" },
+    search: { search: true },
+  });
+test.beforeAll(async () => {
+  controls = await renderControls();
+});
+
 test.describe("the real interactive LanguageControl at phone width", () => {
   test.beforeEach(async ({ page }) => {
     await isolate(page, []);
@@ -59,10 +72,7 @@ test.describe("the real interactive LanguageControl at phone width", () => {
   });
 
   test("direct counterpart link", async ({ page }) => {
-    await mountLanguageControl(
-      page,
-      renderLanguageControl({ counterpart: "/pt/guia/" }),
-    );
+    await mountLanguageControl(page, controls.link);
     const control = page.locator(".rv-sound .rv-lang");
     await expect(control).toHaveAttribute("data-lang-state", "link");
     const link = control.locator("a");
@@ -86,7 +96,7 @@ test.describe("the real interactive LanguageControl at phone width", () => {
   });
 
   test("no-counterpart disclosure", async ({ page }) => {
-    await mountLanguageControl(page, renderLanguageControl());
+    await mountLanguageControl(page, controls.disclosure);
     const control = page.locator(".rv-sound .rv-lang");
     await expect(control).toHaveAttribute("data-lang-state", "disclosure");
     const details = control.locator("details");
@@ -125,10 +135,7 @@ test.describe("the real interactive LanguageControl at phone width", () => {
   test("Portuguese-only page discloses toward English with long Portuguese text inside the viewport", async ({
     page,
   }) => {
-    await mountLanguageControl(
-      page,
-      renderLanguageControl({ locale: "pt-BR" }),
-    );
+    await mountLanguageControl(page, controls.ptDisclosure);
     await page.locator(".rv-lang summary").click();
     await expect(page.locator(".rv-lang details p")).toHaveText(
       "Esta página não está disponível em inglês.",
@@ -147,7 +154,7 @@ test("the real search LANG link carries q and nothing else", async ({
   await page.goto(
     base("docs") + searchPath.docs + "?scope=everywhere&utm=x#frag",
   );
-  await mountLanguageControl(page, renderLanguageControl({ search: true }));
+  await mountLanguageControl(page, controls.search);
   const link = page.locator("a[data-lang-search]");
   await expect(link).toHaveAttribute("href", "/pt/search/");
   const input = page.locator("[data-search-input]");
