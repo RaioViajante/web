@@ -136,6 +136,7 @@ export function LeaderRow({
   wrapValue = false,
   linkComponent,
   rel,
+  hrefLang,
 }: {
   label: ReactNode;
   value?: ReactNode;
@@ -148,6 +149,8 @@ export function LeaderRow({
   linkComponent?: LinkComponent;
   /** Link relation, for example `me` on a profile of the site's owner. */
   rel?: string;
+  /** Language of a deliberate cross-language destination. */
+  hrefLang?: string;
 }) {
   const content = (
     <>
@@ -174,6 +177,7 @@ export function LeaderRow({
       data-sound={sound}
       aria-describedby={describedBy}
       rel={rel}
+      hrefLang={hrefLang}
     >
       {content}
     </SiteLink>

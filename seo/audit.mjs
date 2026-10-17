@@ -8,7 +8,9 @@ import {
   checkSearchPage,
   checkSitemap,
   searchPaths,
+  searchPathFor,
 } from "./metadata-policy.ts";
+import { DEFAULT_LOCALE, LOCALE_IDS, localeOfPath } from "../site/locales.ts";
 import { siteOrigins } from "../site/sites.ts";
 
 // Glue shared by the build-output test and the HTTP verifier: given the
@@ -50,8 +52,11 @@ export async function auditSite({
   // The search page is not indexed and not in the sitemap, but must stay
   // crawlable: robots.txt may not block it (or crawlers could not see noindex).
   const search = searchPaths[site];
-  if (paths.includes(search))
-    problems.push(`app ${site} sitemap: lists ${search}, which is noindex`);
+  for (const locale of LOCALE_IDS)
+    if (paths.includes(searchPathFor(site, locale)))
+      problems.push(
+        `app ${site} sitemap: lists ${searchPathFor(site, locale)}, which is noindex`,
+      );
   problems.push(...checkRobots(site, files.robots, [...paths, search]));
   problems.push(...checkManifest(site, files.manifest, themeColor));
   let rssItems;
@@ -85,12 +90,20 @@ export async function auditSite({
   // reciprocity. A localized search page is added here once its app ships it.
   const searchPages = [];
   if (html) {
-    const document = await html(search);
-    if (document === undefined)
-      problems.push(`app ${site} page ${search}: document could not be read`);
-    else {
-      problems.push(...checkSearchPage(site, document));
-      searchPages.push({ site, path: search, html: document });
+    // The English search page always; another locale's only once the app
+    // publishes pages in it (its sitemap lists them), which is how a published
+    // but not yet advertised locale joins the checks.
+    const published = new Set(paths.map((path) => localeOfPath(path)));
+    for (const locale of LOCALE_IDS) {
+      if (locale !== DEFAULT_LOCALE && !published.has(locale)) continue;
+      const where = searchPathFor(site, locale);
+      const document = await html(where);
+      if (document === undefined)
+        problems.push(`app ${site} page ${where}: document could not be read`);
+      else {
+        problems.push(...checkSearchPage(site, document, where, locale));
+        searchPages.push({ site, path: where, html: document });
+      }
     }
   }
   return {

@@ -3,7 +3,13 @@ import { fileURLToPath } from "node:url";
 import { siteOrigins } from "../site/sites.ts";
 import { checkSecurityTxt, securityTxtPath } from "../security/security-txt.ts";
 import { renderLlmsTxt } from "./llms.ts";
-import { checkEnglishIndexLocale } from "./search-index.ts";
+import { checkEnglishIndexLocale, checkIndexLocale } from "./search-index.ts";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_IDS,
+  localeOfPath,
+  localizedPath,
+} from "../site/locales.ts";
 import { ports, startServers } from "../security/local-servers.mjs";
 import { auditSite, expectedThemeColor } from "./audit.mjs";
 import {
@@ -18,7 +24,7 @@ import {
   checkSearchPage,
   checkUniqueness,
   parseDocument,
-  searchPaths,
+  searchPathFor,
 } from "./metadata-policy.ts";
 
 // Runtime SEO verification of the four built apps over local HTTP. Every
@@ -73,6 +79,14 @@ const alternatePages = [];
 const images = new Map();
 const assets = new Map();
 const discoveryLinks = new Set();
+const collectSocialImages = (site, path, html) => {
+  const doc = parseDocument(html);
+  for (const key of ["og:image", "twitter:image"]) {
+    const url = doc.meta.get(key)?.[0];
+    if (url) images.set(url, `app ${site} page ${path}`);
+  }
+  return doc;
+};
 let documents = 0;
 for (const site of sites) {
   const security = await text(site, securityTxtPath, /^text\/plain\b/);
@@ -116,6 +130,7 @@ for (const site of sites) {
     },
   });
   problems.push(...result.problems);
+  const sitemapPaths = result.entries.map((e) => new URL(e.loc).pathname);
   // The English baseline (seo/english-baseline.json): nothing recorded may
   // disappear. Additions, including localized pages, are not a problem.
   const recorded = baseline[site];
@@ -145,18 +160,19 @@ for (const site of sites) {
   problems.push(
     ...checkBaselineSearchIndex(site, recorded, indexEntries),
     // Producer migration (#42): every English entry states locale "en".
-    ...checkEnglishIndexLocale(site, recorded.searchIndex.path, indexEntries),
+    ...checkEnglishIndexLocale(
+      site,
+      recorded.searchIndex.path,
+      indexEntries,
+      sitemapPaths,
+    ),
   );
   allPages.push(...result.pages);
   alternatePages.push(...result.alternatePages);
   documents += result.pages.length;
 
   for (const page of result.pages) {
-    const doc = parseDocument(page.html);
-    for (const key of ["og:image", "twitter:image"]) {
-      const url = doc.meta.get(key)?.[0];
-      if (url) images.set(url, `app ${site} page ${page.path}`);
-    }
+    const doc = collectSocialImages(site, page.path, page.html);
     for (const link of doc.links)
       if (
         /^(icon|apple-touch-icon|manifest)$/.test(link.rel) ||
@@ -177,26 +193,74 @@ for (const site of sites) {
 
   // Search: not in the sitemap (audited above), but explicitly visited: 200,
   // noindex/follow and one bare canonical, whatever the query string.
-  const search = searchPaths[site];
-  for (const query of [
-    "",
-    "?q=seo%20check",
-    "?q=a&utm_source=x&utm_campaign=y",
-  ]) {
-    const { response, text: searched } = await get(site, search + query);
-    if (response.status !== 200)
-      fail(`app ${site} ${search}${query}: HTTP ${response.status}`);
-    problems.push(...checkSearchPage(site, searched, search + query));
+  // Every locale the app publishes pages in (its sitemap says which) has its
+  // own search page and index; English always does.
+  const published = [
+    DEFAULT_LOCALE,
+    ...LOCALE_IDS.filter(
+      (locale) =>
+        locale !== DEFAULT_LOCALE &&
+        result.entries.some(
+          (e) => localeOfPath(new URL(e.loc).pathname) === locale,
+        ),
+    ),
+  ];
+  for (const locale of published) {
+    const search = searchPathFor(site, locale);
+    for (const query of [
+      "",
+      "?q=seo%20check",
+      "?q=a&utm_source=x&utm_campaign=y",
+    ]) {
+      const { response, text: searched } = await get(site, search + query);
+      if (response.status !== 200)
+        fail(`app ${site} ${search}${query}: HTTP ${response.status}`);
+      problems.push(...checkSearchPage(site, searched, search + query, locale));
+      collectSocialImages(site, search + query, searched);
+    }
+    // Another locale's index: JSON, a valid array, every entry that locale's.
+    if (locale !== DEFAULT_LOCALE) {
+      const indexPath = localizedPath(site, locale, "/search-index.json");
+      const published_ = await get(site, indexPath);
+      if (published_.response.status !== 200)
+        fail(`app ${site} ${indexPath}: HTTP ${published_.response.status}`);
+      if (
+        !/^application\/json\b/.test(
+          published_.response.headers.get("content-type") ?? "",
+        )
+      )
+        fail(`app ${site} ${indexPath}: not served as application/json`);
+      problems.push(
+        ...checkIndexLocale(
+          site,
+          indexPath,
+          published_.text ? JSON.parse(published_.text) : undefined,
+          locale,
+          sitemapPaths,
+        ),
+      );
+    }
   }
 
   // Missing routes: 404, noindex, no canonical, no hreflang, not in the
-  // sitemap, and `lang` equal to the copy rendered (English for every miss
-  // today; the Portuguese miss checks arrive with the apps that serve them).
-  const sitemapPaths = result.entries.map((e) => new URL(e.loc).pathname);
+  // sitemap, and `lang` equal to the copy rendered.
   if (site === "root" || site === "dump")
-    for (const path of site === "dump"
-      ? ["/seo-missing-check", "/posts/seo-missing-check"]
-      : ["/seo-missing-check"]) {
+    for (const { path, lang } of [
+      ...(site === "dump"
+        ? ["/seo-missing-check", "/posts/seo-missing-check"]
+        : ["/seo-missing-check"]
+      ).map((path) => ({
+        path,
+        lang: DEFAULT_LOCALE,
+      })),
+      // A published locale answers its own misses in its own language.
+      ...published
+        .filter((locale) => locale !== DEFAULT_LOCALE)
+        .map((locale) => ({
+          path: localizedPath(site, locale, "/seo-missing-check"),
+          lang: locale,
+        })),
+    ]) {
       const { response, text: body } = await get(site, path);
       // TEMPORARY LEGACY EXCEPTION, this one call site only. A missing dump
       // post is answered with Next's generic error document, which has no
@@ -213,10 +277,11 @@ for (const site of sites) {
           path,
           status: response.status,
           html: body,
-          lang: "en",
+          lang,
           sitemapPaths,
         }).filter((p) => !(legacyDumpMiss && p.includes("404 <html lang>"))),
       );
+      collectSocialImages(site, path, body);
     }
   else {
     // Astro preview does not serve 404.html for unknown paths, so read the
@@ -234,6 +299,7 @@ for (const site of sites) {
         sitemapPaths,
       }),
     );
+    collectSocialImages(site, "/404.html", built);
   }
 }
 

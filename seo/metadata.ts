@@ -143,13 +143,18 @@ export function notFoundMetadata(
   origin: string,
   site: string,
   locale: LocaleId = DEFAULT_LOCALE,
+  /** The page's own words when it is not English; the app supplies them. */
+  copy?: { title: string; description: string },
 ) {
   const metadata = pageMetadata(origin, site, {
     ...notFoundSeo,
     // The 404 of the locale whose copy is rendered; it is never part of a cluster.
     path: `${LOCALES[locale].urlPrefix}${notFoundSeo.path}`,
     locale,
-    description: `This page could not be found on ${new URL(origin).host}.`,
+    description:
+      copy?.description ??
+      `This page could not be found on ${new URL(origin).host}.`,
+    ...(copy ? { title: copy.title } : {}),
   });
   // Next.js documents injecting `noindex` on 404 responses, and does so for a
   // page-level notFound(). On Vercel, unmatched URLs are served through the

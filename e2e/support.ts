@@ -1,5 +1,6 @@
 import type { ConsoleMessage, Page } from "@playwright/test";
 import { ports } from "../security/local-servers.mjs";
+import { DEFAULT_LOCALE, localeOfPath, type LocaleId } from "../site/locales";
 
 export type Site = "root" | "dump" | "docs" | "lab";
 export const sites = Object.keys(ports) as Site[];
@@ -18,6 +19,15 @@ export const searchPath: Record<Site, string> = {
   lab: "/search/",
 };
 export const missingPath = "/e2e-missing-page";
+/** A missing page under any locale prefix (`/pt/e2e-missing-page`) counts as missing. */
+export const isMissingPath = (path: string) => path.endsWith(missingPath);
+
+/** The language each host intentionally renders for a URL, including misses. */
+export function expectedDocumentLocale(site: Site, path: string): LocaleId {
+  if (isMissingPath(path) && (site === "docs" || site === "lab"))
+    return DEFAULT_LOCALE;
+  return localeOfPath(path.split("?")[0]!);
+}
 
 /** Every document in the app's own sitemap, plus its search page. No second route list. */
 export async function inventory(site: Site) {
@@ -26,7 +36,14 @@ export async function inventory(site: Site) {
     ([, loc]) => new URL(loc!).pathname,
   );
   if (!paths.length) throw new Error(`${site}: sitemap has no URLs`);
-  return { paths, search: searchPath[site] };
+  // A locale the app publishes pages in has its own search page and its own
+  // answer for a missing page.
+  const prefixes = [
+    ...new Set(paths.map((p) => p.match(/^\/pt(?=\/|$)/)?.[0])),
+  ].filter((prefix): prefix is string => Boolean(prefix));
+  const searches = prefixes.map((prefix) => prefix + searchPath[site]);
+  const missing = prefixes.map((prefix) => prefix + missingPath);
+  return { paths, search: searchPath[site], searches, missing };
 }
 
 const localHosts = new Set(sites.map((site) => new URL(base(site)).origin));

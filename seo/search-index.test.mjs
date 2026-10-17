@@ -5,7 +5,7 @@ import test from "node:test";
 import { isReservedPath } from "../site/locales.ts";
 import { siteOrigins } from "../site/sites.ts";
 import { checkBaselineSearchIndex } from "./english-baseline.ts";
-import { checkEnglishIndexLocale } from "./search-index.ts";
+import { checkEnglishIndexLocale, checkIndexLocale } from "./search-index.ts";
 
 const baseline = JSON.parse(
   await readFile(new URL("./english-baseline.json", import.meta.url), "utf8"),
@@ -20,7 +20,7 @@ const entry = (extra = {}) => ({
   ...extra,
 });
 const check = (entries) =>
-  checkEnglishIndexLocale("docs", "/search-index.json", entries);
+  checkEnglishIndexLocale("docs", "/search-index.json", entries, ["/x/"]);
 
 test("an English index whose every entry says locale en passes", () => {
   assert.deepEqual(check([entry(), entry({ body: "b" })]), []);
@@ -90,8 +90,20 @@ for (const site of ["docs", "lab"])
     );
     assert.ok(existsSync(file), `build ${site} first`);
     const entries = JSON.parse(await readFile(file, "utf8"));
+    const sitemap = await readFile(
+      new URL(`../apps/${site}/dist/sitemap.xml`, import.meta.url),
+      "utf8",
+    );
+    const publishedPaths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+      ([, loc]) => new URL(loc).pathname,
+    );
     assert.deepEqual(
-      checkEnglishIndexLocale(site, "/search-index.json", entries),
+      checkEnglishIndexLocale(
+        site,
+        "/search-index.json",
+        entries,
+        publishedPaths,
+      ),
       [],
     );
     assert.ok(entries.length > 0);
@@ -108,3 +120,86 @@ for (const site of ["docs", "lab"])
         assert.ok(field in entry, `${entry.href} lacks ${field}`);
     }
   });
+
+test("a Portuguese index states pt-BR, the host and Portuguese pages", () => {
+  const pt = (extra = {}) => ({
+    site: "root",
+    locale: "pt-BR",
+    title: "início",
+    href: "https://raioviajante.com/pt",
+    description: "d",
+    ...extra,
+  });
+  const check = (entries) =>
+    checkIndexLocale("root", "/pt/search-index.json", entries, "pt-BR", [
+      "/pt",
+      "/pt/about",
+    ]);
+  assert.deepEqual(
+    check([pt(), pt({ href: "https://raioviajante.com/pt/about" })]),
+    [],
+  );
+  assert.match(
+    check([pt({ locale: "en" })]).join(),
+    /locale "en", expected "pt-BR"/,
+  );
+  assert.match(check([pt({ locale: undefined })]).join(), /missing/);
+  assert.match(check([pt({ site: "docs" })]).join(), /not site "root"/);
+  assert.match(
+    check([pt({ href: "https://raioviajante.com/about" })]).join(),
+    /do not link to a pt-BR page/,
+  );
+  assert.match(
+    check([pt({ href: "https://docs.raioviajante.com/pt/" })]).join(),
+    /do not link to a pt-BR page/,
+  );
+  assert.match(check([]).join(), /no entries/);
+  // An English index must not link into the Portuguese tree.
+  assert.match(
+    checkEnglishIndexLocale(
+      "root",
+      "/search-index.json",
+      [
+        {
+          site: "root",
+          locale: "en",
+          title: "about",
+          href: "https://raioviajante.com/pt/about",
+          description: "d",
+        },
+      ],
+      ["/about"],
+    ).join(),
+    /do not link to a en page/,
+  );
+});
+
+test("required and optional entry fields have their declared types", () => {
+  assert.match(check([entry({ title: undefined })]).join(), /field "title"/);
+  assert.match(check([entry({ href: 42 })]).join(), /field "href"/);
+  assert.match(check([entry({ body: false })]).join(), /field "body"/);
+  assert.match(check([entry({ title: "" })]).join(), /field "title" is empty/);
+  assert.match(check([null]).join(), /entry 1 is not an object/);
+});
+
+test("destinations must belong to the authoritative published inventory", () => {
+  assert.match(
+    check([entry({ href: "https://docs.raioviajante.com/ghost/" })]).join(),
+    /absent from the published sitemap inventory/,
+  );
+});
+
+test("exact duplicate entries are rejected while distinct entries for one page are allowed", () => {
+  const samePage = entry();
+  assert.match(
+    check([samePage, { ...samePage }]).join(),
+    /1 duplicate entries/,
+  );
+  assert.deepEqual(
+    check([
+      samePage,
+      entry({ title: "Section", href: `${samePage.href}#section` }),
+    ]),
+    [],
+  );
+});

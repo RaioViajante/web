@@ -63,6 +63,8 @@ export interface TryInstead {
   label: string;
   value: string;
   href: string;
+  /** Language of the destination when it differs from the rendered page. */
+  hrefLang?: string;
 }
 
 /**
@@ -126,6 +128,7 @@ export function NotFoundPage({
             label={row.label}
             value={row.value}
             href={row.href}
+            hrefLang={row.hrefLang}
             linkComponent={linkComponent}
           />
         ))}

@@ -13,12 +13,17 @@ export const AVATAR_REST_FRAME = 3;
  * click. Static markup: the shared behavior script (`avatar-coin.ts`) runs the
  * loop, so Next and Astro apps render it the same way.
  */
-export function AvatarCoin() {
+export function AvatarCoin({
+  label = "Flip RaioViajante avatar",
+}: {
+  /** The accessible name; an app that renders another language supplies its own. */
+  label?: string;
+} = {}) {
   return (
     <button
       type="button"
       className="avatar-coin"
-      aria-label="Flip RaioViajante avatar"
+      aria-label={label}
       data-avatar-coin
       data-frames={JSON.stringify(avatarFrames)}
       data-durations={AVATAR_DURATIONS.join(",")}

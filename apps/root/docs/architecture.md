@@ -20,3 +20,34 @@ appear without redeploying root once dump's RSS feed is deployed and that
 cache refreshes on a subsequent visit. A small
 known-post list keeps the page populated if the feed is temporarily unavailable.
 This is a read-only integration; publishing still happens in dump.
+
+## Portuguese tree (pt-BR)
+
+Root publishes a partial Portuguese tree while its Portuguese participation in
+`site/` stays `false`, so nothing links to it from elsewhere and `LANG` stays a
+noninteractive status. See [docs/i18n.md](../../../docs/i18n.md).
+
+- **Route registry.** `lib/routes.ts` declares which pages exist in which
+  locale (Home, About and Search in Portuguese at `/pt`, `/pt/about`,
+  `/pt/search`; every other page English-only). Navigation, metadata,
+  counterparts (`hreflang`), the sitemap, social cards and the search index all
+  derive from it. `tests/routes.test.mjs` (`pnpm --filter @raioviajante/root
+test`, Node's built-in runner) checks that every declared path is a built page
+  and every built page is declared, plus the shared inventory rules.
+- **Copy.** Portuguese editorial copy is Root's own, in `lib/pt.ts`. Shared UI
+  strings come from the `packages/design` catalog. English-only destinations are
+  named as such in words and carry `hreflang="en"`; Terms and Privacy stay
+  English-only.
+- **Locale.** The proxy sets `x-locale` from the URL (overwriting any client
+  value). The one root layout renders `<html lang>` from it, and
+  `app/not-found.tsx` renders the English or Portuguese 404 from it. Misses are
+  answered by that global not-found, with a real 404 and server-rendered,
+  correctly-languaged HTML. Do not call `notFound()` from a Root page: in
+  Next.js 16 it produces a generic error document without `lang`.
+- **Search.** `/pt/search-index.json` is static and lists only the published
+  Portuguese pages (`locale: "pt-BR"`). Until Root participates, the shared
+  search page shows its "no results yet" state and does not read it.
+- **Latest writing.** English is unchanged. Portuguese reads Dump's
+  `/pt/rss.xml` only once Dump participates in Portuguese; before then it says
+  so in Portuguese and links the English Dump, labelled. It never shows English
+  posts as Portuguese content.

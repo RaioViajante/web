@@ -1,3 +1,9 @@
+import {
+  DEFAULT_LOCALE,
+  localizedPath,
+  participates,
+  type LocaleId,
+} from "../../../site/locales";
 import { siteOrigins } from "../../../site/sites";
 const DUMP_ORIGIN = siteOrigins.dump;
 const FEED_URL = `${DUMP_ORIGIN}/rss.xml`;
@@ -55,7 +61,13 @@ function tag(item: string, name: string): string | null {
   return match ? decodeXml(match[1].trim()) : null;
 }
 
-export function parseRecentPosts(feed: string): RecentPost[] {
+export function parseRecentPosts(
+  feed: string,
+  locale: LocaleId = DEFAULT_LOCALE,
+): RecentPost[] {
+  // A locale's feed carries that locale's posts: /posts/ in English, /pt/posts/
+  // in Portuguese. Anything else is not that locale's writing.
+  const postsPath = localizedPath("dump", locale, "/posts/");
   return [...feed.matchAll(/<item>([\s\S]*?)<\/item>/g)]
     .map((match): RecentPost | null => {
       const title = tag(match[1], "title");
@@ -68,7 +80,7 @@ export function parseRecentPosts(feed: string): RecentPost[] {
         const date = new Date(published);
         if (
           url.origin !== DUMP_ORIGIN ||
-          !url.pathname.startsWith("/posts/") ||
+          !url.pathname.startsWith(postsPath) ||
           Number.isNaN(date.getTime())
         ) {
           return null;
@@ -97,5 +109,39 @@ export async function getRecentPosts(): Promise<RecentPost[]> {
     return posts.length > 0 ? posts : fallbackPosts;
   } catch {
     return fallbackPosts;
+  }
+}
+
+/** Dump's feed in a locale, built from the shared registry and origins. */
+export const feedUrl = (locale: LocaleId) =>
+  `${DUMP_ORIGIN}${localizedPath("dump", locale, "/rss.xml")}`;
+
+export type LatestWriting =
+  | { state: "ready"; posts: RecentPost[] }
+  /** Dump does not publish this locale (yet), or its feed has nothing valid: say so, never substitute English. */
+  | { state: "unavailable" };
+
+/**
+ * The latest writing in a locale. English is `getRecentPosts` as before, with
+ * its English fallback list. Any other locale reads Dump's feed for that
+ * locale only once Dump participates in it, and otherwise (or on any failure)
+ * reports `unavailable`: never English posts under another language.
+ */
+export async function getLatestWriting(
+  locale: LocaleId,
+): Promise<LatestWriting> {
+  if (locale === DEFAULT_LOCALE)
+    return { state: "ready", posts: await getRecentPosts() };
+  if (!participates("dump", locale)) return { state: "unavailable" };
+  try {
+    const response = await fetch(feedUrl(locale), {
+      next: { revalidate: 60 },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) return { state: "unavailable" };
+    const posts = parseRecentPosts(await response.text(), locale);
+    return posts.length ? { state: "ready", posts } : { state: "unavailable" };
+  } catch {
+    return { state: "unavailable" };
   }
 }

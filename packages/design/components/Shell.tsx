@@ -164,7 +164,9 @@ export function Footer({
   const { footer, lang } = catalogFor(locale);
   const legal = (href: string, label: string, destination: LocaleId) => (
     <SiteLink
-      linkComponent={linkComponent}
+      // A Next layout can survive client navigation. Crossing languages must
+      // reload the document so its root <html lang> is rendered afresh.
+      linkComponent={destination === locale ? linkComponent : undefined}
       href={href}
       data-sound="nav"
       {...(destination !== locale
