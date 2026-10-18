@@ -1,0 +1,66 @@
+---
+contentId: "traduzir-o-site-sem-fingir-que-tudo-ja-existe"
+locale: "pt-BR"
+originalLocale: "pt-BR"
+title: "Traduzir o site sem fingir que tudo já existe"
+description: "Como o dump separa identidade, idioma e publicação para oferecer conteúdo parcial em português sem inventar equivalências."
+tags:
+  - meta
+  - architecture
+  - web
+draft: true
+---
+
+Traduzir um site parece, à primeira vista, um trabalho de trocar textos. Neste projeto, a parte mais delicada apareceu antes da tradução: decidir o que uma página em outro idioma realmente significa.
+
+Se um texto existe em inglês, isso não quer dizer que já exista em português. Se uma rota tem o prefixo `/pt`, ela também não deveria carregar conteúdo em inglês só para evitar um vazio. O site precisa conseguir dizer “esta versão existe” e “esta ainda não existe” sem misturar as duas respostas.
+
+## Uma obra e suas versões
+
+O dump separa a identidade do conteúdo da identidade da rota. Cada obra tem um `contentId` estável; cada versão localizada tem seu próprio `locale`, slug e ciclo de publicação.
+
+Uma tradução pode, por exemplo, compartilhar o identificador `maybe-this-can-be-something-someday` com o texto original sem copiar o slug inglês. A relação vem do `contentId`, não de títulos parecidos nem de uma convenção de nomes.
+
+Isso também permite o caminho inverso: um texto pode nascer em português e continuar sendo uma obra válida mesmo sem uma versão em inglês. `originalLocale` registra essa origem; não define qual idioma é mais importante.
+
+## Parcial precisa ser uma situação normal
+
+O objetivo aqui não é manter uma tabela perfeitamente simétrica. Algumas páginas terão versões nos dois idiomas; outras poderão continuar existindo em apenas um deles.
+
+Por isso, listas de textos, arquivo, tags, relacionados, séries e navegação anterior/próxima são montados somente com registros publicados no idioma atual. Não há substituição automática por outra língua. Quando uma tradução não existe, a rota correspondente também não existe.
+
+Esse comportamento é mais rígido, mas deixa a resposta honesta. Uma página ausente retorna `404`; ela não ganha uma moldura em português ao redor de um texto em inglês.
+
+## A URL escolhe o idioma
+
+Neste site, o idioma vem da URL. As rotas inglesas continuam sem prefixo, enquanto as portuguesas vivem sob `/pt`.
+
+Isso evita fazer a mesma URL mudar conforme o navegador, um cookie ou a localização da pessoa. Também mantém cache, links compartilhados, metadados e ferramentas de busca olhando para a mesma representação.
+
+Slugs localizados são independentes. Essa escolha custa um pouco mais de inventário, porque cada caminho precisa ser declarado e validado, mas evita transformar a tradução em detalhe de apresentação.
+
+## Publicar não é o mesmo que anunciar
+
+As rotas portuguesas podem existir antes de o restante do ecossistema começar a apontar para elas. O projeto trata isso como duas etapas diferentes.
+
+Primeiro, as páginas são publicadas diretamente e verificadas: idioma do documento, URL canônica, metadados, índice de busca, mapa do site e respostas `404`. A participação pública do idioma continua desativada durante essa fase, então o controle `LANG` e os outros sites não anunciam uma experiência que ainda está em validação.
+
+Só uma etapa posterior pode ativar essa divulgação entre hosts. É uma decisão específica deste projeto, não uma regra universal para sites multilíngues.
+
+## O que continua para depois
+
+Nem toda integração entra junto com as primeiras páginas.
+
+O feed inglês em `/rss.xml` precisa preservar URLs, GUIDs, ordem e datas. Um feed em português e sua autodetecção pertencem a uma migração separada; `/pt/rss.xml` não é anunciado enquanto não existe.
+
+Os comentários em inglês também continuam associados ao caminho atual de cada página. Textos em português ficam temporariamente sem a seção de comentários, até que a identidade das discussões seja migrada de forma explícita.
+
+Links automáticos para demonstrações do Lab seguem a mesma cautela: se não existe uma versão portuguesa real, o texto em português não apresenta o destino inglês como se fosse equivalente. Um link editorial para material em inglês ainda pode existir, desde que diga isso claramente e declare `hreflang="en"`.
+
+## Datas pertencem à versão publicada
+
+A tradução não herda a data do original. Cada versão recebe `publishedAt` quando ela realmente se torna pública, no fuso adotado pelo projeto.
+
+Durante a preparação, um manuscrito sem essa data permanece fora do inventário publicado. Ele não precisa de uma data inventada para caber no build, e também não corre o risco de aparecer antes da hora em uma rota, no mapa do site ou na busca.
+
+No fim, a arquitetura serve a uma ideia simples: mostrar apenas o que de fato existe, no idioma em que existe, e deixar espaço para o restante chegar depois.

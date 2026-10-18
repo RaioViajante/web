@@ -32,6 +32,9 @@ Each post starts with frontmatter:
 
 ```yaml
 ---
+contentId: "my-post"
+locale: "en"
+originalLocale: "en"
 title: "Post title"
 description: "One or two sentences. Used for previews, meta tags, and the feed."
 publishedAt: "2026-01-30"
@@ -43,11 +46,13 @@ draft: false
 ---
 ```
 
-`title`, `description`, and `publishedAt` are required; `updatedAt`, `tags`, and
-`draft` are not. `publishedAt` is the original publication date. Add
-`updatedAt` only for a later meaningful editorial or factual revision. A
-`draft: true` post stays out of production — listings, tags, feed, sitemap —
-and 404s there, but still renders locally for previewing.
+`contentId`, `locale`, `originalLocale`, `title`, `description`, and
+`publishedAt` are required; `updatedAt`, `tags`, and `draft` are not.
+`publishedAt` belongs to this localized version. Add `updatedAt` only for a
+later meaningful editorial or factual revision. A `draft: true` post stays out
+of every public route and inventory — listings, tags, feed, sitemap and search.
+Undated manuscripts stay under `content/drafts/<locale>/` until their actual
+release date is known.
 
 See `content/README.md` for the rest.
 
@@ -74,7 +79,7 @@ pnpm run build
 ```
 app/         routes, layout, feed, sitemap
 components/  the dump shell, post listings and article
-content/     posts, as MDX
+content/     published posts, editorial drafts and localized tags
 lib/         content pipeline, feed, site config
 tests/       Jest specs
 ```
