@@ -23,10 +23,15 @@ export function checkIndexLocale(
   entries: unknown,
   locale: LocaleId,
   publishedPaths: readonly string[],
+  publishedSearchablePaths: readonly string[],
 ): Problems {
   const at = `app ${site} ${path}`;
   if (!Array.isArray(entries)) return [`${at}: not a JSON array`];
   const problems: Problems = [];
+  if (entries.length === 0 && publishedSearchablePaths.length > 0)
+    problems.push(
+      `${at}: empty index despite ${publishedSearchablePaths.length} published searchable destination${publishedSearchablePaths.length === 1 ? "" : "s"}`,
+    );
   const wrong = new Map<string, number>();
   let strangers = 0;
   let elsewhere = 0;
@@ -146,6 +151,14 @@ export function checkEnglishIndexLocale(
   path: string,
   entries: unknown,
   publishedPaths: readonly string[],
+  publishedSearchablePaths: readonly string[],
 ): Problems {
-  return checkIndexLocale(site, path, entries, DEFAULT_LOCALE, publishedPaths);
+  return checkIndexLocale(
+    site,
+    path,
+    entries,
+    DEFAULT_LOCALE,
+    publishedPaths,
+    publishedSearchablePaths,
+  );
 }

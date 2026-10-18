@@ -1,13 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { contentSecurityPolicy } from "../../security/headers";
-import {
-  DEFAULT_LOCALE,
-  LOCALES,
-  localeOfPath,
-  stripLocalePrefix,
-  type LocaleId,
-} from "../../site/locales";
+import { DEFAULT_LOCALE, LOCALES, type LocaleId } from "../../site/locales";
 import {
   publishedPostPaths,
   publishedTagPaths,
@@ -21,13 +15,69 @@ const published = {
   ]),
 } satisfies Record<LocaleId, Set<string>>;
 
-function isDynamicContentPath(pathname: string): boolean {
-  const path = stripLocalePrefix(pathname);
-  return path.startsWith("/posts/") || path.startsWith("/tags/");
+interface GuardedPath {
+  locale: LocaleId;
+  dynamic: boolean;
+  malformed: boolean;
+  lookupPath?: string;
+}
+
+/**
+ * Parse only the URL pathname the client requested. This deliberately avoids
+ * the general locale helpers: those reject protocol-relative-looking paths,
+ * while the proxy must turn such input into a localized 404 rather than throw.
+ */
+export function guardedPath(pathname: string): GuardedPath {
+  const locale: LocaleId =
+    pathname === LOCALES["pt-BR"].urlPrefix ||
+    pathname.startsWith(`${LOCALES["pt-BR"].urlPrefix}/`)
+      ? "pt-BR"
+      : DEFAULT_LOCALE;
+  const neutral =
+    locale === DEFAULT_LOCALE
+      ? pathname
+      : pathname.slice(LOCALES[locale].urlPrefix.length) || "/";
+  const malformed = pathname.startsWith("//") || neutral.includes("//");
+  const match = /^\/(posts|tags)\/(.*)$/.exec(neutral);
+  if (!match) return { locale, dynamic: false, malformed };
+
+  // Let Next preserve its established redirect for a published URL with one
+  // trailing slash. All other extra separators are malformed route input.
+  const rawSlug = match[2]!.endsWith("/") ? match[2]!.slice(0, -1) : match[2]!;
+  if (!rawSlug || rawSlug.includes("/"))
+    return { locale, dynamic: true, malformed: true };
+
+  let slug: string;
+  try {
+    slug = decodeURIComponent(rawSlug);
+  } catch {
+    return { locale, dynamic: true, malformed: true };
+  }
+  if (!slug || slug.includes("/") || slug.includes("\\"))
+    return { locale, dynamic: true, malformed: true };
+
+  // English tag routes have historically been case-insensitive. Encoded
+  // unreserved characters in both post and tag slugs also reached the same
+  // page. Compare their decoded route identity without redirecting or adding
+  // aliases; post slugs remain case-sensitive.
+  const kind = match[1]!;
+  const comparableSlug = kind === "tags" ? slug.toLowerCase() : slug;
+  return {
+    locale,
+    dynamic: true,
+    malformed,
+    lookupPath: `${LOCALES[locale].urlPrefix}/${kind}/${comparableSlug}`,
+  };
 }
 
 export function isPublishedDynamicPath(pathname: string): boolean {
-  return published[localeOfPath(pathname)].has(pathname);
+  const guarded = guardedPath(pathname);
+  return Boolean(
+    guarded.dynamic &&
+    !guarded.malformed &&
+    guarded.lookupPath &&
+    published[guarded.locale].has(guarded.lookupPath),
+  );
 }
 
 export function proxy(request: NextRequest) {
@@ -39,13 +89,15 @@ export function proxy(request: NextRequest) {
   );
   const headers = new Headers(request.headers);
   headers.set("x-nonce", nonce);
-  const locale = localeOfPath(request.nextUrl.pathname);
+  const guarded = guardedPath(request.nextUrl.pathname);
+  const { locale } = guarded;
   // URL-only locale authority: overwrite any value supplied by the client.
   headers.set("x-locale", locale);
   headers.set("Content-Security-Policy", csp);
   const invalidDynamicRoute =
-    isDynamicContentPath(request.nextUrl.pathname) &&
-    !isPublishedDynamicPath(request.nextUrl.pathname);
+    guarded.malformed ||
+    (guarded.dynamic &&
+      (!guarded.lookupPath || !published[locale].has(guarded.lookupPath)));
   const response = invalidDynamicRoute
     ? NextResponse.rewrite(
         new URL(`${LOCALES[locale].urlPrefix}/__dump-not-found`, request.url),

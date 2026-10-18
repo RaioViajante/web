@@ -111,6 +111,15 @@ A `draft: true` post is excluded from every public route and inventory,
 including the homepage, archive, tag pages, RSS, sitemap and search. Its route
 returns 404 until the record is published.
 
+The request proxy checks dynamic membership against the generated published
+inventory; it never scans MDX per request. It compares decoded route segments
+so established English URLs using percent-encoded unreserved characters still
+resolve, and English tag slugs remain case-insensitive. Encoded separators,
+invalid percent encodings, drafts and unknown slugs are localized 404s. Next.js
+normalizes repeated separators and one trailing slash before the proxy with its
+established 308; a missing normalized destination then returns the localized
+404. No alias or new canonical is introduced.
+
 An article whose truthful first-publication date is not known yet cannot be a
 post record, because `publishedAt` remains required even for a draft. Prepare
 such work in `content/drafts/<locale>/`; that directory is never loaded by the

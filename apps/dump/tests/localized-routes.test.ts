@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import sitemap from "@/app/sitemap";
+import sitemap, { buildSitemap } from "@/app/sitemap";
 import { GET as portugueseSearchIndex } from "@/app/pt/search-index.json/route";
 import { publishedPageInventory, postPath, tagPath } from "@/lib/inventory";
 import { getAllTags, getPublishedPosts } from "@/lib/posts";
@@ -40,6 +40,41 @@ describe("localized published inventory", () => {
     expect(paths).not.toContain("/pt/search");
     expect(paths.some((path) => path.startsWith("/pt/posts/"))).toBe(false);
     expect(paths.some((path) => path.startsWith("/pt/tags/"))).toBe(false);
+  });
+
+  it("keeps structural routes indexable when the reviewed publication commit adds Portuguese content", () => {
+    const plannedPosts = [
+      {
+        slug: "talvez-isso-vire-alguma-coisa-um-dia",
+        locale: "pt-BR" as const,
+      },
+      {
+        slug: "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+        locale: "pt-BR" as const,
+      },
+    ];
+    const plannedTags = ["pessoal", "meta", "dump", "arquitetura", "web"].map(
+      (slug) => ({ locale: "pt-BR" as const, slug }),
+    );
+    const paths = buildSitemap(plannedPosts, plannedTags).map(
+      ({ url }) => new URL(url).pathname,
+    );
+
+    expect(paths).toEqual(
+      expect.arrayContaining([
+        "/pt",
+        "/pt/archive",
+        "/pt/tags",
+        "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia",
+        "/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+        "/pt/tags/pessoal",
+        "/pt/tags/meta",
+        "/pt/tags/dump",
+        "/pt/tags/arquitetura",
+        "/pt/tags/web",
+      ]),
+    );
+    expect(staticMetadata(routes.home["pt-BR"]!).robots).toBeUndefined();
   });
 
   it("serves a valid empty Portuguese search index", async () => {

@@ -28,7 +28,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "jest",
+    "test": "jest && node --test scripts/*.test.mjs",
     "test:watch": "jest --watch",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

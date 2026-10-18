@@ -160,7 +160,15 @@ export function HomePostList({
             <LeaderRow
               key={item.name}
               label={item.name}
-              value={`${parts.length} ${parts.length === 1 ? "part" : "parts"}`}
+              value={`${parts.length} ${
+                parts.length === 1
+                  ? portuguese
+                    ? ptCopy.home.part
+                    : "part"
+                  : portuguese
+                    ? ptCopy.home.parts
+                    : "parts"
+              }`}
               href={postPath(parts[0]!)}
               linkComponent={Link}
             />

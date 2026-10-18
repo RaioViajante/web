@@ -69,4 +69,21 @@ describe("<HomePostList />", () => {
     expect(screen.getByText("No posts yet.")).toBeInTheDocument();
     expect(screen.queryByRole("article")).not.toBeInTheDocument();
   });
+
+  it("localizes Portuguese series counts without changing their identity", () => {
+    const portuguesePart: Post = {
+      ...posts[0]!,
+      slug: "construindo-orbit",
+      contentId: "building-orbit",
+      locale: "pt-BR",
+      originalLocale: "en",
+      title: "Construindo Orbit",
+    };
+    render(<HomePostList posts={[portuguesePart]} locale="pt-BR" />);
+
+    expect(
+      screen.getByRole("link", { name: /orbit.*1 parte/i }),
+    ).toHaveAttribute("href", "/pt/posts/construindo-orbit");
+    expect(screen.queryByText(/1 part$/)).not.toBeInTheDocument();
+  });
 });

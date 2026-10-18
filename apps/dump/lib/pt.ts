@@ -34,6 +34,8 @@ export const ptCopy = {
     line: "um despejo de memória, tomara que legível.",
     latest: "Mais recente",
     series: "Séries",
+    part: "parte",
+    parts: "partes",
     follow: "Acompanhe",
     code: "código ↗",
     empty: "Ainda não há textos publicados em português.",
