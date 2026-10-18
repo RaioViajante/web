@@ -20,6 +20,9 @@
   },
   "scripts": {
     "dev": "next dev",
+    "content:routes": "node scripts/content-routes.mjs && prettier --write lib/published-routes.generated.ts",
+    "predev": "pnpm content:routes",
+    "prebuild": "pnpm content:routes",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",

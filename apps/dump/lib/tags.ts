@@ -1,4 +1,5 @@
 import { isLocaleId, type LocaleId } from "../../../site/locales";
+import definitions from "../content/tags.json";
 
 // Dump's tag taxonomy. A tag has a stable internal id (what posts reference and
 // what queries filter on), and, per locale, a display label and a URL slug.
@@ -22,42 +23,7 @@ export interface TagDefinition {
 
 const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-/** English presentations of the tags Dump publishes today: label and slug are the id, as always. */
-const english = (id: TagId): TagDefinition => ({
-  id,
-  locales: { en: { label: id, slug: id } },
-});
-
-export const tagDefinitions: readonly TagDefinition[] = [
-  "architecture",
-  "assembly",
-  "automation",
-  "cli",
-  "compilers",
-  "distributed-systems",
-  "dump",
-  "java",
-  "language-design",
-  "mcp",
-  "meta",
-  "osdev",
-  "personal",
-  "programming-languages",
-  "projects",
-  "pytest",
-  "python",
-  "reliability",
-  "security",
-  "spring",
-  "sweep",
-  "time",
-  "toml",
-  "typescript",
-  "web",
-  "workflow",
-  "writing",
-  "x86",
-].map(english);
+export const tagDefinitions = definitions as readonly TagDefinition[];
 
 export interface Taxonomy {
   definitions: readonly TagDefinition[];

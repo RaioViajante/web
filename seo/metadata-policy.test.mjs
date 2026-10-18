@@ -82,6 +82,38 @@ test("entities in titles are decoded before comparison", () => {
 
 test("a complete document passes", () => assert.deepEqual(doc(), []));
 
+test("Portuguese Dump pages do not advertise RSS before the feed exists", () => {
+  const canonical = "https://dump.raioviajante.com/pt";
+  const portuguese = (extraHead = "") =>
+    html({
+      lang: "pt-BR",
+      canonical,
+      title: "dump em português",
+      extraHead,
+      drop: ["rss"],
+    })
+      .replace('content="en_US"', 'content="pt_BR"')
+      .replace('content="article"', 'content="website"');
+  const check = (markup) =>
+    checkDocument({
+      site: "dump",
+      path: "/pt",
+      loc: canonical,
+      html: markup,
+      themeColor: COLOR,
+    }).filter((problem) => problem.includes("RSS"));
+
+  assert.deepEqual(check(portuguese()), []);
+  assert.match(
+    check(
+      portuguese(
+        '<link rel="alternate" type="application/rss+xml" href="https://dump.raioviajante.com/rss.xml"/>',
+      ),
+    ).join("\n"),
+    /localized RSS discovery must remain absent/,
+  );
+});
+
 test("document rules each produce a located diagnostic", () => {
   const cases = [
     [{ lang: "pt" }, /app dump page \/posts\/foo: <html lang> is "pt"/],

@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 
 import { sectionNumber } from "@raioviajante/design/sections";
+import { DEFAULT_LOCALE } from "../../../site/locales";
 import {
   getPublishedPosts,
   sortPostsNewestFirst,
@@ -99,6 +100,28 @@ export function chronologicalNeighbours(
   };
 }
 
+/** Automatic Lab suggestions exist only when that localized counterpart exists. */
+export function labForPost(post: Post) {
+  const currentSeries = seriesOf(post);
+  if (post.locale !== DEFAULT_LOCALE) return null;
+  return post.tags.includes("osdev")
+    ? {
+        title: "Boot sector",
+        href: "https://lab.raioviajante.com/experiments/boot-sector/",
+      }
+    : currentSeries?.name === "orbit"
+      ? {
+          title: "Execution states",
+          href: "https://lab.raioviajante.com/experiments/execution-states/",
+        }
+      : currentSeries?.name === "sweep"
+        ? {
+            title: "Filename classifier",
+            href: "https://lab.raioviajante.com/experiments/filename-classifier/",
+          }
+        : null;
+}
+
 export function getPostDetails(post: Post) {
   const raw = fs.readFileSync(
     path.join(process.cwd(), "content", "posts", `${post.slug}.mdx`),
@@ -125,22 +148,7 @@ export function getPostDetails(post: Post) {
   const related = relatedPosts(post, posts);
   const { previous, next } = chronologicalNeighbours(post, posts);
   const currentSeries = seriesOf(post);
-  const lab = post.tags.includes("osdev")
-    ? {
-        title: "Boot sector",
-        href: "https://lab.raioviajante.com/experiments/boot-sector/",
-      }
-    : currentSeries?.name === "orbit"
-      ? {
-          title: "Execution states",
-          href: "https://lab.raioviajante.com/experiments/execution-states/",
-        }
-      : currentSeries?.name === "sweep"
-        ? {
-            title: "Filename classifier",
-            href: "https://lab.raioviajante.com/experiments/filename-classifier/",
-          }
-        : null;
+  const lab = labForPost(post);
   return {
     headings,
     minutes: Math.max(1, Math.ceil(words / 220)),

@@ -1,6 +1,7 @@
 import {
   DEFAULT_LOCALE,
   localeOfPath,
+  stripLocalePrefix,
   type LocaleId,
 } from "../site/locales.ts";
 import { siteOrigins, type SiteId as Site } from "../site/sites.ts";
@@ -25,7 +26,6 @@ export function checkIndexLocale(
 ): Problems {
   const at = `app ${site} ${path}`;
   if (!Array.isArray(entries)) return [`${at}: not a JSON array`];
-  if (entries.length === 0) return [`${at}: no entries`];
   const problems: Problems = [];
   const wrong = new Map<string, number>();
   let strangers = 0;
@@ -33,6 +33,7 @@ export function checkIndexLocale(
   let unpublished = 0;
   const inventory = new Set(publishedPaths);
   const duplicates = new Map<string, number>();
+  const duplicateContentIds = new Map<string, number>();
   const required = ["site", "locale", "title", "href", "description"] as const;
   const optional = ["number", "date", "body"] as const;
   for (const [index, entry] of entries.entries()) {
@@ -51,10 +52,34 @@ export function checkIndexLocale(
         problems.push(
           `${at}: entry ${index + 1} field "${field}" is not a string`,
         );
-    if (typeof record.title === "string" && !record.title.trim())
-      problems.push(`${at}: entry ${index + 1} field "title" is empty`);
-    if (typeof record.href === "string" && !record.href.trim())
-      problems.push(`${at}: entry ${index + 1} field "href" is empty`);
+    let isDumpWorkEntry = false;
+    if (typeof record.href === "string")
+      try {
+        const url = new URL(record.href);
+        isDumpWorkEntry =
+          site === "dump" &&
+          !url.hash &&
+          stripLocalePrefix(url.pathname).startsWith("/posts/");
+      } catch {
+        // URL diagnostics are emitted below; do not duplicate them here.
+      }
+    if (record.contentId !== undefined || isDumpWorkEntry) {
+      if (
+        typeof record.contentId !== "string" ||
+        !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(record.contentId)
+      )
+        problems.push(
+          `${at}: entry ${index + 1} field "contentId" is not a valid stable id`,
+        );
+      else if (isDumpWorkEntry)
+        duplicateContentIds.set(
+          record.contentId,
+          (duplicateContentIds.get(record.contentId) ?? 0) + 1,
+        );
+    }
+    for (const field of ["title", "href", "description"] as const)
+      if (typeof record[field] === "string" && !record[field].trim())
+        problems.push(`${at}: entry ${index + 1} field "${field}" is empty`);
 
     const found = record.locale;
     if (found !== locale) {
@@ -66,6 +91,10 @@ export function checkIndexLocale(
       if (typeof record.href !== "string") throw new TypeError("invalid href");
       const url = new URL(record.href);
       if (
+        !["http:", "https:"].includes(url.protocol) ||
+        url.username ||
+        url.password ||
+        url.search ||
         url.origin !== siteOrigins[site] ||
         localeOfPath(url.pathname) !== locale
       )
@@ -76,7 +105,9 @@ export function checkIndexLocale(
     }
 
     const duplicateKey = JSON.stringify(
-      [...required, ...optional].map((field) => record[field] ?? null),
+      [...required, ...optional, "contentId"].map(
+        (field) => record[field] ?? null,
+      ),
     );
     duplicates.set(duplicateKey, (duplicates.get(duplicateKey) ?? 0) + 1);
   }
@@ -100,6 +131,12 @@ export function checkIndexLocale(
   );
   if (duplicateCount)
     problems.push(`${at}: ${duplicateCount} duplicate entries`);
+  const duplicateWorks = [...duplicateContentIds.values()].reduce(
+    (count, occurrences) => count + Math.max(occurrences - 1, 0),
+    0,
+  );
+  if (duplicateWorks)
+    problems.push(`${at}: ${duplicateWorks} duplicate content ids`);
   return problems;
 }
 

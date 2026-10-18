@@ -3,7 +3,7 @@ import path from "node:path";
 
 import matter from "gray-matter";
 
-import { isLocaleId, type LocaleId } from "../../../site/locales";
+import { isLocaleId, localeById, type LocaleId } from "../../../site/locales";
 import {
   taxonomy as defaultTaxonomy,
   tagPresentation,
@@ -33,7 +33,7 @@ export interface PostFrontmatter {
   updatedAt?: string;
   /** Stable tag ids (see `lib/tags.ts`). May be empty. */
   tags: TagId[];
-  /** When true, this version is hidden from listings and from production builds. */
+  /** When true, this version is excluded from every public route and inventory. */
   draft: boolean;
 }
 
@@ -364,22 +364,17 @@ export function getPostVersion(
 }
 
 /**
- * Slugs of one locale to prerender. Production builds only the published set,
- * so a draft 404s once deployed; `next dev` serves drafts so they can be
- * previewed.
+ * Published slugs of one locale to prerender. Drafts never receive routes;
+ * undated editorial work lives outside the post collection entirely.
  */
 export function getPostSlugs(
   locale: LocaleId,
   directory: string = POSTS_DIRECTORY,
   taxonomy: Taxonomy = defaultTaxonomy,
 ): string[] {
-  const posts =
-    process.env.NODE_ENV === "production"
-      ? getPublishedPosts(locale, directory, taxonomy)
-      : getAllPosts(directory, taxonomy).filter(
-          (post) => post.locale === locale,
-        );
-  return posts.map((post) => post.slug);
+  return getPublishedPosts(locale, directory, taxonomy).map(
+    (post) => post.slug,
+  );
 }
 
 /** A post of this locale by its slug; a slug that exists only in another locale is not found. */
@@ -442,19 +437,25 @@ export function getPostsByTag(
 }
 
 /** e.g. "2026-09-03" -> "September 3, 2026". Timezone-independent. */
-export function formatPostDate(date: string): string {
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
+export function formatPostDate(date: string, locale: LocaleId = "en"): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString(
+    localeById(locale).intlLocale,
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    },
+  );
 }
 
 /** e.g. "2026-09-03" -> "September". Timezone-independent. */
-export function formatPostMonth(date: string): string {
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", {
-    month: "long",
-    timeZone: "UTC",
-  });
+export function formatPostMonth(date: string, locale: LocaleId = "en"): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString(
+    localeById(locale).intlLocale,
+    {
+      month: "long",
+      timeZone: "UTC",
+    },
+  );
 }

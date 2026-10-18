@@ -8,6 +8,7 @@ import { DEFAULT_LOCALE } from "../../../../../site/locales";
 import { getAllTags, getPostsByTag } from "@/lib/posts";
 import { tagFromSlug } from "@/lib/tags";
 import { metadataFor } from "@/lib/seo";
+import { tagCounterparts } from "@/lib/inventory";
 
 export const dynamicParams = false;
 
@@ -23,9 +24,12 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { tag } = await params;
-  const label = tagFromSlug(DEFAULT_LOCALE, tag)?.label ?? tag;
+  const found = tagFromSlug(DEFAULT_LOCALE, tag);
+  const label = found?.label ?? tag;
   return metadataFor({
     path: tagHref(tag),
+    locale: DEFAULT_LOCALE,
+    counterparts: found ? tagCounterparts(DEFAULT_LOCALE, found.id) : [],
     title: `Posts tagged "${label}"`,
     description: `Technical writing and project notes tagged "${label}" on dump.`,
   });

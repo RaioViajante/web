@@ -1,48 +1,64 @@
 import Link from "next/link";
 import { LeaderRow, Section } from "@raioviajante/design/parts";
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 
+import { postPath, tagPath } from "@/lib/inventory";
+import { ptCopy } from "@/lib/pt";
 import { sortPostsNewestFirst, type Post, type TagCount } from "@/lib/posts";
 
-export function tagHref(slug: string): string {
-  return `/tags/${encodeURIComponent(slug)}`;
+export function tagHref(
+  slug: string,
+  locale: LocaleId = DEFAULT_LOCALE,
+): string {
+  return tagPath(locale, slug);
 }
 export function formatTagPostDate(date: string): string {
   return date.slice(2);
 }
 
-export function TagIndex({ tags }: { tags: TagCount[] }) {
-  if (!tags.length) return <p className="tags-empty">No tags yet.</p>;
+export function TagIndex({
+  tags,
+  locale = DEFAULT_LOCALE,
+}: {
+  tags: TagCount[];
+  locale?: LocaleId;
+}) {
+  if (!tags.length)
+    return (
+      <p className="tags-empty">
+        {locale === DEFAULT_LOCALE ? "No tags yet." : ptCopy.tags.empty}
+      </p>
+    );
+  const portuguese = locale !== DEFAULT_LOCALE;
   const groups = [
     {
-      label: "Recurring",
+      label: portuguese ? ptCopy.tags.recurring : "Recurring",
       number: "02.",
+      recurring: true,
       items: tags.filter((item) => item.count > 1),
     },
     {
-      label: "Once so far",
+      label: portuguese ? ptCopy.tags.once : "Once so far",
       number: "02.1",
+      recurring: false,
       items: tags.filter((item) => item.count === 1),
     },
   ].filter((group) => group.items.length > 0);
   return (
     <>
-      {groups.map(({ label, number, items }, index) => (
+      {groups.map(({ label, number, recurring, items }, index) => (
         <Section
           key={label}
           number={index === 0 ? "02." : number}
           title={label}
         >
-          <ol
-            className={
-              label === "Recurring" ? "tag-index" : "tag-index tag-index--two"
-            }
-          >
+          <ol className={recurring ? "tag-index" : "tag-index tag-index--two"}>
             {items.map(({ id, label, slug, count }) => (
               <li className="tag-index-item" key={id}>
                 <LeaderRow
                   label={label}
                   value={count}
-                  href={tagHref(slug)}
+                  href={tagHref(slug, locale)}
                   linkComponent={Link}
                 />
               </li>
@@ -66,7 +82,7 @@ export function TagPostList({ posts }: { posts: Post[] }) {
                 {post.publishedAt.slice(5)}
               </time>
             }
-            href={`/posts/${post.slug}`}
+            href={postPath(post)}
             linkComponent={Link}
           />
         </li>

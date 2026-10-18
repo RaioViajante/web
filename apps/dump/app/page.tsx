@@ -27,6 +27,7 @@ export default async function HomePage() {
       <HomePostList
         posts={posts}
         latestMinutes={latest ? getPostDetails(latest).minutes : undefined}
+        locale={DEFAULT_LOCALE}
       />
     </DumpShell>
   );

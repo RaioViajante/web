@@ -1,26 +1,25 @@
 import type { MetadataRoute } from "next";
 
-import { DEFAULT_LOCALE } from "../../../site/locales";
+import { LOCALE_IDS } from "../../../site/locales";
+import { postPath, tagPath } from "@/lib/inventory";
 import { getAllTags, getPublishedPosts } from "@/lib/posts";
+import { declaredPages } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = getPublishedPosts(DEFAULT_LOCALE);
-
-  const staticRoutes = ["/", "/archive", "/tags", "/terms", "/privacy"].map(
-    (path) => ({
-      url: absoluteUrl(path),
-    }),
+  const staticRoutes = declaredPages()
+    .filter(({ key }) => key !== "search")
+    .map(({ path }) => ({ url: absoluteUrl(path) }));
+  const postRoutes = LOCALE_IDS.flatMap((locale) =>
+    getPublishedPosts(locale).map((post) => ({
+      url: absoluteUrl(postPath(post)),
+      ...(post.updatedAt ? { lastModified: post.updatedAt } : {}),
+    })),
   );
-
-  const postRoutes = posts.map((post) => ({
-    url: absoluteUrl(`/posts/${post.slug}`),
-    ...(post.updatedAt ? { lastModified: post.updatedAt } : {}),
-  }));
-
-  const tagRoutes = getAllTags(DEFAULT_LOCALE).map(({ slug }) => ({
-    url: absoluteUrl(`/tags/${encodeURIComponent(slug)}`),
-  }));
-
+  const tagRoutes = LOCALE_IDS.flatMap((locale) =>
+    getAllTags(locale).map(({ slug }) => ({
+      url: absoluteUrl(tagPath(locale, slug)),
+    })),
+  );
   return [...staticRoutes, ...postRoutes, ...tagRoutes];
 }
