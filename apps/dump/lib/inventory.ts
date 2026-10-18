@@ -6,6 +6,7 @@ import {
 import type { Counterpart, LocalizedRoute } from "../../../seo/locale";
 import { getAllTags, getPublishedPosts, type Post } from "./posts";
 import { declaredPages } from "./routes";
+import { encodeTagSlug } from "./tag-route";
 import { taxonomy } from "./tags";
 
 export function postPath(post: Pick<Post, "locale" | "slug">): string {
@@ -13,7 +14,7 @@ export function postPath(post: Pick<Post, "locale" | "slug">): string {
 }
 
 export function tagPath(locale: LocaleId, slug: string): string {
-  return localizedPath("dump", locale, `/tags/${encodeURIComponent(slug)}`);
+  return localizedPath("dump", locale, `/tags/${encodeTagSlug(slug)}`);
 }
 
 export function postCounterparts(post: Post): Counterpart[] {

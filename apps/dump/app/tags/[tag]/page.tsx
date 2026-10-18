@@ -5,7 +5,7 @@ import { PageHeader } from "@raioviajante/design/parts";
 import { DumpShell } from "@/components/DumpShell";
 import { TagPostList, tagHref } from "@/components/TagViews";
 import { DEFAULT_LOCALE } from "../../../../../site/locales";
-import { getAllTags, getPostsByTag } from "@/lib/posts";
+import { getAllTags, getPostsByTagId } from "@/lib/posts";
 import { tagFromSlug } from "@/lib/tags";
 import { metadataFor } from "@/lib/seo";
 import { tagCounterparts } from "@/lib/inventory";
@@ -25,27 +25,28 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { tag } = await params;
   const found = tagFromSlug(DEFAULT_LOCALE, tag);
-  const label = found?.label ?? tag;
+  if (!found) notFound();
   return metadataFor({
-    path: tagHref(tag),
+    path: tagHref(found.slug),
     locale: DEFAULT_LOCALE,
-    counterparts: found ? tagCounterparts(DEFAULT_LOCALE, found.id) : [],
-    title: `Posts tagged "${label}"`,
-    description: `Technical writing and project notes tagged "${label}" on dump.`,
+    counterparts: tagCounterparts(DEFAULT_LOCALE, found.id),
+    title: `Posts tagged "${found.label}"`,
+    description: `Technical writing and project notes tagged "${found.label}" on dump.`,
   });
 }
 
 export default async function TagPage({ params }: PageProps) {
   const { tag } = await params;
-  const posts = getPostsByTag(DEFAULT_LOCALE, tag);
+  const found = tagFromSlug(DEFAULT_LOCALE, tag);
+  if (!found) notFound();
+  const posts = getPostsByTagId(DEFAULT_LOCALE, found.id);
   if (posts.length === 0) notFound();
-  const label = tagFromSlug(DEFAULT_LOCALE, tag)?.label ?? tag;
 
   return (
     <DumpShell current="/tags">
       <PageHeader
         label="Tag"
-        title={label}
+        title={found.label}
         line={`${posts.length} ${posts.length === 1 ? "post" : "posts"}`}
       />
       <TagPostList posts={posts} />

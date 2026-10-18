@@ -97,7 +97,12 @@ English labels and `/tags/<id>` URLs stay unchanged. A post's tags must each
 have a presentation in the post's own locale, or the build fails; there is no
 English fallback. Filtering uses the id; a localized slug only routes to it,
 and no slug identifies a tag. Adding or localizing a tag means editing the JSON
-definition.
+definition. A declared slug is an NFC-normalized decoded path segment. Unicode
+and reserved characters are encoded exactly once in its URL; path separators,
+percent signs, whitespace and malformed Unicode are not valid slug data.
+English tag lookup remains case-insensitive for historical compatibility.
+Portuguese lookup is exact, and canonical URLs come from the declared
+presentation rather than request text.
 
 ### Series
 
@@ -114,7 +119,8 @@ returns 404 until the record is published.
 The request proxy checks dynamic membership against the generated published
 inventory; it never scans MDX per request. It compares decoded route segments
 so established English URLs using percent-encoded unreserved characters still
-resolve, and English tag slugs remain case-insensitive. Encoded separators,
+resolve, and English tag slugs remain case-insensitive. Portuguese tag slugs
+use their exact declared case. Encoded separators, residual percent escapes,
 invalid percent encodings, drafts and unknown slugs are localized 404s. Next.js
 normalizes repeated separators and one trailing slash before the proxy with its
 established 308; a missing normalized destination then returns the localized

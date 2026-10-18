@@ -1,7 +1,17 @@
 /** @jest-environment node */
 import { NextRequest } from "next/server";
 
-import { guardedPath, isPublishedDynamicPath, proxy } from "../proxy";
+import {
+  guardedPath,
+  isPublishedDynamicPath,
+  proxy,
+  type PublishedDynamicPaths,
+} from "../proxy";
+
+const encodedTags: PublishedDynamicPaths = {
+  en: new Set(["/tags/caf%C3%A9%2Bc%23"]),
+  "pt-BR": new Set(["/pt/tags/caf%C3%A9%2Bpt%23", "/pt/tags/pessoal"]),
+};
 
 describe("dynamic route guard", () => {
   it("accepts only generated published memberships", () => {
@@ -22,6 +32,38 @@ describe("dynamic route guard", () => {
     expect(isPublishedDynamicPath("/tags/OSDEV")).toBe(true);
     expect(isPublishedDynamicPath("/tags/%6f%73%64%65%76")).toBe(true);
     expect(isPublishedDynamicPath("/posts/foo%2Fbar")).toBe(false);
+  });
+
+  it("matches encoded tag identities without weakening Portuguese casing", () => {
+    expect(isPublishedDynamicPath("/tags/CAF%C3%89%2BC%23", encodedTags)).toBe(
+      true,
+    );
+    expect(
+      isPublishedDynamicPath("/pt/tags/caf%C3%A9%2Bpt%23", encodedTags),
+    ).toBe(true);
+    expect(isPublishedDynamicPath("/pt/tags/%70essoal", encodedTags)).toBe(
+      true,
+    );
+    expect(isPublishedDynamicPath("/pt/tags/PESSOAL", encodedTags)).toBe(false);
+    expect(
+      isPublishedDynamicPath("/pt/tags/CAF%C3%89%2BPT%23", encodedTags),
+    ).toBe(false);
+  });
+
+  it.each([
+    "/tags/x%2Fy",
+    "/tags/x%5Cy",
+    "/tags/x%252Fy",
+    "/tags/%E0%A4%A",
+    "/pt/tags/x%2Fy",
+    "/pt/tags/x%252Fy",
+  ])("rejects unsafe or ambiguous encoded tag input (%s)", (path) => {
+    expect(() => guardedPath(path)).not.toThrow();
+    expect(guardedPath(path)).toMatchObject({
+      dynamic: true,
+      malformed: true,
+    });
+    expect(isPublishedDynamicPath(path, encodedTags)).toBe(false);
   });
 
   it.each([

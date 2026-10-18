@@ -77,6 +77,23 @@ describe("localized published inventory", () => {
     expect(staticMetadata(routes.home["pt-BR"]!).robots).toBeUndefined();
   });
 
+  it("uses the shared canonical encoder for sitemap tag URLs", () => {
+    const paths = buildSitemap(
+      [],
+      [
+        { locale: "en", slug: "café+c#" },
+        { locale: "pt-BR", slug: "café+pt#" },
+      ],
+    ).map(({ url }) => new URL(url).pathname);
+
+    expect(paths).toEqual(
+      expect.arrayContaining([
+        "/tags/caf%C3%A9%2Bc%23",
+        "/pt/tags/caf%C3%A9%2Bpt%23",
+      ]),
+    );
+  });
+
   it("serves a valid empty Portuguese search index", async () => {
     const response = portugueseSearchIndex();
     expect(response.headers.get("content-type")).toMatch(/^application\/json/);

@@ -272,7 +272,7 @@ export function getPostsByTag(
   directory: string = POSTS_DIRECTORY,
   taxonomy: Taxonomy = defaultTaxonomy,
 ): Post[] {
-  const id = taxonomy.idForSlug(locale, tagSlug.toLowerCase());
+  const id = taxonomy.idForSlug(locale, tagSlug);
   return id ? getPostsByTagId(locale, id, directory, taxonomy) : [];
 }
 

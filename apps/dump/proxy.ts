@@ -6,14 +6,36 @@ import {
   publishedPostPaths,
   publishedTagPaths,
 } from "./lib/published-routes.generated";
+import {
+  decodeTagPathSegment,
+  encodeTagSlug,
+  tagLookupSlug,
+} from "./lib/tag-route";
 
-const published = {
-  en: new Set<string>([...publishedPostPaths.en, ...publishedTagPaths.en]),
+export type PublishedDynamicPaths = Record<LocaleId, ReadonlySet<string>>;
+
+function tagManifestLookupPath(locale: LocaleId, path: string): string {
+  const start = `${LOCALES[locale].urlPrefix}/tags/`;
+  const segment = path.startsWith(start) ? path.slice(start.length) : "";
+  const slug = decodeTagPathSegment(segment);
+  const lookup = slug && tagLookupSlug(locale, slug);
+  if (!lookup)
+    throw new Error(`Invalid generated tag route ${JSON.stringify(path)}.`);
+  return `${start}${encodeTagSlug(lookup)}`;
+}
+
+const published: PublishedDynamicPaths = {
+  en: new Set<string>([
+    ...publishedPostPaths.en,
+    ...publishedTagPaths.en.map((path) => tagManifestLookupPath("en", path)),
+  ]),
   "pt-BR": new Set<string>([
     ...publishedPostPaths["pt-BR"],
-    ...publishedTagPaths["pt-BR"],
+    ...publishedTagPaths["pt-BR"].map((path) =>
+      tagManifestLookupPath("pt-BR", path),
+    ),
   ]),
-} satisfies Record<LocaleId, Set<string>>;
+};
 
 interface GuardedPath {
   locale: LocaleId;
@@ -47,6 +69,23 @@ export function guardedPath(pathname: string): GuardedPath {
   if (!rawSlug || rawSlug.includes("/"))
     return { locale, dynamic: true, malformed: true };
 
+  // English tag routes have historically been case-insensitive. Encoded
+  // unreserved characters in both post and tag slugs also reached the same
+  // page. Tags use the shared single-decode identity contract; post slugs
+  // remain case-sensitive.
+  const kind = match[1]!;
+  if (kind === "tags") {
+    const slug = decodeTagPathSegment(rawSlug);
+    const lookup = slug && tagLookupSlug(locale, slug);
+    if (!lookup) return { locale, dynamic: true, malformed: true };
+    return {
+      locale,
+      dynamic: true,
+      malformed,
+      lookupPath: `${LOCALES[locale].urlPrefix}/tags/${encodeTagSlug(lookup)}`,
+    };
+  }
+
   let slug: string;
   try {
     slug = decodeURIComponent(rawSlug);
@@ -55,28 +94,24 @@ export function guardedPath(pathname: string): GuardedPath {
   }
   if (!slug || slug.includes("/") || slug.includes("\\"))
     return { locale, dynamic: true, malformed: true };
-
-  // English tag routes have historically been case-insensitive. Encoded
-  // unreserved characters in both post and tag slugs also reached the same
-  // page. Compare their decoded route identity without redirecting or adding
-  // aliases; post slugs remain case-sensitive.
-  const kind = match[1]!;
-  const comparableSlug = kind === "tags" ? slug.toLowerCase() : slug;
   return {
     locale,
     dynamic: true,
     malformed,
-    lookupPath: `${LOCALES[locale].urlPrefix}/${kind}/${comparableSlug}`,
+    lookupPath: `${LOCALES[locale].urlPrefix}/${kind}/${slug}`,
   };
 }
 
-export function isPublishedDynamicPath(pathname: string): boolean {
+export function isPublishedDynamicPath(
+  pathname: string,
+  inventory: PublishedDynamicPaths = published,
+): boolean {
   const guarded = guardedPath(pathname);
   return Boolean(
     guarded.dynamic &&
     !guarded.malformed &&
     guarded.lookupPath &&
-    published[guarded.locale].has(guarded.lookupPath),
+    inventory[guarded.locale].has(guarded.lookupPath),
   );
 }
 

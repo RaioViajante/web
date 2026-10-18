@@ -102,6 +102,23 @@ test("Dump rejects encoded malformed paths over actual HTTP without losing URL l
   for (const [path, lang] of [
     ["/posts/%E0%A4%A", "en"],
     ["/posts/foo%2Fbar", "en"],
+    ["/tags/foo%2Fbar", "en"],
+    ["/tags/foo%252Fbar", "en"],
+    ["/pt/tags/%E0%A4%A", "pt-BR"],
+  ] as const) {
+    const response = await rawGet(path, { "x-locale": "client-controlled" });
+    expect(response.status, path).toBe(404);
+    expect(response.location, path).toBeUndefined();
+    expect(response.body, path).toContain(`<html lang="${lang}"`);
+  }
+});
+
+test("Dump tag misses preserve URL-authoritative localized 404s", async () => {
+  for (const [path, lang] of [
+    ["/tags/not-real", "en"],
+    ["/pt/tags/pessoal", "pt-BR"],
+    ["/pt/tags/PESSOAL", "pt-BR"],
+    ["/pt/tags/%70essoal", "pt-BR"],
   ] as const) {
     const response = await rawGet(path, { "x-locale": "client-controlled" });
     expect(response.status, path).toBe(404);

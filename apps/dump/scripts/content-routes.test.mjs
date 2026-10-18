@@ -60,3 +60,29 @@ test("the manifest generator uses validated draft state for membership", () => {
     rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test("the manifest generator encodes authoritative tag slugs exactly once", () => {
+  const directory = mkdtempSync(join(tmpdir(), "dump-routes-"));
+  const encodedTaxonomy = [
+    {
+      id: "encoded-topic",
+      locales: {
+        en: { label: "encoded topic", slug: "café+c#" },
+      },
+    },
+  ];
+  try {
+    writeFileSync(
+      join(directory, "published.mdx"),
+      record("false")
+        .replace("contentId: example", "contentId: published")
+        .replace("  - meta", "  - encoded-topic"),
+    );
+    assert.deepEqual(collectPublishedRoutes(directory, encodedTaxonomy), {
+      posts: { en: ["/posts/published"], "pt-BR": [] },
+      tags: { en: ["/tags/caf%C3%A9%2Bc%23"], "pt-BR": [] },
+    });
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});

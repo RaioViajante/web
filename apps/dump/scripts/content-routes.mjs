@@ -8,6 +8,7 @@ import {
   parseFrontmatter,
   slugFromFilename,
 } from "../lib/content-schema.ts";
+import { encodeTagSlug } from "../lib/tag-route.ts";
 
 const app = join(dirname(fileURLToPath(import.meta.url)), "..");
 const locales = ["en", "pt-BR"];
@@ -38,7 +39,7 @@ export function collectPublishedRoutes(postsDirectory, taxonomy) {
           `${filename}: tag ${JSON.stringify(id)} has no ${post.locale} presentation`,
         );
       tags[post.locale].add(
-        `${prefix[post.locale]}/tags/${encodeURIComponent(presentation.slug)}`,
+        `${prefix[post.locale]}/tags/${encodeTagSlug(presentation.slug)}`,
       );
     }
   }

@@ -8,7 +8,7 @@ import type { Post } from "@/lib/posts";
 // alias (see tests/tag-views.test.tsx), so this uses the real relative path.
 jest.mock("../lib/posts", () => ({
   ...jest.requireActual("../lib/posts"),
-  getAllTags: jest.fn(),
+  getAllTags: jest.fn(() => []),
 }));
 
 // robots, alternatesFor, and the JSON-LD helpers all resolve through
@@ -242,5 +242,30 @@ describe("dynamic route pages keep canonical and RSS together", () => {
       canonical: "/tags/osdev",
       types: RSS_TYPES,
     });
+  });
+
+  it("English tag aliases canonicalize from the authoritative record", async () => {
+    const { generateMetadata } = await import("@/app/tags/[tag]/page");
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ tag: "OSDEV" }),
+    });
+
+    expect(metadata.alternates).toMatchObject({ canonical: "/tags/osdev" });
+  });
+
+  it("Portuguese tag lookup is exact and its canonical comes from the taxonomy", async () => {
+    const { generateMetadata } = await import("@/app/pt/tags/[tag]/page");
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ tag: "pessoal" }),
+    });
+    expect(metadata.alternates).toMatchObject({
+      canonical: "/pt/tags/pessoal",
+    });
+
+    await expect(
+      generateMetadata({ params: Promise.resolve({ tag: "PESSOAL" }) }),
+    ).rejects.toThrow(/404/);
   });
 });
