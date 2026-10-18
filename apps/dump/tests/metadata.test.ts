@@ -19,6 +19,11 @@ const PRODUCTION_ORIGIN = "https://dump.raioviajante.com";
 const RSS_TYPES = {
   "application/rss+xml": [{ url: "/rss.xml", title: "dump RSS" }],
 };
+const cluster = (en: string, pt: string) => ({
+  en: `${PRODUCTION_ORIGIN}${en}`,
+  "pt-BR": `${PRODUCTION_ORIGIN}${pt}`,
+  "x-default": `${PRODUCTION_ORIGIN}${en}`,
+});
 
 beforeEach(() => {
   jest.resetModules();
@@ -64,6 +69,7 @@ describe("static pages keep canonical and RSS together", () => {
     const { metadata } = await import("@/app/page");
     expect(metadata.alternates).toEqual({
       canonical: "/",
+      languages: cluster("/", "/pt"),
       types: RSS_TYPES,
     });
   });
@@ -72,6 +78,7 @@ describe("static pages keep canonical and RSS together", () => {
     const { metadata } = await import("@/app/archive/page");
     expect(metadata.alternates).toEqual({
       canonical: "/archive",
+      languages: cluster("/archive", "/pt/archive"),
       types: RSS_TYPES,
     });
   });
@@ -80,6 +87,7 @@ describe("static pages keep canonical and RSS together", () => {
     const { metadata } = await import("@/app/tags/page");
     expect(metadata.alternates).toEqual({
       canonical: "/tags",
+      languages: cluster("/tags", "/pt/tags"),
       types: RSS_TYPES,
     });
   });
@@ -103,7 +111,7 @@ describe("homeJsonLd", () => {
         description:
           "Computer science notes, projects, devlogs, and technology writing by RaioViajante.",
         url: `${PRODUCTION_ORIGIN}/`,
-        inLanguage: "en",
+        inLanguage: ["en", "pt-BR"],
         author: PERSON,
       },
       {
@@ -113,7 +121,7 @@ describe("homeJsonLd", () => {
         description:
           "Computer science notes, projects, devlogs, and technology writing by RaioViajante.",
         url: `${PRODUCTION_ORIGIN}/`,
-        inLanguage: "en",
+        inLanguage: ["en", "pt-BR"],
         author: PERSON,
         isPartOf: { "@id": `${PRODUCTION_ORIGIN}/#website` },
       },
@@ -177,6 +185,19 @@ describe("blogPostingJsonLd", () => {
     expect(blogPostingJsonLd({ ...post, tags: [] })).not.toHaveProperty(
       "keywords",
     );
+  });
+
+  it("uses the post locale's tag labels as keywords", async () => {
+    const { blogPostingJsonLd } = await import("@/lib/structured-data");
+    expect(
+      blogPostingJsonLd({
+        ...post,
+        slug: "exemplo",
+        locale: "pt-BR",
+        originalLocale: "pt-BR",
+        tags: ["personal", "meta"],
+      }),
+    ).toHaveProperty("keywords", "pessoal, meta");
   });
 });
 

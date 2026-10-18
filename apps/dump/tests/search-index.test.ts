@@ -17,7 +17,7 @@ describe("search-index.json", () => {
       expect(entry.href).toMatch(
         /^https:\/\/dump\.raioviajante\.com\/posts\/[a-z0-9-]+$/,
       );
-      for (const field of ["title", "description", "date", "body"])
+      for (const field of ["contentId", "title", "description", "date", "body"])
         expect(typeof entry[field]).toBe("string");
     }
   });

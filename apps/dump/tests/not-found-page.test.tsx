@@ -1,9 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import NotFound from "@/app/not-found";
 
+jest.mock("next/headers", () => ({
+  headers: async () => new Headers({ "x-locale": "en" }),
+}));
+
 describe("<NotFound />", () => {
-  it("shows the shared editorial 404 and useful destinations", () => {
-    render(<NotFound />);
+  it("shows the shared editorial 404 and useful destinations", async () => {
+    render(await NotFound());
     expect(
       screen.getByRole("heading", { level: 1, name: "I looked everywhere." }),
     ).toBeInTheDocument();
