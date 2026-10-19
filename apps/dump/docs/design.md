@@ -10,7 +10,7 @@ shared `linkComponent` prop, without prefetching. The design handoff's static
 pages were the visual reference during the migration; the root site's values,
 now in the shared tokens, took precedence where they differed. `lib/seo.ts`
 lists every page's title and description for metadata, the social cards under
-`/og/` and the sitemap; RSS stays at `/rss.xml`.
+`/og/` and the sitemap; RSS stays at `/rss.xml` (English) with `/pt/rss.xml` for Portuguese.
 
 `app/globals.css` holds only what is dump's own: the featured post, the month
 lists, the archive date column, the tag grid, the reading progress bar and the
