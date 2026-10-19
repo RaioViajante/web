@@ -19,6 +19,9 @@ const PRODUCTION_ORIGIN = "https://dump.raioviajante.com";
 const RSS_TYPES = {
   "application/rss+xml": [{ url: "/rss.xml", title: "dump RSS" }],
 };
+const PT_RSS_TYPES = {
+  "application/rss+xml": [{ url: "/pt/rss.xml", title: "dump RSS" }],
+};
 const cluster = (en: string, pt: string) => ({
   en: `${PRODUCTION_ORIGIN}${en}`,
   "pt-BR": `${PRODUCTION_ORIGIN}${pt}`,
@@ -244,6 +247,7 @@ describe("dynamic route pages keep canonical and RSS together", () => {
         "/posts/maybe-this-can-be-something-someday",
         `/pt/posts/${slug}`,
       ),
+      types: PT_RSS_TYPES,
     });
     expect(metadata.openGraph).toMatchObject({
       type: "article",
@@ -276,7 +280,10 @@ describe("dynamic route pages keep canonical and RSS together", () => {
       params: Promise.resolve({ slug }),
     });
 
-    expect(metadata.alternates).toEqual({ canonical: `/pt/posts/${slug}` });
+    expect(metadata.alternates).toEqual({
+      canonical: `/pt/posts/${slug}`,
+      types: PT_RSS_TYPES,
+    });
     expect(metadata.openGraph).toMatchObject({
       type: "article",
       locale: "pt_BR",

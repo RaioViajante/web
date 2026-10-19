@@ -52,9 +52,9 @@ describe("current English content", () => {
 
   it("keeps the RSS items: links, GUIDs and pubDates", () => {
     const feed = renderRssFeed(published);
-    const guids = [
-      ...feed.matchAll(/<guid isPermaLink="true">([^<]+)<\/guid>/g),
-    ].map((m) => m[1]);
+    const guids = [...feed.matchAll(/<guid[^>]*>([^<]+)<\/guid>/g)].map(
+      (m) => m[1],
+    );
     const links = [
       ...feed.matchAll(/<item>[\s\S]*?<link>([^<]+)<\/link>/g),
     ].map((m) => m[1]);
@@ -63,7 +63,6 @@ describe("current English content", () => {
       urls.map((url) => new URL(url!).pathname);
     expect(paths(guids)).toEqual(contract.postUrls);
     expect(paths(links)).toEqual(contract.postUrls);
-    expect(guids).toEqual(links);
     const pubDates = [...feed.matchAll(/<pubDate>([^<]+)<\/pubDate>/g)].map(
       (m) => m[1],
     );

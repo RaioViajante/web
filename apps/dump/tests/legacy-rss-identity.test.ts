@@ -20,12 +20,14 @@ interface FeedItem {
 }
 
 function parseItems(xml: string): FeedItem[] {
-  return [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(([, body]) => ({
-    guid: body.match(/<guid[^>]*>([^<]*)<\/guid>/)![1],
-    isPermaLink: body.match(/<guid isPermaLink="([^"]+)"/)?.[1],
-    link: body.match(/<link>([^<]*)<\/link>/)?.[1],
-    pubDate: body.match(/<pubDate>([^<]*)<\/pubDate>/)?.[1],
-  }));
+  return [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(
+    ([, body = ""]) => ({
+      guid: body.match(/<guid[^>]*>([^<]*)<\/guid>/)![1]!,
+      isPermaLink: body.match(/<guid isPermaLink="([^"]+)"/)?.[1],
+      link: body.match(/<link>([^<]*)<\/link>/)?.[1],
+      pubDate: body.match(/<pubDate>([^<]*)<\/pubDate>/)?.[1],
+    }),
+  );
 }
 
 let feed = "";
