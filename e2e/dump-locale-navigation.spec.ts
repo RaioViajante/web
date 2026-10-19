@@ -137,6 +137,82 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
     await expect(page.locator(`a[href="/pt/tags/${slug}"]`)).toHaveCount(1);
 });
 
+test("Dump searches its local Portuguese index before locale participation", async ({
+  page,
+}) => {
+  const external: string[] = [];
+  await isolate(page, external);
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  const indexResponse = page.waitForResponse(
+    (response) =>
+      response.url() === `${base("dump")}/pt/search-index.json` &&
+      response.status() === 200,
+  );
+  const response = await page.goto(`${base("dump")}/pt/search`);
+  expect(response?.status()).toBe(200);
+  await expectLang(page, "pt-BR");
+
+  const entries = (await (await indexResponse).json()) as Array<{
+    contentId: string;
+    title: string;
+    href: string;
+  }>;
+  expect(entries).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        contentId: "maybe-this-can-be-something-someday",
+        title: "Talvez isso vire alguma coisa um dia",
+        href: `${canonicalDumpOrigin}/pt/posts/talvez-isso-vire-alguma-coisa-um-dia`,
+      }),
+      expect.objectContaining({
+        contentId: "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+        title: "Traduzir o site sem fingir que tudo já existe",
+        href: `${canonicalDumpOrigin}/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe`,
+      }),
+    ]),
+  );
+
+  const search = page.locator("[data-search-page]");
+  const input = page.locator("[data-search-input]");
+  await expect(search).toHaveAttribute("data-search-state", "ready");
+  await expect(input).toBeFocused();
+
+  await input.fill("Traduzir");
+  let result = page.locator("[data-search-result]");
+  await expect(result).toHaveCount(1);
+  await expect(result).toContainText(
+    "Traduzir o site sem fingir que tudo já existe",
+  );
+  // The index states canonical origins; the e2e harness maps them to the
+  // local server when the client renders a result.
+  await expect(result).toHaveAttribute(
+    "href",
+    `${base("dump")}/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe`,
+  );
+
+  await input.fill("mensagem de erro");
+  result = page.locator("[data-search-result]");
+  await expect(result).toHaveCount(1);
+  await expect(result).toContainText("Talvez isso vire alguma coisa um dia");
+
+  await input.fill("nenhum resultado publicado");
+  await expect(page.locator("[data-search-result]")).toHaveCount(0);
+  await expect(page.locator("[data-search-empty]")).toBeVisible();
+
+  await input.fill("Traduzir");
+  await expect(page.locator("[data-search-result]")).toHaveCount(1);
+  await input.press("Enter");
+  await expect(page).toHaveURL(
+    `${base("dump")}/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe`,
+  );
+  await expectLang(page, "pt-BR");
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(390);
+  expect(external).toEqual([]);
+});
+
 test("Dump dynamic misses use localized server-rendered 404 documents", async ({
   page,
 }) => {

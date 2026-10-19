@@ -74,7 +74,7 @@ it("falls back to the filtered result position without supplied numbers", async 
 
 async function mount(entries: SearchEntry[], query: string) {
   document.body.innerHTML = renderToStaticMarkup(
-    <SearchPage site={entries[0]!.site} locale="en" />,
+    <SearchPage site={entries[0]!.site} locale={entries[0]!.locale} />,
   );
   vi.stubGlobal(
     "fetch",
@@ -146,28 +146,75 @@ it.each([
 });
 
 it.each(["root", "dump", "docs", "lab"] as const)(
-  "never fetches an index for %s in a locale it does not participate in",
+  "loads %s's local Portuguese index but does not federate to inactive peers",
   async (site) => {
     document.body.innerHTML = renderToStaticMarkup(
       <SearchPage site={site} locale="pt-BR" />,
     );
-    const fetchMock = vi.fn();
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => [] });
     vi.stubGlobal("fetch", fetchMock);
     stop = attachSearch();
     const page = document.querySelector<HTMLElement>("[data-search-page]")!;
-    await vi.waitFor(() => expect(page.dataset.searchState).toBe("skipped"));
-    // Everywhere must not probe either: no host participates in pt-BR.
+    await vi.waitFor(() => expect(page.dataset.searchState).toBe("ready"));
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(fetchMock).toHaveBeenCalledWith("/pt/search-index.json", {
+      mode: "cors",
+    });
+    // Everywhere keeps the already-loaded local index but must not probe any
+    // non-participating peer.
     document
       .querySelector<HTMLButtonElement>('[data-search-scope="everywhere"]')!
       .click();
     await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(page.dataset.searchState).toBe("skipped");
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(page.dataset.searchState).toBe("ready");
     expect(
       document.querySelector("[data-search-bubble]")?.textContent,
     ).not.toBe("search is unavailable right now.");
   },
 );
+
+it("finds both reviewed Portuguese Dump posts from its local index", async () => {
+  const translated: SearchEntry = {
+    site: "dump",
+    locale: "pt-BR",
+    contentId: "maybe-this-can-be-something-someday",
+    title: "Talvez isso vire alguma coisa um dia",
+    href: "https://dump.raioviajante.com/pt/posts/talvez-isso-vire-alguma-coisa-um-dia",
+    description: "Um diário complicado demais.",
+    body: "Uma mensagem de erro por três horas.",
+  };
+  const original: SearchEntry = {
+    site: "dump",
+    locale: "pt-BR",
+    contentId: "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+    title: "Traduzir o site sem fingir que tudo já existe",
+    href: "https://dump.raioviajante.com/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+    description: "Identidade, idioma e publicação.",
+  };
+
+  await mount([translated, original], "Traduzir");
+  let result = document.querySelector<HTMLAnchorElement>(
+    "[data-search-result]",
+  )!;
+  expect(result.textContent).toContain(original.title);
+  expect(new URL(result.href).pathname).toBe(
+    "/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+  );
+
+  const input = document.querySelector<HTMLInputElement>(
+    "[data-search-input]",
+  )!;
+  input.value = "mensagem de erro";
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  result = document.querySelector<HTMLAnchorElement>("[data-search-result]")!;
+  expect(result.textContent).toContain(translated.title);
+  expect(new URL(result.href).pathname).toBe(
+    "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia",
+  );
+});
 
 it("states ready for an active empty index and unavailable for a failed one", async () => {
   document.body.innerHTML = renderToStaticMarkup(
