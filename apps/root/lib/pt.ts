@@ -69,14 +69,15 @@ export const ptHome = {
       description: "Código, projetos e experimentos em andamento.",
     },
     source: {
-      note: "código dos vídeos",
+      label: "Código dos Vídeos",
+      note: "código-fonte",
       description: "Código-fonte que acompanha meus vídeos de programação.",
     },
     email: {
       note: "e-mail",
       description: "Escreva sobre uma ideia, uma dúvida ou uma colaboração.",
     },
-  } as Record<string, { note: string; description: string }>,
+  } as Record<string, { label?: string; note: string; description: string }>,
 };
 
 export const ptAbout = {

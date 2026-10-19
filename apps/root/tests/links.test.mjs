@@ -59,3 +59,21 @@ test("no current profile link keeps the old handle or a decorated label", () => 
 test("every home link category has Portuguese copy", () => {
   for (const link of primaryLinks) assert.ok(ptHome.linkCopy[link.category]);
 });
+
+test("only the video-code link has a localized Portuguese label", () => {
+  assert.equal(videoSourceLink.label, "Video Source Code");
+  assert.equal(ptHome.linkCopy.source.label, "Código dos Vídeos");
+  for (const link of primaryLinks)
+    if (link.category !== "source")
+      assert.equal(ptHome.linkCopy[link.category].label, undefined);
+});
+
+test("only the video-code link has a Portuguese label; other labels stay platform names", () => {
+  assert.equal(ptHome.linkCopy.source.label, "Código dos Vídeos");
+  assert.equal(videoSourceLink.label, "Video Source Code");
+  const relabeled = Object.entries(ptHome.linkCopy).filter(([, c]) => c.label);
+  assert.deepEqual(
+    relabeled.map(([k]) => k),
+    ["source"],
+  );
+});

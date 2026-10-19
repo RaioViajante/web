@@ -45,7 +45,7 @@ export default async function HomePt() {
             <PreviewRow
               key={link.href}
               id={`primary-link-${link.category}`}
-              label={link.label}
+              label={copy.label ?? link.label}
               href={link.href}
               rel={link.rel}
               note={copy.note}
