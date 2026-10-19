@@ -20,12 +20,15 @@
   },
   "scripts": {
     "dev": "next dev",
+    "content:routes": "node scripts/content-routes.mjs && prettier --write lib/published-routes.generated.ts",
+    "predev": "pnpm content:routes",
+    "prebuild": "pnpm content:routes",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "jest",
+    "test": "jest && node --test scripts/*.test.mjs",
     "test:watch": "jest --watch",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

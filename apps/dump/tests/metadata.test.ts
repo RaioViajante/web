@@ -8,7 +8,7 @@ import type { Post } from "@/lib/posts";
 // alias (see tests/tag-views.test.tsx), so this uses the real relative path.
 jest.mock("../lib/posts", () => ({
   ...jest.requireActual("../lib/posts"),
-  getAllTags: jest.fn(),
+  getAllTags: jest.fn(() => []),
 }));
 
 // robots, alternatesFor, and the JSON-LD helpers all resolve through
@@ -19,6 +19,11 @@ const PRODUCTION_ORIGIN = "https://dump.raioviajante.com";
 const RSS_TYPES = {
   "application/rss+xml": [{ url: "/rss.xml", title: "dump RSS" }],
 };
+const cluster = (en: string, pt: string) => ({
+  en: `${PRODUCTION_ORIGIN}${en}`,
+  "pt-BR": `${PRODUCTION_ORIGIN}${pt}`,
+  "x-default": `${PRODUCTION_ORIGIN}${en}`,
+});
 
 beforeEach(() => {
   jest.resetModules();
@@ -64,6 +69,7 @@ describe("static pages keep canonical and RSS together", () => {
     const { metadata } = await import("@/app/page");
     expect(metadata.alternates).toEqual({
       canonical: "/",
+      languages: cluster("/", "/pt"),
       types: RSS_TYPES,
     });
   });
@@ -72,6 +78,7 @@ describe("static pages keep canonical and RSS together", () => {
     const { metadata } = await import("@/app/archive/page");
     expect(metadata.alternates).toEqual({
       canonical: "/archive",
+      languages: cluster("/archive", "/pt/archive"),
       types: RSS_TYPES,
     });
   });
@@ -80,6 +87,7 @@ describe("static pages keep canonical and RSS together", () => {
     const { metadata } = await import("@/app/tags/page");
     expect(metadata.alternates).toEqual({
       canonical: "/tags",
+      languages: cluster("/tags", "/pt/tags"),
       types: RSS_TYPES,
     });
   });
@@ -103,7 +111,7 @@ describe("homeJsonLd", () => {
         description:
           "Computer science notes, projects, devlogs, and technology writing by RaioViajante.",
         url: `${PRODUCTION_ORIGIN}/`,
-        inLanguage: "en",
+        inLanguage: ["en", "pt-BR"],
         author: PERSON,
       },
       {
@@ -113,7 +121,7 @@ describe("homeJsonLd", () => {
         description:
           "Computer science notes, projects, devlogs, and technology writing by RaioViajante.",
         url: `${PRODUCTION_ORIGIN}/`,
-        inLanguage: "en",
+        inLanguage: ["en", "pt-BR"],
         author: PERSON,
         isPartOf: { "@id": `${PRODUCTION_ORIGIN}/#website` },
       },
@@ -178,6 +186,19 @@ describe("blogPostingJsonLd", () => {
       "keywords",
     );
   });
+
+  it("uses the post locale's tag labels as keywords", async () => {
+    const { blogPostingJsonLd } = await import("@/lib/structured-data");
+    expect(
+      blogPostingJsonLd({
+        ...post,
+        slug: "exemplo",
+        locale: "pt-BR",
+        originalLocale: "pt-BR",
+        tags: ["personal", "meta"],
+      }),
+    ).toHaveProperty("keywords", "pessoal, meta");
+  });
 });
 
 describe("dynamic route pages keep canonical and RSS together", () => {
@@ -210,6 +231,61 @@ describe("dynamic route pages keep canonical and RSS together", () => {
     expect(metadata.alternates).toMatchObject({ canonical: `/posts/${slug}` });
   });
 
+  it("translated Portuguese post has a reciprocal cluster and localized article metadata", async () => {
+    const { generateMetadata } = await import("@/app/pt/posts/[slug]/page");
+    const slug = "talvez-isso-vire-alguma-coisa-um-dia";
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ slug }),
+    });
+
+    expect(metadata.alternates).toEqual({
+      canonical: `/pt/posts/${slug}`,
+      languages: cluster(
+        "/posts/maybe-this-can-be-something-someday",
+        `/pt/posts/${slug}`,
+      ),
+    });
+    expect(metadata.openGraph).toMatchObject({
+      type: "article",
+      locale: "pt_BR",
+      alternateLocale: ["en_US"],
+      url: `${PRODUCTION_ORIGIN}/pt/posts/${slug}`,
+      publishedTime: "2026-10-19T00:00:00.000Z",
+      images: [
+        expect.objectContaining({
+          url: `${PRODUCTION_ORIGIN}/og/pt/posts/${slug}.png`,
+          width: 1200,
+          height: 630,
+        }),
+      ],
+    });
+    expect(metadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      images: [
+        expect.objectContaining({
+          url: `${PRODUCTION_ORIGIN}/og/pt/posts/${slug}.png`,
+        }),
+      ],
+    });
+  });
+
+  it("Portuguese-original post has a self-canonical without an invented counterpart", async () => {
+    const { generateMetadata } = await import("@/app/pt/posts/[slug]/page");
+    const slug = "traduzir-o-site-sem-fingir-que-tudo-ja-existe";
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ slug }),
+    });
+
+    expect(metadata.alternates).toEqual({ canonical: `/pt/posts/${slug}` });
+    expect(metadata.openGraph).toMatchObject({
+      type: "article",
+      locale: "pt_BR",
+      url: `${PRODUCTION_ORIGIN}/pt/posts/${slug}`,
+      publishedTime: "2026-10-19T00:00:00.000Z",
+    });
+    expect(metadata.openGraph).not.toHaveProperty("alternateLocale");
+  });
+
   it("tag page: canonical tag URL", async () => {
     const { generateMetadata } = await import("@/app/tags/[tag]/page");
 
@@ -221,5 +297,30 @@ describe("dynamic route pages keep canonical and RSS together", () => {
       canonical: "/tags/osdev",
       types: RSS_TYPES,
     });
+  });
+
+  it("English tag aliases canonicalize from the authoritative record", async () => {
+    const { generateMetadata } = await import("@/app/tags/[tag]/page");
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ tag: "OSDEV" }),
+    });
+
+    expect(metadata.alternates).toMatchObject({ canonical: "/tags/osdev" });
+  });
+
+  it("Portuguese tag lookup is exact and its canonical comes from the taxonomy", async () => {
+    const { generateMetadata } = await import("@/app/pt/tags/[tag]/page");
+
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ tag: "pessoal" }),
+    });
+    expect(metadata.alternates).toMatchObject({
+      canonical: "/pt/tags/pessoal",
+    });
+
+    await expect(
+      generateMetadata({ params: Promise.resolve({ tag: "PESSOAL" }) }),
+    ).rejects.toThrow(/404/);
   });
 });

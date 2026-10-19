@@ -38,14 +38,14 @@ describe("current English content", () => {
   });
 
   it("was migrated once: every post is English, original English, contentId equal to its previous slug", () => {
-    const everything = getAllPosts();
-    expect(everything).toHaveLength(contract.posts.length);
-    for (const post of everything) {
+    const english = getAllPosts().filter((post) => post.locale === "en");
+    expect(english).toHaveLength(contract.posts.length);
+    for (const post of english) {
       expect(post.locale).toBe("en");
       expect(post.originalLocale).toBe("en");
       expect(post.contentId).toBe(post.slug);
     }
-    expect(everything.map((p) => p.slug).sort()).toEqual(
+    expect(english.map((p) => p.slug).sort()).toEqual(
       contract.posts.map((p) => p.slug).sort(),
     );
   });

@@ -2,10 +2,18 @@ import Link from "next/link";
 import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { IndexHeader, LeaderRow, Section } from "@raioviajante/design/parts";
 import { identity } from "../../../seo/structured-data";
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 
 import { series } from "@/lib/post-details";
+import { postPath } from "@/lib/inventory";
+import { ptCopy } from "@/lib/pt";
 import { tagPresentation } from "@/lib/tags";
-import { formatPostMonth, sortPostsNewestFirst, type Post } from "@/lib/posts";
+import {
+  formatPostDate,
+  formatPostMonth,
+  sortPostsNewestFirst,
+  type Post,
+} from "@/lib/posts";
 
 interface PostMonth {
   key: string;
@@ -17,7 +25,10 @@ interface PostMonth {
 const tagLabels = (post: Post) =>
   post.tags.map((tag) => tagPresentation(tag, post.locale).label).join(" · ");
 
-export function groupPostsByMonth(posts: readonly Post[]): PostMonth[] {
+export function groupPostsByMonth(
+  posts: readonly Post[],
+  locale: LocaleId = DEFAULT_LOCALE,
+): PostMonth[] {
   const months = new Map<string, PostMonth>();
   for (const post of sortPostsNewestFirst(posts)) {
     const key = post.publishedAt.slice(0, 7);
@@ -26,7 +37,7 @@ export function groupPostsByMonth(posts: readonly Post[]): PostMonth[] {
     else
       months.set(key, {
         key,
-        name: formatPostMonth(post.publishedAt),
+        name: formatPostMonth(post.publishedAt, locale),
         posts: [post],
       });
   }
@@ -36,37 +47,67 @@ export function groupPostsByMonth(posts: readonly Post[]): PostMonth[] {
 export function HomePostList({
   posts,
   latestMinutes,
+  locale = DEFAULT_LOCALE,
 }: {
   posts: Post[];
   /** Reading time of the newest post, computed by the page from its source. */
   latestMinutes?: number;
+  locale?: LocaleId;
 }) {
   const sorted = sortPostsNewestFirst(posts);
   const [latest, ...older] = sorted;
-  if (!latest) return <p className="home-empty">No posts yet.</p>;
-  const months = groupPostsByMonth(older);
+  if (!latest)
+    return (
+      <>
+        <IndexHeader
+          name="dump"
+          line={
+            locale === DEFAULT_LOCALE
+              ? "a memory dump, hopefully readable."
+              : ptCopy.home.line
+          }
+          avatar={<AvatarCoin />}
+        />
+        <p className="home-empty">
+          {locale === DEFAULT_LOCALE ? "No posts yet." : ptCopy.home.empty}
+        </p>
+      </>
+    );
+  const months = groupPostsByMonth(older, locale);
+  const portuguese = locale !== DEFAULT_LOCALE;
   return (
     <>
       <IndexHeader
         name="dump"
-        line="a memory dump, hopefully readable."
+        line={
+          portuguese ? ptCopy.home.line : "a memory dump, hopefully readable."
+        }
         avatar={<AvatarCoin />}
       />
-      <Section number="00." title="Latest" id="latest-heading" index>
+      <Section
+        number="00."
+        title={portuguese ? ptCopy.home.latest : "Latest"}
+        id="latest-heading"
+        index
+      >
         <Link
           className="featured-post"
           data-sound="nav"
-          href={`/posts/${latest.slug}`}
+          href={postPath(latest)}
         >
           <strong>{latest.title}</strong>
           <span>{latest.description}</span>
         </Link>
         <p className="post-meta">
-          <time dateTime={latest.publishedAt}>{latest.publishedAt}</time>
+          <time dateTime={latest.publishedAt}>
+            {portuguese
+              ? formatPostDate(latest.publishedAt, locale)
+              : latest.publishedAt}
+          </time>
           <span aria-hidden="true"> · </span>
           {latestMinutes ? (
             <>
-              {latestMinutes} min read
+              {latestMinutes} {portuguese ? ptCopy.post.minute : "min read"}
               <span aria-hidden="true"> · </span>
             </>
           ) : null}
@@ -88,10 +129,12 @@ export function HomePostList({
                   label={post.title}
                   value={
                     <time dateTime={post.publishedAt}>
-                      {post.publishedAt.slice(5)}
+                      {portuguese
+                        ? formatPostDate(post.publishedAt, locale)
+                        : post.publishedAt.slice(5)}
                     </time>
                   }
-                  href={`/posts/${post.slug}`}
+                  href={postPath(post)}
                   linkComponent={Link}
                 />
                 <p>{post.description}</p>
@@ -103,7 +146,7 @@ export function HomePostList({
       ))}
       <Section
         number={`00.${months.length + 1}`}
-        title="Series"
+        title={portuguese ? ptCopy.home.series : "Series"}
         id="series-heading"
         index
       >
@@ -117,8 +160,16 @@ export function HomePostList({
             <LeaderRow
               key={item.name}
               label={item.name}
-              value={`${parts.length} ${parts.length === 1 ? "part" : "parts"}`}
-              href={`/posts/${parts[0]!.slug}`}
+              value={`${parts.length} ${
+                parts.length === 1
+                  ? portuguese
+                    ? ptCopy.home.part
+                    : "part"
+                  : portuguese
+                    ? ptCopy.home.parts
+                    : "parts"
+              }`}
+              href={postPath(parts[0]!)}
               linkComponent={Link}
             />
           ) : null;
@@ -126,14 +177,14 @@ export function HomePostList({
       </Section>
       <Section
         number={`00.${months.length + 2}`}
-        title="Follow along"
+        title={portuguese ? ptCopy.home.follow : "Follow along"}
         id="follow-heading"
         index
       >
-        <LeaderRow label="RSS" value="feed" href="/rss.xml" />
+        {!portuguese && <LeaderRow label="RSS" value="feed" href="/rss.xml" />}
         <LeaderRow
           label="GitHub"
-          value="code ↗"
+          value={portuguese ? ptCopy.home.code : "code ↗"}
           href={identity.github}
           rel="me"
         />

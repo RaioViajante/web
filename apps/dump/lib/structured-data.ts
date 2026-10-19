@@ -1,4 +1,3 @@
-import { DEFAULT_LOCALE } from "../../../site/locales";
 import { socialUrl } from "../../../seo/metadata";
 import {
   inLanguageOf,
@@ -10,7 +9,10 @@ import {
 } from "../../../seo/structured-data";
 
 import type { Post } from "@/lib/posts";
+import { postPath } from "@/lib/inventory";
+import { publishedLocales } from "@/lib/routes";
 import { absoluteUrl, site } from "@/lib/site";
+import { tagPresentation } from "@/lib/tags";
 
 /**
  * Minimal JSON-LD, derived from the same `site`/`Post` data that already
@@ -23,15 +25,19 @@ const blogId = () => `${site.url}/#blog`;
 
 /** Home page: the `WebSite` and the `Blog` it contains, by the same person. */
 export function homeJsonLd() {
+  const languages = publishedLocales();
   return [
-    websiteJsonLd(site.url, site.name, site.description, { author: true }),
+    websiteJsonLd(site.url, site.name, site.description, {
+      author: true,
+      languages,
+    }),
     {
       "@type": "Blog" as const,
       "@id": blogId(),
       name: site.name,
       description: site.description,
       url: absoluteUrl("/"),
-      inLanguage: shippedLanguages(),
+      inLanguage: shippedLanguages(languages),
       author: personRef(),
       isPartOf: { "@id": websiteId(site.url) },
     },
@@ -43,7 +49,8 @@ export function homeJsonLd() {
  * genuinely has. The image is the post's generated social card.
  */
 export function blogPostingJsonLd(post: Post) {
-  const url = absoluteUrl(`/posts/${post.slug}`);
+  const path = postPath(post);
+  const url = absoluteUrl(path);
   return {
     "@type": "BlogPosting" as const,
     headline: post.title,
@@ -51,11 +58,17 @@ export function blogPostingJsonLd(post: Post) {
     datePublished: post.publishedAt,
     ...(post.updatedAt ? { dateModified: post.updatedAt } : {}),
     url,
-    mainEntityOfPage: webPageRef(url),
+    mainEntityOfPage: webPageRef(url, post.locale),
     author: personRef(),
-    inLanguage: inLanguageOf(DEFAULT_LOCALE),
+    inLanguage: inLanguageOf(post.locale),
     isPartOf: { "@id": blogId() },
-    ...(post.tags.length ? { keywords: post.tags.join(", ") } : {}),
-    image: socialUrl(site.url, `/posts/${post.slug}`),
+    ...(post.tags.length
+      ? {
+          keywords: post.tags
+            .map((tag) => tagPresentation(tag, post.locale).label)
+            .join(", "),
+        }
+      : {}),
+    image: socialUrl(site.url, path),
   };
 }

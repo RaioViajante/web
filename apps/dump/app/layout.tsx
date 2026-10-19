@@ -6,7 +6,12 @@ import type { ReactNode } from "react";
 import { alternatesFor, site } from "@/lib/site";
 import { Behavior } from "@raioviajante/design/behavior-react";
 import { themeColor } from "@raioviajante/design/theme-color";
-import { localeById } from "../../../site/locales";
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  isLocaleId,
+  localeById,
+} from "../../../site/locales";
 
 import "@raioviajante/design/styles.css";
 import "./globals.css";
@@ -65,10 +70,10 @@ export default async function RootLayout({
 }: {
   children: ReactNode;
 }) {
-  // Reading the request opts HTML into dynamic rendering for per-request CSP.
-  await headers();
+  const stated = (await headers()).get("x-locale");
+  const locale = isLocaleId(stated) ? stated : DEFAULT_LOCALE;
   return (
-    <html lang={site.locale} className={mono.variable}>
+    <html lang={LOCALES[locale].htmlLang} className={mono.variable}>
       <body>
         {children}
         <Behavior />

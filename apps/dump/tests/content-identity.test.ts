@@ -20,6 +20,12 @@ import {
   type Post,
 } from "@/lib/posts";
 import { createTaxonomy, tagFromSlug, tagPresentation } from "@/lib/tags";
+import {
+  canonicalTagSlug,
+  decodeTagPathSegment,
+  encodeTagSlug,
+} from "@/lib/tag-route";
+import { tagPath } from "@/lib/inventory";
 
 const DIR = path.join(__dirname, "fixtures", "multilingual");
 const present = (label: string, slug = label) => ({ label, slug });
@@ -277,6 +283,45 @@ describe("tags: id, label and slug are separate", () => {
     );
   });
 
+  it("encodes a Unicode and reserved-character slug once and resolves its canonical record", () => {
+    const encoded = createTaxonomy([
+      {
+        id: "encoded-topic",
+        locales: {
+          en: present("encoded topic", "café+c#"),
+          "pt-BR": present("tópico codificado", "café+pt#"),
+        },
+      },
+    ]);
+
+    expect(tagFromSlug("en", "CAFÉ+C#", encoded)).toEqual({
+      id: "encoded-topic",
+      label: "encoded topic",
+      slug: "café+c#",
+    });
+    expect(tagFromSlug("pt-BR", "café+pt#", encoded)).toEqual({
+      id: "encoded-topic",
+      label: "tópico codificado",
+      slug: "café+pt#",
+    });
+    expect(tagFromSlug("pt-BR", "CAFÉ+PT#", encoded)).toBeUndefined();
+    expect(tagPath("en", "café+c#")).toBe("/tags/caf%C3%A9%2Bc%23");
+    expect(tagPath("pt-BR", "café+pt#")).toBe("/pt/tags/caf%C3%A9%2Bpt%23");
+  });
+
+  it("uses a single safe decode with deterministic Unicode normalization", () => {
+    expect(decodeTagPathSegment("caf%C3%A9%2Bc%23")).toBe("café+c#");
+    expect(decodeTagPathSegment("cafe%CC%81%2Bc%23")).toBe("café+c#");
+    expect(encodeTagSlug("café+c#")).toBe("caf%C3%A9%2Bc%23");
+
+    for (const segment of ["x%2Fy", "x%5Cy", "x%252Fy", "%E0%A4%A"]) {
+      expect(decodeTagPathSegment(segment)).toBeUndefined();
+    }
+    expect(() => canonicalTagSlug("x/y")).toThrow(/Invalid canonical/);
+    expect(() => canonicalTagSlug("x%2Fy")).toThrow(/Invalid canonical/);
+    expect(() => canonicalTagSlug("cafe\u0301")).toThrow(/Invalid canonical/);
+  });
+
   it("counts a locale's tags in that locale's words", () => {
     expect(getAllTags("pt-BR", DIR, TAXONOMY)).toEqual([
       {
@@ -310,7 +355,13 @@ describe("tags: id, label and slug are separate", () => {
     ).toThrow(/slug "same" in en is used by both "a" and "b"/);
     expect(() =>
       createTaxonomy([{ id: "a", locales: { en: present("a", "Not Valid") } }]),
-    ).toThrow(/invalid slug/);
+    ).toThrow(/invalid canonical slug/);
+    expect(() =>
+      createTaxonomy([
+        { id: "a", locales: { en: present("a", "Mixed") } },
+        { id: "b", locales: { en: present("b", "mixed") } },
+      ]),
+    ).toThrow(/used by both "a" and "b"/);
     // The same slug in different locales is fine.
     expect(() =>
       createTaxonomy([

@@ -1,26 +1,38 @@
 import type { MetadataRoute } from "next";
 
-import { DEFAULT_LOCALE } from "../../../site/locales";
-import { getAllTags, getPublishedPosts } from "@/lib/posts";
+import { LOCALE_IDS, type LocaleId } from "../../../site/locales";
+import { postPath, tagPath } from "@/lib/inventory";
+import { getAllTags, getPublishedPosts, type Post } from "@/lib/posts";
+import { declaredPages } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = getPublishedPosts(DEFAULT_LOCALE);
+interface SitemapTag {
+  locale: LocaleId;
+  slug: string;
+}
 
-  const staticRoutes = ["/", "/archive", "/tags", "/terms", "/privacy"].map(
-    (path) => ({
-      url: absoluteUrl(path),
-    }),
-  );
-
+export function buildSitemap(
+  posts: readonly Pick<Post, "locale" | "slug" | "updatedAt">[],
+  tags: readonly SitemapTag[],
+): MetadataRoute.Sitemap {
+  const staticRoutes = declaredPages()
+    .filter(({ key }) => key !== "search")
+    .map(({ path }) => ({ url: absoluteUrl(path) }));
   const postRoutes = posts.map((post) => ({
-    url: absoluteUrl(`/posts/${post.slug}`),
+    url: absoluteUrl(postPath(post)),
     ...(post.updatedAt ? { lastModified: post.updatedAt } : {}),
   }));
-
-  const tagRoutes = getAllTags(DEFAULT_LOCALE).map(({ slug }) => ({
-    url: absoluteUrl(`/tags/${encodeURIComponent(slug)}`),
+  const tagRoutes = tags.map(({ locale, slug }) => ({
+    url: absoluteUrl(tagPath(locale, slug)),
   }));
-
   return [...staticRoutes, ...postRoutes, ...tagRoutes];
+}
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  return buildSitemap(
+    LOCALE_IDS.flatMap((locale) => getPublishedPosts(locale)),
+    LOCALE_IDS.flatMap((locale) =>
+      getAllTags(locale).map(({ slug }) => ({ locale, slug })),
+    ),
+  );
 }

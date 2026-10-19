@@ -45,4 +45,32 @@ describe("<PostArticle />", () => {
     expect(screen.getByText("Article description.")).toBeInTheDocument();
     expect(screen.getByText("Article body.")).toBeInTheDocument();
   });
+
+  it("renders Portuguese navigation without comments or English tag paths", () => {
+    render(
+      <PostArticle
+        post={{
+          ...post,
+          slug: "artigo",
+          locale: "pt-BR",
+          originalLocale: "pt-BR",
+          title: "Título do artigo",
+          tags: ["personal", "meta"],
+        }}
+      >
+        <p>Corpo do artigo.</p>
+      </PostArticle>,
+    );
+
+    expect(screen.getAllByText("3 de setembro de 2026")).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: "pessoal" })[0]).toHaveAttribute(
+      "href",
+      "/pt/tags/pessoal",
+    );
+    expect(
+      screen.queryByRole("heading", { name: "Comments" }),
+    ).not.toBeInTheDocument();
+    expect(document.querySelector(".comments")).toBeNull();
+    expect(screen.queryByText("RSS")).not.toBeInTheDocument();
+  });
 });

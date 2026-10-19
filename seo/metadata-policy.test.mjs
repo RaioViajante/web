@@ -82,6 +82,38 @@ test("entities in titles are decoded before comparison", () => {
 
 test("a complete document passes", () => assert.deepEqual(doc(), []));
 
+test("Portuguese Dump pages do not advertise RSS before the feed exists", () => {
+  const canonical = "https://dump.raioviajante.com/pt";
+  const portuguese = (extraHead = "") =>
+    html({
+      lang: "pt-BR",
+      canonical,
+      title: "dump em português",
+      extraHead,
+      drop: ["rss"],
+    })
+      .replace('content="en_US"', 'content="pt_BR"')
+      .replace('content="article"', 'content="website"');
+  const check = (markup) =>
+    checkDocument({
+      site: "dump",
+      path: "/pt",
+      loc: canonical,
+      html: markup,
+      themeColor: COLOR,
+    }).filter((problem) => problem.includes("RSS"));
+
+  assert.deepEqual(check(portuguese()), []);
+  assert.match(
+    check(
+      portuguese(
+        '<link rel="alternate" type="application/rss+xml" href="https://dump.raioviajante.com/rss.xml"/>',
+      ),
+    ).join("\n"),
+    /localized RSS discovery must remain absent/,
+  );
+});
+
 test("document rules each produce a located diagnostic", () => {
   const cases = [
     [{ lang: "pt" }, /app dump page \/posts\/foo: <html lang> is "pt"/],
@@ -365,6 +397,38 @@ const jsonLd = (nodes, over = {}) =>
 
 test("a faithful BlogPosting passes", () =>
   assert.deepEqual(jsonLd([post()]), []));
+
+test("a Portuguese BlogPosting is not required to join the English RSS feed", () => {
+  const url = "https://dump.raioviajante.com/pt/posts/foo";
+  const image = "https://dump.raioviajante.com/og/pt/posts/foo.png";
+  const portuguesePost = {
+    ...post(),
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url, inLanguage: "pt-BR" },
+    inLanguage: "pt-BR",
+    image,
+  };
+  const markup = html({
+    lang: "pt-BR",
+    canonical: url,
+    ld: [portuguesePost],
+    drop: ["rss"],
+  })
+    .replace('content="en_US"', 'content="pt_BR"')
+    .replaceAll("https://dump.raioviajante.com/og/posts/foo.png", image);
+
+  assert.deepEqual(
+    checkJsonLd({
+      site: "dump",
+      path: "/pt/posts/foo",
+      loc: url,
+      html: markup,
+      sitemapLocs: [url],
+      rss: [],
+    }),
+    [],
+  );
+});
 
 test("BlogPosting rules", () => {
   const broken = (change, over) =>

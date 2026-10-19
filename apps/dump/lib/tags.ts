@@ -1,4 +1,6 @@
 import { isLocaleId, type LocaleId } from "../../../site/locales";
+import definitions from "../content/tags.json";
+import { canonicalTagSlug, tagLookupSlug } from "./tag-route";
 
 // Dump's tag taxonomy. A tag has a stable internal id (what posts reference and
 // what queries filter on), and, per locale, a display label and a URL slug.
@@ -22,42 +24,7 @@ export interface TagDefinition {
 
 const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-/** English presentations of the tags Dump publishes today: label and slug are the id, as always. */
-const english = (id: TagId): TagDefinition => ({
-  id,
-  locales: { en: { label: id, slug: id } },
-});
-
-export const tagDefinitions: readonly TagDefinition[] = [
-  "architecture",
-  "assembly",
-  "automation",
-  "cli",
-  "compilers",
-  "distributed-systems",
-  "dump",
-  "java",
-  "language-design",
-  "mcp",
-  "meta",
-  "osdev",
-  "personal",
-  "programming-languages",
-  "projects",
-  "pytest",
-  "python",
-  "reliability",
-  "security",
-  "spring",
-  "sweep",
-  "time",
-  "toml",
-  "typescript",
-  "web",
-  "workflow",
-  "writing",
-  "x86",
-].map(english);
+export const tagDefinitions = definitions as readonly TagDefinition[];
 
 export interface Taxonomy {
   definitions: readonly TagDefinition[];
@@ -90,11 +57,20 @@ export function createTaxonomy(
         throw new Error(
           `Tag "${definition.id}" (${locale}) has an empty label.`,
         );
-      if (!KEBAB.test(presentation.slug))
+      let slug: string;
+      try {
+        slug = canonicalTagSlug(presentation.slug);
+      } catch {
         throw new Error(
-          `Tag "${definition.id}" (${locale}) has an invalid slug "${presentation.slug}": use lowercase letters, digits and hyphens.`,
+          `Tag "${definition.id}" (${locale}) has an invalid canonical slug "${presentation.slug}".`,
         );
-      const key = `${locale} ${presentation.slug}`;
+      }
+      const lookup = tagLookupSlug(locale, slug);
+      if (!lookup)
+        throw new Error(
+          `Tag "${definition.id}" (${locale}) has an invalid canonical slug "${presentation.slug}".`,
+        );
+      const key = `${locale} ${lookup}`;
       const owner = bySlug.get(key);
       if (owner)
         throw new Error(
@@ -106,7 +82,10 @@ export function createTaxonomy(
   return {
     definitions,
     presentation: (id, locale) => byId.get(id)?.locales[locale],
-    idForSlug: (locale, slug) => bySlug.get(`${locale} ${slug}`),
+    idForSlug: (locale, slug) => {
+      const lookup = tagLookupSlug(locale, slug);
+      return lookup ? bySlug.get(`${locale} ${lookup}`) : undefined;
+    },
   };
 }
 
@@ -118,7 +97,7 @@ export function tagFromSlug(
   slug: string,
   from: Taxonomy = taxonomy,
 ): ({ id: TagId } & TagPresentation) | undefined {
-  const id = from.idForSlug(locale, slug.toLowerCase());
+  const id = from.idForSlug(locale, slug);
   const found = id ? from.presentation(id, locale) : undefined;
   return id && found ? { id, ...found } : undefined;
 }

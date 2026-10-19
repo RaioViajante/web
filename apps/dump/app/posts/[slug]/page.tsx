@@ -6,7 +6,7 @@ import { PostArticle } from "@/components/PostArticle";
 import { DEFAULT_LOCALE } from "../../../../../site/locales";
 import { getPostBySlug, getPostSlugs } from "@/lib/posts";
 import { renderPost } from "@/lib/render-post";
-import { metadataFor } from "@/lib/seo";
+import { metadataFor, postSeo } from "@/lib/seo";
 import { jsonLdScript } from "../../../../../seo/structured-data";
 import { blogPostingJsonLd } from "@/lib/structured-data";
 
@@ -27,11 +27,7 @@ export async function generateMetadata({
   const post = getPostBySlug(DEFAULT_LOCALE, slug);
   if (!post) return {};
 
-  const metadata = metadataFor({
-    path: `/posts/${post.slug}`,
-    title: post.title,
-    description: post.description,
-  });
+  const metadata = metadataFor(postSeo(post));
   return {
     ...metadata,
     openGraph: {

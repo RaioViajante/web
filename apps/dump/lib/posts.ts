@@ -3,39 +3,22 @@ import path from "node:path";
 
 import matter from "gray-matter";
 
-import { isLocaleId, type LocaleId } from "../../../site/locales";
+import { isLocaleId, localeById, type LocaleId } from "../../../site/locales";
 import {
   taxonomy as defaultTaxonomy,
   tagPresentation,
   type TagId,
   type Taxonomy,
 } from "@/lib/tags";
+import {
+  isPublishedPost,
+  isValidContentId,
+  parseFrontmatter,
+  slugFromFilename,
+  type PostFrontmatter,
+} from "./content-schema";
 
-/** Frontmatter every post file must declare (see `content/README.md`). */
-export interface PostFrontmatter {
-  /**
-   * Immutable, locale-neutral identity of the work. Every version of one work
-   * (original and translations) shares it. It is declared, never derived from
-   * a slug, filename, title or date.
-   */
-  contentId: string;
-  /** The language of this version. */
-  locale: LocaleId;
-  /** The language the work was first written in; the same on every version. */
-  originalLocale: LocaleId;
-  /** Human title, used verbatim in headings and metadata. */
-  title: string;
-  /** One or two sentences; used for previews, `<meta>` description, and RSS. */
-  description: string;
-  /** This version's original publication date as `YYYY-MM-DD`. */
-  publishedAt: string;
-  /** Date of this version's latest meaningful revision, when one exists. */
-  updatedAt?: string;
-  /** Stable tag ids (see `lib/tags.ts`). May be empty. */
-  tags: TagId[];
-  /** When true, this version is hidden from listings and from production builds. */
-  draft: boolean;
-}
+export { parseFrontmatter, slugFromFilename, type PostFrontmatter };
 
 /** A post version's frontmatter plus its URL slug (the filename without extension). */
 export interface Post extends PostFrontmatter {
@@ -52,140 +35,8 @@ export interface TagCount {
 
 export const POSTS_DIRECTORY = path.join(process.cwd(), "content", "posts");
 
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
 /** Lowercase letters/digits in hyphen-separated groups. Used for slugs, tag ids and content ids. */
 const KEBAB_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-class FrontmatterError extends Error {
-  constructor(slug: string, message: string) {
-    super(`Invalid frontmatter in "${slug}.mdx": ${message}`);
-    this.name = "FrontmatterError";
-  }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isValidDate(value: unknown): value is string {
-  if (typeof value !== "string" || !DATE_PATTERN.test(value)) return false;
-  if (value.startsWith("0000-")) return false;
-  const parsed = new Date(`${value}T00:00:00Z`);
-  return (
-    !Number.isNaN(parsed.getTime()) &&
-    parsed.toISOString().slice(0, 10) === value
-  );
-}
-
-/**
- * Validate raw parsed YAML into a typed `PostFrontmatter`. Throws a
- * `FrontmatterError` with an actionable message on any problem, so a broken
- * file fails the build instead of shipping half-rendered.
- */
-export function parseFrontmatter(data: unknown, slug: string): PostFrontmatter {
-  if (!isRecord(data)) {
-    throw new FrontmatterError(
-      slug,
-      "expected a YAML block at the top of the file",
-    );
-  }
-
-  const {
-    contentId,
-    locale,
-    originalLocale,
-    title,
-    description,
-    publishedAt,
-    updatedAt,
-    tags,
-    draft,
-  } = data;
-
-  if (typeof contentId !== "string" || !KEBAB_PATTERN.test(contentId)) {
-    throw new FrontmatterError(
-      slug,
-      "`contentId` is required: lowercase letters, digits and hyphens, declared explicitly (not inferred from the filename)",
-    );
-  }
-  if (!isLocaleId(locale)) {
-    throw new FrontmatterError(
-      slug,
-      `\`locale\` is required and must be a supported locale (got ${JSON.stringify(locale)})`,
-    );
-  }
-  if (!isLocaleId(originalLocale)) {
-    throw new FrontmatterError(
-      slug,
-      `\`originalLocale\` is required and must be a supported locale (got ${JSON.stringify(originalLocale)})`,
-    );
-  }
-  if (typeof title !== "string" || title.trim() === "") {
-    throw new FrontmatterError(
-      slug,
-      "`title` is required and must be a non-empty string",
-    );
-  }
-  if (typeof description !== "string" || description.trim() === "") {
-    throw new FrontmatterError(
-      slug,
-      "`description` is required and must be a non-empty string",
-    );
-  }
-  if (!isValidDate(publishedAt)) {
-    throw new FrontmatterError(
-      slug,
-      "`publishedAt` is required and must be a valid `YYYY-MM-DD` string",
-    );
-  }
-  if (updatedAt !== undefined && !isValidDate(updatedAt)) {
-    throw new FrontmatterError(
-      slug,
-      "`updatedAt` must be a valid `YYYY-MM-DD` string",
-    );
-  }
-  if (updatedAt !== undefined && updatedAt <= publishedAt) {
-    throw new FrontmatterError(
-      slug,
-      "`updatedAt` must be later than `publishedAt`",
-    );
-  }
-
-  let normalizedTags: string[] = [];
-  if (tags !== undefined) {
-    if (!Array.isArray(tags) || tags.some((tag) => typeof tag !== "string")) {
-      throw new FrontmatterError(slug, "`tags` must be a list of strings");
-    }
-    normalizedTags = tags
-      .map((tag) => tag.trim().toLowerCase())
-      .filter(Boolean);
-    for (const tag of normalizedTags) {
-      if (!KEBAB_PATTERN.test(tag)) {
-        throw new FrontmatterError(
-          slug,
-          `tag "${tag}" must be lowercase letters, digits, and hyphens`,
-        );
-      }
-    }
-  }
-
-  if (draft !== undefined && typeof draft !== "boolean") {
-    throw new FrontmatterError(slug, "`draft` must be a boolean");
-  }
-
-  return {
-    contentId,
-    locale,
-    originalLocale,
-    title,
-    description,
-    publishedAt,
-    ...(updatedAt ? { updatedAt } : {}),
-    tags: normalizedTags,
-    draft: draft === true,
-  };
-}
 
 /**
  * The collection-level identity rules. For every work (`contentId`): one
@@ -205,7 +56,7 @@ export function validatePostCollection(
   const works = new Map<string, Post[]>();
   const slugs = new Map<string, Post>();
   for (const post of posts) {
-    if (!KEBAB_PATTERN.test(post.contentId))
+    if (!isValidContentId(post.contentId))
       problems.push(`${at(post)}: invalid contentId "${post.contentId}"`);
     if (!isLocaleId(post.locale))
       problems.push(`${at(post)}: unsupported locale "${post.locale}"`);
@@ -262,17 +113,6 @@ export function validatePostCollection(
  * The URL slug for a post file. Filenames are the single source of truth for
  * slugs, so the rule is strict: lowercase letters, digits, and hyphens.
  */
-export function slugFromFilename(filename: string): string {
-  const base = filename.replace(/\.mdx$/, "");
-  if (filename === base || !KEBAB_PATTERN.test(base)) {
-    throw new Error(
-      `Invalid post filename "${filename}": name must be lowercase letters, ` +
-        `digits, and hyphens with an .mdx extension (e.g. "my-first-boot-sector.mdx").`,
-    );
-  }
-  return base;
-}
-
 /**
  * A post file's text without the identity frontmatter lines (`contentId`,
  * `locale`, `originalLocale`). The search index has always searched the file
@@ -335,7 +175,7 @@ export function getPublishedPosts(
   taxonomy: Taxonomy = defaultTaxonomy,
 ): Post[] {
   return getAllPosts(directory, taxonomy).filter(
-    (post) => post.locale === locale && !post.draft,
+    (post) => post.locale === locale && isPublishedPost(post),
   );
 }
 
@@ -364,22 +204,17 @@ export function getPostVersion(
 }
 
 /**
- * Slugs of one locale to prerender. Production builds only the published set,
- * so a draft 404s once deployed; `next dev` serves drafts so they can be
- * previewed.
+ * Published slugs of one locale to prerender. Drafts never receive routes;
+ * undated editorial work lives outside the post collection entirely.
  */
 export function getPostSlugs(
   locale: LocaleId,
   directory: string = POSTS_DIRECTORY,
   taxonomy: Taxonomy = defaultTaxonomy,
 ): string[] {
-  const posts =
-    process.env.NODE_ENV === "production"
-      ? getPublishedPosts(locale, directory, taxonomy)
-      : getAllPosts(directory, taxonomy).filter(
-          (post) => post.locale === locale,
-        );
-  return posts.map((post) => post.slug);
+  return getPublishedPosts(locale, directory, taxonomy).map(
+    (post) => post.slug,
+  );
 }
 
 /** A post of this locale by its slug; a slug that exists only in another locale is not found. */
@@ -437,24 +272,30 @@ export function getPostsByTag(
   directory: string = POSTS_DIRECTORY,
   taxonomy: Taxonomy = defaultTaxonomy,
 ): Post[] {
-  const id = taxonomy.idForSlug(locale, tagSlug.toLowerCase());
+  const id = taxonomy.idForSlug(locale, tagSlug);
   return id ? getPostsByTagId(locale, id, directory, taxonomy) : [];
 }
 
 /** e.g. "2026-09-03" -> "September 3, 2026". Timezone-independent. */
-export function formatPostDate(date: string): string {
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  });
+export function formatPostDate(date: string, locale: LocaleId = "en"): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString(
+    localeById(locale).intlLocale,
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    },
+  );
 }
 
 /** e.g. "2026-09-03" -> "September". Timezone-independent. */
-export function formatPostMonth(date: string): string {
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", {
-    month: "long",
-    timeZone: "UTC",
-  });
+export function formatPostMonth(date: string, locale: LocaleId = "en"): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString(
+    localeById(locale).intlLocale,
+    {
+      month: "long",
+      timeZone: "UTC",
+    },
+  );
 }

@@ -1,3 +1,5 @@
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
+
 /**
  * Canonical origin (no trailing slash), resolved in priority order:
  *   1. `NEXT_PUBLIC_SITE_URL` — set this in Vercel for the production domain.
@@ -48,12 +50,19 @@ export function absoluteUrl(path: string): string {
 export function alternatesFor(
   canonicalPath?: string,
   languages?: Record<string, string>,
+  locale: LocaleId = DEFAULT_LOCALE,
 ) {
   return {
     ...(canonicalPath ? { canonical: canonicalPath } : {}),
     ...(languages ? { languages } : {}),
-    types: {
-      "application/rss+xml": [{ url: "/rss.xml", title: `${site.name} RSS` }],
-    },
+    ...(locale === DEFAULT_LOCALE
+      ? {
+          types: {
+            "application/rss+xml": [
+              { url: "/rss.xml", title: `${site.name} RSS` },
+            ],
+          },
+        }
+      : {}),
   };
 }

@@ -7,7 +7,7 @@ import {
   TagPostList,
   tagHref,
 } from "@/components/TagViews";
-import { getAllTags, getPostsByTag } from "@/lib/posts";
+import { getAllTags, getPostsByTagId } from "@/lib/posts";
 import type { Post, TagCount } from "@/lib/posts";
 
 // `app/tags/[tag]/page.tsx` reads real published posts by default (as it
@@ -22,11 +22,11 @@ import type { Post, TagCount } from "@/lib/posts";
 jest.mock("../lib/posts", () => ({
   ...jest.requireActual("../lib/posts"),
   getAllTags: jest.fn(),
-  getPostsByTag: jest.fn(),
+  getPostsByTagId: jest.fn(),
 }));
 
 const mockGetAllTags = jest.mocked(getAllTags);
-const mockGetPostsByTag = jest.mocked(getPostsByTag);
+const mockGetPostsByTagId = jest.mocked(getPostsByTagId);
 
 const posts: Post[] = [
   {
@@ -74,7 +74,7 @@ describe("<TagIndex />", () => {
   });
 
   it("URL-encodes tag links consistently", () => {
-    expect(tagHref("systems-notes")).toBe("/tags/systems-notes");
+    expect(tagHref("café+c#")).toBe("/tags/caf%C3%A9%2Bc%23");
   });
 
   it("renders an honest zero-tag state", () => {
@@ -115,7 +115,7 @@ describe("<TagPostList />", () => {
 describe("tag routes", () => {
   afterEach(() => {
     mockGetAllTags.mockReset();
-    mockGetPostsByTag.mockReset();
+    mockGetPostsByTagId.mockReset();
   });
 
   it("does not generate tag routes when there are no published posts", () => {
@@ -135,10 +135,19 @@ describe("tag routes", () => {
   });
 
   it("returns a real 404 for a tag with no published posts", async () => {
-    mockGetPostsByTag.mockReturnValue([]);
+    mockGetPostsByTagId.mockReturnValue([]);
 
     await expect(
       TagPage({ params: Promise.resolve({ tag: "does-not-exist" }) }),
     ).rejects.toThrow(/404/);
+  });
+
+  it("renders an established English case alias through the authoritative tag id", async () => {
+    mockGetPostsByTagId.mockReturnValue(posts);
+
+    render(await TagPage({ params: Promise.resolve({ tag: "OSDEV" }) }));
+
+    expect(mockGetPostsByTagId).toHaveBeenCalledWith("en", "osdev");
+    expect(screen.getByRole("heading", { name: "osdev" })).toBeInTheDocument();
   });
 });

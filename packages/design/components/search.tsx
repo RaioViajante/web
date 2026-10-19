@@ -71,6 +71,8 @@ export interface SearchEntry {
   site: SiteId;
   /** The index's locale: every production producer publishes it (#42) and readers require it. */
   locale: LocaleId;
+  /** Stable work identity for content entries such as Dump posts. */
+  contentId?: string;
   title: string;
   href: string;
   description: string;

@@ -1,5 +1,5 @@
 import { socialKey } from "../../../../../seo/metadata";
-import { getSeoPages } from "@/lib/seo";
+import { getSeoPages, notFoundPages } from "@/lib/seo";
 import { site } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -7,7 +7,7 @@ export const dynamicParams = false;
 
 /** One social image per indexed page, rendered at build time. */
 export function generateStaticParams() {
-  return getSeoPages().map((page) => ({
+  return [...getSeoPages(), ...notFoundPages].map((page) => ({
     slug: socialKey(page.path).split("/"),
   }));
 }
@@ -17,7 +17,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string[] }> },
 ) {
   const { slug } = await params;
-  const page = getSeoPages().find(
+  const page = [...getSeoPages(), ...notFoundPages].find(
     (page) => socialKey(page.path) === slug.join("/"),
   );
   if (!page) return new Response("Not found", { status: 404 });

@@ -369,10 +369,15 @@ export function checkDocument({
     const feed = doc.links.filter(
       (l) => l.rel === "alternate" && l.type === "application/rss+xml",
     );
-    if (feed.length !== 1)
-      p.push(`${at}: expected one RSS discovery link, found ${feed.length}`);
-    else if (norm(feed[0]!.href) !== `${siteOrigins.dump}/rss.xml`)
-      p.push(`${at}: RSS link is ${feed[0]!.href}`);
+    if (locale === DEFAULT_LOCALE) {
+      if (feed.length !== 1)
+        p.push(`${at}: expected one RSS discovery link, found ${feed.length}`);
+      else if (norm(feed[0]!.href) !== `${siteOrigins.dump}/rss.xml`)
+        p.push(`${at}: RSS link is ${feed[0]!.href}`);
+    } else if (feed.length !== 0)
+      p.push(
+        `${at}: localized RSS discovery must remain absent until the locale feed exists`,
+      );
   }
 
   if (
@@ -957,7 +962,9 @@ export function checkJsonLd(ctx: JsonLdContext) {
         `${at}: sitemap lastmod ${lastmod} is the publication date, which is not a modification date`,
       );
     const item = ctx.rss?.find((i) => norm(i.link) === norm(canonical));
-    if (ctx.rss) {
+    // Issue #48 owns localized feeds. Until then, /rss.xml is the preserved
+    // English contract and Portuguese posts must neither join nor advertise it.
+    if (ctx.rss && localeOfPath(path) === DEFAULT_LOCALE) {
       if (!item) p.push(`${at}: the post is not in the RSS feed`);
       else {
         if (`${item.title} — dump` !== title)

@@ -20,7 +20,13 @@ const entry = (extra = {}) => ({
   ...extra,
 });
 const check = (entries) =>
-  checkEnglishIndexLocale("docs", "/search-index.json", entries, ["/x/"]);
+  checkEnglishIndexLocale(
+    "docs",
+    "/search-index.json",
+    entries,
+    ["/x/"],
+    ["/x/"],
+  );
 
 test("an English index whose every entry says locale en passes", () => {
   assert.deepEqual(check([entry(), entry({ body: "b" })]), []);
@@ -46,9 +52,13 @@ test("every entry is checked, not a representative one", () => {
   assert.match(check([entry({ locale: null })]).join(), /locale null/);
 });
 
-test("the index must be a non-empty array", () => {
+test("the index must be an array and cannot be empty when searchable pages exist", () => {
   assert.match(check({}).join(), /not a JSON array/);
-  assert.match(check([]).join(), /no entries/);
+  assert.match(check([]).join(), /empty index despite 1 published searchable/);
+  assert.deepEqual(
+    checkEnglishIndexLocale("docs", "/search-index.json", [], ["/"], []),
+    [],
+  );
 });
 
 test("the committed #40 baseline is a historical floor: entries with or without locale satisfy it", () => {
@@ -103,6 +113,7 @@ for (const site of ["docs", "lab"])
         "/search-index.json",
         entries,
         publishedPaths,
+        baseline[site].searchIndex.pages,
       ),
       [],
     );
@@ -131,10 +142,14 @@ test("a Portuguese index states pt-BR, the host and Portuguese pages", () => {
     ...extra,
   });
   const check = (entries) =>
-    checkIndexLocale("root", "/pt/search-index.json", entries, "pt-BR", [
-      "/pt",
-      "/pt/about",
-    ]);
+    checkIndexLocale(
+      "root",
+      "/pt/search-index.json",
+      entries,
+      "pt-BR",
+      ["/pt", "/pt/about"],
+      ["/pt", "/pt/about"],
+    );
   assert.deepEqual(
     check([pt(), pt({ href: "https://raioviajante.com/pt/about" })]),
     [],
@@ -153,7 +168,7 @@ test("a Portuguese index states pt-BR, the host and Portuguese pages", () => {
     check([pt({ href: "https://docs.raioviajante.com/pt/" })]).join(),
     /do not link to a pt-BR page/,
   );
-  assert.match(check([]).join(), /no entries/);
+  assert.match(check([]).join(), /empty index despite 2 published searchable/);
   // An English index must not link into the Portuguese tree.
   assert.match(
     checkEnglishIndexLocale(
@@ -169,6 +184,7 @@ test("a Portuguese index states pt-BR, the host and Portuguese pages", () => {
         },
       ],
       ["/about"],
+      ["/about"],
     ).join(),
     /do not link to a en page/,
   );
@@ -179,6 +195,10 @@ test("required and optional entry fields have their declared types", () => {
   assert.match(check([entry({ href: 42 })]).join(), /field "href"/);
   assert.match(check([entry({ body: false })]).join(), /field "body"/);
   assert.match(check([entry({ title: "" })]).join(), /field "title" is empty/);
+  assert.match(
+    check([entry({ description: " " })]).join(),
+    /field "description" is empty/,
+  );
   assert.match(check([null]).join(), /entry 1 is not an object/);
 });
 
@@ -189,7 +209,7 @@ test("destinations must belong to the authoritative published inventory", () => 
   );
 });
 
-test("exact duplicate entries are rejected while distinct entries for one page are allowed", () => {
+test("exact duplicate entries are rejected while same-page section entries remain supported", () => {
   const samePage = entry();
   assert.match(
     check([samePage, { ...samePage }]).join(),
@@ -200,6 +220,80 @@ test("exact duplicate entries are rejected while distinct entries for one page a
       samePage,
       entry({ title: "Section", href: `${samePage.href}#section` }),
     ]),
+    [],
+  );
+});
+
+test("Dump content entries require stable unique content ids", () => {
+  const dump = (extra = {}) => ({
+    site: "dump",
+    locale: "pt-BR",
+    contentId: "uma-obra",
+    title: "Uma obra",
+    href: "https://dump.raioviajante.com/pt/posts/uma-obra",
+    description: "d",
+    ...extra,
+  });
+  const validate = (entries) =>
+    checkIndexLocale(
+      "dump",
+      "/pt/search-index.json",
+      entries,
+      "pt-BR",
+      ["/pt/posts/uma-obra", "/pt/posts/outra-obra"],
+      ["/pt/posts/uma-obra", "/pt/posts/outra-obra"],
+    );
+  assert.match(
+    validate([]).join(),
+    /empty index despite 2 published searchable/,
+  );
+  assert.deepEqual(validate([dump()]), []);
+  assert.match(validate([dump({ contentId: undefined })]).join(), /contentId/);
+  assert.match(
+    validate([dump({ contentId: "Not valid" })]).join(),
+    /contentId/,
+  );
+  assert.match(
+    validate([
+      dump(),
+      dump({ href: "https://dump.raioviajante.com/pt/posts/outra-obra" }),
+    ]).join(),
+    /duplicate content ids/,
+  );
+  assert.match(
+    validate([
+      dump({ href: "https://dump.raioviajante.com/pt/posts/fantasma" }),
+    ]).join(),
+    /absent from the published sitemap inventory/,
+  );
+  assert.match(
+    validate([dump({ href: "not a url" })]).join(),
+    /do not link to a pt-BR page/,
+  );
+  assert.deepEqual(
+    validate([
+      dump(),
+      dump({
+        contentId: undefined,
+        title: "Uma seção",
+        href: "https://dump.raioviajante.com/pt/posts/uma-obra#uma-secao",
+        number: "01.",
+      }),
+    ]),
+    [],
+  );
+});
+
+test("a locale with only non-searchable structural pages may publish an empty index", () => {
+  assert.deepEqual(
+    checkIndexLocale(
+      "dump",
+      "/pt/search-index.json",
+      [],
+      "pt-BR",
+      ["/pt", "/pt/archive", "/pt/tags"],
+      [],
+    ),
     [],
   );
 });

@@ -46,6 +46,24 @@ const localFor = (url) => {
 const problems = [];
 const fail = (message) => problems.push(message);
 
+// Searchability is a page/content contract, not a locale-participation flag.
+// Structural Dump pages are meaningful and indexable but its search index is
+// post-only; the other hosts retain the page set recorded in the English
+// baseline, localized when such a route actually exists.
+const searchablePublishedPaths = (site, locale, publishedPaths) => {
+  const paths = publishedPaths.filter((path) => localeOfPath(path) === locale);
+  if (site === "dump")
+    return paths.filter((path) =>
+      (locale === DEFAULT_LOCALE ? path : path.slice(3)).startsWith("/posts/"),
+    );
+  const expected = new Set(
+    baseline[site].searchIndex.pages.map((path) =>
+      localizedPath(site, locale, path),
+    ),
+  );
+  return paths.filter((path) => expected.has(path));
+};
+
 const { stop } = await startServers();
 process.on("exit", stop);
 const themeColor = await expectedThemeColor();
@@ -165,6 +183,7 @@ for (const site of sites) {
       recorded.searchIndex.path,
       indexEntries,
       sitemapPaths,
+      searchablePublishedPaths(site, DEFAULT_LOCALE, sitemapPaths),
     ),
   );
   allPages.push(...result.pages);
@@ -237,6 +256,7 @@ for (const site of sites) {
           published_.text ? JSON.parse(published_.text) : undefined,
           locale,
           sitemapPaths,
+          searchablePublishedPaths(site, locale, sitemapPaths),
         ),
       );
     }

@@ -10,9 +10,10 @@ describe("shared social image route", () => {
   it("generates one image per published post, so future posts get one automatically", async () => {
     const mod = await import("@/app/og/[...slug]/route");
     const keys = mod.generateStaticParams().map(({ slug }) => slug.join("/"));
-    for (const slug of getPostSlugs("en")) {
+    for (const slug of getPostSlugs("en"))
       expect(keys).toContain(`posts/${slug}.png`);
-    }
+    for (const slug of getPostSlugs("pt-BR"))
+      expect(keys).toContain(`pt/posts/${slug}.png`);
     expect(keys).toContain("index.png");
     expect(new Set(keys).size).toBe(keys.length);
   });

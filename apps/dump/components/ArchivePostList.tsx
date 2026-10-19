@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { LeaderRow, Section } from "@raioviajante/design/parts";
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 
+import { postPath } from "@/lib/inventory";
+import { ptCopy } from "@/lib/pt";
 import { tagPresentation } from "@/lib/tags";
 import { formatPostMonth, sortPostsNewestFirst, type Post } from "@/lib/posts";
 
@@ -11,7 +14,10 @@ export function formatArchiveDate(date: string): string {
   return date.slice(5);
 }
 
-export function groupPostsByYear(posts: readonly Post[]): PostYear[] {
+export function groupPostsByYear(
+  posts: readonly Post[],
+  locale: LocaleId = DEFAULT_LOCALE,
+): PostYear[] {
   const years = new Map<string, PostYear>();
   for (const post of sortPostsNewestFirst(posts)) {
     const year = post.publishedAt.slice(0, 4);
@@ -22,7 +28,7 @@ export function groupPostsByYear(posts: readonly Post[]): PostYear[] {
     if (!monthGroup) {
       monthGroup = {
         month,
-        name: formatPostMonth(post.publishedAt),
+        name: formatPostMonth(post.publishedAt, locale),
         posts: [],
       };
       group.months.push(monthGroup);
@@ -33,11 +39,22 @@ export function groupPostsByYear(posts: readonly Post[]): PostYear[] {
   return [...years.values()];
 }
 
-export function ArchivePostList({ posts }: { posts: Post[] }) {
-  if (!posts.length) return <p className="archive-empty">No posts yet.</p>;
+export function ArchivePostList({
+  posts,
+  locale = DEFAULT_LOCALE,
+}: {
+  posts: Post[];
+  locale?: LocaleId;
+}) {
+  if (!posts.length)
+    return (
+      <p className="archive-empty">
+        {locale === DEFAULT_LOCALE ? "No posts yet." : ptCopy.archive.empty}
+      </p>
+    );
   return (
     <>
-      {groupPostsByYear(posts).map(({ year, months }, index) => (
+      {groupPostsByYear(posts, locale).map(({ year, months }, index) => (
         <Section
           key={year}
           number={`${String(index + 1).padStart(2, "0")}.`}
@@ -68,7 +85,7 @@ export function ArchivePostList({ posts }: { posts: Post[] }) {
                           ? tagPresentation(post.tags[0], post.locale).label
                           : undefined
                       }
-                      href={`/posts/${post.slug}`}
+                      href={postPath(post)}
                       linkComponent={Link}
                     />
                   </li>

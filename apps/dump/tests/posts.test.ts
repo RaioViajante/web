@@ -187,20 +187,11 @@ describe("post collection", () => {
     ).toEqual(["second-post", "first-post"]);
   });
 
-  it("keeps drafts prerenderable outside production so they can be previewed", () => {
-    expect(getPostSlugs("en", FIXTURES, TAXONOMY)).toContain("hidden-post");
-  });
-
-  it("drops drafts from the production prerender set", () => {
-    const nodeEnv = jest.replaceProperty(process.env, "NODE_ENV", "production");
-    try {
-      expect(getPostSlugs("en", FIXTURES, TAXONOMY)).toEqual([
-        "second-post",
-        "first-post",
-      ]);
-    } finally {
-      nodeEnv.restore();
-    }
+  it("never gives drafts a prerendered route", () => {
+    expect(getPostSlugs("en", FIXTURES, TAXONOMY)).toEqual([
+      "second-post",
+      "first-post",
+    ]);
   });
 
   it("treats a missing content directory as no posts", () => {
@@ -236,5 +227,9 @@ describe("formatPostDate", () => {
     // A naive `new Date("2026-01-01")` in a negative-offset zone renders as
     // Dec 31. This must stay January 1 everywhere.
     expect(formatPostDate("2026-01-01")).toBe("January 1, 2026");
+  });
+
+  it("formats Portuguese dates through the locale registry", () => {
+    expect(formatPostDate("2026-09-03", "pt-BR")).toBe("3 de setembro de 2026");
   });
 });

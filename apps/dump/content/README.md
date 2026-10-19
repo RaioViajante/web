@@ -73,8 +73,8 @@ replace them. `publishedAt` remains the authority for ordering and RSS;
   the same work. A translation has its own filename and slug.
 - `publishedAt`, `updatedAt` and `draft` belong to each localized version.
   They are never copied between versions or inferred from Git, the filesystem
-  or the build. Only English routes exist today; Portuguese routes are added by
-  a later slice.
+  or the build. Portuguese routes exist under `/pt`; only published Portuguese
+  records enter them.
 
 ### Date authority
 
@@ -91,13 +91,18 @@ changes do not establish a content update on their own.
 
 ### Tags
 
-Frontmatter `tags` are stable tag ids defined in `lib/tags.ts`. Each id has,
-per locale, a display label and a URL slug (today only English, where both
-equal the id, so `/tags/<id>` is unchanged). A post's tags must each have a
-presentation in the post's own locale, or the build fails; there is no English
-fallback. Filtering uses the id; a localized slug only routes to it, and no
-slug identifies a tag. Adding a tag, or localizing one, means editing the
-definition in `lib/tags.ts`.
+Frontmatter `tags` are stable tag ids defined in `content/tags.json` and read
+through `lib/tags.ts`. Each id has, per locale, a display label and a URL slug.
+English labels and `/tags/<id>` URLs stay unchanged. A post's tags must each
+have a presentation in the post's own locale, or the build fails; there is no
+English fallback. Filtering uses the id; a localized slug only routes to it,
+and no slug identifies a tag. Adding or localizing a tag means editing the JSON
+definition. A declared slug is an NFC-normalized decoded path segment. Unicode
+and reserved characters are encoded exactly once in its URL; path separators,
+percent signs, whitespace and malformed Unicode are not valid slug data.
+English tag lookup remains case-insensitive for historical compatibility.
+Portuguese lookup is exact, and canonical URLs come from the declared
+presentation rather than request text.
 
 ### Series
 
@@ -107,9 +112,26 @@ tags. The reader UI belongs to a later issue.
 
 ### Drafts
 
-A `draft: true` post is excluded from the homepage, archive, tag pages, RSS, and
-the sitemap. `next dev` still renders it at its real URL so you can preview it;
-production returns 404 until you set `draft: false`.
+A `draft: true` post is excluded from every public route and inventory,
+including the homepage, archive, tag pages, RSS, sitemap and search. Its route
+returns 404 until the record is published.
+
+The request proxy checks dynamic membership against the generated published
+inventory; it never scans MDX per request. It compares decoded route segments
+so established English URLs using percent-encoded unreserved characters still
+resolve, and English tag slugs remain case-insensitive. Portuguese tag slugs
+use their exact declared case. Encoded separators, residual percent escapes,
+invalid percent encodings, drafts and unknown slugs are localized 404s. Next.js
+normalizes repeated separators and one trailing slash before the proxy with its
+established 308; a missing normalized destination then returns the localized
+404. No alias or new canonical is introduced.
+
+An article whose truthful first-publication date is not known yet cannot be a
+post record, because `publishedAt` remains required even for a draft. Prepare
+such work in `content/drafts/<locale>/`; that directory is never loaded by the
+site. On the actual release date, add `publishedAt`, move the file into
+`content/posts/`, regenerate the route manifest with `pnpm content:routes`, and
+run the full release checks before merge.
 
 ## Markdown support
 
