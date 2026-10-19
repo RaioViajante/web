@@ -1,0 +1,88 @@
+{
+  "source": "https://dump.raioviajante.com/rss.xml",
+  "capturedAt": "2026-10-19T18:23:59Z",
+  "capturedFrom": "production, HTTP 200, content-type application/rss+xml; charset=utf-8, before any feed-generation change (main a52e928)",
+  "rawFile": "production-rss-2026-10-19.xml",
+  "rawSha256": "3a17cd9118bd008e2fe3fbd02b6a08e72b99813d1665d0e0ab68588b0737f577",
+  "channel": {
+    "title": "dump",
+    "link": "https://dump.raioviajante.com",
+    "description": "Computer science notes, projects, devlogs, and technology writing by RaioViajante.",
+    "language": "en",
+    "self": "https://dump.raioviajante.com/rss.xml"
+  },
+  "items": [
+    {
+      "guid": "https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was",
+      "pubDate": "Sun, 27 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/gave-one-operation-more-than-one-deadline",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/gave-one-operation-more-than-one-deadline",
+      "pubDate": "Sun, 27 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/kept-building-and-stopped-writing-it-down",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/kept-building-and-stopped-writing-it-down",
+      "pubDate": "Sun, 27 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/started-writing-down-the-failures-before-the-features",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/started-writing-down-the-failures-before-the-features",
+      "pubDate": "Sun, 27 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/my-project-cards-were-getting-ahead-of-my-projects",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/my-project-cards-were-getting-ahead-of-my-projects",
+      "pubDate": "Sun, 27 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/an-execution-is-more-than-a-row-in-a-database",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/an-execution-is-more-than-a-row-in-a-database",
+      "pubDate": "Sun, 13 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/split-my-internet-into-four-different-kinds-of-place",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/split-my-internet-into-four-different-kinds-of-place",
+      "pubDate": "Sun, 13 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/started-designing-a-language-before-i-could-compile-one",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/started-designing-a-language-before-i-could-compile-one",
+      "pubDate": "Sun, 13 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases",
+      "pubDate": "Sat, 12 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/building-orbit",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/building-orbit",
+      "pubDate": "Mon, 07 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/there-is-no-printf-down-here",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/there-is-no-printf-down-here",
+      "pubDate": "Sat, 05 Sep 2026 00:00:00 GMT"
+    },
+    {
+      "guid": "https://dump.raioviajante.com/posts/maybe-this-can-be-something-someday",
+      "isPermaLink": "true",
+      "link": "https://dump.raioviajante.com/posts/maybe-this-can-be-something-someday",
+      "pubDate": "Fri, 04 Sep 2026 00:00:00 GMT"
+    }
+  ]
+}

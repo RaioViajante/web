@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>dump</title>
+    <link>https://dump.raioviajante.com</link>
+    <description>Computer science notes, projects, devlogs, and technology writing by RaioViajante.</description>
+    <language>en</language>
+    <atom:link href="https://dump.raioviajante.com/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A TOML File Changed What Sweep Was</title>
+      <link>https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was</guid>
+      <pubDate>Sun, 27 Sep 2026 00:00:00 GMT</pubDate>
+      <description>Sweep started with my file-organizing preferences inside the code, but loading TOML configuration turned those preferences into an interface the program has to respect.</description>
+      <category>python</category>
+      <category>toml</category>
+      <category>cli</category>
+      <category>sweep</category>
+    </item>
+    <item>
+      <title>I Gave One Operation More Than One Deadline</title>
+      <link>https://dump.raioviajante.com/posts/gave-one-operation-more-than-one-deadline</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/gave-one-operation-more-than-one-deadline</guid>
+      <pubDate>Sun, 27 Sep 2026 00:00:00 GMT</pubDate>
+      <description>I thought jobs-mcp had one caller deadline, but pagination, retries, pacing, and transport had each acquired their own interpretation of the time left.</description>
+      <category>typescript</category>
+      <category>reliability</category>
+      <category>time</category>
+      <category>mcp</category>
+    </item>
+    <item>
+      <title>I Kept Building and Stopped Writing It Down</title>
+      <link>https://dump.raioviajante.com/posts/kept-building-and-stopped-writing-it-down</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/kept-building-and-stopped-writing-it-down</guid>
+      <pubDate>Sun, 27 Sep 2026 00:00:00 GMT</pubDate>
+      <description>I made dump to catch the things I discover while building, then spent two weeks building too many things to stop and write about any of them.</description>
+      <category>personal</category>
+      <category>meta</category>
+      <category>writing</category>
+      <category>workflow</category>
+    </item>
+    <item>
+      <title>I Started Writing Down the Failures Before the Features</title>
+      <link>https://dump.raioviajante.com/posts/started-writing-down-the-failures-before-the-features</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/started-writing-down-the-failures-before-the-features</guid>
+      <pubDate>Sun, 27 Sep 2026 00:00:00 GMT</pubDate>
+      <description>jobs-mcp began as a tool for job workflows, then accumulated decisions about provenance, secrets, recovery, and automation before the visible product had much to show.</description>
+      <category>architecture</category>
+      <category>reliability</category>
+      <category>security</category>
+      <category>mcp</category>
+    </item>
+    <item>
+      <title>My Project Cards Were Getting Ahead of My Projects</title>
+      <link>https://dump.raioviajante.com/posts/my-project-cards-were-getting-ahead-of-my-projects</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/my-project-cards-were-getting-ahead-of-my-projects</guid>
+      <pubDate>Sun, 27 Sep 2026 00:00:00 GMT</pubDate>
+      <description>A short project description can make an unfinished idea sound suspiciously complete, so I started making the site more honest about what actually exists.</description>
+      <category>personal</category>
+      <category>meta</category>
+      <category>projects</category>
+      <category>web</category>
+    </item>
+    <item>
+      <title>An Execution Is More Than a Row in a Database</title>
+      <link>https://dump.raioviajante.com/posts/an-execution-is-more-than-a-row-in-a-database</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/an-execution-is-more-than-a-row-in-a-database</guid>
+      <pubDate>Sun, 13 Sep 2026 00:00:00 GMT</pubDate>
+      <description>Orbit started with Jobs and endpoints, but modeling the first real execution forced me to decide which state transitions are legal and which ones should fail loudly.</description>
+      <category>java</category>
+      <category>spring</category>
+      <category>distributed-systems</category>
+    </item>
+    <item>
+      <title>I Split My Internet Into Four Different Kinds of Place</title>
+      <link>https://dump.raioviajante.com/posts/split-my-internet-into-four-different-kinds-of-place</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/split-my-internet-into-four-different-kinds-of-place</guid>
+      <pubDate>Sun, 13 Sep 2026 00:00:00 GMT</pubDate>
+      <description>I kept building places for different kinds of work until it became obvious that my personal website was trying to be a home page, notebook, documentation site, and experiment lab at the same time.</description>
+      <category>meta</category>
+      <category>dump</category>
+      <category>personal</category>
+    </item>
+    <item>
+      <title>I Started Designing a Language Before I Could Compile One</title>
+      <link>https://dump.raioviajante.com/posts/started-designing-a-language-before-i-could-compile-one</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/started-designing-a-language-before-i-could-compile-one</guid>
+      <pubDate>Sun, 13 Sep 2026 00:00:00 GMT</pubDate>
+      <description>I started designing yanawa while still learning how programming languages and compilers are built, and discovered that deciding what a language should be is its own kind of technical work.</description>
+      <category>programming-languages</category>
+      <category>language-design</category>
+      <category>compilers</category>
+    </item>
+    <item>
+      <title>Apparently Moving a File Has Edge Cases</title>
+      <link>https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases</guid>
+      <pubDate>Sat, 12 Sep 2026 00:00:00 GMT</pubDate>
+      <description>I started reorganizing my entire workflow, got tired of moving files by hand, and somehow ended up learning Python, pytest, and why even moving a file has edge cases.</description>
+      <category>python</category>
+      <category>pytest</category>
+      <category>automation</category>
+      <category>sweep</category>
+    </item>
+    <item>
+      <title>I Got Bored of CRUD, So I&apos;m Building a Scheduler</title>
+      <link>https://dump.raioviajante.com/posts/building-orbit</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/building-orbit</guid>
+      <pubDate>Mon, 07 Sep 2026 00:00:00 GMT</pubDate>
+      <description>I wanted to get better at Java and Spring, so naturally I started building a self-hosted job scheduler and accidentally found JPA, state machines, and distributed systems waiting for me.</description>
+      <category>java</category>
+      <category>spring</category>
+      <category>distributed-systems</category>
+    </item>
+    <item>
+      <title>There Is No printf Down Here</title>
+      <link>https://dump.raioviajante.com/posts/there-is-no-printf-down-here</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/there-is-no-printf-down-here</guid>
+      <pubDate>Sat, 05 Sep 2026 00:00:00 GMT</pubDate>
+      <description>My first steps into x86 assembly, BIOS interrupts, boot sectors, and the strange realization that there is no operating system underneath me anymore.</description>
+      <category>osdev</category>
+      <category>assembly</category>
+      <category>x86</category>
+    </item>
+    <item>
+      <title>Maybe This Can Be Something Someday</title>
+      <link>https://dump.raioviajante.com/posts/maybe-this-can-be-something-someday</link>
+      <guid isPermaLink="true">https://dump.raioviajante.com/posts/maybe-this-can-be-something-someday</guid>
+      <pubDate>Fri, 04 Sep 2026 00:00:00 GMT</pubDate>
+      <description>Why this place exists, what I hope it becomes, and why I probably overengineered a diary.</description>
+      <category>personal</category>
+      <category>meta</category>
+      <category>dump</category>
+    </item>
+  </channel>
+</rss>
