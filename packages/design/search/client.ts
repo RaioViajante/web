@@ -4,7 +4,7 @@ import { SITES, type SiteId } from "../../../site/sites";
 import type { SearchEntry } from "../components/search";
 import {
   loadEverywhere,
-  loadSiteIndex,
+  loadCurrentSiteIndex,
   searchEntries,
   skippedNote,
   unavailableNote,
@@ -127,8 +127,6 @@ function mountPage(page: HTMLElement) {
   let all: SearchEntry[] = [];
   let unavailable: SiteId[] = [];
   let skipped: SiteId[] = [];
-  // The current host does not publish this locale: say so, not "unavailable".
-  let currentSkipped = false;
 
   function setSelected(next: number) {
     const rows = [
@@ -156,9 +154,7 @@ function mountPage(page: HTMLElement) {
         line.hidden = line.dataset.searchSuggestions !== scope;
       });
     if (!query) {
-      bubble.textContent = currentSkipped
-        ? text.skipped(catalogFor(locale).lang.names[locale])
-        : initialPrompt;
+      bubble.textContent = initialPrompt;
       return;
     }
     const found = searchEntries(scope === "site" ? own : all, query, locale);
@@ -203,24 +199,19 @@ function mountPage(page: HTMLElement) {
     render();
   }
 
-  // Participation is checked before any request, for this host too. The
-  // state is exposed for the catalog slice to word; no copy is added here.
-  void loadSiteIndex(site, locale, () => readIndex(site, site, locale)).then(
-    (index) => {
-      page.dataset.searchState = index.state;
-      if (index.state === "ready") {
-        own = index.entries;
-        all = index.entries;
-        if (scope === "everywhere") void loadAll();
-        else render();
-      } else if (index.state === "unavailable") {
-        bubble.textContent = text.unavailable;
-      } else {
-        currentSkipped = true;
-        render();
-      }
-    },
-  );
+  // The current route's own published index is available independently of
+  // cross-host participation. `loadAll` applies participation to peers only.
+  void loadCurrentSiteIndex(site, locale, () =>
+    readIndex(site, site, locale),
+  ).then((index) => {
+    page.dataset.searchState = index.state;
+    if (index.state === "ready") {
+      own = index.entries;
+      all = index.entries;
+      if (scope === "everywhere") void loadAll();
+      else render();
+    } else bubble.textContent = text.unavailable;
+  });
 
   input.addEventListener("input", render);
   input.addEventListener("keydown", (event) => {

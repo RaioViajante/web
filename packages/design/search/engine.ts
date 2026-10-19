@@ -42,27 +42,30 @@ export interface EverywhereIndex {
   skipped: SiteId[];
 }
 
-/** How one host's index stands in a locale; #44 renders the words. */
-export type SiteIndex =
+/** How the current host's own index stands in the route's locale. */
+export type CurrentSiteIndex =
   | { state: "ready"; entries: SearchEntry[] }
-  /** Participating, but the fetch failed or the response was invalid. */
-  | { state: "unavailable" }
+  /** The local fetch failed or its response was invalid. */
+  | { state: "unavailable" };
+
+/** How another host's index stands for federated search. */
+export type FederatedSiteIndex =
+  | CurrentSiteIndex
   /** Not participating in the locale: never read. */
   | { state: "skipped" };
 
 /**
- * Read one host's index for a locale. Participation is checked first, for the
- * current host as much as any other, so a non-participating host is never
- * requested. A participating host's response is validated against that host
- * and locale before it counts; an empty array is a valid `ready` index.
+ * Read the current page's own index. Reaching a localized search page is not
+ * locale participation: the index may be published for direct verification
+ * before cross-host advertising and federation are enabled. The response is
+ * still validated against the route's site and locale, and an empty array is
+ * a valid `ready` index.
  */
-export async function loadSiteIndex(
+export async function loadCurrentSiteIndex(
   site: SiteId,
   locale: LocaleId,
   read: (site: SiteId) => Promise<SearchEntry[]>,
-  isParticipating: (site: SiteId, locale: LocaleId) => boolean = participates,
-): Promise<SiteIndex> {
-  if (!isParticipating(site, locale)) return { state: "skipped" };
+): Promise<CurrentSiteIndex> {
   try {
     return {
       state: "ready",
@@ -74,13 +77,28 @@ export async function loadSiteIndex(
 }
 
 /**
+ * Read another host's index for federated search. Participation is checked
+ * before any request, so unpublished locale endpoints are never probed.
+ */
+export async function loadFederatedSiteIndex(
+  site: SiteId,
+  locale: LocaleId,
+  read: (site: SiteId) => Promise<SearchEntry[]>,
+  isParticipating: (site: SiteId, locale: LocaleId) => boolean = participates,
+): Promise<FederatedSiteIndex> {
+  if (!isParticipating(site, locale)) return { state: "skipped" };
+  return loadCurrentSiteIndex(site, locale, read);
+}
+
+/**
  * Merge this site's index with every other participating site's, within one
  * locale. `own` is validated against this site and the locale (a wrong one
  * throws: it is a caller error, not data). Every other host goes through
- * `loadSiteIndex`: a participating host that cannot be reached, or answers
- * with the wrong site or locale, is reported, never thrown, and the rest still
- * searches; an empty index succeeded; a host that does not participate is
- * skipped without a request. Participation, not probing, decides.
+ * `loadFederatedSiteIndex`: a participating host that cannot be reached, or
+ * answers with the wrong site or locale, is reported, never thrown, and the
+ * rest still searches; an empty index succeeded; a host that does not
+ * participate is skipped without a request. Participation, not probing,
+ * decides.
  */
 export async function loadEverywhere(
   currentSite: SiteId,
@@ -92,7 +110,9 @@ export async function loadEverywhere(
   const entries = [...validateIndex(own, currentSite, locale)];
   const others = SITES.filter((item) => item.id !== currentSite);
   const loaded = await Promise.all(
-    others.map((item) => loadSiteIndex(item.id, locale, read, isParticipating)),
+    others.map((item) =>
+      loadFederatedSiteIndex(item.id, locale, read, isParticipating),
+    ),
   );
   const unavailable: SiteId[] = [];
   const skipped: SiteId[] = [];

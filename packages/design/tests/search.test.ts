@@ -4,7 +4,8 @@ import type { SiteId } from "../../../site/sites";
 import type { LocaleId } from "../../../site/locales";
 import {
   loadEverywhere,
-  loadSiteIndex,
+  loadCurrentSiteIndex,
+  loadFederatedSiteIndex,
   searchEntries,
   unavailableNote,
 } from "../search/engine";
@@ -63,6 +64,17 @@ describe("searchEntries", () => {
     const entries = [entry("docs", "ISTANBUL", undefined, "pt-BR")];
     expect(searchEntries(entries, "istanbul", "pt-BR")).toHaveLength(1);
     expect(searchEntries(entries, "istanbul", "en")).toHaveLength(1);
+  });
+
+  it("preserves localized content identity in matching results", () => {
+    const portuguese = {
+      ...entry("dump", "Traduzir o site", "identidade e publicação", "pt-BR"),
+      contentId: "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+      href: "https://dump.raioviajante.com/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+    };
+    expect(searchEntries([portuguese], "publicacao", "pt-BR")).toEqual([
+      portuguese,
+    ]);
   });
 });
 
@@ -219,13 +231,25 @@ describe("loadEverywhere", () => {
   });
 });
 
-describe("loadSiteIndex", () => {
-  it("never reads a host that does not participate, the current host included", async () => {
+describe("current and federated index loading", () => {
+  it("reads a valid current-host index without consulting participation", async () => {
     const read = vi.fn(async (site: SiteId) => [
       entry(site, "x", undefined, "pt-BR"),
     ]);
     for (const site of ["root", "dump", "docs", "lab"] as const)
-      expect(await loadSiteIndex(site, "pt-BR", read)).toEqual({
+      expect(await loadCurrentSiteIndex(site, "pt-BR", read)).toEqual({
+        state: "ready",
+        entries: [entry(site, "x", undefined, "pt-BR")],
+      });
+    expect(read).toHaveBeenCalledTimes(4);
+  });
+
+  it("never reads a non-participating host during federation", async () => {
+    const read = vi.fn(async (site: SiteId) => [
+      entry(site, "x", undefined, "pt-BR"),
+    ]);
+    for (const site of ["root", "dump", "docs", "lab"] as const)
+      expect(await loadFederatedSiteIndex(site, "pt-BR", read)).toEqual({
         state: "skipped",
       });
     expect(read).not.toHaveBeenCalled();
@@ -233,34 +257,32 @@ describe("loadSiteIndex", () => {
 
   it("is ready with entries, ready with a valid empty index, unavailable on failure or invalid data", async () => {
     expect(
-      await loadSiteIndex("docs", "en", async () => [entry("docs", "a")], all),
+      await loadCurrentSiteIndex("docs", "en", async () => [
+        entry("docs", "a"),
+      ]),
     ).toEqual({ state: "ready", entries: [entry("docs", "a")] });
-    expect(await loadSiteIndex("docs", "en", async () => [], all)).toEqual({
+    expect(await loadCurrentSiteIndex("docs", "en", async () => [])).toEqual({
       state: "ready",
       entries: [],
     });
     expect(
-      await loadSiteIndex(
-        "docs",
-        "en",
-        async () => Promise.reject(new Error("x")),
-        all,
+      await loadCurrentSiteIndex("docs", "en", async () =>
+        Promise.reject(new Error("x")),
       ),
     ).toEqual({ state: "unavailable" });
     expect(
-      await loadSiteIndex(
-        "docs",
-        "en",
-        async () => [entry("docs", "a", undefined, "pt-BR")],
-        all,
-      ),
+      await loadCurrentSiteIndex("docs", "en", async () => [
+        entry("docs", "a", undefined, "pt-BR"),
+      ]),
     ).toEqual({ state: "unavailable" });
   });
 
   it("with real participation, English hosts are read", async () => {
     const read = vi.fn(async (site: SiteId) => [entry(site, "x")]);
     for (const site of ["root", "dump", "docs", "lab"] as const)
-      expect((await loadSiteIndex(site, "en", read)).state).toBe("ready");
+      expect((await loadFederatedSiteIndex(site, "en", read)).state).toBe(
+        "ready",
+      );
     expect(read).toHaveBeenCalledTimes(4);
   });
 });

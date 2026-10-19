@@ -318,31 +318,31 @@ describe("search copy", () => {
     );
   });
 
-  it("words the skipped current host apart from unavailable, without a fetch", async () => {
-    const fetchMock = vi.fn();
+  it("loads the current Portuguese index independently of participation", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => [] });
     const { page, stop } = await mount("pt-BR", fetchMock);
-    await vi.waitFor(() => expect(page.dataset.searchState).toBe("skipped"));
+    await vi.waitFor(() => expect(page.dataset.searchState).toBe("ready"));
     expect(document.querySelector("[data-search-bubble]")?.textContent).toBe(
-      "ainda não há resultados em português.",
+      "o que você precisa consultar?",
     );
-    expect(
-      document.querySelector("[data-search-bubble]")?.textContent,
-    ).not.toBe(catalogFor("pt-BR").search.unavailable);
-    expect(fetchMock).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledWith("/pt/search-index.json", {
+      mode: "cors",
+    });
     stop();
   });
 
   it("words an unavailable current host in the page locale", async () => {
-    // Portuguese participation is not active, so the English page proves the English wording
     const { page, stop } = await mount(
-      "en",
+      "pt-BR",
       vi.fn().mockResolvedValue({ ok: false }),
     );
     await vi.waitFor(() =>
       expect(page.dataset.searchState).toBe("unavailable"),
     );
     expect(document.querySelector("[data-search-bubble]")?.textContent).toBe(
-      "search is unavailable right now.",
+      "a busca está indisponível agora.",
     );
     stop();
   });
