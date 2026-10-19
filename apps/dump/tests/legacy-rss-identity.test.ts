@@ -70,10 +70,41 @@ describe("English /rss.xml against the production snapshot", () => {
     }
   });
 
-  it("has no unrecorded or duplicated items while the editorial set is unchanged", () => {
-    const guids = rendered().map((item) => item.guid);
-    expect(new Set(guids).size).toBe(guids.length);
-    expect(guids).toEqual(fixture.items.map((item) => item.guid));
+  it("lists no GUID or link twice", () => {
+    const rows = rendered();
+    expect(new Set(rows.map((i) => i.guid)).size).toBe(rows.length);
+    expect(new Set(rows.map((i) => i.link)).size).toBe(rows.length);
+  });
+
+  it("never reuses a legacy GUID for any other item", () => {
+    const legacy = new Set(fixture.items.map((i) => i.guid));
+    const recordedLinks = new Map(fixture.items.map((i) => [i.guid, i.link]));
+    for (const item of rendered())
+      if (legacy.has(item.guid))
+        expect(item.link).toBe(recordedLinks.get(item.guid));
+      else
+        expect(item.guid).toMatch(/^tag:dump\.raioviajante\.com,2026:post\//);
+  });
+
+  it("accepts a new English post without touching the snapshot", async () => {
+    const { renderRssFeed } = await import("@/lib/rss");
+    const { getPublishedPosts } = await import("@/lib/posts");
+    const added = {
+      ...getPublishedPosts("en")[0]!,
+      slug: "brand-new",
+      contentId: "brand-new",
+      publishedAt: "2026-12-01",
+    };
+    const extended = parseItems(
+      renderRssFeed([added, ...getPublishedPosts("en")]),
+    );
+    expect(extended).toHaveLength(fixture.items.length + 1);
+    expect(extended[0]).toMatchObject({
+      guid: "tag:dump.raioviajante.com,2026:post/brand-new/en",
+      isPermaLink: "false",
+    });
+    for (const recorded of fixture.items)
+      expect(extended).toContainEqual(recorded);
   });
 
   it("keeps the recorded channel contract", () => {

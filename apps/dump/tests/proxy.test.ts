@@ -2,6 +2,7 @@
 import { NextRequest } from "next/server";
 
 import {
+  config,
   guardedPath,
   isPublishedDynamicPath,
   proxy,
@@ -151,4 +152,43 @@ describe("dynamic route guard", () => {
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
     expect(response.headers.get("x-middleware-request-x-locale")).toBe("en");
   });
+});
+
+describe("proxy matcher", () => {
+  // Next compiles `matcher` entries as `/…` patterns anchored to the whole path.
+  const matches = (path: string) =>
+    new RegExp(`^${config.matcher[0]}$`).test(path);
+
+  it.each([
+    "/rss.xml",
+    "/pt/rss.xml",
+    "/search-index.json",
+    "/pt/search-index.json",
+  ])("leaves the static feed or index %s outside the proxy", (path) =>
+    expect(matches(path)).toBe(false),
+  );
+
+  it.each([
+    "/pt/rss.xml/",
+    "/rss.xml/extra",
+    "/pt/rss.xml.bak",
+    "/posts/rss.xml",
+    "/pt/posts/rss.xml",
+    "/en/rss.xml",
+    "/pt/pt/rss.xml",
+    "/xrss.xml",
+  ])("does not exempt the lookalike %s", (path) =>
+    expect(matches(path)).toBe(true),
+  );
+
+  it.each([
+    "/",
+    "/pt",
+    "/posts/maybe-this-can-be-something-someday",
+    "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia",
+    "/pt/tags/pessoal",
+    "/tags/osdev",
+  ])("still runs the proxy for the page %s", (path) =>
+    expect(matches(path)).toBe(true),
+  );
 });

@@ -13,6 +13,7 @@ import {
   tagGuid,
 } from "@/lib/rss-identity";
 import { alternatesFor, site } from "@/lib/site";
+import { tagPresentation } from "@/lib/tags";
 
 function post(overrides: Partial<Post> = {}): Post {
   return {
@@ -270,6 +271,40 @@ describe("locale-specific feeds", () => {
       "tag:dump.raioviajante.com,2026:post/original-pt/pt-BR",
     );
     expect(translated.link).toMatch(/\/pt\/posts\/talvez$/);
+  });
+});
+
+describe("feed categories", () => {
+  const categories = (feed: string) =>
+    [...feed.matchAll(/<category>([^<]*)<\/category>/g)].map((m) => m[1]);
+
+  it("shows Portuguese readers the Portuguese tag labels, not the tag ids", () => {
+    const tags = ["personal", "architecture", "meta"];
+    const labels = tags.map((id) => tagPresentation(id, "pt-BR").label);
+    const feed = renderRssFeed(
+      [post({ locale: "pt-BR", originalLocale: "pt-BR", tags })],
+      "pt-BR",
+    );
+    expect(categories(feed)).toEqual(labels);
+    expect(labels).not.toEqual(tags);
+  });
+
+  it("keeps every published Portuguese category equal to its presentation label", () => {
+    for (const published of getPublishedPosts("pt-BR"))
+      for (const label of categories(renderRssFeed([published], "pt-BR")))
+        expect(
+          published.tags.map((id) => tagPresentation(id, "pt-BR").label),
+        ).toContain(label);
+  });
+
+  it("keeps English categories as the stable tag ids", () => {
+    const feed = renderRssFeed([post({ tags: ["osdev"] })]);
+    expect(categories(feed)).toEqual(["osdev"]);
+  });
+
+  it("escapes category labels", () => {
+    const feed = renderRssFeed([post({ tags: ["osdev"] })]);
+    expect(feed).not.toMatch(/<category>[^<]*[&"'][^<]*<\/category>/);
   });
 });
 

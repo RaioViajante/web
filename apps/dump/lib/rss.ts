@@ -7,6 +7,7 @@ import {
 import { absoluteUrl, site } from "@/lib/site";
 import { ptPageSeo } from "@/lib/pt";
 import { rssGuid } from "@/lib/rss-identity";
+import { tagPresentation } from "@/lib/tags";
 import type { Post } from "@/lib/posts";
 
 function escapeXml(value: string): string {
@@ -54,7 +55,10 @@ function item(post: Post): string {
     `      <guid isPermaLink="${guid === url}">${escapeXml(guid)}</guid>`,
     `      <pubDate>${toRfc822(post.publishedAt)}</pubDate>`,
     `      <description>${escapeXml(post.description)}</description>`,
-    ...post.tags.map((tag) => `      <category>${escapeXml(tag)}</category>`),
+    ...post.tags.map(
+      (tag) =>
+        `      <category>${escapeXml(tagPresentation(tag, post.locale).label)}</category>`,
+    ),
     "    </item>",
   ].join("\n");
 }

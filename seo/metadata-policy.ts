@@ -369,15 +369,11 @@ export function checkDocument({
     const feed = doc.links.filter(
       (l) => l.rel === "alternate" && l.type === "application/rss+xml",
     );
-    if (locale === DEFAULT_LOCALE) {
-      if (feed.length !== 1)
-        p.push(`${at}: expected one RSS discovery link, found ${feed.length}`);
-      else if (norm(feed[0]!.href) !== `${siteOrigins.dump}/rss.xml`)
-        p.push(`${at}: RSS link is ${feed[0]!.href}`);
-    } else if (feed.length !== 0)
-      p.push(
-        `${at}: localized RSS discovery must remain absent until the locale feed exists`,
-      );
+    const expected = `${siteOrigins.dump}${localizedPath("dump", locale, "/rss.xml")}`;
+    if (feed.length !== 1)
+      p.push(`${at}: expected one RSS discovery link, found ${feed.length}`);
+    else if (norm(feed[0]!.href) !== expected)
+      p.push(`${at}: RSS link is ${feed[0]!.href}, expected ${expected}`);
   }
 
   if (
