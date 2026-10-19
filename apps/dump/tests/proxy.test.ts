@@ -21,8 +21,10 @@ describe("dynamic route guard", () => {
     expect(isPublishedDynamicPath("/posts/not-real")).toBe(false);
     expect(
       isPublishedDynamicPath("/pt/posts/talvez-isso-vire-alguma-coisa-um-dia"),
-    ).toBe(false);
-    expect(isPublishedDynamicPath("/pt/tags/pessoal")).toBe(false);
+    ).toBe(true);
+    expect(isPublishedDynamicPath("/pt/tags/pessoal")).toBe(true);
+    expect(isPublishedDynamicPath("/pt/posts/building-orbit")).toBe(false);
+    expect(isPublishedDynamicPath("/pt/tags/not-real")).toBe(false);
   });
 
   it("preserves established encoded post and case-insensitive tag forms", () => {
@@ -116,6 +118,25 @@ describe("dynamic route guard", () => {
     );
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
     expect(response.headers.get("x-middleware-request-x-locale")).toBe("en");
+  });
+
+  it("does not rewrite published Portuguese posts or canonical tags", () => {
+    for (const path of [
+      "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia",
+      "/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+      "/pt/tags/pessoal",
+      "/pt/tags/arquitetura",
+    ]) {
+      const response = proxy(
+        new NextRequest(`https://dump.raioviajante.com${path}`, {
+          headers: { "x-locale": "client-controlled" },
+        }),
+      );
+      expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+      expect(response.headers.get("x-middleware-request-x-locale")).toBe(
+        "pt-BR",
+      );
+    }
   });
 
   it.each([

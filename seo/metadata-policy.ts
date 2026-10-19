@@ -962,7 +962,9 @@ export function checkJsonLd(ctx: JsonLdContext) {
         `${at}: sitemap lastmod ${lastmod} is the publication date, which is not a modification date`,
       );
     const item = ctx.rss?.find((i) => norm(i.link) === norm(canonical));
-    if (ctx.rss) {
+    // Issue #48 owns localized feeds. Until then, /rss.xml is the preserved
+    // English contract and Portuguese posts must neither join nor advertise it.
+    if (ctx.rss && localeOfPath(path) === DEFAULT_LOCALE) {
       if (!item) p.push(`${at}: the post is not in the RSS feed`);
       else {
         if (`${item.title} — dump` !== title)

@@ -398,6 +398,38 @@ const jsonLd = (nodes, over = {}) =>
 test("a faithful BlogPosting passes", () =>
   assert.deepEqual(jsonLd([post()]), []));
 
+test("a Portuguese BlogPosting is not required to join the English RSS feed", () => {
+  const url = "https://dump.raioviajante.com/pt/posts/foo";
+  const image = "https://dump.raioviajante.com/og/pt/posts/foo.png";
+  const portuguesePost = {
+    ...post(),
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url, inLanguage: "pt-BR" },
+    inLanguage: "pt-BR",
+    image,
+  };
+  const markup = html({
+    lang: "pt-BR",
+    canonical: url,
+    ld: [portuguesePost],
+    drop: ["rss"],
+  })
+    .replace('content="en_US"', 'content="pt_BR"')
+    .replaceAll("https://dump.raioviajante.com/og/posts/foo.png", image);
+
+  assert.deepEqual(
+    checkJsonLd({
+      site: "dump",
+      path: "/pt/posts/foo",
+      loc: url,
+      html: markup,
+      sitemapLocs: [url],
+      rss: [],
+    }),
+    [],
+  );
+});
+
 test("BlogPosting rules", () => {
   const broken = (change, over) =>
     jsonLd([{ ...post(), ...change }], over).join("\n");

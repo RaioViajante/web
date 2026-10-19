@@ -5,6 +5,7 @@ import { base, isolate } from "./support";
 
 const expectLang = async (page: Page, lang: string) =>
   expect(await page.evaluate(() => document.documentElement.lang)).toBe(lang);
+const canonicalDumpOrigin = "https://dump.raioviajante.com";
 
 const rawGet = (path: string, headers: Record<string, string> = {}) =>
   new Promise<{ status: number; location?: string; body: string }>(
@@ -73,10 +74,73 @@ test("Dump keeps locale-pure navigation and document history", async ({
   expect(external).toEqual([]);
 });
 
+test("Dump publishes the reviewed Portuguese inventory without English fallback", async ({
+  page,
+}) => {
+  const translatedPath = "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia";
+  const originalPath =
+    "/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe";
+
+  let response = await page.goto(`${base("dump")}/pt`);
+  expect(response?.status()).toBe(200);
+  await expectLang(page, "pt-BR");
+  await expect(
+    page.getByRole("link", { name: /Talvez isso vire alguma coisa um dia/ }),
+  ).toHaveAttribute("href", translatedPath);
+  await expect(
+    page.getByRole("link", {
+      name: /Traduzir o site sem fingir que tudo já existe/,
+    }),
+  ).toHaveAttribute("href", originalPath);
+  await expect(
+    page.getByText("Maybe This Can Be Something Someday", { exact: true }),
+  ).toHaveCount(0);
+
+  response = await page.goto(base("dump") + translatedPath);
+  expect(response?.status()).toBe(200);
+  await expectLang(page, "pt-BR");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    `${canonicalDumpOrigin}${translatedPath}`,
+  );
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]'),
+  ).toHaveAttribute(
+    "href",
+    `${canonicalDumpOrigin}/posts/maybe-this-can-be-something-someday`,
+  );
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="pt-BR"]'),
+  ).toHaveAttribute("href", `${canonicalDumpOrigin}${translatedPath}`);
+  await expect(page.getByRole("heading", { name: "Comments" })).toHaveCount(0);
+
+  response = await page.goto(base("dump") + originalPath);
+  expect(response?.status()).toBe(200);
+  await expectLang(page, "pt-BR");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    `${canonicalDumpOrigin}${originalPath}`,
+  );
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Comments" })).toHaveCount(0);
+
+  response = await page.goto(`${base("dump")}/pt/archive`);
+  expect(response?.status()).toBe(200);
+  await expectLang(page, "pt-BR");
+  await expect(page.locator(`a[href="${translatedPath}"]`)).toHaveCount(1);
+  await expect(page.locator(`a[href="${originalPath}"]`)).toHaveCount(1);
+
+  response = await page.goto(`${base("dump")}/pt/tags`);
+  expect(response?.status()).toBe(200);
+  await expectLang(page, "pt-BR");
+  for (const slug of ["arquitetura", "dump", "meta", "pessoal", "web"])
+    await expect(page.locator(`a[href="/pt/tags/${slug}"]`)).toHaveCount(1);
+});
+
 test("Dump dynamic misses use localized server-rendered 404 documents", async ({
   page,
 }) => {
-  const path = "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia";
+  const path = "/pt/posts/building-orbit";
   const response = await page.goto(base("dump") + path);
   expect(response?.status()).toBe(404);
   await expect(page).toHaveURL(base("dump") + path);
@@ -116,14 +180,26 @@ test("Dump rejects encoded malformed paths over actual HTTP without losing URL l
 test("Dump tag misses preserve URL-authoritative localized 404s", async () => {
   for (const [path, lang] of [
     ["/tags/not-real", "en"],
-    ["/pt/tags/pessoal", "pt-BR"],
+    ["/pt/tags/not-real", "pt-BR"],
     ["/pt/tags/PESSOAL", "pt-BR"],
-    ["/pt/tags/%70essoal", "pt-BR"],
+    ["/pt/tags/personal", "pt-BR"],
   ] as const) {
     const response = await rawGet(path, { "x-locale": "client-controlled" });
     expect(response.status, path).toBe(404);
     expect(response.location, path).toBeUndefined();
     expect(response.body, path).toContain(`<html lang="${lang}"`);
+  }
+});
+
+test("Dump Portuguese tag routes accept canonical encoding but not aliases", async () => {
+  for (const path of ["/pt/tags/pessoal", "/pt/tags/%70essoal"]) {
+    const response = await rawGet(path, { "x-locale": "client-controlled" });
+    expect(response.status, path).toBe(200);
+    expect(response.location, path).toBeUndefined();
+    expect(response.body, path).toContain('<html lang="pt-BR"');
+    expect(response.body, path).toContain(
+      `<link rel="canonical" href="${canonicalDumpOrigin}/pt/tags/pessoal"`,
+    );
   }
 });
 

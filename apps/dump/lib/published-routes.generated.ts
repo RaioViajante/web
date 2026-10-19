@@ -14,7 +14,10 @@ export const publishedPostPaths = {
     "/posts/started-writing-down-the-failures-before-the-features",
     "/posts/there-is-no-printf-down-here",
   ],
-  "pt-BR": [],
+  "pt-BR": [
+    "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia",
+    "/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+  ],
 } as const;
 
 export const publishedTagPaths = {
@@ -48,5 +51,11 @@ export const publishedTagPaths = {
     "/tags/writing",
     "/tags/x86",
   ],
-  "pt-BR": [],
+  "pt-BR": [
+    "/pt/tags/arquitetura",
+    "/pt/tags/dump",
+    "/pt/tags/meta",
+    "/pt/tags/pessoal",
+    "/pt/tags/web",
+  ],
 } as const;
