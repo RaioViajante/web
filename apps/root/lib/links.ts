@@ -1,9 +1,8 @@
-import { CONTACT } from "../../../site/sites";
-import { identity } from "../../../seo/structured-data";
+import { CONTACT } from "../../../site/sites.ts";
+import { identity } from "../../../seo/structured-data.ts";
 
 export interface PrimaryLink {
   label: string;
-  galleryLabel?: string;
   href: string;
   category: string;
   description: string;
@@ -19,20 +18,32 @@ const github: PrimaryLink = {
   description: "Code, projects and experiments in progress.",
 };
 
+/** The video-code organization is not a profile of the person: no `rel="me"`. */
+export const videoSourceLink: PrimaryLink = {
+  label: "Video Source Code",
+  href: "https://github.com/raioviajando",
+  category: "source",
+  description: "Source code that accompanies my programming videos.",
+};
+
 export const socialLinks: PrimaryLink[] = [
   {
-    label: "X / Twitter",
-    galleryLabel: "X",
-    href: "https://x.com/semrollback",
+    label: "Instagram",
+    href: "https://www.instagram.com/raioviajando/",
     rel: "me",
-    category: "posts",
-    description:
-      "Daily updates on the projects I'm building. This is where I'll be most active.",
+    category: "photos",
+    description: "Photos and short updates from the things I'm building.",
   },
   {
-    label: "YouTube / @semrollback",
-    galleryLabel: "YouTube",
-    href: "https://www.youtube.com/@semrollback",
+    label: "X",
+    href: "https://x.com/raioviajando",
+    rel: "me",
+    category: "posts",
+    description: "Updates on the projects I'm building.",
+  },
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/@raioviajando",
     rel: "me",
     category: "channel",
     description:
@@ -40,19 +51,23 @@ export const socialLinks: PrimaryLink[] = [
   },
   {
     label: "TikTok",
-    galleryLabel: "TikTok",
-    href: "https://www.tiktok.com/@semrollback",
+    href: "https://www.tiktok.com/@raioviajando",
     rel: "me",
     category: "shorts",
     description: "Short animations and quick takes on programming ideas.",
   },
 ];
 
-export const profileLinks: PrimaryLink[] = [github, ...socialLinks];
+export const profileLinks: PrimaryLink[] = [
+  github,
+  ...socialLinks,
+  videoSourceLink,
+];
 
 export const primaryLinks: PrimaryLink[] = [
   ...socialLinks,
   github,
+  videoSourceLink,
   {
     label: CONTACT.email,
     href: `mailto:${CONTACT.email}`,

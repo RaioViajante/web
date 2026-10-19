@@ -45,10 +45,14 @@ export const ptHome = {
   avatarLabel: "Virar o avatar do RaioViajante",
   /** Notes and descriptions of the primary links, keyed by their category. */
   linkCopy: {
+    photos: {
+      note: "fotos",
+      description:
+        "Fotos e atualizações rápidas das coisas que estou construindo.",
+    },
     posts: {
       note: "posts",
-      description:
-        "Atualizações diárias dos projetos que estou construindo. É onde mais apareço.",
+      description: "Atualizações dos projetos que estou construindo.",
     },
     channel: {
       note: "canal",
@@ -63,6 +67,10 @@ export const ptHome = {
     code: {
       note: "código",
       description: "Código, projetos e experimentos em andamento.",
+    },
+    source: {
+      note: "código dos vídeos",
+      description: "Código-fonte que acompanha meus vídeos de programação.",
     },
     email: {
       note: "e-mail",
