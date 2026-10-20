@@ -70,7 +70,10 @@ describe("<PostArticle />", () => {
     expect(
       screen.queryByRole("heading", { name: "Comments" }),
     ).not.toBeInTheDocument();
-    expect(document.querySelector(".comments")).toBeNull();
+    expect(
+      screen.getByRole("heading", { name: "Comentários" }),
+    ).toBeInTheDocument();
+    expect(document.querySelector(".comments")).not.toBeNull();
     expect(screen.queryByText("RSS")).not.toBeInTheDocument();
   });
 });

@@ -42,9 +42,11 @@ export function PostArticle({
       href: "#keep-reading",
       number: "02.",
     },
-    ...(!portuguese
-      ? [{ label: "Comments", href: "#comments", number: "03." }]
-      : []),
+    {
+      label: portuguese ? copy.comments : "Comments",
+      href: "#comments",
+      number: "03.",
+    },
   ];
   const hasRelated = details.related.length > 0 || details.lab;
   const counterpart = postCounterparts(post)[0]?.path;
@@ -197,12 +199,18 @@ export function PostArticle({
             </div>
           )}
         </Section>
-        {!portuguese && (
-          <Section number="03." title="Comments" id="comments">
-            <p>Powered by GitHub Discussions.</p>
-            <Comments />
-          </Section>
-        )}
+        <Section
+          number="03."
+          title={portuguese ? copy.comments : "Comments"}
+          id="comments"
+        >
+          <p>
+            {portuguese
+              ? "Com tecnologia do GitHub Discussions."
+              : "Powered by GitHub Discussions."}
+          </p>
+          <Comments contentId={post.contentId} locale={post.locale} />
+        </Section>
       </article>
     </DumpShell>
   );
