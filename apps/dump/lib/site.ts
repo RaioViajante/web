@@ -1,4 +1,8 @@
-import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
+import {
+  DEFAULT_LOCALE,
+  localizedPath,
+  type LocaleId,
+} from "../../../site/locales";
 
 /**
  * Canonical origin (no trailing slash), resolved in priority order:
@@ -37,7 +41,8 @@ export function absoluteUrl(path: string): string {
 }
 
 /**
- * A page's `alternates` metadata: RSS autodiscovery, plus this page's own
+ * A page's `alternates` metadata: RSS autodiscovery for the page's own locale
+ * (`/rss.xml` or `/pt/rss.xml`, never the other language's), plus this page's own
  * canonical URL if it has one.
  *
  * Next merges `metadata` fields shallowly — a page that sets its own
@@ -55,14 +60,13 @@ export function alternatesFor(
   return {
     ...(canonicalPath ? { canonical: canonicalPath } : {}),
     ...(languages ? { languages } : {}),
-    ...(locale === DEFAULT_LOCALE
-      ? {
-          types: {
-            "application/rss+xml": [
-              { url: "/rss.xml", title: `${site.name} RSS` },
-            ],
-          },
-        }
-      : {}),
+    types: {
+      "application/rss+xml": [
+        {
+          url: localizedPath("dump", locale, "/rss.xml"),
+          title: `${site.name} RSS`,
+        },
+      ],
+    },
   };
 }

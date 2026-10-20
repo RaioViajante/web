@@ -206,7 +206,8 @@ recorded sitemap page, discovery endpoint and search-index page must still be
 served, and the index keeps its fields. It is a floor, so added pages (including
 localized ones) never fail it. `pnpm seo:baseline` regenerates it from the
 built apps; use it only for a deliberate English change and review the diff.
-RSS item identity is not part of it.
+RSS item identity is not part of it; Dump pins it separately from the live
+feed (see [i18n.md](i18n.md#guid-compatibility)).
 
 The English search indexes also carry the additive `locale: "en"` on every
 entry (`seo/search-index.ts`, checked over HTTP for all four hosts and on the

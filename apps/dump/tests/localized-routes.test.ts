@@ -218,7 +218,7 @@ describe("localized published inventory", () => {
     expect(entries.every(({ locale }) => locale === "pt-BR")).toBe(true);
   });
 
-  it("emits reciprocal static metadata without advertising Portuguese RSS", () => {
+  it("emits reciprocal static metadata advertising only the Portuguese RSS feed", () => {
     const metadata = staticMetadata(routes.home["pt-BR"]!);
     expect(metadata.alternates.canonical).toBe("/pt");
     expect(
@@ -228,7 +228,9 @@ describe("localized published inventory", () => {
         ),
       ),
     ).toEqual({ en: "/", "pt-BR": "/pt", "x-default": "/" });
-    expect(metadata.alternates).not.toHaveProperty("types");
+    expect(metadata.alternates.types).toEqual({
+      "application/rss+xml": [{ url: "/pt/rss.xml", title: "dump RSS" }],
+    });
     expect(metadata.openGraph).toMatchObject({ locale: "pt_BR" });
   });
 

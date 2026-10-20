@@ -82,8 +82,10 @@ test("entities in titles are decoded before comparison", () => {
 
 test("a complete document passes", () => assert.deepEqual(doc(), []));
 
-test("Portuguese Dump pages do not advertise RSS before the feed exists", () => {
+test("Dump pages advertise exactly their own locale's feed", () => {
   const canonical = "https://dump.raioviajante.com/pt";
+  const feedLink = (href) =>
+    `<link rel="alternate" type="application/rss+xml" href="${href}"/>`;
   const portuguese = (extraHead = "") =>
     html({
       lang: "pt-BR",
@@ -103,15 +105,40 @@ test("Portuguese Dump pages do not advertise RSS before the feed exists", () => 
       themeColor: COLOR,
     }).filter((problem) => problem.includes("RSS"));
 
-  assert.deepEqual(check(portuguese()), []);
+  assert.deepEqual(
+    check(portuguese(feedLink("https://dump.raioviajante.com/pt/rss.xml"))),
+    [],
+  );
+  assert.match(
+    check(portuguese()).join("\n"),
+    /expected one RSS discovery link, found 0/,
+  );
+  assert.match(
+    check(portuguese(feedLink("https://dump.raioviajante.com/rss.xml"))).join(
+      "\n",
+    ),
+    /RSS link is https:\/\/dump\.raioviajante\.com\/rss\.xml, expected https:\/\/dump\.raioviajante\.com\/pt\/rss\.xml/,
+  );
   assert.match(
     check(
       portuguese(
-        '<link rel="alternate" type="application/rss+xml" href="https://dump.raioviajante.com/rss.xml"/>',
+        feedLink("https://dump.raioviajante.com/pt/rss.xml") +
+          feedLink("https://dump.raioviajante.com/rss.xml"),
       ),
     ).join("\n"),
-    /localized RSS discovery must remain absent/,
+    /expected one RSS discovery link, found 2/,
   );
+  // An English page keeps the English feed only.
+  const english = checkDocument({
+    site: "dump",
+    path: "/posts/foo",
+    loc: "https://dump.raioviajante.com/posts/foo",
+    html: html({
+      extraHead: feedLink("https://dump.raioviajante.com/pt/rss.xml"),
+    }),
+    themeColor: COLOR,
+  }).filter((problem) => problem.includes("RSS"));
+  assert.match(english.join("\n"), /expected one RSS discovery link, found 2/);
 });
 
 test("document rules each produce a located diagnostic", () => {
