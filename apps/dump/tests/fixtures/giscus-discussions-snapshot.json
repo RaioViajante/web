@@ -1,0 +1,32 @@
+{
+  "captured": "2026-10-20",
+  "method": "Read-only GitHub GraphQL query (repository.discussions, first:100, all categories). No mutation was issued. Bodies are not stored; only the strict marker line was extracted.",
+  "repository": {
+    "id": "R_kgDOUu8oYA",
+    "name": "RaioViajante/web",
+    "discussionsTotal": 1
+  },
+  "category": {
+    "id": "DIC_kwDOUu8oYM4DGx0J",
+    "name": "Comments"
+  },
+  "discussions": [
+    {
+      "number": 14,
+      "nodeId": "D_kwDOUu8oYM4AprNS",
+      "url": "https://github.com/RaioViajante/web/discussions/14",
+      "categoryId": "DIC_kwDOUu8oYM4DGx0J",
+      "title": "posts/maybe-this-can-be-something-someday",
+      "strictMarker": "65f3e21fcc73de876a701a998dfe1a8015bdfd48",
+      "commentCount": 1,
+      "comments": [
+        {
+          "nodeId": "DC_kwDOUu8oYM4BHTFa",
+          "createdAt": "2026-10-01T02:41:03Z"
+        }
+      ],
+      "contentId": "maybe-this-can-be-something-someday",
+      "legacySlug": "maybe-this-can-be-something-someday"
+    }
+  ]
+}
