@@ -69,6 +69,16 @@ export const ptCopy = {
     related: "Relacionados por tag",
     minute: "min de leitura",
     comments: "Comentários",
+    commentsUi: {
+      waiting:
+        "Os comentários carregam do giscus (GitHub Discussions) quando você chega a esta seção.",
+      manual:
+        "Os comentários são fornecidos pelo giscus (GitHub Discussions). Carregá-los conecta ao giscus.app e ao GitHub.",
+      loading: "Carregando comentários…",
+      failed: "Não foi possível carregar os comentários.",
+      load: "Carregar comentários",
+      retry: "Tentar novamente",
+    },
   },
   notFound: {
     metadata: {

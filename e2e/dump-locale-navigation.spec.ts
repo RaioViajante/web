@@ -112,7 +112,9 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   await expect(
     page.locator('link[rel="alternate"][hreflang="pt-BR"]'),
   ).toHaveAttribute("href", `${canonicalDumpOrigin}${translatedPath}`);
-  await expect(page.getByRole("heading", { name: "Comments" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Comentários" })).toHaveCount(
+    1,
+  );
 
   response = await page.goto(base("dump") + originalPath);
   expect(response?.status()).toBe(200);
@@ -122,7 +124,9 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
     `${canonicalDumpOrigin}${originalPath}`,
   );
   await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "Comments" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Comentários" })).toHaveCount(
+    1,
+  );
 
   response = await page.goto(`${base("dump")}/pt/archive`);
   expect(response?.status()).toBe(200);
@@ -313,7 +317,7 @@ test("Dump preserves established encoded, case-insensitive and trailing-slash be
   expect(trailing.location).toBe("/posts/maybe-this-can-be-something-someday");
 });
 
-test("English post comments retain the pathname-mapped Giscus boundary", async ({
+test("English post comments keep the lazy Giscus boundary", async ({
   page,
 }) => {
   await page.goto(`${base("dump")}/posts/maybe-this-can-be-something-someday`);

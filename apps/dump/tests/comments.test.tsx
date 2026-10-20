@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 
 import { Comments } from "@/components/Comments";
 
+const CONTENT_ID = "maybe-this-can-be-something-someday";
 const SCRIPT_SELECTOR = 'script[src="https://giscus.app/client.js"]';
 
 class MockIntersectionObserver {
@@ -37,7 +38,7 @@ function intersectFirst() {
   act(() => observer.trigger(true));
 }
 
-describe("<Comments />", () => {
+describe("<Comments contentId={CONTENT_ID} />", () => {
   beforeEach(() => {
     MockIntersectionObserver.instances = [];
     (
@@ -47,7 +48,7 @@ describe("<Comments />", () => {
   });
 
   it("renders the container immediately, without loading giscus", () => {
-    const { container } = render(<Comments />);
+    const { container } = render(<Comments contentId={CONTENT_ID} />);
 
     expect(container.querySelector("div.comments")).toBeInTheDocument();
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
@@ -58,7 +59,7 @@ describe("<Comments />", () => {
 
     it("loads giscus immediately, once, when the URL carries ?giscus=", () => {
       window.history.replaceState(null, "", "/posts/x?giscus=token");
-      render(<Comments />);
+      render(<Comments contentId={CONTENT_ID} />);
       // No scroll or intersection needed.
       expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
       expect(screen.getByRole("status")).toHaveTextContent("Loading comments");
@@ -72,17 +73,17 @@ describe("<Comments />", () => {
       delete (global as unknown as { IntersectionObserver?: unknown })
         .IntersectionObserver;
       window.history.replaceState(null, "", "/posts/x?giscus=token");
-      render(<Comments />);
+      render(<Comments contentId={CONTENT_ID} />);
       const script = document.querySelector(SCRIPT_SELECTOR);
       expect(script).toBeInTheDocument();
       expect(script).toHaveAttribute("data-repo", "RaioViajante/web");
-      expect(script).toHaveAttribute("data-mapping", "pathname");
+      expect(script).toHaveAttribute("data-mapping", "specific");
     });
 
     it("does not read, copy or change the token or the URL itself", () => {
       window.history.replaceState(null, "", "/posts/x?giscus=token");
       const setItem = jest.spyOn(Storage.prototype, "setItem");
-      render(<Comments />);
+      render(<Comments contentId={CONTENT_ID} />);
       expect(window.location.search).toBe("?giscus=token");
       expect(setItem).not.toHaveBeenCalled();
       setItem.mockRestore();
@@ -90,19 +91,19 @@ describe("<Comments />", () => {
 
     it("keeps the lazy behaviour for ordinary visits and unrelated parameters", () => {
       window.history.replaceState(null, "", "/posts/x?ref=feed");
-      render(<Comments />);
+      render(<Comments contentId={CONTENT_ID} />);
       expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
     });
   });
 
   it("shows a local status instead of contacting giscus", () => {
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     expect(screen.getByRole("status")).toHaveTextContent(/when you scroll/);
     expect(document.querySelector("iframe")).not.toBeInTheDocument();
   });
 
   it("observes with a 200px margin and loads the script only once", () => {
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     const observer = MockIntersectionObserver.instances.at(-1)!;
     expect(observer.options).toEqual({ rootMargin: "200px" });
     intersectFirst();
@@ -118,7 +119,7 @@ describe("<Comments />", () => {
   it("without IntersectionObserver waits for an explicit button press", () => {
     delete (global as unknown as { IntersectionObserver?: unknown })
       .IntersectionObserver;
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
     const button = screen.getByRole("button", { name: "Load comments" });
     fireEvent.click(button);
@@ -130,9 +131,9 @@ describe("<Comments />", () => {
     delete (global as unknown as { IntersectionObserver?: unknown })
       .IntersectionObserver;
     const container = document.createElement("div");
-    container.innerHTML = renderToString(<Comments />);
+    container.innerHTML = renderToString(<Comments contentId={CONTENT_ID} />);
     document.body.appendChild(container);
-    render(<Comments />, { container, hydrate: true });
+    render(<Comments contentId={CONTENT_ID} />, { container, hydrate: true });
     expect(screen.getByRole("button", { name: "Load comments" })).toBeVisible();
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
     container.remove();
@@ -141,7 +142,7 @@ describe("<Comments />", () => {
   it("keeps keyboard focus on the status text after Load comments", () => {
     delete (global as unknown as { IntersectionObserver?: unknown })
       .IntersectionObserver;
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     const button = screen.getByRole("button", { name: "Load comments" });
     button.focus();
     fireEvent.click(button);
@@ -151,7 +152,7 @@ describe("<Comments />", () => {
   it("moves focus into the widget when a keyboard reader's load finishes", () => {
     delete (global as unknown as { IntersectionObserver?: unknown })
       .IntersectionObserver;
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     const button = screen.getByRole("button", { name: "Load comments" });
     button.focus();
     fireEvent.click(button);
@@ -165,7 +166,7 @@ describe("<Comments />", () => {
   });
 
   it("reports a failed load and allows a retry", () => {
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     intersectFirst();
     act(() => {
       document
@@ -178,7 +179,7 @@ describe("<Comments />", () => {
   });
 
   it("defers loading giscus until the comments area nears the viewport", () => {
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
 
     intersectFirst();
@@ -187,7 +188,7 @@ describe("<Comments />", () => {
   });
 
   it("configures the RaioViajante/web repository and Comments category", () => {
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     intersectFirst();
 
     const script = document.querySelector(SCRIPT_SELECTOR);
@@ -197,17 +198,62 @@ describe("<Comments />", () => {
     expect(script).toHaveAttribute("data-category-id", "DIC_kwDOUu8oYM4DGx0J");
   });
 
-  it("maps discussions to the article pathname, strictly", () => {
-    render(<Comments />);
+  it("maps discussions to the work's stable key, strictly", () => {
+    render(<Comments contentId={CONTENT_ID} />);
     intersectFirst();
 
     const script = document.querySelector(SCRIPT_SELECTOR);
-    expect(script).toHaveAttribute("data-mapping", "pathname");
+    expect(script).toHaveAttribute("data-mapping", "specific");
     expect(script).toHaveAttribute("data-strict", "1");
+    expect(script).toHaveAttribute("data-term", `posts/${CONTENT_ID}`);
+    expect(script).not.toHaveAttribute("data-mapping", "pathname");
+  });
+
+  it("shares one discussion across locales and only changes the interface language", () => {
+    const attributes = (locale: "en" | "pt-BR") => {
+      const { unmount } = render(
+        <Comments contentId={CONTENT_ID} locale={locale} />,
+      );
+      intersectFirst();
+      const script = document.querySelector(SCRIPT_SELECTOR)!;
+      const read = Object.fromEntries(
+        [...script.attributes]
+          .filter((a) => a.name.startsWith("data-"))
+          .map((a) => [a.name, a.value]),
+      );
+      unmount();
+      document.querySelector(SCRIPT_SELECTOR)?.remove();
+      return read;
+    };
+    const english = attributes("en");
+    const portuguese = attributes("pt-BR");
+    expect(english["data-lang"]).toBe("en");
+    expect(portuguese["data-lang"]).toBe("pt");
+    const { "data-lang": _en, ...englishRest } = english;
+    const { "data-lang": _pt, ...portugueseRest } = portuguese;
+    expect(portugueseRest).toEqual(englishRest);
+  });
+
+  it("derives the term from contentId alone, not the page URL", () => {
+    window.history.replaceState(null, "", "/pt/posts/um-slug-localizado");
+    render(<Comments contentId="another-work" locale="pt-BR" />);
+    intersectFirst();
+    expect(document.querySelector(SCRIPT_SELECTOR)).toHaveAttribute(
+      "data-term",
+      "posts/another-work",
+    );
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("shows Portuguese status text on Portuguese pages", () => {
+    render(<Comments contentId={CONTENT_ID} locale="pt-BR" />);
+    expect(screen.getByRole("status")).toHaveTextContent(
+      /Os comentários carregam/,
+    );
   });
 
   it("keeps giscus minimal: no reactions, no metadata emission", () => {
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     intersectFirst();
 
     const script = document.querySelector(SCRIPT_SELECTOR);
@@ -216,7 +262,7 @@ describe("<Comments />", () => {
   });
 
   it("loads the custom editorial theme", () => {
-    render(<Comments />);
+    render(<Comments contentId={CONTENT_ID} />);
     intersectFirst();
     expect(document.querySelector(SCRIPT_SELECTOR)).toHaveAttribute(
       "data-theme",

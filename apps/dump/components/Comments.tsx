@@ -8,13 +8,9 @@ import {
   useSyncExternalStore,
 } from "react";
 
-// Repository configuration for the giscus GitHub Discussions backend. These
-// are the real, retrieved repo/category identifiers for RaioViajante/web —
-// see docs/comments.md for how they were obtained and how to re-derive them.
-const REPO = "RaioViajante/web";
-const REPO_ID = "R_kgDOUu8oYA";
-const CATEGORY = "Comments";
-const CATEGORY_ID = "DIC_kwDOUu8oYM4DGx0J";
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
+import { GISCUS, commentKey, giscusLang } from "@/lib/comment-key";
+import { ptCopy } from "@/lib/pt";
 
 /** Distance below the viewport at which scrolling toward the comments starts loading them. */
 const ROOT_MARGIN = "200px";
@@ -23,6 +19,8 @@ type Status = "waiting" | "manual" | "loading" | "failed" | "loaded";
 
 function loadGiscus(
   container: HTMLDivElement,
+  contentId: string,
+  locale: LocaleId,
   onLoad: () => void,
   onError: () => void,
 ) {
@@ -30,30 +28,38 @@ function loadGiscus(
   script.src = "https://giscus.app/client.js";
   script.async = true;
   script.crossOrigin = "anonymous";
-  script.setAttribute("data-repo", REPO);
-  script.setAttribute("data-repo-id", REPO_ID);
-  script.setAttribute("data-category", CATEGORY);
-  script.setAttribute("data-category-id", CATEGORY_ID);
-  script.setAttribute("data-mapping", "pathname");
+  script.setAttribute("data-repo", GISCUS.repo);
+  script.setAttribute("data-repo-id", GISCUS.repoId);
+  script.setAttribute("data-category", GISCUS.category);
+  script.setAttribute("data-category-id", GISCUS.categoryId);
+  // One discussion per work, shared by every localized version.
+  script.setAttribute("data-mapping", "specific");
+  script.setAttribute("data-term", commentKey(contentId));
   script.setAttribute("data-strict", "1");
   script.setAttribute("data-reactions-enabled", "0");
   script.setAttribute("data-emit-metadata", "0");
   script.setAttribute("data-theme", `${window.location.origin}/giscus.css`);
-  script.setAttribute("data-lang", "en");
+  script.setAttribute("data-lang", giscusLang(locale));
   script.addEventListener("load", onLoad);
   script.addEventListener("error", onError);
 
   container.appendChild(script);
 }
 
-const MESSAGES: Record<Exclude<Status, "loaded">, string> = {
+const ENGLISH_TEXT = {
   waiting:
     "Comments load from giscus (GitHub Discussions) when you scroll to this section.",
   manual:
     "Comments are provided by giscus (GitHub Discussions). Loading them connects to giscus.app and GitHub.",
   loading: "Loading comments…",
   failed: "Comments could not be loaded.",
+  load: "Load comments",
+  retry: "Try again",
 };
+
+function textFor(locale: LocaleId) {
+  return locale === DEFAULT_LOCALE ? ENGLISH_TEXT : ptCopy.post.commentsUi;
+}
 
 /**
  * Article comments, backed by giscus (GitHub Discussions). Isolated client
@@ -63,7 +69,15 @@ const MESSAGES: Record<Exclude<Status, "loaded">, string> = {
  * one exception is the return from GitHub sign-in (`?giscus=` in the URL),
  * which loads giscus immediately so it can finish the sign-in.
  */
-export function Comments() {
+export function Comments({
+  contentId,
+  locale = DEFAULT_LOCALE,
+}: {
+  /** The work's stable identity; its discussion is shared across locales. */
+  contentId: string;
+  locale?: LocaleId;
+}) {
+  const text = textFor(locale);
   const mountRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
   const started = useRef(false);
@@ -84,6 +98,8 @@ export function Comments() {
     setStatus("loading");
     loadGiscus(
       node,
+      contentId,
+      locale,
       () => {
         // The status text unmounts; if the reader was on it, move them into the widget.
         if (document.activeElement === statusRef.current)
@@ -95,7 +111,7 @@ export function Comments() {
         setStatus("failed");
       },
     );
-  }, []);
+  }, [contentId, locale]);
 
   useEffect(() => {
     const node = mountRef.current;
@@ -138,7 +154,7 @@ export function Comments() {
     <div className="comments">
       {status !== "loaded" && (
         <p ref={statusRef} role="status" tabIndex={-1}>
-          {MESSAGES[status]}
+          {text[status]}
         </p>
       )}
       {(status === "manual" || status === "failed") && (
@@ -151,7 +167,7 @@ export function Comments() {
             statusRef.current?.focus();
           }}
         >
-          {status === "failed" ? "Try again" : "Load comments"}
+          {status === "failed" ? text.retry : text.load}
         </button>
       )}
       <div ref={mountRef} />
