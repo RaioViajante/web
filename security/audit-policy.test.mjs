@@ -4,8 +4,8 @@ import test from "node:test";
 import { evaluateAudit } from "./audit-policy.mjs";
 
 // Fixtures shaped like `pnpm audit --json`; nothing here touches the real
-// lockfile. The committed policy is used as is, so the exceptions themselves are
-// what these tests protect.
+// lockfile. The committed policy is used as is except for an explicit synthetic
+// production exception in tests of the production-path rules.
 const policy = JSON.parse(
   await readFile(new URL("./audit-exceptions.json", import.meta.url), "utf8"),
 );
@@ -27,18 +27,18 @@ const advisory = (over = {}) => ({
   ],
   ...over,
 });
-const sprintf = (over = {}) =>
+const parser = (over = {}) =>
   advisory({
     id: 2,
-    module_name: "sprintf-js",
-    github_advisory_id: "GHSA-hp3w-g68c-fv3c",
+    module_name: "example-parser",
+    github_advisory_id: "GHSA-example",
     severity: "moderate",
     findings: [
       {
         version: "1.0.3",
         paths: [
-          "apps__dump>gray-matter>js-yaml>argparse>sprintf-js",
-          "apps__dump>jest>@jest/core>js-yaml>argparse>sprintf-js",
+          "apps__dump>gray-matter>example-parser",
+          "apps__dump>jest>example-parser",
         ],
       },
     ],
@@ -47,32 +47,46 @@ const sprintf = (over = {}) =>
 const report = (...list) => ({
   advisories: Object.fromEntries(list.map((a, i) => [String(i + 1), a])),
 });
-// The production audit lists sprintf-js through gray-matter only.
-const prodSprintf = (over = {}) =>
-  sprintf({
+const productionPolicy = {
+  ...policy,
+  exceptions: [
+    ...policy.exceptions,
+    {
+      package: "example-parser",
+      advisory: "GHSA-example",
+      severity: "moderate",
+      versions: ["1.0.3"],
+      reachedThrough: ["gray-matter", "jest"],
+      production: true,
+      productionPaths: ["apps__dump>gray-matter>example-parser"],
+      expires: "2026-12-06",
+    },
+  ],
+};
+const prodParser = (over = {}) =>
+  parser({
     findings: [
       {
         version: "1.0.3",
-        paths: ["apps__dump>gray-matter>js-yaml>argparse>sprintf-js"],
+        paths: ["apps__dump>gray-matter>example-parser"],
       },
     ],
     ...over,
   });
 const check = (full, production, at = now, p = policy) =>
   evaluateAudit({ full, production, policy: p, now: at });
-const current = () =>
-  check(report(advisory(), sprintf()), report(prodSprintf()));
+const current = () => check(report(advisory()), report());
 const has = (problems, ...parts) =>
   problems.some((p) => parts.every((part) => p.includes(part)));
 
-test("the two reviewed exceptions pass exactly", () =>
+test("the remaining reviewed exception passes exactly", () =>
   assert.deepEqual(current(), []));
 
 test("the committed policy is within its 60-day window", () => {
   const limit = Date.parse(policy.decided) + policy.maxReviewDays * 86_400_000;
   for (const e of policy.exceptions)
     assert.ok(Date.parse(`${e.expires}T00:00:00Z`) <= limit, e.package);
-  assert.equal(policy.exceptions.length, 2);
+  assert.equal(policy.exceptions.length, 1);
 });
 
 test("unknown advisories fail at every severity", () => {
@@ -80,7 +94,6 @@ test("unknown advisories fail at every severity", () => {
     const problems = check(
       report(
         advisory(),
-        sprintf(),
         advisory({
           id: 3,
           module_name: "left-pad",
@@ -88,7 +101,7 @@ test("unknown advisories fail at every severity", () => {
           severity,
         }),
       ),
-      report(prodSprintf()),
+      report(),
     );
     assert.ok(
       has(problems, "left-pad GHSA-aaaa-bbbb-cccc", "unreviewed"),
@@ -101,7 +114,6 @@ test("a critical advisory fails", () => {
   const problems = check(
     report(
       advisory(),
-      sprintf(),
       advisory({
         id: 4,
         module_name: "evil",
@@ -109,7 +121,7 @@ test("a critical advisory fails", () => {
         severity: "critical",
       }),
     ),
-    report(prodSprintf()),
+    report(),
   );
   assert.ok(has(problems, "evil GHSA-x", "critical advisory"));
 });
@@ -124,18 +136,15 @@ test("a production HIGH fails, excepted or not", () => {
   assert.ok(
     has(
       check(
-        report(advisory(), sprintf(), prodHigh),
-        report(prodSprintf(), prodHigh),
+        report(advisory(), prodHigh),
+        report(prodHigh),
       ),
       "react-thing GHSA-y",
       "production dependency path",
     ),
   );
   // Even the braces exception cannot hide a high advisory that reaches production.
-  const problems = check(
-    report(advisory(), sprintf()),
-    report(advisory(), prodSprintf()),
-  );
+  const problems = check(report(advisory()), report(advisory()));
   assert.ok(has(problems, "braces", "production dependency path"));
   assert.ok(has(problems, "braces", "now in a production dependency path"));
 });
@@ -144,8 +153,8 @@ test("braces: a fix becoming available fails", () => {
   assert.ok(
     has(
       check(
-        report(advisory({ patched_versions: ">=3.0.4" }), sprintf()),
-        report(prodSprintf()),
+        report(advisory({ patched_versions: ">=3.0.4" })),
+        report(),
       ),
       "braces GHSA-vfj7-8cjw-p6xm",
       "a fix is now available (>=3.0.4); upgrade and remove the exception",
@@ -166,9 +175,8 @@ test("braces: a new affected version or an unreviewed dependency path fails", ()
               },
             ],
           }),
-          sprintf(),
         ),
-        report(prodSprintf()),
+        report(),
       ),
       "affected versions are 3.0.2",
     ),
@@ -180,58 +188,65 @@ test("braces: a new affected version or an unreviewed dependency path fails", ()
           advisory({
             findings: [{ version: "3.0.3", paths: ["apps__dump>next>braces"] }],
           }),
-          sprintf(),
         ),
-        report(prodSprintf()),
+        report(),
       ),
       "unreviewed dependency: apps__dump>next>braces",
     ),
   );
 });
 
-test("sprintf-js: severity escalation, a fix and a changed production path fail", () => {
+test("a synthetic production exception fails on escalation, a fix or a new path", () => {
   assert.ok(
     has(
       check(
-        report(advisory(), sprintf({ severity: "high" })),
-        report(prodSprintf({ severity: "high" })),
+        report(advisory(), parser({ severity: "high" })),
+        report(prodParser({ severity: "high" })),
+        now,
+        productionPolicy,
       ),
-      "sprintf-js",
+      "example-parser",
       "severity is now high",
     ),
   );
   assert.ok(
     has(
       check(
-        report(advisory(), sprintf({ patched_versions: ">=1.1.4" })),
-        report(prodSprintf()),
+        report(advisory(), parser({ patched_versions: ">=1.1.4" })),
+        report(prodParser()),
+        now,
+        productionPolicy,
       ),
-      "sprintf-js",
+      "example-parser",
       "a fix is now available",
     ),
   );
-  const moved = sprintf({
+  const moved = parser({
     findings: [
-      { version: "1.0.3", paths: ["apps__root>some-new-parser>sprintf-js"] },
+      { version: "1.0.3", paths: ["apps__root>some-new-parser>example-parser"] },
     ],
   });
-  const problems = check(report(advisory(), moved), report(moved));
+  const problems = check(
+    report(advisory(), moved),
+    report(moved),
+    now,
+    productionPolicy,
+  );
   assert.ok(
     has(
       problems,
-      "sprintf-js",
-      "production path changed: apps__root>some-new-parser>sprintf-js",
+      "example-parser",
+      "production path changed: apps__root>some-new-parser>example-parser",
     ),
   );
-  assert.ok(has(problems, "sprintf-js", "unreviewed dependency"));
+  assert.ok(has(problems, "example-parser", "unreviewed dependency"));
 });
 
-test("sprintf-js, unlike braces, is allowed in production (and must stay there until reviewed)", () => {
-  assert.deepEqual(current(), []);
+test("a synthetic production exception must stay in the reviewed class", () => {
   assert.ok(
     has(
-      check(report(advisory(), sprintf()), report()),
-      "sprintf-js",
+      check(report(advisory(), parser()), report(), now, productionPolicy),
+      "example-parser",
       "no longer appears in the production audit",
     ),
   );
@@ -239,31 +254,35 @@ test("sprintf-js, unlike braces, is allowed in production (and must stay there u
 
 test("an expired exception fails and says to review it", () => {
   const problems = check(
-    report(advisory(), sprintf()),
-    report(prodSprintf()),
+    report(advisory()),
+    report(),
     new Date("2026-12-07T00:00:00Z"),
   );
   assert.ok(has(problems, "braces", "expired on 2026-12-06; review it"));
-  assert.ok(has(problems, "sprintf-js", "expired on 2026-12-06"));
   assert.deepEqual(
-    check(
-      report(advisory(), sprintf()),
-      report(prodSprintf()),
-      new Date("2026-12-06T12:00:00Z"),
-    ),
+    check(report(advisory()), report(), new Date("2026-12-06T12:00:00Z")),
     [],
   );
 });
 
 test("an exception whose advisory disappeared is stale", () => {
-  const problems = check(report(sprintf()), report(prodSprintf()));
+  const problems = check(report(), report());
   assert.ok(has(problems, "braces GHSA-vfj7-8cjw-p6xm", "stale exception"));
+});
+
+test("the withdrawn sprintf-js advisory is no longer excepted if reported again", () => {
+  const withdrawn = parser({
+    module_name: "sprintf-js",
+    github_advisory_id: "GHSA-hp3w-g68c-fv3c",
+  });
+  const problems = check(report(advisory(), withdrawn), report(withdrawn));
+  assert.ok(has(problems, "sprintf-js GHSA-hp3w-g68c-fv3c", "unreviewed"));
 });
 
 test("a changed advisory identity is not the reviewed one", () => {
   const problems = check(
-    report(advisory({ github_advisory_id: "GHSA-other" }), sprintf()),
-    report(prodSprintf()),
+    report(advisory({ github_advisory_id: "GHSA-other" })),
+    report(),
   );
   assert.ok(has(problems, "braces GHSA-other", "unreviewed"));
   assert.ok(has(problems, "braces GHSA-vfj7-8cjw-p6xm", "stale exception"));
@@ -276,7 +295,7 @@ test("an expiry beyond the review window is rejected", () => {
   };
   assert.ok(
     has(
-      check(report(advisory(), sprintf()), report(prodSprintf()), now, long),
+      check(report(advisory()), report(), now, long),
       "more than 60 days after the decision",
     ),
   );

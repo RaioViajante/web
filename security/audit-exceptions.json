@@ -14,19 +14,6 @@
       "patched": "none",
       "expires": "2026-12-06",
       "rationale": "Only ESLint's glob matching (eslint-config-next, eslint-plugin-astro) reaches it, in development tooling that never runs in production and never receives untrusted patterns. 3.0.3 is the latest release and the advisory has no fixed version. It must stay out of every production dependency path."
-    },
-    {
-      "package": "sprintf-js",
-      "advisory": "GHSA-hp3w-g68c-fv3c",
-      "summary": "denial of service through unbounded precision specifiers",
-      "severity": "moderate",
-      "production": true,
-      "productionPaths": ["apps__dump>gray-matter>js-yaml>argparse>sprintf-js"],
-      "versions": ["1.0.3"],
-      "reachedThrough": ["gray-matter", "jest"],
-      "patched": "none",
-      "expires": "2026-12-06",
-      "rationale": "Reached in production only through dump's gray-matter (js-yaml 3 and argparse), which parses the repository's own post frontmatter, never visitor input. Moderate severity, below the production HIGH gate; there is no fixed version. A new or different production path, or any rise in severity, needs review."
     }
   ]
 }

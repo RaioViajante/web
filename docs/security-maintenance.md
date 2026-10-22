@@ -25,12 +25,19 @@ fails too. The rules are pure code with fixture tests
 | Package            | Advisory            | Severity | Class                 | Why accepted                                                                                                                                                                                            |
 | ------------------ | ------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `braces` 3.0.3     | GHSA-vfj7-8cjw-p6xm | high     | development only      | Reached only through ESLint's glob matching (`eslint-config-next`, `eslint-plugin-astro`); no fixed release exists. Must never appear in a production path.                                             |
-| `sprintf-js` 1.0.3 | GHSA-hp3w-g68c-fv3c | moderate | production-classified | Reached in production only as `apps/dump > gray-matter > js-yaml > argparse > sprintf-js`, which parses the repository's own post frontmatter; no fixed release exists; below the production HIGH gate. |
 
-Neither is a permanent waiver. Both expire together, 60 days after the decision.
+This is not a permanent waiver. It expires 60 days after the decision.
 When the date passes, the gate fails and a person must review: fix or upgrade
 the dependency, or renew deliberately by editing the date in the JSON (never more
 than 60 days after a new decision date). Nothing extends it automatically.
+
+The former `sprintf-js` exception (GHSA-hp3w-g68c-fv3c) was removed after
+GitHub [withdrew the advisory](https://github.com/advisories/GHSA-hp3w-g68c-fv3c)
+on 2026-10-22. It is no longer reported by the full or production pnpm audit;
+the lockfile still includes `sprintf-js` 1.0.3 through dump's `gray-matter >
+js-yaml > argparse` and Jest's development tooling. There is no patched
+`sprintf-js` release or dependency upgrade for this withdrawn advisory. The
+gate still fails on any new advisory, including a future one for this package.
 
 ## Dependabot
 
