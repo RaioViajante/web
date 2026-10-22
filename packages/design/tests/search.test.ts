@@ -122,21 +122,44 @@ describe("loadEverywhere", () => {
     expect(loaded.entries).toEqual(own);
   });
 
-  it("uses registry participation by default: English fetches all, Portuguese only Dump", async () => {
+  it("uses registry participation by default: English fetches all, Portuguese Root and Dump", async () => {
     const read = vi.fn(async (site: SiteId) => [
-      entry(site, "x", undefined, site === "dump" ? "pt-BR" : "en"),
+      entry(
+        site,
+        "x",
+        undefined,
+        site === "root" || site === "dump" ? "pt-BR" : "en",
+      ),
     ]);
     const en = await loadEverywhere("docs", "en", [], read);
     expect(read).toHaveBeenCalledTimes(3);
     expect(en.skipped).toEqual([]);
     read.mockClear();
     const pt = await loadEverywhere("docs", "pt-BR", [], read);
-    expect(read).toHaveBeenCalledExactlyOnceWith("dump");
+    expect(read).toHaveBeenCalledTimes(2);
+    expect(read).toHaveBeenCalledWith("root");
+    expect(read).toHaveBeenCalledWith("dump");
     expect(pt.entries.map(({ site, locale }) => [site, locale])).toEqual([
+      ["root", "pt-BR"],
       ["dump", "pt-BR"],
     ]);
-    expect(pt.skipped).toEqual(["root", "lab"]);
+    expect(pt.skipped).toEqual(["lab"]);
     expect(pt.unavailable).toEqual([]);
+  });
+
+  it("stops fetching Root on configuration rollback while Dump stays active", async () => {
+    const read = vi.fn(async (site: SiteId) => [
+      entry(site, "x", undefined, "pt-BR"),
+    ]);
+    const result = await loadEverywhere(
+      "dump",
+      "pt-BR",
+      [],
+      read,
+      (site, locale) => locale === "en" || site === "dump",
+    );
+    expect(read).not.toHaveBeenCalled();
+    expect(result.skipped).toEqual(["root", "docs", "lab"]);
   });
 
   it("fetches only the sites that participate in a partially active locale", async () => {
@@ -249,20 +272,23 @@ describe("current and federated index loading", () => {
     expect(read).toHaveBeenCalledTimes(4);
   });
 
-  it("reads Dump but never reads inactive Portuguese hosts during federation", async () => {
+  it("reads Root and Dump but never reads inactive Portuguese hosts during federation", async () => {
     const read = vi.fn(async (site: SiteId) => [
       entry(site, "x", undefined, "pt-BR"),
     ]);
-    for (const site of ["root", "docs", "lab"] as const)
+    for (const site of ["docs", "lab"] as const)
       expect(await loadFederatedSiteIndex(site, "pt-BR", read)).toEqual({
         state: "skipped",
       });
     expect(read).not.toHaveBeenCalled();
-    expect(await loadFederatedSiteIndex("dump", "pt-BR", read)).toEqual({
-      state: "ready",
-      entries: [entry("dump", "x", undefined, "pt-BR")],
-    });
-    expect(read).toHaveBeenCalledExactlyOnceWith("dump");
+    for (const site of ["root", "dump"] as const)
+      expect(await loadFederatedSiteIndex(site, "pt-BR", read)).toEqual({
+        state: "ready",
+        entries: [entry(site, "x", undefined, "pt-BR")],
+      });
+    expect(read).toHaveBeenCalledTimes(2);
+    expect(read).toHaveBeenCalledWith("root");
+    expect(read).toHaveBeenCalledWith("dump");
   });
 
   it("is ready with entries, ready with a valid empty index, unavailable on failure or invalid data", async () => {

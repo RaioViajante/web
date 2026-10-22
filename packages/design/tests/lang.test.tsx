@@ -21,7 +21,7 @@ const state = (body: HTMLElement) =>
 
 describe("LANG: participation first", () => {
   it("A: an English page before Portuguese activation is a status, not a link", () => {
-    for (const site of ["root", "docs", "lab"] as const) {
+    for (const site of ["docs", "lab"] as const) {
       const body = render({ site }); // real registry: pt-BR is not participating
       expect(state(body)).toBe("status");
       expect(body.textContent).toContain("LANG EN");
@@ -40,8 +40,23 @@ describe("LANG: participation first", () => {
     );
   });
 
+  it("Root links a real counterpart and discloses an English-only page", () => {
+    const home = render({ site: "root", counterpart: "/pt" });
+    expect(state(home)).toBe("link");
+    expect(home.querySelector("a")?.getAttribute("href")).toBe("/pt");
+    const missing = render({ site: "root" });
+    expect(state(missing)).toBe("disclosure");
+    expect(missing.querySelector("details a")?.getAttribute("href")).toBe(
+      "/pt",
+    );
+  });
+
   it("B: a directly visited pre-activation Portuguese page is LANG PT, noninteractive", () => {
-    const body = render({ locale: "pt-BR", counterpart: "/about/" });
+    const body = render({
+      site: "docs",
+      locale: "pt-BR",
+      counterpart: "/about/",
+    });
     expect(state(body)).toBe("status");
     expect(body.textContent).toContain("LANG PT");
     expect(body.querySelector("a, details, summary")).toBeNull();
