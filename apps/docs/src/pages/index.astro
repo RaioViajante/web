@@ -6,7 +6,7 @@ import { getPages, navPages, pathOf } from "../lib/docs";
 import { childIndexes } from "../lib/nav";
 import { homeJsonLd } from "../lib/structured-data";
 
-const all = await getPages();
+const all = await getPages("en");
 const nav = await navPages();
 // A project's guide is followed by the pages listed under it (the Sweep CLI
 // reference): the note names them, so a guide without any shows no note.

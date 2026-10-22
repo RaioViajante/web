@@ -38,10 +38,12 @@ test("a cold-cache production build keeps semantic headings in the search index"
 	assert.ok(entries.some(({ href }) => href.endsWith("/projects/sweep/cli/")));
 	assert.ok(!ptEntries.some(({ href }) => href.includes("/cli/")));
 	const en = readFileSync(join(outDir, "projects/sweep/index.html"), "utf8");
+	const enHome = readFileSync(join(outDir, "index.html"), "utf8");
 	const pt = readFileSync(join(outDir, "pt/projetos/sweep/index.html"), "utf8");
 	const home = readFileSync(join(outDir, "pt/index.html"), "utf8");
 	const missing = readFileSync(join(outDir, "404.html"), "utf8");
 	assert.match(en, /<html lang="en">/);
+	assert.doesNotMatch(enHome, /<a href="\/pt\/projetos\/sweep\/"/);
 	assert.match(pt, /<html lang="pt-BR">/);
 	assert.match(pt, /<link rel="canonical" href="https:\/\/docs\.raioviajante\.com\/pt\/projetos\/sweep\/">/);
 	assert.match(pt, /hreflang="en" href="https:\/\/docs\.raioviajante\.com\/projects\/sweep\/"/);
