@@ -32,6 +32,14 @@ test("an English index whose every entry says locale en passes", () => {
   assert.deepEqual(check([entry(), entry({ body: "b" })]), []);
 });
 
+test("Docs search work identity accepts captured slash-separated collection IDs", () => {
+  assert.deepEqual(check([entry({ contentId: "projects/sweep" })]), []);
+  assert.match(
+    check([entry({ contentId: "projects//sweep" })]).join(),
+    /not a valid stable id/,
+  );
+});
+
 test("every entry is checked, not a representative one", () => {
   assert.match(
     check([entry(), entry({ locale: undefined })]).join(),

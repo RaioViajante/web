@@ -1,5 +1,8 @@
 import { PageHeader } from "@raioviajante/design/parts";
 import type { Crumb } from "../lib/nav";
+import type { LocaleId } from "../../../../site/locales";
+import { localizedPath } from "../../../../site/locales";
+import { copyFor } from "../lib/copy";
 
 /** The header of a documentation page: breadcrumb, title, one line, meta row. */
 export function DocHeader({
@@ -9,6 +12,7 @@ export function DocHeader({
 	status,
 	meta,
 	source,
+    locale = "en",
 }: {
 	/** Breadcrumb after "docs"; the last one is the current page. */
 	crumbs: Crumb[];
@@ -17,12 +21,13 @@ export function DocHeader({
 	status: string;
 	meta: string[];
 	source?: string;
+    locale?: LocaleId;
 }) {
 	return (
 		<PageHeader
 			label={
 				<>
-					<a href="/">docs</a>
+					<a href={localizedPath("docs", locale, "/")}>docs</a>
 					{crumbs.map((crumb, index) => (
 						<span key={`${index}-${crumb.label}`}>
 							{" / "}
@@ -42,7 +47,7 @@ export function DocHeader({
 			meta={[
 				status,
 				...meta,
-				...(source ? [<a key="source" href={source}>source ↗</a>] : []),
+				...(source ? [<a key="source" href={source}>{copyFor(locale).source} ↗</a>] : []),
 			]}
 		/>
 	);

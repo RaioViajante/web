@@ -19,13 +19,27 @@ This site does not automatically mirror every `/docs` file from every project re
 ```
 projects/
   sweep/
+    cli/
 
 raioviajante/
   design-language/
   repository-conventions/
 ```
 
-Sweep currently has one public page. The RaioViajante section contains the design language and repository conventions pages.
+Sweep has a guide and a CLI reference under `projects/sweep/cli/`. The
+RaioViajante section contains the design language and repository conventions
+pages.
+
+Each English page declares its existing collection entry ID as `contentId`, along
+with `locale`, `originalLocale` and its existing public `path`. The Portuguese
+collection publishes the Sweep guide at `/pt/projetos/sweep/`, sharing its
+`contentId` with the English guide. The CLI reference and both RaioViajante
+pages are English-only; no Portuguese route is generated for them. A Portuguese
+document must have its own declared path and authored body, not an English
+fallback. A work with no public original retains a nonpublic provenance record
+before its original is withdrawn. `src/lib/identity.ts` validates routes and
+identities at build time; Portuguese participation in `site/` remains off until
+production verification and the separate activation change.
 
 ## Potential future information architecture
 

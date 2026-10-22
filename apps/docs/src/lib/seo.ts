@@ -1,4 +1,5 @@
-import { getPages, pathOf } from "./docs";
+import { getPages, lastUpdated, pathOf } from "./docs";
+import { localizedPath } from "../../../../site/locales";
 import { notFoundSeo } from "../../../../seo/metadata";
 import { siteOrigins } from "../../../../site/sites";
 export const origin = siteOrigins.docs;
@@ -13,6 +14,8 @@ export async function getSeoPages(): Promise<SeoPage[]> {
 	return [
 		{ path: "/", title: "technical documentation" },
 		{ path: "/search/", title: "Search" },
+		{ path: localizedPath("docs", "pt-BR", "/"), title: "Documentação técnica" },
+		{ path: localizedPath("docs", "pt-BR", "/search/"), title: "Busca" },
 		{ path: "/terms/", title: "Terms of Use" },
 		{ path: "/privacy/", title: "Privacy Policy" },
 		notFoundSeo,
@@ -20,7 +23,7 @@ export async function getSeoPages(): Promise<SeoPage[]> {
 			path: pathOf(page),
 			title: page.data.title,
 			// Only an explicit editorial date; git history is not a content date.
-			lastmod: page.data.lastUpdated,
+			lastmod: lastUpdated(page),
 		})),
 	];
 }

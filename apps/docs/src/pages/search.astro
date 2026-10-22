@@ -4,6 +4,6 @@ import { DEFAULT_LOCALE } from "../../../../site/locales";
 import DocsShell from "../layouts/DocsShell.astro";
 ---
 
-<DocsShell title="Search" description="Search RaioViajante docs and sites." current="/search/">
+<DocsShell title="Search" description="Search RaioViajante docs and sites." current="/search/" counterparts={[{ locale: "pt-BR", path: "/pt/search/" }]}>
 	<SearchPage site="docs" locale={DEFAULT_LOCALE} />
 </DocsShell>

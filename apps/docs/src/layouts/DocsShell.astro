@@ -10,6 +10,8 @@ import "../styles/docs.css";
 import type { NavItem } from "@raioviajante/design/shell";
 import { DocsFrame } from "../components/DocsFrame";
 import { navItems, searchNumber } from "../lib/docs";
+import { DEFAULT_LOCALE, LOCALES, type LocaleId } from "../../../../site/locales";
+import type { Counterpart } from "../../../../seo/locale";
 
 interface Props {
 	title: string;
@@ -22,17 +24,19 @@ interface Props {
 	fullTitle?: boolean;
 	/** Structured data nodes for this page. */
 	jsonLd?: object[];
+	locale?: LocaleId;
+	counterparts?: Counterpart[];
 }
 
-const { title, description, current, toc, fullTitle = false, jsonLd } = Astro.props;
+const { title, description, current, toc, fullTitle = false, jsonLd, locale = DEFAULT_LOCALE, counterparts } = Astro.props;
 const color = await themeColor();
 const pageTitle = fullTitle ? title : `${title} — docs`;
-const items = await navItems();
-const number = await searchNumber();
+const items = await navItems(locale);
+const number = await searchNumber(locale);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={LOCALES[locale].htmlLang}>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="preload" href={fontUrl} as="font" type="font/woff2" crossorigin />
@@ -43,6 +47,8 @@ const number = await searchNumber();
 			title={pageTitle}
 			description={description}
 			noindex={isNotFoundPath(Astro.url.pathname)}
+			locale={locale}
+			counterparts={counterparts}
 			themeColor={color}
 		/>
 		{jsonLd && <script is:inline type="application/ld+json" set:html={jsonLdScript(...jsonLd)} />}
@@ -55,7 +61,7 @@ const number = await searchNumber();
 		<link rel="manifest" href="/manifest.webmanifest" />
 	</head>
 	<body>
-		<DocsFrame pages={items} current={current} toc={toc} searchNumber={number}>
+		<DocsFrame pages={items} current={current} toc={toc} searchNumber={number} locale={locale} counterpart={counterparts?.[0]?.path}>
 			<slot />
 		</DocsFrame>
 		<script>

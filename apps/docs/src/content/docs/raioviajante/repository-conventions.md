@@ -1,4 +1,8 @@
 ---
+contentId: raioviajante/repository-conventions
+locale: en
+originalLocale: en
+path: /raioviajante/repository-conventions/
 title: Repository conventions
 description: Commits, publishing changes, and the working language across RaioViajante repositories.
 order: 3

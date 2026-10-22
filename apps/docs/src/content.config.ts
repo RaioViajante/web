@@ -1,11 +1,17 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import { LOCALE_IDS, type LocaleId } from "../../../site/locales";
 
 export const collections = {
 	docs: defineCollection({
 		loader: glob({ pattern: "**/*.md", base: "./src/content/docs" }),
 		schema: z.object({
+			contentId: z.string().min(1),
+			locale: z.enum(LOCALE_IDS as [LocaleId, ...LocaleId[]]),
+			originalLocale: z.enum(LOCALE_IDS as [LocaleId, ...LocaleId[]]),
+			/** Declared public path, independent of the collection entry ID. */
+			path: z.string(),
 			title: z.string(),
 			description: z.string(),
 			/** One line under the title; falls back to the description. */
