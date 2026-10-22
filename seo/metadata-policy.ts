@@ -1037,7 +1037,16 @@ export function checkJsonLd(ctx: JsonLdContext) {
     });
     if (items.length && norm(items[items.length - 1].item) !== norm(canonical))
       p.push(`${at}: the last breadcrumb is not the current page`);
-    if (items.length && norm(items[0].item) !== `${siteOrigins[site]}/`)
+    if (
+      items.length &&
+      norm(items[0].item) !==
+        norm(
+          new URL(
+            localizedPath(site, localeOfPath(ctx.path), "/"),
+            siteOrigins[site],
+          ).href,
+        )
+    )
       p.push(`${at}: the first breadcrumb is not the site home`);
   }
   return p;

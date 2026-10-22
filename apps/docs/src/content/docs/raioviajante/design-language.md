@@ -1,4 +1,8 @@
 ---
+contentId: raioviajante/design-language
+locale: en
+originalLocale: en
+path: /raioviajante/design-language/
 title: Design language
 description: Shared tokens, typography, and restraint across the RaioViajante ecosystem.
 tagline: One system, four sites, four jobs.

@@ -6,7 +6,7 @@ import { getPages, navPages, pathOf } from "../lib/docs";
 import { childIndexes } from "../lib/nav";
 import { homeJsonLd } from "../lib/structured-data";
 
-const all = await getPages();
+const all = await getPages("en");
 const nav = await navPages();
 // A project's guide is followed by the pages listed under it (the Sweep CLI
 // reference): the note names them, so a guide without any shows no note.
@@ -25,6 +25,7 @@ const standards = pages.filter((entry) => entry.data.group === "raioviajante");
 	title="docs — technical documentation for things built under raioviajante."
 	description="Public technical documentation for projects and systems built under RaioViajante."
 	current="/"
+	counterparts={[{ locale: "pt-BR", path: "/pt/" }]}
 	fullTitle
 	jsonLd={homeJsonLd()}
 >

@@ -1,0 +1,13 @@
+---
+import { getPages, pathOf } from "../../lib/docs";
+import DocPage from "../../components/DocPage.astro";
+
+export async function getStaticPaths() {
+	return (await getPages("pt-BR")).map((entry, index) => ({
+		params: { slug: pathOf(entry).slice(4, -1) },
+		props: { entry, index },
+	}));
+}
+const { entry, index } = Astro.props;
+---
+<DocPage entry={entry} index={index} />

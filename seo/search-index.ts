@@ -71,7 +71,9 @@ export function checkIndexLocale(
     if (record.contentId !== undefined || isDumpWorkEntry) {
       if (
         typeof record.contentId !== "string" ||
-        !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(record.contentId)
+        !(site === "docs"
+          ? /^[a-z0-9]+(?:[/-][a-z0-9]+)*$/.test(record.contentId)
+          : /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(record.contentId))
       )
         problems.push(
           `${at}: entry ${index + 1} field "contentId" is not a valid stable id`,

@@ -1,4 +1,8 @@
 ---
+contentId: projects/sweep/cli
+locale: en
+originalLocale: en
+path: /projects/sweep/cli/
 title: Sweep CLI
 description: Every Sweep command, argument and output field in one place.
 tagline: Every command, argument and output field, in one place.

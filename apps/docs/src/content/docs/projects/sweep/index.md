@@ -1,4 +1,8 @@
 ---
+contentId: projects/sweep
+locale: en
+originalLocale: en
+path: /projects/sweep/
 title: Sweep
 description: A Python command-line tool for organizing files in a selected directory.
 tagline: File organizer for a selected directory.

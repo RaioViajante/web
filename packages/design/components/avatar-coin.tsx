@@ -15,15 +15,19 @@ export const AVATAR_REST_FRAME = 3;
  */
 export function AvatarCoin({
   label = "Flip RaioViajante avatar",
+  reducedMotionLabel = "Illustrated RaioViajante character",
 }: {
   /** The accessible name; an app that renders another language supplies its own. */
   label?: string;
+  reducedMotionLabel?: string;
 } = {}) {
   return (
     <button
       type="button"
       className="avatar-coin"
       aria-label={label}
+      data-avatar-label={label}
+      data-avatar-reduced-label={reducedMotionLabel}
       data-avatar-coin
       data-frames={JSON.stringify(avatarFrames)}
       data-durations={AVATAR_DURATIONS.join(",")}

@@ -36,8 +36,9 @@ function setUp(button: HTMLButtonElement) {
     button.setAttribute(
       "aria-label",
       motion.matches
-        ? "Illustrated RaioViajante character"
-        : "Flip RaioViajante avatar",
+        ? (button.dataset.avatarReducedLabel ??
+            "Illustrated RaioViajante character")
+        : (button.dataset.avatarLabel ?? "Flip RaioViajante avatar"),
     );
     if (motion.matches) {
       button.classList.remove("is-flipping");

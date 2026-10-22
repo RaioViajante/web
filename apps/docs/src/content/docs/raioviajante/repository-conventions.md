@@ -1,4 +1,8 @@
 ---
+contentId: raioviajante/repository-conventions
+locale: en
+originalLocale: en
+path: /raioviajante/repository-conventions/
 title: Repository conventions
 description: Commits, publishing changes, and the working language across RaioViajante repositories.
 order: 3
@@ -21,4 +25,4 @@ Nothing is pushed to a remote without explicit permission. History is not rewrit
 
 ## Language
 
-Filenames, documentation, code, comments, commit messages, and configuration are written in English throughout.
+Repository documentation, technical filenames, code, identifiers, comments, commit messages, and configuration use English. Published documentation may be authored in English or Brazilian Portuguese; translations are added incrementally, and localized URL slugs may differ.
