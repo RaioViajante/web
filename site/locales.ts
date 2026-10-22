@@ -86,7 +86,7 @@ export function localeById(id: LocaleId): Locale {
  */
 export const localeParticipation: Record<SiteId, Record<LocaleId, boolean>> = {
   root: { en: true, "pt-BR": false },
-  dump: { en: true, "pt-BR": false },
+  dump: { en: true, "pt-BR": true },
   docs: { en: true, "pt-BR": false },
   lab: { en: true, "pt-BR": false },
 };

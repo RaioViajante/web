@@ -122,15 +122,20 @@ describe("loadEverywhere", () => {
     expect(loaded.entries).toEqual(own);
   });
 
-  it("uses registry participation by default: English fetches all, Portuguese none", async () => {
-    const read = vi.fn(async (site: SiteId) => [entry(site, "x")]);
+  it("uses registry participation by default: English fetches all, Portuguese only Dump", async () => {
+    const read = vi.fn(async (site: SiteId) => [
+      entry(site, "x", undefined, site === "dump" ? "pt-BR" : "en"),
+    ]);
     const en = await loadEverywhere("docs", "en", [], read);
     expect(read).toHaveBeenCalledTimes(3);
     expect(en.skipped).toEqual([]);
     read.mockClear();
     const pt = await loadEverywhere("docs", "pt-BR", [], read);
-    expect(read).not.toHaveBeenCalled();
-    expect(pt.skipped).toEqual(["root", "dump", "lab"]);
+    expect(read).toHaveBeenCalledExactlyOnceWith("dump");
+    expect(pt.entries.map(({ site, locale }) => [site, locale])).toEqual([
+      ["dump", "pt-BR"],
+    ]);
+    expect(pt.skipped).toEqual(["root", "lab"]);
     expect(pt.unavailable).toEqual([]);
   });
 
@@ -244,15 +249,20 @@ describe("current and federated index loading", () => {
     expect(read).toHaveBeenCalledTimes(4);
   });
 
-  it("never reads a non-participating host during federation", async () => {
+  it("reads Dump but never reads inactive Portuguese hosts during federation", async () => {
     const read = vi.fn(async (site: SiteId) => [
       entry(site, "x", undefined, "pt-BR"),
     ]);
-    for (const site of ["root", "dump", "docs", "lab"] as const)
+    for (const site of ["root", "docs", "lab"] as const)
       expect(await loadFederatedSiteIndex(site, "pt-BR", read)).toEqual({
         state: "skipped",
       });
     expect(read).not.toHaveBeenCalled();
+    expect(await loadFederatedSiteIndex("dump", "pt-BR", read)).toEqual({
+      state: "ready",
+      entries: [entry("dump", "x", undefined, "pt-BR")],
+    });
+    expect(read).toHaveBeenCalledExactlyOnceWith("dump");
   });
 
   it("is ready with entries, ready with a valid empty index, unavailable on failure or invalid data", async () => {

@@ -146,7 +146,7 @@ it.each([
 });
 
 it.each(["root", "dump", "docs", "lab"] as const)(
-  "loads %s's local Portuguese index but does not federate to inactive peers",
+  "loads %s's local Portuguese index and federates only to active peers",
   async (site) => {
     document.body.innerHTML = renderToStaticMarkup(
       <SearchPage site={site} locale="pt-BR" />,
@@ -162,13 +162,17 @@ it.each(["root", "dump", "docs", "lab"] as const)(
     expect(fetchMock).toHaveBeenCalledWith("/pt/search-index.json", {
       mode: "cors",
     });
-    // Everywhere keeps the already-loaded local index but must not probe any
-    // non-participating peer.
+    // Everywhere keeps the local index and requests only Dump when it is a peer.
     document
       .querySelector<HTMLButtonElement>('[data-search-scope="everywhere"]')!
       .click();
     await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(fetchMock).toHaveBeenCalledTimes(site === "dump" ? 1 : 2);
+    if (site !== "dump")
+      expect(fetchMock).toHaveBeenCalledWith(
+        "http://localhost:3000/pt/search-index.json",
+        { mode: "cors" },
+      );
     expect(page.dataset.searchState).toBe("ready");
     expect(
       document.querySelector("[data-search-bubble]")?.textContent,

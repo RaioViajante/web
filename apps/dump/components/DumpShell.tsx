@@ -22,24 +22,27 @@ function navigation(locale: LocaleId): NavItem[] {
 }
 
 /**
- * The shared shell with dump's pages. `current` is the page's own path (a post
- * counts as "posts"); `toc` is a post's "on this page" list.
+ * The shared shell with dump's pages. `current` selects the navigation item;
+ * `languagePath` is the actual content path when it differs from that item.
+ * Only an ordinary route can infer a counterpart from the route registry.
  */
 export function DumpShell({
   current,
+  languagePath,
   locale = DEFAULT_LOCALE,
   counterpart,
   toc,
   children,
 }: {
   current?: string;
+  languagePath?: string;
   locale?: LocaleId;
   counterpart?: string;
   toc?: NavItem[];
   children: ReactNode;
 }) {
   const pages = navigation(locale);
-  const route = current ? routeOfPath(current) : undefined;
+  const route = routeOfPath(languagePath ?? current ?? "");
   const staticCounterpart = route
     ? counterpartsOf(route.key, locale)[0]?.path
     : undefined;

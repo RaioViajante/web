@@ -75,5 +75,21 @@ describe("<PostArticle />", () => {
     ).toBeInTheDocument();
     expect(document.querySelector(".comments")).not.toBeNull();
     expect(screen.queryByText("RSS")).not.toBeInTheDocument();
+    expect(
+      document.querySelector(".rv-lang")?.getAttribute("data-lang-state"),
+    ).toBe("disclosure");
+    expect(
+      document.querySelector(".rv-lang details a")?.getAttribute("href"),
+    ).toBe("/");
+  });
+
+  it("does not present an English-only post's home as its translation", () => {
+    render(<PostArticle post={post}>Article body.</PostArticle>);
+    expect(
+      document.querySelector(".rv-lang")?.getAttribute("data-lang-state"),
+    ).toBe("disclosure");
+    expect(
+      document.querySelector(".rv-lang details a")?.getAttribute("href"),
+    ).toBe("/pt");
   });
 });

@@ -7,11 +7,10 @@ import {
 } from "./lang-fixtures";
 import { base, isolate, searchPath, sites, viewports } from "./support";
 
-// While Portuguese participation is off everywhere, LANG is a status on every
-// real page. The interactive states are exercised with the real LanguageControl
-// markup (see lang-fixtures.ts) inside a real styled page at phone width.
+// Inactive hosts show a status; Dump's published Portuguese home is a real
+// destination. The other interactive states use the real control markup.
 
-for (const site of sites)
+for (const site of sites.filter((site) => site !== "dump"))
   test(`${site}: LANG is a noninteractive "LANG EN" status and the utility row fits a phone`, async ({
     page,
   }) => {
@@ -30,6 +29,25 @@ for (const site of sites)
     await expect(page.locator('a[hreflang="pt-BR"]')).toHaveCount(0);
     expect(await overflows(page)).toBe(false);
   });
+
+test("Dump home LANG links its real counterpart at phone width", async ({ page }) => {
+  await isolate(page, []);
+  await page.setViewportSize(viewports.mobile);
+  await page.goto(base("dump") + "/");
+  const lang = page.locator(".rv-sound .rv-lang");
+  await expect(lang).toHaveAttribute("data-lang-state", "link");
+  const link = lang.getByRole("link", { name: "Português (Brasil)" });
+  await expect(link).toHaveAttribute("href", "/pt");
+  await expect(link).toHaveAttribute("hreflang", "pt-BR");
+  expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  expect(await overflows(page)).toBe(false);
+  await tabTo(page, ".rv-lang a");
+  expect(await link.evaluate((el) => el.matches(":focus-visible"))).toBe(true);
+  await axeClean(page);
+  await link.press("Enter");
+  await expect(page).toHaveURL(base("dump") + "/pt");
+  await expect(page.locator(".rv-lang a[href='/']")).toHaveCount(1);
+});
 
 const overflows = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);

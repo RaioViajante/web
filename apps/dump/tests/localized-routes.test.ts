@@ -40,9 +40,9 @@ const PORTUGUESE_TAG_PATHS = [
 ];
 
 describe("localized published inventory", () => {
-  it("passes reciprocal locale checks and preserves non-participation", () => {
+  it("passes reciprocal locale checks and participates in Portuguese", () => {
     expect(checkLocaleInventory("dump", publishedPageInventory())).toEqual([]);
-    expect(participates("dump", "pt-BR")).toBe(false);
+    expect(participates("dump", "pt-BR")).toBe(true);
   });
 
   it("keeps the generated proxy inventory synchronized with published posts and tags", () => {
