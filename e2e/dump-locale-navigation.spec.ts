@@ -134,10 +134,7 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
     "disclosure",
   );
   await page.locator(".rv-lang summary").click();
-  await expect(page.locator(".rv-lang details a")).toHaveAttribute(
-    "href",
-    "/",
-  );
+  await expect(page.locator(".rv-lang details a")).toHaveAttribute("href", "/");
   await expect(page.getByRole("heading", { name: "Comentários" })).toHaveCount(
     1,
   );
@@ -170,11 +167,30 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   );
 });
 
-test("Dump searches its local Portuguese index without fetching inactive hosts", async ({
+test("Dump searches its local Portuguese index and federates Root but not inactive hosts", async ({
   page,
 }) => {
   const external: string[] = [];
   await isolate(page, external);
+  const rootIndex = await (
+    await fetch(`${base("root")}/pt/search-index.json`)
+  ).text();
+  let rootRequests = 0;
+  await page.route(
+    (url) =>
+      url.pathname === "/pt/search-index.json" &&
+      (url.origin === "https://raioviajante.com" ||
+        /^http:\/\/127\.0\.0\.1:300[02]$/.test(url.origin)),
+    (route) => {
+      rootRequests++;
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        headers: { "access-control-allow-origin": "*" },
+        body: rootIndex,
+      });
+    },
+  );
   await page.setViewportSize({ width: 390, height: 844 });
 
   const indexResponse = page.waitForResponse(
@@ -243,6 +259,7 @@ test("Dump searches its local Portuguese index without fetching inactive hosts",
 
   await page.locator('[data-search-scope="everywhere"]').click();
   await expect(search).toHaveAttribute("data-search-state", "ready");
+  expect(rootRequests).toBe(1);
   expect(external).toEqual([]);
 
   await input.fill("Traduzir");

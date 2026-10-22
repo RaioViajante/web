@@ -85,7 +85,7 @@ export function localeById(id: LocaleId): Locale {
  * advertise"). Every cross-host use of a locale reads this.
  */
 export const localeParticipation: Record<SiteId, Record<LocaleId, boolean>> = {
-  root: { en: true, "pt-BR": false },
+  root: { en: true, "pt-BR": true },
   dump: { en: true, "pt-BR": true },
   docs: { en: true, "pt-BR": false },
   lab: { en: true, "pt-BR": false },

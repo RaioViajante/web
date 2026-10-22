@@ -469,22 +469,24 @@ describe("footer cross-site destinations", () => {
     ]);
   });
 
-  it("uses the registry: inactive hosts cannot advertise Dump Portuguese, while Dump skips inactive hosts", () => {
+  it("uses the registry: Root and Dump link each other in Portuguese and skip inactive hosts", () => {
     const inactive = html(<Footer site="docs" locale="pt-BR" />);
     expect(inactive.innerHTML).not.toMatch(/\/pt/);
-    const active = html(<Footer site="dump" locale="pt-BR" />);
-    const links = [...active.querySelectorAll("footer nav:first-of-type a")];
-    expect(links.map((link) => link.getAttribute("href"))).toEqual([
-      "https://raioviajante.com",
-      "https://dump.raioviajante.com/pt",
-      "https://docs.raioviajante.com",
-      "https://lab.raioviajante.com",
-    ]);
-    expect(links.map((link) => link.getAttribute("hreflang"))).toEqual([
-      "en",
-      "pt-BR",
-      "en",
-      "en",
-    ]);
+    for (const site of ["root", "dump"] as const) {
+      const active = html(<Footer site={site} locale="pt-BR" />);
+      const links = [...active.querySelectorAll("footer nav:first-of-type a")];
+      expect(links.map((link) => link.getAttribute("href"))).toEqual([
+        "https://raioviajante.com/pt",
+        "https://dump.raioviajante.com/pt",
+        "https://docs.raioviajante.com",
+        "https://lab.raioviajante.com",
+      ]);
+      expect(links.map((link) => link.getAttribute("hreflang"))).toEqual([
+        "pt-BR",
+        "pt-BR",
+        "en",
+        "en",
+      ]);
+    }
   });
 });

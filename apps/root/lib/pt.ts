@@ -5,6 +5,17 @@
 // not translated.
 
 import type { RouteKey } from "./routes.ts";
+import { localizedPath, participates } from "../../../site/locales.ts";
+import { siteOrigins } from "../../../site/sites.ts";
+
+/** A localized cross-host destination needs both deployments to participate. */
+export const ptDumpHome =
+  participates("root", "pt-BR") && participates("dump", "pt-BR")
+    ? {
+        href: `${siteOrigins.dump}${localizedPath("dump", "pt-BR", "/")}`,
+        hrefLang: "pt-BR" as const,
+      }
+    : { href: siteOrigins.dump, hrefLang: "en" as const };
 
 export const ptPageSeo: Partial<
   Record<RouteKey, { title: string; description: string }>
@@ -149,9 +160,8 @@ export const ptNotFound = {
     { label: "raioviajante.com", value: "recomeçar", href: "/pt" },
     {
       label: "dump",
-      value: "textos (em inglês)",
-      href: "https://dump.raioviajante.com",
-      hrefLang: "en",
+      value: ptDumpHome.hrefLang === "pt-BR" ? "textos" : "textos (em inglês)",
+      ...ptDumpHome,
     },
     {
       label: "docs",

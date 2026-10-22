@@ -5,6 +5,7 @@ import test from "node:test";
 import { checkLocaleInventory } from "../../../seo/locale.ts";
 import {
   isReservedPath,
+  localeParticipation,
   localeOfPath,
   participates,
 } from "../../../site/locales.ts";
@@ -15,7 +16,7 @@ import {
   routeOfPath,
   routes,
 } from "../lib/routes.ts";
-import { ptNotFound } from "../lib/pt.ts";
+import { ptDumpHome, ptNotFound } from "../lib/pt.ts";
 
 // Root's route registry is the one record of which pages exist in which
 // locale. These checks keep it honest in both directions (docs/i18n.md, "Route
@@ -113,15 +114,49 @@ test("a path resolves to its route and locale, and an undeclared one does not", 
   assert.equal(routeOfPath("/pt/gallery"), undefined);
 });
 
-test("publishing Portuguese routes does not activate Portuguese participation", () => {
+test("Root participation activates only its published Portuguese routes", () => {
+  assert.equal(participates("root", "pt-BR"), true);
+  for (const key of ["home", "about", "search"])
+    assert.ok(routes[key]["pt-BR"], key);
+  for (const key of [
+    "projects",
+    "contact",
+    "gallery",
+    "this-site",
+    "setup",
+    "terms",
+    "privacy",
+  ])
+    assert.equal(routes[key]["pt-BR"], undefined, key);
+});
+
+test("rollback disables Root participation while its Portuguese routes stay published", (t) => {
+  t.after(() => {
+    localeParticipation.root["pt-BR"] = true;
+  });
+  localeParticipation.root["pt-BR"] = false;
   assert.equal(participates("root", "pt-BR"), false);
+  assert.deepEqual(
+    declaredPages()
+      .filter(({ locale }) => locale === "pt-BR")
+      .map(({ path }) => path)
+      .sort(),
+    ["/pt", "/pt/about", "/pt/search"],
+  );
+  assert.equal(participates("dump", "pt-BR"), true);
 });
 
 test("Portuguese 404 recovery links identify deliberate English destinations", () => {
-  const english = ptNotFound.tryInstead.filter(({ href }) =>
-    href.startsWith("https://"),
+  const english = ptNotFound.tryInstead.filter(
+    ({ hrefLang }) => hrefLang === "en",
   );
-  assert.equal(english.length, 3);
+  assert.equal(english.length, 2);
+  assert.deepEqual(
+    ptNotFound.tryInstead
+      .filter(({ hrefLang }) => hrefLang === "pt-BR")
+      .map(({ href }) => href),
+    [ptDumpHome.href],
+  );
   assert.equal(
     english.every(({ hrefLang }) => hrefLang === "en"),
     true,

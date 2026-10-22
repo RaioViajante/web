@@ -124,7 +124,7 @@ describe("Shell", () => {
         x
       </Shell>,
     );
-    expect(withoutToc).not.toMatch(/<details|<summary|ON THIS PAGE/);
+    expect(withoutToc).not.toMatch(/rv-nav__details|ON THIS PAGE/);
   });
 });
 
