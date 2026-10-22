@@ -43,7 +43,12 @@ export default async function TagPagePt({ params }: PageProps) {
   const posts = getPostsByTagId(locale, found.id);
   if (posts.length === 0) notFound();
   return (
-    <DumpShell current="/pt/tags" locale={locale}>
+    <DumpShell
+      current="/pt/tags"
+      languagePath={tagHref(found.slug, locale)}
+      counterpart={tagCounterparts(locale, found.id)[0]?.path}
+      locale={locale}
+    >
       <PageHeader
         label={ptCopy.tags.pageLabel}
         title={found.label}

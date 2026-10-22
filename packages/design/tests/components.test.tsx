@@ -118,7 +118,7 @@ describe("Shell", () => {
       /<summary[^>]*>ON THIS PAGE <span aria-hidden="true">·<\/span> 1<\/summary>/,
     );
     expect(toc.indexOf("</summary>")).toBeLessThan(toc.indexOf('href="#code"'));
-    expect(html.match(/<details/g)).toHaveLength(1);
+    expect(html.match(/<details class="rv-nav__details"/g)).toHaveLength(1);
     const withoutToc = renderToStaticMarkup(
       <Shell locale="en" site="root" pages={pages}>
         x

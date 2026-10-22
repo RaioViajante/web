@@ -43,7 +43,11 @@ export default async function TagPage({ params }: PageProps) {
   if (posts.length === 0) notFound();
 
   return (
-    <DumpShell current="/tags">
+    <DumpShell
+      current="/tags"
+      languagePath={tagHref(found.slug)}
+      counterpart={tagCounterparts(DEFAULT_LOCALE, found.id)[0]?.path}
+    >
       <PageHeader
         label="Tag"
         title={found.label}

@@ -21,12 +21,23 @@ const state = (body: HTMLElement) =>
 
 describe("LANG: participation first", () => {
   it("A: an English page before Portuguese activation is a status, not a link", () => {
-    for (const site of ["root", "dump", "docs", "lab"] as const) {
+    for (const site of ["root", "docs", "lab"] as const) {
       const body = render({ site }); // real registry: pt-BR is not participating
       expect(state(body)).toBe("status");
       expect(body.textContent).toContain("LANG EN");
       expect(body.querySelector("a, details, button, summary")).toBeNull();
     }
+  });
+
+  it("Dump offers only its declared Portuguese counterpart with the real registry", () => {
+    const home = render({ site: "dump", counterpart: "/pt" });
+    expect(state(home)).toBe("link");
+    expect(home.querySelector("a")?.getAttribute("href")).toBe("/pt");
+    const missing = render({ site: "dump" });
+    expect(state(missing)).toBe("disclosure");
+    expect(missing.querySelector("details a")?.getAttribute("href")).toBe(
+      "/pt",
+    );
   });
 
   it("B: a directly visited pre-activation Portuguese page is LANG PT, noninteractive", () => {

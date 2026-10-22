@@ -54,6 +54,7 @@ export function PostArticle({
   return (
     <DumpShell
       current={post.locale === DEFAULT_LOCALE ? "/" : "/pt"}
+      languagePath={postPath(post)}
       locale={post.locale}
       counterpart={counterpart}
       toc={toc}
