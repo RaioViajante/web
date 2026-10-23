@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { base, isolate, viewports } from "./support";
 
-test("Portuguese Lab publishes only the real Sweep counterpart, without activating LANG", async ({
+test("Portuguese Lab publishes only the real Sweep counterpart with active LANG", async ({
   page,
 }) => {
   await isolate(page, []);
@@ -18,10 +18,14 @@ test("Portuguese Lab publishes only the real Sweep counterpart, without activati
   );
   await expect(page.locator(".rv-lang")).toHaveAttribute(
     "data-lang-state",
-    "status",
+    "link",
   );
   await expect(page.locator(".rv-lang")).toContainText("LANG PT");
-  await expect(page.locator(".rv-lang a, .rv-lang button")).toHaveCount(0);
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/");
+  await page.locator(".rv-lang a").press("Enter");
+  await expect(page).toHaveURL(`${base("lab")}/`);
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/pt/");
+  await page.goto(`${base("lab")}/pt/`);
   await page.locator('[data-filter="done"]').click();
   await expect(page.locator("[data-filter-result]")).toHaveText(
     "0 experimentos",
@@ -62,6 +66,10 @@ test("Portuguese classifier translates live output, preserves actual destination
     "href",
     "https://lab.raioviajante.com/experiments/filename-classifier/",
   );
+  await expect(page.locator(".rv-lang a")).toHaveAttribute(
+    "href",
+    "/experiments/filename-classifier/",
+  );
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
@@ -98,6 +106,23 @@ test("Portuguese search is locale-pure and missing translations use the English 
   expect(html).toContain('<html lang="en"');
   expect(html).toContain('name="robots" content="noindex, follow"');
   expect(html).not.toContain('rel="canonical"');
+  for (const path of [
+    "/experiments/execution-states/",
+    "/experiments/boot-sector/",
+  ]) {
+    await page.goto(base("lab") + path);
+    await expect(page.locator(".rv-lang")).toHaveAttribute(
+      "data-lang-state",
+      "disclosure",
+    );
+    await expect(page.locator(".rv-lang details a")).toHaveAttribute(
+      "href",
+      "/pt/",
+    );
+    await expect(
+      page.locator('link[rel="alternate"][hreflang="pt-BR"]'),
+    ).toHaveCount(0);
+  }
 });
 
 test("every Portuguese Lab suggestion finds a published Portuguese experiment in both scopes", async ({

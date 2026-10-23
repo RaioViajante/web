@@ -86,12 +86,12 @@ test("Docs search LANG carries q only, in both directions", async ({
   }
 });
 
-test("Root and Dump Portuguese federation includes Docs but not Lab", async ({
+test("Root and Dump Portuguese federation includes Docs and Lab", async ({
   page,
 }) => {
   const external: string[] = [];
   await isolate(page, external);
-  for (const site of ["root", "dump", "docs"] as const) {
+  for (const site of ["root", "dump", "docs", "lab"] as const) {
     const index = await (
       await fetch(`${base(site)}/pt/search-index.json`)
     ).text();
@@ -105,6 +105,7 @@ test("Root and Dump Portuguese federation includes Docs but not Lab", async ({
                 root: "https://raioviajante.com",
                 dump: "https://dump.raioviajante.com",
                 docs: "https://docs.raioviajante.com",
+                lab: "https://lab.raioviajante.com",
               } as const
             )[site]),
       (route) =>
@@ -135,10 +136,9 @@ test("Root and Dump Portuguese federation includes Docs but not Lab", async ({
     expect(requested).toContain(
       "https://docs.raioviajante.com/pt/search-index.json",
     );
-    expect(
-      requested.some((url) => new URL(url).hostname.startsWith("lab.")),
-    ).toBe(false);
-    expect(requested).not.toContain(`${base("lab")}/pt/search-index.json`);
+    expect(requested).toContain(
+      "https://lab.raioviajante.com/pt/search-index.json",
+    );
     expect(external).toEqual([]);
     expect(
       await page

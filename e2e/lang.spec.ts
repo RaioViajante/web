@@ -7,29 +7,7 @@ import {
 } from "./lang-fixtures";
 import { base, isolate, searchPath, sites, viewports } from "./support";
 
-// Lab shows a status; Root, Dump and Docs offer their real counterparts.
-
-for (const site of sites.filter((site) => site === "lab"))
-  test(`${site}: LANG is a noninteractive "LANG EN" status and the utility row fits a phone`, async ({
-    page,
-  }) => {
-    await isolate(page, []);
-    await page.setViewportSize(viewports.mobile);
-    await page.goto(base(site) + "/");
-    const lang = page.locator(".rv-sound .rv-lang");
-    await expect(lang).toHaveCount(1);
-    await expect(lang).toHaveAttribute("data-lang-state", "status");
-    await expect(lang).toContainText("LANG EN");
-    await expect(lang.locator("a, button, details, summary")).toHaveCount(0);
-    await expect(lang.locator("[aria-disabled]")).toHaveCount(0);
-    expect(
-      (await page.locator("[data-sound-toggle]").boundingBox())!.height,
-    ).toBeGreaterThanOrEqual(44);
-    await expect(page.locator('a[hreflang="pt-BR"]')).toHaveCount(0);
-    expect(await overflows(page)).toBe(false);
-  });
-
-for (const site of ["root", "dump", "docs"] as const)
+for (const site of sites)
   test(`${site} home LANG links its real counterpart at phone width`, async ({
     page,
   }) => {
@@ -39,7 +17,7 @@ for (const site of ["root", "dump", "docs"] as const)
     const lang = page.locator(".rv-sound .rv-lang");
     await expect(lang).toHaveAttribute("data-lang-state", "link");
     const link = lang.getByRole("link", { name: "Português (Brasil)" });
-    const destination = site === "docs" ? "/pt/" : "/pt";
+    const destination = site === "docs" || site === "lab" ? "/pt/" : "/pt";
     await expect(link).toHaveAttribute("href", destination);
     await expect(link).toHaveAttribute("hreflang", "pt-BR");
     expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);

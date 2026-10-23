@@ -100,7 +100,7 @@ describe("Shell", () => {
     );
     const pagesNav = withSearch.slice(
       withSearch.indexOf('aria-label="pages"'),
-      withSearch.indexOf("</nav>"),
+      withSearch.indexOf("</nav>", withSearch.indexOf('aria-label="pages"')),
     );
     expect(pagesNav.lastIndexOf("rv-search")).toBeGreaterThan(
       pagesNav.lastIndexOf("archive"),

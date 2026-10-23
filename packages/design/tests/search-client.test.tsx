@@ -162,12 +162,12 @@ it.each(["root", "dump", "docs", "lab"] as const)(
     expect(fetchMock).toHaveBeenCalledWith("/pt/search-index.json", {
       mode: "cors",
     });
-    // Everywhere requests Root, Dump and Docs only when they are peers.
+    // Everywhere requests every other participating host.
     document
       .querySelector<HTMLButtonElement>('[data-search-scope="everywhere"]')!
       .click();
     await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(fetchMock).toHaveBeenCalledTimes(site === "lab" ? 4 : 3);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
     if (site === "docs" || site === "lab")
       expect(fetchMock).toHaveBeenCalledWith(
         "http://localhost:3000/pt/search-index.json",

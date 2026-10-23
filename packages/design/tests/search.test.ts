@@ -122,23 +122,28 @@ describe("loadEverywhere", () => {
     expect(loaded.entries).toEqual(own);
   });
 
-  it("uses registry participation by default: English fetches all, Portuguese skips Lab", async () => {
+  it("uses registry participation by default: both languages fetch all four hosts", async () => {
     const read = vi.fn(async (site: SiteId) => [
-      entry(site, "x", undefined, site === "lab" ? "en" : "pt-BR"),
+      entry(site, "x", undefined, "en"),
     ]);
     const en = await loadEverywhere("docs", "en", [], read);
     expect(read).toHaveBeenCalledTimes(3);
     expect(en.skipped).toEqual([]);
     read.mockClear();
+    read.mockImplementation(async (site: SiteId) => [
+      entry(site, "x", undefined, "pt-BR"),
+    ]);
     const pt = await loadEverywhere("docs", "pt-BR", [], read);
-    expect(read).toHaveBeenCalledTimes(2);
+    expect(read).toHaveBeenCalledTimes(3);
     expect(read).toHaveBeenCalledWith("root");
     expect(read).toHaveBeenCalledWith("dump");
+    expect(read).toHaveBeenCalledWith("lab");
     expect(pt.entries.map(({ site, locale }) => [site, locale])).toEqual([
       ["root", "pt-BR"],
       ["dump", "pt-BR"],
+      ["lab", "pt-BR"],
     ]);
-    expect(pt.skipped).toEqual(["lab"]);
+    expect(pt.skipped).toEqual([]);
     expect(pt.unavailable).toEqual([]);
   });
 
@@ -162,8 +167,12 @@ describe("loadEverywhere", () => {
       entry(site, "x", undefined, "pt-BR"),
     ]);
     const active = await loadEverywhere("root", "pt-BR", [], read);
-    expect(read.mock.calls.map(([site]) => site)).toEqual(["dump", "docs"]);
-    expect(active.skipped).toEqual(["lab"]);
+    expect(read.mock.calls.map(([site]) => site)).toEqual([
+      "dump",
+      "docs",
+      "lab",
+    ]);
+    expect(active.skipped).toEqual([]);
     read.mockClear();
     const rolledBack = await loadEverywhere(
       "root",
@@ -286,23 +295,36 @@ describe("current and federated index loading", () => {
     expect(read).toHaveBeenCalledTimes(4);
   });
 
-  it("reads Root, Dump and Docs but never inactive Lab during federation", async () => {
+  it("reads all four Portuguese hosts during federation", async () => {
     const read = vi.fn(async (site: SiteId) => [
       entry(site, "x", undefined, "pt-BR"),
     ]);
-    expect(await loadFederatedSiteIndex("lab", "pt-BR", read)).toEqual({
-      state: "skipped",
-    });
-    expect(read).not.toHaveBeenCalled();
-    for (const site of ["root", "dump", "docs"] as const)
+    for (const site of ["root", "dump", "docs", "lab"] as const)
       expect(await loadFederatedSiteIndex(site, "pt-BR", read)).toEqual({
         state: "ready",
         entries: [entry(site, "x", undefined, "pt-BR")],
       });
-    expect(read).toHaveBeenCalledTimes(3);
+    expect(read).toHaveBeenCalledTimes(4);
     expect(read).toHaveBeenCalledWith("root");
     expect(read).toHaveBeenCalledWith("dump");
     expect(read).toHaveBeenCalledWith("docs");
+    expect(read).toHaveBeenCalledWith("lab");
+  });
+
+  it("stops reading only Lab on rollback while published routes remain", async () => {
+    const read = vi.fn(async (site: SiteId) => [
+      entry(site, "x", undefined, "pt-BR"),
+    ]);
+    const rolledBack = (site: SiteId, locale: "en" | "pt-BR") =>
+      locale === "en" || site !== "lab";
+    expect(
+      await loadFederatedSiteIndex("lab", "pt-BR", read, rolledBack),
+    ).toEqual({
+      state: "skipped",
+    });
+    const result = await loadEverywhere("root", "pt-BR", [], read, rolledBack);
+    expect(read.mock.calls.map(([site]) => site)).toEqual(["dump", "docs"]);
+    expect(result.skipped).toEqual(["lab"]);
   });
 
   it("is ready with entries, ready with a valid empty index, unavailable on failure or invalid data", async () => {
