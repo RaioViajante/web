@@ -6,6 +6,8 @@ import {
   Callout,
 } from "@raioviajante/design/components";
 import { classifyFilename } from "../../lib/filename-classifier";
+import { classifierCopy } from "../../lib/copy";
+import type { LocaleId } from "../../../../../site/locales";
 export const initialNames = [
   "photo.png",
   "REPORT.PDF",
@@ -13,17 +15,27 @@ export const initialNames = [
   "README",
   ".hidden",
 ];
-export function ClassifierBench() {
+export function ClassifierBench({ locale }: { locale: LocaleId }) {
+  const text = classifierCopy[locale];
   return (
-    <div data-classifier>
+    <div
+      data-classifier
+      data-copy={JSON.stringify({
+        categories: text.categories,
+        none: text.none,
+        file: text.file,
+        files: text.files,
+        classified: text.classified,
+      })}
+    >
       <LabBench
-        caption="bench · runs in this browser"
-        where={<ActionButton data-reset>reset</ActionButton>}
+        caption={text.caption}
+        where={<ActionButton data-reset>{text.reset}</ActionButton>}
       >
         <BenchBand>
           <div className="bench-inputs">
             <label>
-              <span className="rv-label">Directory</span>
+              <span className="rv-label">{text.directory}</span>
               <input
                 className="rv-input"
                 id="directory"
@@ -32,7 +44,7 @@ export function ClassifierBench() {
               />
             </label>
             <label>
-              <span className="rv-label">Filenames · one per line</span>
+              <span className="rv-label">{text.filenames}</span>
               <textarea
                 className="rv-input"
                 id="filenames"
@@ -45,7 +57,7 @@ export function ClassifierBench() {
           </div>
           <div className="bench-actions">
             <ActionButton primary data-classify>
-              try
+              {text.try}
             </ActionButton>
             {[
               "notes.final.MD",
@@ -65,13 +77,11 @@ export function ClassifierBench() {
             <TableBlock>
               <thead>
                 <tr>
-                  {["file", "suffix", "category", "destination"].map(
-                    (title) => (
-                      <th key={title} scope="col">
-                        {title}
-                      </th>
-                    ),
-                  )}
+                  {text.headers.map((title) => (
+                    <th key={title} scope="col">
+                      {title}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -80,8 +90,14 @@ export function ClassifierBench() {
                     <th scope="row" className="tok-string">
                       {row.filename}
                     </th>
-                    <td className="tok-number">{row.suffix || "(none)"}</td>
-                    <td className="tok-type">{row.category}</td>
+                    <td className="tok-number">{row.suffix || text.none}</td>
+                    <td className="tok-type">
+                      {
+                        text.categories[
+                          row.category as keyof typeof text.categories
+                        ]
+                      }
+                    </td>
                     <td>{`~/Downloads/${row.category}/${row.filename}`}</td>
                   </tr>
                 ))}
@@ -95,22 +111,29 @@ export function ClassifierBench() {
             aria-atomic="true"
             data-summary
           >
-            5 files · Images 1 · Documents 1 · Archives 1 · Other 2
+            5 {text.files} {text.classified} · {text.categories.Images} 1 ·{" "}
+            {text.categories.Documents} 1 · {text.categories.Archives} 1 ·{" "}
+            {text.categories.Other} 2
           </p>
         </BenchBand>
       </LabBench>
-      <Callout label={'Why .hidden is "Other"'}>
+      <Callout label={text.why}>
         <span id="filename-help">
-          Python 3.14 <code>Path.suffix</code> treats a leading dot as part of
-          the name. Only the final suffix counts: <code>archive.tar.gz</code>{" "}
-          uses <code>.gz</code>. A trailing dot is suffix <code>.</code>, so{" "}
-          <code>image.</code> is Other. Filename spaces are preserved.
-          Destinations are previews; no files move.
+          {locale === "en" ? (
+            <>
+              Python 3.14 <code>Path.suffix</code> treats a leading dot as part
+              of the name. Only the final suffix counts:{" "}
+              <code>archive.tar.gz</code> uses <code>.gz</code>. A trailing dot
+              is suffix <code>.</code>, so <code>image.</code> is Other.
+              Filename spaces are preserved. Destinations are previews; no files
+              move.
+            </>
+          ) : (
+            text.explanation
+          )}
         </span>
       </Callout>
-      <noscript>
-        The examples are precomputed. Enable JavaScript to try other filenames.
-      </noscript>
+      <noscript>{text.noscript}</noscript>
     </div>
   );
 }

@@ -1,0 +1,21 @@
+---
+import type { InferGetStaticPropsType } from "astro";
+import ExperimentLayout from "../../../layouts/ExperimentLayout.astro";
+import FilenameClassifier from "../../../components/surfaces/FilenameClassifier.astro";
+import { portugueseExperiments } from "../../../data/experiments";
+
+export function getStaticPaths() {
+  return portugueseExperiments.map((experiment) => ({
+    params: { slug: experiment.slug },
+    props: { experiment },
+  }));
+}
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const { experiment } = Astro.props as Props;
+---
+
+<ExperimentLayout experiment={experiment}>
+  {experiment.surface === "filename-classifier" && (
+    <FilenameClassifier slot="surface" locale="pt-BR" />
+  )}
+</ExperimentLayout>

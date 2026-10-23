@@ -1,0 +1,13 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { SearchPage } from "@raioviajante/design/search";
+---
+
+<BaseLayout
+  locale="pt-BR"
+  pageTitle="busca"
+  description="Busque experimentos do Lab e nos sites do RaioViajante."
+  counterparts={[{ locale: "en", path: "/search/" }]}
+>
+  <SearchPage site="lab" locale="pt-BR" />
+</BaseLayout>

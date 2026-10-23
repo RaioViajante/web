@@ -1,3 +1,5 @@
+import { localizedPath, type LocaleId } from "../../../../site/locales.ts";
+
 export type ExperimentStatus = "active" | "done" | "archived";
 
 /**
@@ -11,6 +13,9 @@ export type ExperimentSurface =
 
 export interface Experiment {
   id: string;
+  contentId: string;
+  locale: LocaleId;
+  originalLocale: LocaleId;
   slug: string;
   title: string;
   description: string;
@@ -29,6 +34,9 @@ export interface Experiment {
 export const experiments: Experiment[] = [
   {
     id: "003",
+    contentId: "003",
+    locale: "en",
+    originalLocale: "en",
     slug: "boot-sector",
     surface: "boot-sector",
     title: "boot sector",
@@ -45,6 +53,9 @@ export const experiments: Experiment[] = [
   },
   {
     id: "002",
+    contentId: "002",
+    locale: "en",
+    originalLocale: "en",
     slug: "execution-states",
     surface: "execution-states",
     title: "execution states",
@@ -62,6 +73,9 @@ export const experiments: Experiment[] = [
   },
   {
     id: "001",
+    contentId: "001",
+    locale: "en",
+    originalLocale: "en",
     slug: "filename-classifier",
     surface: "filename-classifier",
     title: "filename classifier",
@@ -81,3 +95,100 @@ export const experiments: Experiment[] = [
 export function getExperiment(slug: string): Experiment | undefined {
   return experiments.find((experiment) => experiment.slug === slug);
 }
+
+/** Published versions only. Stable facts are inherited from the English original. */
+export const portugueseExperiments: Experiment[] = [
+  {
+    ...experiments[2],
+    locale: "pt-BR",
+    slug: "classificador-de-arquivos",
+    title: "classificador de arquivos",
+    description: "descubra como o Sweep classifica um nome de arquivo",
+    what: "Com apenas um nome de arquivo, qual categoria o Sweep escolhe e qual seria o destino? O Sweep classifica pela última extensão antes de decidir onde o arquivo pertence. Esta página reproduz essa pequena parte do comportamento no navegador; o Sweep não está em execução aqui.",
+    notes:
+      "Baseado na revisão 3544d36 do Sweep. Apenas as extensões dos nomes são consideradas. Nenhum arquivo é enviado, inspecionado ou movido.",
+  },
+];
+
+export const publishedExperiments = [...experiments, ...portugueseExperiments];
+
+export function experimentsFor(locale: LocaleId): Experiment[] {
+  return publishedExperiments.filter(
+    (experiment) => experiment.locale === locale,
+  );
+}
+
+export function experimentPath(experiment: Experiment): string {
+  return localizedPath(
+    "lab",
+    experiment.locale,
+    `/experiments/${experiment.slug}/`,
+  );
+}
+
+export function counterpartsOf(experiment: Experiment) {
+  return publishedExperiments
+    .filter(
+      (item) =>
+        item.contentId === experiment.contentId &&
+        item.locale !== experiment.locale,
+    )
+    .map((item) => ({ locale: item.locale, path: experimentPath(item) }));
+}
+
+export function validateExperiments(
+  versions: readonly Experiment[],
+  withdrawnOriginals: readonly {
+    contentId: string;
+    originalLocale: LocaleId;
+  }[] = [],
+): void {
+  const keys = new Set<string>();
+  const paths = new Set<string>();
+  const tombstones = new Map<string, LocaleId>();
+  for (const record of withdrawnOriginals) {
+    if (tombstones.has(record.contentId))
+      throw new Error(`Duplicate original provenance: ${record.contentId}`);
+    tombstones.set(record.contentId, record.originalLocale);
+  }
+  for (const version of versions) {
+    const key = `${version.contentId}:${version.locale}`;
+    const path = experimentPath(version);
+    if (keys.has(key) || paths.has(path))
+      throw new Error(`Duplicate experiment version: ${key} ${path}`);
+    keys.add(key);
+    paths.add(path);
+    const work = versions.filter(
+      (item) => item.contentId === version.contentId,
+    );
+    const originals = work.filter(
+      (item) => item.locale === item.originalLocale,
+    ).length;
+    if (
+      originals +
+        Number(tombstones.get(version.contentId) === version.originalLocale) !==
+        1 ||
+      work.some(
+        (item) =>
+          item.originalLocale !== version.originalLocale ||
+          item.id !== version.id ||
+          item.project !== version.project ||
+          item.revision !== version.revision ||
+          item.created !== version.created ||
+          item.source !== version.source ||
+          item.status !== version.status ||
+          item.fidelity !== version.fidelity ||
+          item.surface !== version.surface,
+      )
+    ) {
+      throw new Error(
+        `Inconsistent experiment provenance: ${version.contentId}`,
+      );
+    }
+  }
+  for (const id of tombstones.keys())
+    if (!versions.some((item) => item.contentId === id))
+      throw new Error(`Orphaned original provenance: ${id}`);
+}
+
+validateExperiments(publishedExperiments);

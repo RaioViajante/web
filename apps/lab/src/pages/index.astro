@@ -6,32 +6,16 @@ import { origin } from "../lib/seo";
 ---
 
 <BaseLayout
+  counterparts={[{ locale: "pt-BR", path: "/pt/" }]}
   jsonLd={[
-    websiteJsonLd(origin, "lab", "lab.raioviajante.com — things may break."),
+    websiteJsonLd(origin, "lab", "lab.raioviajante.com — things may break.", {
+      languages: ["en", "pt-BR"],
+    }),
   ]}
 >
   <LabIndex />
 </BaseLayout>
 <script>
-  import { experimentCount } from "../lib/experiment-count";
-
-  const buttons = document.querySelectorAll<HTMLButtonElement>("[data-filter]");
-  buttons.forEach((button) =>
-    button.addEventListener("click", () => {
-      buttons.forEach((item) =>
-        item.setAttribute("aria-pressed", String(item === button)),
-      );
-      let count = 0;
-      document
-        .querySelectorAll<HTMLElement>("[data-experiment-list] [data-status]")
-        .forEach((item) => {
-          item.hidden =
-            button.dataset.filter !== "all" &&
-            item.dataset.status !== button.dataset.filter;
-          if (!item.hidden) count++;
-        });
-      document.querySelector("[data-filter-result]")!.textContent =
-        experimentCount(count);
-    }),
-  );
+  import { startExperimentFilter } from "../lib/filter";
+  startExperimentFilter();
 </script>

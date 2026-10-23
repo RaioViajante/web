@@ -1,12 +1,24 @@
 ---
 import { ClassifierBench } from "./ClassifierBench";
+import type { LocaleId } from "../../../../../site/locales";
+interface Props {
+  locale: LocaleId;
+}
+const { locale } = Astro.props;
 ---
 
-<ClassifierBench />
+<ClassifierBench locale={locale} />
 <script>
   import { classifyFilename } from "../../lib/filename-classifier";
   import { playSound } from "@raioviajante/design/sound";
   const container = document.querySelector<HTMLElement>("[data-classifier]")!;
+  const text = JSON.parse(container.dataset.copy!) as {
+    categories: Record<string, string>;
+    none: string;
+    file: string;
+    files: string;
+    classified: string;
+  };
   const names = container.querySelector<HTMLTextAreaElement>("#filenames")!;
   const directory = container.querySelector<HTMLInputElement>("#directory")!;
   const body = container.querySelector("tbody")!;
@@ -25,8 +37,8 @@ import { ClassifierBench } from "./ClassifierBench";
         const tr = document.createElement("tr");
         [
           row.filename,
-          row.suffix || "(none)",
-          row.category,
+          row.suffix || text.none,
+          text.categories[row.category],
           `${dir}/${row.category}/${row.filename}`,
         ].forEach((value, index) => {
           const cell = document.createElement(index === 0 ? "th" : "td");
@@ -38,10 +50,10 @@ import { ClassifierBench } from "./ClassifierBench";
         return tr;
       }),
     );
-    summary.textContent = `${results.length} ${results.length === 1 ? "file" : "files"} classified · ${Object.entries(
+    summary.textContent = `${results.length} ${results.length === 1 ? text.file : text.files} ${text.classified} · ${Object.entries(
       counts,
     )
-      .map(([category, count]) => `${category} ${count}`)
+      .map(([category, count]) => `${text.categories[category]} ${count}`)
       .join(" · ")}`;
     if (sound) playSound("success");
   }
