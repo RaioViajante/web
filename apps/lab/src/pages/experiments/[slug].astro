@@ -20,7 +20,7 @@ const { experiment } = Astro.props as Props;
 
 <ExperimentLayout experiment={experiment}>
   {experiment.surface === "filename-classifier" && (
-    <FilenameClassifier slot="surface" />
+    <FilenameClassifier slot="surface" locale="en" />
   )}
   {experiment.surface === "execution-states" && (
     <ExecutionStates slot="surface" />

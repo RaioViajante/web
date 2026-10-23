@@ -9,25 +9,34 @@ import "@raioviajante/design/styles.css";
 import "../styles/lab.css";
 import { LabFrame } from "../components/LabFrame";
 import { formatTitle } from "../lib/site";
+import { LOCALES, type LocaleId } from "../../../../site/locales";
+import type { Counterpart } from "../../../../seo/locale";
+import { textFor } from "../lib/copy";
 interface Props {
   pageTitle?: string;
   description?: string;
   current?: string;
   /** Structured data nodes for this page. */
   jsonLd?: object[];
+  locale?: LocaleId;
+  counterparts?: Counterpart[];
 }
 const {
   pageTitle,
   description = "lab.raioviajante.com — things may break.",
   current = Astro.url.pathname,
   jsonLd,
+  locale = "en",
+  counterparts,
 } = Astro.props;
 const color = await themeColor();
-const title = formatTitle(pageTitle);
+const title = pageTitle
+  ? formatTitle(pageTitle)
+  : `lab — ${textFor(locale).tagline}`;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={LOCALES[locale].htmlLang}>
   <head>
     <meta charset="utf-8" />
     <link
@@ -45,6 +54,8 @@ const title = formatTitle(pageTitle);
       description={description}
       noindex={isNotFoundPath(Astro.url.pathname)}
       themeColor={color}
+      locale={locale}
+      counterparts={counterparts}
     />
     {jsonLd && (
       <script
@@ -66,7 +77,7 @@ const title = formatTitle(pageTitle);
     <title>{title}</title>
   </head>
   <body>
-    <LabFrame current={current}>
+    <LabFrame current={current} locale={locale}>
       <slot />
     </LabFrame>
     <script>

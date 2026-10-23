@@ -27,8 +27,24 @@ avatar animation and block interactions. No copied shared markup, assets or
 styles live in lab. Every experiment stays inside the shared content column;
 wide code and classification output scroll within their blocks.
 
-Experiment IDs, status, fidelity, provenance and publication dates come from
-`src/data/experiments.ts`. The dynamic route statically renders each surface.
+Experiment IDs, status, fidelity and provenance come from
+`src/data/experiments.ts`. Each published version declares a stable `contentId`,
+locale, original locale and independent slug. The English route keeps its
+original path; `/pt/experiments/[slug]` builds only authored Portuguese
+versions. Validation rejects duplicate versions, changed shared facts and
+missing originals (unless a withdrawn original has an explicit nonpublic
+provenance record). `created` and `revision` are experiment facts, not document
+publication or modification dates. The locale inventory supplies counterpart
+metadata; no missing version is inferred from an English slug.
+
+`src/lib/copy.ts` supplies display labels, UTC date formatting and classifier
+bench strings. The localized bench emits its strings into static markup as a
+data attribute; plain TypeScript reads those strings and never consults the
+browser's language or storage. Portuguese search has its own static index and
+includes only real Portuguese versions. Lab participation remains false until
+production verification and a separate activation change.
+
+The dynamic routes statically render each surface.
 The classifier and execution functions are shared by the browser and Node tests.
 Boot models are highlighted at build time and its five panels switch locally.
 No server, database, CMS, sibling build dependency or experiment persistence is

@@ -4,9 +4,9 @@ import {
   LeaderRow,
   RelatedRows,
 } from "@raioviajante/design/parts";
-import { DEFAULT_LOCALE } from "../../../../site/locales";
 import type { Experiment } from "../data/experiments";
-import { experiments } from "../data/experiments";
+import { experimentsFor, experimentPath } from "../data/experiments";
+import { displayDate, textFor } from "../lib/copy";
 
 export function ExperimentHeader({
   experiment: e,
@@ -15,18 +15,18 @@ export function ExperimentHeader({
 }) {
   return (
     <PageHeader
-      label={`EXPERIMENT ${e.id} · ${e.project}`}
+      label={`${e.locale === "en" ? "EXPERIMENT" : "EXPERIMENTO"} ${e.id} · ${e.project}`}
       title={e.title}
       line={e.description}
       meta={[
-        e.status,
-        e.fidelity,
-        `created ${e.created}`,
+        textFor(e.locale).status[e.status],
+        textFor(e.locale).fidelityLabel[e.fidelity],
+        `${textFor(e.locale).created} ${displayDate(e)}`,
         `${e.project} ${e.revision}`,
         ...(e.source
           ? [
               <a key="source" href={e.source} data-sound="nav">
-                source ↗
+                {textFor(e.locale).source}
               </a>,
             ]
           : []),
@@ -35,6 +35,19 @@ export function ExperimentHeader({
   );
 }
 export function Fidelity({ experiment: e }: { experiment: Experiment }) {
+  if (e.locale === "pt-BR")
+    return (
+      <>
+        {[
+          ["regras de classificação", "conforme documentadas no Docs"],
+          ["comportamento da extensão", "Python 3.14 Path.suffix"],
+          ["acesso ao sistema de arquivos", "nenhum · nada é movido"],
+          ["verificação de conflitos e tamanho", "não reproduzidas"],
+        ].map(([label, value]) => (
+          <LeaderRow key={label} label={label} value={value} />
+        ))}
+      </>
+    );
   const rows =
     e.surface === "filename-classifier"
       ? [
@@ -68,6 +81,21 @@ export function ExperimentRelated({
 }: {
   experiment: Experiment;
 }) {
+  if (e.locale === "pt-BR")
+    return (
+      <>
+        <LeaderRow
+          label="Sweep · classificação"
+          value="docs ↗"
+          href="https://docs.raioviajante.com/pt/projetos/sweep/#classificação"
+        />
+        <LeaderRow
+          label="código-fonte do Sweep"
+          value="github ↗"
+          href={e.source}
+        />
+      </>
+    );
   const items =
     e.surface === "filename-classifier"
       ? [
@@ -121,28 +149,36 @@ export function ExperimentRelated({
   );
 }
 export function ExperimentPager({ experiment: e }: { experiment: Experiment }) {
-  const ordered = [...experiments].reverse();
+  const ordered = [...experimentsFor(e.locale)].reverse();
   const index = ordered.findIndex((item) => item.id === e.id);
   const prev = ordered[index - 1];
   const next = ordered[index + 1];
   return (
     <Pager
-      locale={DEFAULT_LOCALE}
+      locale={e.locale}
       prev={
         prev
           ? {
               title: `${prev.id} ${prev.title}`,
-              href: `/experiments/${prev.slug}/`,
+              href: experimentPath(prev),
             }
-          : { label: "← All experiments", title: "lab/", href: "/" }
+          : {
+              label: `← ${textFor(e.locale).all}`,
+              title: "lab/",
+              href: e.locale === "en" ? "/" : "/pt/",
+            }
       }
       next={
         next
           ? {
               title: `${next.id} ${next.title}`,
-              href: `/experiments/${next.slug}/`,
+              href: experimentPath(next),
             }
-          : { label: "All experiments →", title: "lab/", href: "/" }
+          : {
+              label: `${textFor(e.locale).all} →`,
+              title: "lab/",
+              href: e.locale === "en" ? "/" : "/pt/",
+            }
       }
     />
   );

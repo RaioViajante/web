@@ -1,0 +1,23 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { LabIndex } from "../../components/LabIndex";
+import { websiteJsonLd } from "../../../../../seo/structured-data";
+import { origin } from "../../lib/seo";
+---
+
+<BaseLayout
+  locale="pt-BR"
+  description="Experimentos técnicos do RaioViajante, com limites e código-fonte documentados."
+  counterparts={[{ locale: "en", path: "/" }]}
+  jsonLd={[
+    websiteJsonLd(origin, "lab", "lab.raioviajante.com — things may break.", {
+      languages: ["en", "pt-BR"],
+    }),
+  ]}
+>
+  <LabIndex locale="pt-BR" />
+</BaseLayout>
+<script>
+  import { startExperimentFilter } from "../../lib/filter";
+  startExperimentFilter();
+</script>

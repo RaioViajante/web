@@ -12,6 +12,15 @@ The initial collection was published in Lab on 2026-09-13:
 | 002 | execution states    | active | Orbit `cd97666`: Execution lifecycle rules and domain tests             |
 | 001 | filename classifier | active | Sweep `3544d36`: final-extension classifier and tests                   |
 
+The first manually authored Portuguese version is `001`, **classificador de
+arquivos**, at `/pt/experiments/classificador-de-arquivos/`. Its `contentId` is
+`001`, its original locale is English, and its source facts remain the same.
+`002` and `003` have no Portuguese version or alternate. The classifier's
+Portuguese category labels are display text; the preview destination retains
+the actual English category directory names used by Sweep. The Portuguese
+home, search index and bench include only this authored translation. The
+`created` value describes the experiment, not when the translation was published.
+
 The classifier reproduces Python 3.14 POSIX suffix behavior, lowercases the suffix, and applies Sweep's category sets. It does not inspect files. Execution states reproduces the domain guards, including cancellation from queued/running, nonblank failure messages, and no success/failure restriction on integer exit-code values. Its timestamps are browser samples; no commands run or state persists. The boot page uses real assembly excerpts with comments omitted and attributes its result to the learning notes. It contains no generated machine bytes or emulator.
 
 ## Numbering and publication
@@ -22,7 +31,7 @@ The earlier demonstration numbers were design fixtures. Real numbering starts at
 - Once published, a real experiment keeps its number forever. Never reuse it.
 - Revisions do not change an experiment's number.
 - Keep the data array in newest/highest-number-first order; the homepage uses that order.
-- `created` means the ISO date of publication in Lab, not the source project's commit date.
+- `created` records the experiment's original Lab date, not the source project's commit date or the date a translation went live. It is not a document lifecycle date and never supplies `lastmod` or `dateModified`.
 - Source revisions belong in provenance notes separately.
 - `done` describes the bounded Lab experiment, not completion of its originating project.
 

@@ -126,10 +126,13 @@ export function SearchNavItem({
 export function SearchPage({
   site,
   locale,
+  suggestions,
 }: {
   site: SiteId;
   /** The rendered locale: the route states it, the client never infers it. */
   locale: LocaleId;
+  /** Optional published-inventory terms; defaults preserve existing site suggestions. */
+  suggestions?: { site: readonly string[]; everywhere: readonly string[] };
 }) {
   const { search } = catalogFor(locale);
   return (
@@ -205,13 +208,20 @@ export function SearchPage({
           height={180}
         />
         <p>{search.empty}</p>
-        <Suggestions locale={locale} scope="site" terms={SUGGESTIONS[site]} />
+        <Suggestions
+          locale={locale}
+          scope="site"
+          terms={suggestions?.site ?? SUGGESTIONS[site]}
+        />
         <Suggestions
           locale={locale}
           scope="everywhere"
-          terms={SITES.filter((other) => other.id !== site).map(
-            (other) => SIGNATURE[other.id],
-          )}
+          terms={
+            suggestions?.everywhere ??
+            SITES.filter((other) => other.id !== site).map(
+              (other) => SIGNATURE[other.id],
+            )
+          }
           hidden
         />
       </div>
