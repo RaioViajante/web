@@ -28,6 +28,7 @@ const full = run([]);
 const production = run(["--prod"]);
 const problems = evaluateAudit({ full, production, policy });
 const count = (r) => Object.keys(r.advisories ?? {}).length;
+const expiries = [...new Set(policy.exceptions.map((e) => e.expires))];
 if (problems.length) {
   console.error(
     `Dependency audit FAILED (${problems.length}):\n${problems.map((p) => `  - ${p}`).join("\n")}`,
@@ -35,5 +36,5 @@ if (problems.length) {
   process.exit(1);
 }
 console.log(
-  `Dependency audit passes: ${count(full)} reviewed advisories (${count(production)} in production), 0 critical, no production HIGH. Exceptions expire ${[...new Set(policy.exceptions.map((e) => e.expires))].join(", ")}.`,
+  `Dependency audit passes: ${count(full)} reviewed advisories (${count(production)} in production), 0 critical, no production HIGH.${expiries.length ? ` Exceptions expire ${expiries.join(", ")}.` : " No exceptions."}`,
 );
