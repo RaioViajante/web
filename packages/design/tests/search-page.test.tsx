@@ -57,4 +57,33 @@ describe("empty search suggestions", () => {
       expect(terms).not.toContain(signature[site]);
     }
   });
+
+  it("accepts published-inventory suggestions without changing English defaults", () => {
+    const defaults = renderToStaticMarkup(
+      <SearchPage site="lab" locale="en" />,
+    );
+    const customized = renderToStaticMarkup(
+      <SearchPage
+        site="lab"
+        locale="pt-BR"
+        suggestions={{
+          site: ["classificador de arquivos", "sweep"],
+          everywhere: ["classificador de arquivos", "sweep"],
+        }}
+      />,
+    );
+    expect(lines(defaults).site!.text).toBe(
+      "try classifier, boot or execution.",
+    );
+    expect(lines(customized)).toEqual({
+      site: {
+        hidden: false,
+        text: "tente classificador de arquivos ou sweep.",
+      },
+      everywhere: {
+        hidden: true,
+        text: "tente classificador de arquivos ou sweep.",
+      },
+    });
+  });
 });

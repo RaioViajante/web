@@ -11,7 +11,16 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
   const text = textFor(locale);
   return (
     <>
-      <IndexHeader name="lab" line={text.tagline} avatar={<AvatarCoin />} />
+      <IndexHeader
+        name="lab"
+        line={text.tagline}
+        avatar={
+          <AvatarCoin
+            label={text.avatar.label}
+            reducedMotionLabel={text.avatar.reduced}
+          />
+        }
+      />
       <Section
         number="00."
         title={text.experiments}

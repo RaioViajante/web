@@ -99,3 +99,77 @@ test("Portuguese search is locale-pure and missing translations use the English 
   expect(html).toContain('name="robots" content="noindex, follow"');
   expect(html).not.toContain('rel="canonical"');
 });
+
+test("every Portuguese Lab suggestion finds a published Portuguese experiment in both scopes", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  await page.goto(`${base("lab")}/pt/search/`);
+  await expect(page.locator("[data-search-page]")).toHaveAttribute(
+    "data-search-state",
+    "ready",
+  );
+  for (const scope of ["site", "everywhere"]) {
+    await page.locator(`[data-search-scope="${scope}"]`).click();
+    await page.locator("[data-search-input]").fill("no-match-for-lab");
+    const suggestions = page.locator(
+      `[data-search-suggestions="${scope}"] [data-search-suggestion]`,
+    );
+    await expect(suggestions.first()).toBeVisible();
+    const terms = await suggestions.allTextContents();
+    expect(terms).toEqual(["classificador de arquivos", "sweep"]);
+    for (const [index, term] of terms.entries()) {
+      const button = page
+        .locator(`[data-search-suggestions="${scope}"]`)
+        .getByRole("button", { name: term, exact: true });
+      if (index === 0) {
+        await button.focus();
+        await expect(button).toBeFocused();
+        await page.keyboard.press("Enter");
+      } else await button.click();
+      await expect(page.locator("[data-search-input]")).toHaveValue(term);
+      await expect(page.locator("[data-search-input]")).toBeFocused();
+      await expect(
+        page.locator("[data-search-result]").first(),
+      ).toHaveAttribute(
+        "href",
+        `${base("lab")}/pt/experiments/classificador-de-arquivos/`,
+      );
+      await page.locator("[data-search-input]").fill("no-match-for-lab");
+    }
+  }
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("Lab avatar keeps language-specific names with and without reduced motion", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  for (const [path, interactive, reduced] of [
+    ["/", "Flip RaioViajante avatar", "Illustrated RaioViajante character"],
+    [
+      "/pt/",
+      "Girar o avatar do RaioViajante",
+      "Personagem ilustrado do RaioViajante",
+    ],
+  ] as const) {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto(base("lab") + path);
+    const avatar = page.locator(".avatar-coin");
+    await expect(avatar).toHaveAttribute("aria-label", interactive);
+    await avatar.focus();
+    await expect(avatar).toBeFocused();
+    expect(
+      await avatar.evaluate((button) => getComputedStyle(button).outlineStyle),
+    ).not.toBe("none");
+    await page.keyboard.press("Enter");
+    await expect(avatar).toHaveClass(/is-flipping/);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(avatar).toHaveAttribute("aria-label", reduced);
+    await expect(avatar).toBeDisabled();
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await expect(avatar).toHaveAttribute("aria-label", interactive);
+    await expect(avatar).toBeEnabled();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  }
+});

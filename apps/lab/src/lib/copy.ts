@@ -4,6 +4,10 @@ import type { Experiment } from "../data/experiments.ts";
 export const copy = {
   en: {
     tagline: "things may break.",
+    avatar: {
+      label: "Flip RaioViajante avatar",
+      reduced: "Illustrated RaioViajante character",
+    },
     search: "search",
     experiments: "Experiments",
     notebook: "Notebook",
@@ -34,6 +38,10 @@ export const copy = {
   },
   "pt-BR": {
     tagline: "experimentos podem falhar.",
+    avatar: {
+      label: "Girar o avatar do RaioViajante",
+      reduced: "Personagem ilustrado do RaioViajante",
+    },
     search: "busca",
     experiments: "Experimentos",
     notebook: "Caderno",
