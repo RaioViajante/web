@@ -20,11 +20,15 @@ const state = (body: HTMLElement) =>
   body.querySelector<HTMLElement>("[data-lang-state]")!.dataset.langState;
 
 describe("LANG: participation first", () => {
-  it("A: Lab stays a status before Portuguese activation", () => {
-    const body = render({ site: "lab" });
-    expect(state(body)).toBe("status");
-    expect(body.textContent).toContain("LANG EN");
-    expect(body.querySelector("a, details, button, summary")).toBeNull();
+  it("Lab links real counterparts and discloses missing translations", () => {
+    const home = render({ site: "lab", counterpart: "/pt/" });
+    expect(state(home)).toBe("link");
+    expect(home.querySelector("a")?.getAttribute("href")).toBe("/pt/");
+    const missing = render({ site: "lab" });
+    expect(state(missing)).toBe("disclosure");
+    expect(missing.querySelector("details a")?.getAttribute("href")).toBe(
+      "/pt/",
+    );
   });
 
   it("Dump offers only its declared Portuguese counterpart with the real registry", () => {
@@ -60,15 +64,14 @@ describe("LANG: participation first", () => {
     );
   });
 
-  it("B: a directly visited pre-activation Lab Portuguese page is LANG PT, noninteractive", () => {
+  it("Lab Portuguese links its real English counterpart", () => {
     const body = render({
       site: "lab",
       locale: "pt-BR",
       counterpart: "/about/",
     });
-    expect(state(body)).toBe("status");
-    expect(body.textContent).toContain("LANG PT");
-    expect(body.querySelector("a, details, summary")).toBeNull();
+    expect(state(body)).toBe("link");
+    expect(body.querySelector("a")?.getAttribute("href")).toBe("/about/");
   });
 
   it("I: participation wins over a supplied counterpart, whichever locale is missing", () => {
@@ -94,7 +97,7 @@ describe("LANG: participation first", () => {
   });
 
   it("the status has an accessible name and no fake disabled link", () => {
-    const body = render({ site: "lab" });
+    const body = render({ site: "lab", isParticipating: only("en") });
     expect(body.querySelector(".rv-sr-only")?.textContent).toBe(
       "Language: English",
     );

@@ -106,7 +106,7 @@ test("isLocaleId accepts only registry ids, whatever it is given", () => {
   assert.equal(localeById("pt-BR").label, "PT");
 });
 
-test("Root, Dump and Docs participate in Portuguese; Lab remains inactive", () => {
+test("all four sites participate in English and Portuguese", () => {
   assert.deepEqual(
     Object.keys(localeParticipation).sort(),
     [...siteIds].sort(),
@@ -120,7 +120,7 @@ test("Root, Dump and Docs participate in Portuguese; Lab remains inactive", () =
     assert.equal(participates(site, "en"), true, `${site} en`);
     assert.equal(
       participates(site, "pt-BR"),
-      site !== "lab",
+      true,
       `${site} pt-BR`,
     );
   }

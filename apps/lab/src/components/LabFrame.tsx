@@ -8,10 +8,12 @@ import { textFor } from "../lib/copy";
 export function LabFrame({
   current,
   locale = DEFAULT_LOCALE,
+  counterpart,
   children,
 }: {
   current?: string;
   locale?: LocaleId;
+  counterpart?: string;
   children?: ReactNode;
 }) {
   return (
@@ -20,6 +22,7 @@ export function LabFrame({
       locale={locale}
       language={{
         search: current === (locale === "en" ? "/search/" : "/pt/search/"),
+        counterpart,
       }}
       termsHref="/terms/"
       privacyHref="/privacy/"

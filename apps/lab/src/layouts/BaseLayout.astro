@@ -77,7 +77,11 @@ const title = pageTitle
     <title>{title}</title>
   </head>
   <body>
-    <LabFrame current={current} locale={locale}>
+    <LabFrame
+      current={current}
+      locale={locale}
+      counterpart={counterparts?.[0]?.path}
+    >
       <slot />
     </LabFrame>
     <script>

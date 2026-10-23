@@ -146,13 +146,13 @@ describe("Shell", () => {
       "pt-BR",
       "pt-BR",
       "pt-BR",
-      "en",
+      "pt-BR",
     ]);
     expect(sites.map((a) => a.textContent)).toEqual([
       "raioviajante.com",
       "dump",
       "docs",
-      "lab (em inglês)",
+      "lab",
     ]);
   });
 
@@ -473,23 +473,21 @@ describe("footer cross-site destinations", () => {
     ]);
   });
 
-  it("uses the registry: active Portuguese hosts link Docs and skip Lab", () => {
-    const inactive = html(<Footer site="lab" locale="pt-BR" />);
-    expect(inactive.innerHTML).not.toMatch(/\/pt/);
-    for (const site of ["root", "dump", "docs"] as const) {
+  it("uses the registry: every Portuguese footer links all four localized homes", () => {
+    for (const site of ["root", "dump", "docs", "lab"] as const) {
       const active = html(<Footer site={site} locale="pt-BR" />);
       const links = [...active.querySelectorAll("footer nav:first-of-type a")];
       expect(links.map((link) => link.getAttribute("href"))).toEqual([
         "https://raioviajante.com/pt",
         "https://dump.raioviajante.com/pt",
         "https://docs.raioviajante.com/pt/",
-        "https://lab.raioviajante.com",
+        "https://lab.raioviajante.com/pt/",
       ]);
       expect(links.map((link) => link.getAttribute("hreflang"))).toEqual([
         "pt-BR",
         "pt-BR",
         "pt-BR",
-        "en",
+        "pt-BR",
       ]);
     }
   });
