@@ -1,21 +1,26 @@
 // Root's Portuguese (pt-BR) editorial copy. App-owned and manually authored:
 // the shared UI strings live in packages/design's catalog. Only pages that ship
-// in Portuguese appear here (Home, About, Search and the 404); the other Root
-// pages are English-only. Names, handles, the email address and tool names are
-// not translated.
+// in Portuguese appear here (Home, About, Contact, Search and the 404); the
+// other Root pages are English-only. Names, handles, the email address and tool
+// names are not translated.
 
 import type { RouteKey } from "./routes.ts";
 import { localizedPath, participates } from "../../../site/locales.ts";
-import { siteOrigins } from "../../../site/sites.ts";
+import { siteOrigins, type SiteId } from "../../../site/sites.ts";
 
 /** A localized cross-host destination needs both deployments to participate. */
-export const ptDumpHome =
-  participates("root", "pt-BR") && participates("dump", "pt-BR")
+function portugueseHome(site: Exclude<SiteId, "root">) {
+  return participates("root", "pt-BR") && participates(site, "pt-BR")
     ? {
-        href: `${siteOrigins.dump}${localizedPath("dump", "pt-BR", "/")}`,
+        href: `${siteOrigins[site]}${localizedPath(site, "pt-BR", "/")}`,
         hrefLang: "pt-BR" as const,
       }
-    : { href: siteOrigins.dump, hrefLang: "en" as const };
+    : { href: siteOrigins[site], hrefLang: "en" as const };
+}
+
+export const ptDumpHome = portugueseHome("dump");
+export const ptDocsHome = portugueseHome("docs");
+export const ptLabHome = portugueseHome("lab");
 
 export const ptPageSeo: Partial<
   Record<RouteKey, { title: string; description: string }>
@@ -30,6 +35,11 @@ export const ptPageSeo: Partial<
     description:
       "Sobre RaioViajante: curiosidade, computação e a construção independente de coisas.",
   },
+  contact: {
+    title: "contato",
+    description:
+      "Entre em contato com RaioViajante por e-mail para conversar sobre ideias, dúvidas, feedback ou colaboração.",
+  },
   search: {
     title: "Busca",
     description: "Encontre páginas, projetos e textos do RaioViajante.",
@@ -40,11 +50,13 @@ export const ptPageSeo: Partial<
 export const ptSearchDescriptions: Partial<Record<RouteKey, string>> = {
   home: "Casa pessoal e últimos textos",
   about: "Sobre RaioViajante",
+  contact: "Formas de entrar em contato",
 };
 
 export const ptNavigation = [
   { key: "home" as const, label: "início" },
   { key: "about" as const, label: "sobre" },
+  { key: "contact" as const, label: "contato" },
 ];
 
 export const ptHome = {
@@ -150,6 +162,25 @@ export const ptAbout = {
     "Gosto de música e de tocar violão, e arranjo tempo para filmes, livros e jogos. Fazem parte do meu mundo mesmo quando não têm nada a ver com software.",
 };
 
+export const ptContact = {
+  label: "contato",
+  title: "Vamos conversar",
+  line: "Ideias, dúvidas, feedback ou só um oi.",
+  primaryTitle: "Contato principal",
+  primary:
+    "Esta é a melhor forma de falar comigo sobre código aberto, algo que poderíamos construir juntos ou uma dúvida sobre o que fiz, escrevi ou documentei. Correções, feedback e um simples oi também são bem-vindos.",
+  messageTitle: "Uma boa primeira mensagem",
+  messageItems: [
+    "O que você tem em mente",
+    "Um link relevante para um projeto, texto ou documentação, se houver",
+    "Que tipo de conversa ou colaboração você procura",
+    "Qualquer prazo importante",
+  ],
+  firstStepTitle: "Um primeiro passo simples",
+  firstStep:
+    "Algumas linhas de contexto bastam para começar. Não precisa preparar um briefing formal.",
+};
+
 export const ptNotFound = {
   metadata: {
     title: "404 — não encontrada",
@@ -165,15 +196,19 @@ export const ptNotFound = {
     },
     {
       label: "docs",
-      value: "documentação (em inglês)",
-      href: "https://docs.raioviajante.com",
-      hrefLang: "en",
+      value:
+        ptDocsHome.hrefLang === "pt-BR"
+          ? "documentação"
+          : "documentação (em inglês)",
+      ...ptDocsHome,
     },
     {
       label: "lab",
-      value: "experimentos (em inglês)",
-      href: "https://lab.raioviajante.com",
-      hrefLang: "en",
+      value:
+        ptLabHome.hrefLang === "pt-BR"
+          ? "experimentos"
+          : "experimentos (em inglês)",
+      ...ptLabHome,
     },
   ],
 };

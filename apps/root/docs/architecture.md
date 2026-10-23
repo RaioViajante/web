@@ -23,13 +23,13 @@ This is a read-only integration; publishing still happens in dump.
 
 ## Portuguese tree (pt-BR)
 
-Root publishes a partial Portuguese tree while its Portuguese participation in
-`site/` stays `false`, so nothing links to it from elsewhere and `LANG` stays a
-noninteractive status. See [docs/i18n.md](../../../docs/i18n.md).
+Root publishes a partial Portuguese tree and participates in Portuguese through
+`site/`, after its public locale contract was verified in production. See
+[docs/i18n.md](../../../docs/i18n.md).
 
 - **Route registry.** `lib/routes.ts` declares which pages exist in which
-  locale (Home, About and Search in Portuguese at `/pt`, `/pt/about`,
-  `/pt/search`; every other page English-only). Navigation, metadata,
+  locale (Home, About, Contact and Search in Portuguese at `/pt`, `/pt/about`,
+  `/pt/contact`, `/pt/search`; every other page English-only). Navigation, metadata,
   counterparts (`hreflang`), the sitemap, social cards and the search index all
   derive from it. `tests/routes.test.mjs` (`pnpm --filter @raioviajante/root
 test`, Node's built-in runner) checks that every declared path is a built page
@@ -45,8 +45,8 @@ test`, Node's built-in runner) checks that every declared path is a built page
   correctly-languaged HTML. Do not call `notFound()` from a Root page: in
   Next.js 16 it produces a generic error document without `lang`.
 - **Search.** `/pt/search-index.json` is static and lists only the published
-  Portuguese pages (`locale: "pt-BR"`). Until Root participates, the shared
-  search page shows its "no results yet" state and does not read it.
+  Portuguese pages (`locale: "pt-BR"`). The shared Portuguese search page reads
+  it because Root participates in the locale.
 - **Latest writing.** English is unchanged. Portuguese reads Dump's
   `/pt/rss.xml` only once Dump participates in Portuguese; before then it says
   so in Portuguese and links the English Dump, labelled. It never shows English

@@ -60,10 +60,22 @@ test("Root offers no invented translations and links only active Portuguese host
     "href",
     "/pt",
   );
+  await page.goto(`${base("root")}/pt/contact`);
+  await expectLang(page, "pt-BR");
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/contact");
+  await expect(
+    page.getByRole("heading", { name: "Vamos conversar" }),
+  ).toBeVisible();
   await page.goto(`${base("root")}/pt/about`);
   await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/about");
   await expect(
     page.locator('main a[href="https://dump.raioviajante.com/pt"]'),
+  ).toHaveAttribute("hreflang", "pt-BR");
+  await expect(
+    page.locator('main a[href="https://docs.raioviajante.com/pt/"]'),
+  ).toHaveAttribute("hreflang", "pt-BR");
+  await expect(
+    page.locator('main a[href="https://lab.raioviajante.com/pt/"]'),
   ).toHaveAttribute("hreflang", "pt-BR");
   const footer = page.locator("footer nav:first-of-type a");
   await expect(footer.nth(0)).toHaveAttribute(
@@ -84,5 +96,11 @@ test("Root offers no invented translations and links only active Portuguese host
   await expectLang(page, "pt-BR");
   await expect(
     page.locator('main a[href="https://dump.raioviajante.com/pt"]'),
+  ).toHaveAttribute("hreflang", "pt-BR");
+  await expect(
+    page.locator('main a[href="https://docs.raioviajante.com/pt/"]'),
+  ).toHaveAttribute("hreflang", "pt-BR");
+  await expect(
+    page.locator('main a[href="https://lab.raioviajante.com/pt/"]'),
   ).toHaveAttribute("hreflang", "pt-BR");
 });
