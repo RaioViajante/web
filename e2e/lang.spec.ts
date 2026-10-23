@@ -7,9 +7,9 @@ import {
 } from "./lang-fixtures";
 import { base, isolate, searchPath, sites, viewports } from "./support";
 
-// Docs and Lab show a status; Root and Dump offer their real counterparts.
+// Lab shows a status; Root, Dump and Docs offer their real counterparts.
 
-for (const site of sites.filter((site) => site === "docs" || site === "lab"))
+for (const site of sites.filter((site) => site === "lab"))
   test(`${site}: LANG is a noninteractive "LANG EN" status and the utility row fits a phone`, async ({
     page,
   }) => {
@@ -29,7 +29,7 @@ for (const site of sites.filter((site) => site === "docs" || site === "lab"))
     expect(await overflows(page)).toBe(false);
   });
 
-for (const site of ["root", "dump"] as const)
+for (const site of ["root", "dump", "docs"] as const)
   test(`${site} home LANG links its real counterpart at phone width`, async ({
     page,
   }) => {
@@ -39,7 +39,8 @@ for (const site of ["root", "dump"] as const)
     const lang = page.locator(".rv-sound .rv-lang");
     await expect(lang).toHaveAttribute("data-lang-state", "link");
     const link = lang.getByRole("link", { name: "Português (Brasil)" });
-    await expect(link).toHaveAttribute("href", "/pt");
+    const destination = site === "docs" ? "/pt/" : "/pt";
+    await expect(link).toHaveAttribute("href", destination);
     await expect(link).toHaveAttribute("hreflang", "pt-BR");
     expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     expect(await overflows(page)).toBe(false);
@@ -49,7 +50,7 @@ for (const site of ["root", "dump"] as const)
     );
     await axeClean(page);
     await link.press("Enter");
-    await expect(page).toHaveURL(base(site) + "/pt");
+    await expect(page).toHaveURL(base(site) + destination);
     await expect(page.locator(".rv-lang a[href='/']")).toHaveCount(1);
   });
 

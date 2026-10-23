@@ -20,13 +20,11 @@ const state = (body: HTMLElement) =>
   body.querySelector<HTMLElement>("[data-lang-state]")!.dataset.langState;
 
 describe("LANG: participation first", () => {
-  it("A: an English page before Portuguese activation is a status, not a link", () => {
-    for (const site of ["docs", "lab"] as const) {
-      const body = render({ site }); // real registry: pt-BR is not participating
-      expect(state(body)).toBe("status");
-      expect(body.textContent).toContain("LANG EN");
-      expect(body.querySelector("a, details, button, summary")).toBeNull();
-    }
+  it("A: Lab stays a status before Portuguese activation", () => {
+    const body = render({ site: "lab" });
+    expect(state(body)).toBe("status");
+    expect(body.textContent).toContain("LANG EN");
+    expect(body.querySelector("a, details, button, summary")).toBeNull();
   });
 
   it("Dump offers only its declared Portuguese counterpart with the real registry", () => {
@@ -51,9 +49,20 @@ describe("LANG: participation first", () => {
     );
   });
 
-  it("B: a directly visited pre-activation Portuguese page is LANG PT, noninteractive", () => {
+  it("Docs links only a supplied counterpart with the real registry", () => {
+    const home = render({ site: "docs", counterpart: "/pt/" });
+    expect(state(home)).toBe("link");
+    expect(home.querySelector("a")?.getAttribute("href")).toBe("/pt/");
+    const missing = render({ site: "docs" });
+    expect(state(missing)).toBe("disclosure");
+    expect(missing.querySelector("details a")?.getAttribute("href")).toBe(
+      "/pt/",
+    );
+  });
+
+  it("B: a directly visited pre-activation Lab Portuguese page is LANG PT, noninteractive", () => {
     const body = render({
-      site: "docs",
+      site: "lab",
       locale: "pt-BR",
       counterpart: "/about/",
     });
@@ -85,7 +94,7 @@ describe("LANG: participation first", () => {
   });
 
   it("the status has an accessible name and no fake disabled link", () => {
-    const body = render({});
+    const body = render({ site: "lab" });
     expect(body.querySelector(".rv-sr-only")?.textContent).toBe(
       "Language: English",
     );

@@ -74,7 +74,7 @@ test("Root offers no invented translations and links only active Portuguese host
     "href",
     "https://dump.raioviajante.com/pt",
   );
-  await expect(footer.nth(2)).toHaveAttribute("hreflang", "en");
+  await expect(footer.nth(2)).toHaveAttribute("hreflang", "pt-BR");
   await expect(footer.nth(3)).toHaveAttribute("hreflang", "en");
   await page.goto(`${base("root")}/pt/does-not-exist`);
   await expectLang(page, "pt-BR");
