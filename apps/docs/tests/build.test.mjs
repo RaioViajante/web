@@ -39,6 +39,7 @@ test("a cold-cache production build keeps semantic headings in the search index"
 	assert.ok(!ptEntries.some(({ href }) => href.includes("/cli/")));
 	const en = readFileSync(join(outDir, "projects/sweep/index.html"), "utf8");
 	const enHome = readFileSync(join(outDir, "index.html"), "utf8");
+	const untranslated = readFileSync(join(outDir, "projects/sweep/cli/index.html"), "utf8");
 	const pt = readFileSync(join(outDir, "pt/projetos/sweep/index.html"), "utf8");
 	const home = readFileSync(join(outDir, "pt/index.html"), "utf8");
 	const missing = readFileSync(join(outDir, "404.html"), "utf8");
@@ -55,9 +56,14 @@ test("a cold-cache production build keeps semantic headings in the search index"
 	assert.doesNotMatch(pt, /<a[^>]*href="\/pt\/projects\/sweep\/cli\/"/);
 	assert.match(home, /href="\/pt\/projetos\/sweep\/"/);
 	assert.doesNotMatch(home, /href="\/projects\/sweep\/cli\/"/);
-	assert.match(home, /data-lang-state="status"/);
+	assert.match(home, /data-lang-state="link"/);
 	assert.match(home, /LANG<!-- --> <span lang="pt-BR">PT<\/span>/);
-	assert.doesNotMatch(home, /href="\/"[^>]*>Português/);
+	assert.match(home, /<a href="\/" lang="en" hrefLang="en"[^>]*>English<\/a>/);
+	assert.match(enHome, /<a href="\/pt\/" lang="pt-BR" hrefLang="pt-BR"[^>]*>Português \(Brasil\)<\/a>/);
+	assert.match(en, /<a href="\/pt\/projetos\/sweep\/" lang="pt-BR"/);
+	assert.match(untranslated, /data-lang-state="disclosure"/);
+	assert.match(untranslated, /href="\/pt\/" hrefLang="pt-BR"/);
+	assert.doesNotMatch(untranslated, /href="\/pt\/projects\/sweep\/cli\/"|hreflang="pt-BR"/);
 	assert.match(missing, /<html lang="en">/);
 	assert.match(missing, /name="robots" content="noindex, follow"/);
 	assert.doesNotMatch(missing, /rel="canonical"|rel="alternate"/);

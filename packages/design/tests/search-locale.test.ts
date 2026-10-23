@@ -132,7 +132,10 @@ describe("searchLocaleHref", () => {
 
   it("advertises nothing unless the host participates in both locales", () => {
     expect(searchLocaleHref("root", "en", "pt-BR", "q")).toBe("/pt/search?q=q");
-    expect(searchLocaleHref("docs", "en", "pt-BR", "q")).toBeUndefined();
+    expect(searchLocaleHref("docs", "en", "pt-BR", "q")).toBe(
+      "/pt/search/?q=q",
+    );
+    expect(searchLocaleHref("lab", "en", "pt-BR", "q")).toBeUndefined();
     expect(
       searchLocaleHref("root", "en", "pt-BR", "q", (_s, l) => l === "en"),
     ).toBeUndefined();

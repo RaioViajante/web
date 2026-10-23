@@ -167,7 +167,7 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   );
 });
 
-test("Dump searches its local Portuguese index and federates Root but not inactive hosts", async ({
+test("Dump searches its local Portuguese index and federates Root and Docs but not Lab", async ({
   page,
 }) => {
   const external: string[] = [];
@@ -175,7 +175,11 @@ test("Dump searches its local Portuguese index and federates Root but not inacti
   const rootIndex = await (
     await fetch(`${base("root")}/pt/search-index.json`)
   ).text();
+  const docsIndex = await (
+    await fetch(`${base("docs")}/pt/search-index.json`)
+  ).text();
   let rootRequests = 0;
+  let docsRequests = 0;
   await page.route(
     (url) =>
       url.pathname === "/pt/search-index.json" &&
@@ -188,6 +192,21 @@ test("Dump searches its local Portuguese index and federates Root but not inacti
         contentType: "application/json",
         headers: { "access-control-allow-origin": "*" },
         body: rootIndex,
+      });
+    },
+  );
+  await page.route(
+    (url) =>
+      url.pathname === "/pt/search-index.json" &&
+      (url.origin === "https://docs.raioviajante.com" ||
+        url.origin === base("docs")),
+    (route) => {
+      docsRequests++;
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        headers: { "access-control-allow-origin": "*" },
+        body: docsIndex,
       });
     },
   );
@@ -260,6 +279,7 @@ test("Dump searches its local Portuguese index and federates Root but not inacti
   await page.locator('[data-search-scope="everywhere"]').click();
   await expect(search).toHaveAttribute("data-search-state", "ready");
   expect(rootRequests).toBe(1);
+  expect(docsRequests).toBe(1);
   expect(external).toEqual([]);
 
   await input.fill("Traduzir");

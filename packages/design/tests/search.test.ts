@@ -122,14 +122,9 @@ describe("loadEverywhere", () => {
     expect(loaded.entries).toEqual(own);
   });
 
-  it("uses registry participation by default: English fetches all, Portuguese Root and Dump", async () => {
+  it("uses registry participation by default: English fetches all, Portuguese skips Lab", async () => {
     const read = vi.fn(async (site: SiteId) => [
-      entry(
-        site,
-        "x",
-        undefined,
-        site === "root" || site === "dump" ? "pt-BR" : "en",
-      ),
+      entry(site, "x", undefined, site === "lab" ? "en" : "pt-BR"),
     ]);
     const en = await loadEverywhere("docs", "en", [], read);
     expect(read).toHaveBeenCalledTimes(3);
@@ -160,6 +155,25 @@ describe("loadEverywhere", () => {
     );
     expect(read).not.toHaveBeenCalled();
     expect(result.skipped).toEqual(["root", "docs", "lab"]);
+  });
+
+  it("stops advertising Docs before its published routes are withdrawn on rollback", async () => {
+    const read = vi.fn(async (site: SiteId) => [
+      entry(site, "x", undefined, "pt-BR"),
+    ]);
+    const active = await loadEverywhere("root", "pt-BR", [], read);
+    expect(read.mock.calls.map(([site]) => site)).toEqual(["dump", "docs"]);
+    expect(active.skipped).toEqual(["lab"]);
+    read.mockClear();
+    const rolledBack = await loadEverywhere(
+      "root",
+      "pt-BR",
+      [],
+      read,
+      (site, locale) => locale === "en" || site === "root" || site === "dump",
+    );
+    expect(read.mock.calls.map(([site]) => site)).toEqual(["dump"]);
+    expect(rolledBack.skipped).toEqual(["docs", "lab"]);
   });
 
   it("fetches only the sites that participate in a partially active locale", async () => {
@@ -272,23 +286,23 @@ describe("current and federated index loading", () => {
     expect(read).toHaveBeenCalledTimes(4);
   });
 
-  it("reads Root and Dump but never reads inactive Portuguese hosts during federation", async () => {
+  it("reads Root, Dump and Docs but never inactive Lab during federation", async () => {
     const read = vi.fn(async (site: SiteId) => [
       entry(site, "x", undefined, "pt-BR"),
     ]);
-    for (const site of ["docs", "lab"] as const)
-      expect(await loadFederatedSiteIndex(site, "pt-BR", read)).toEqual({
-        state: "skipped",
-      });
+    expect(await loadFederatedSiteIndex("lab", "pt-BR", read)).toEqual({
+      state: "skipped",
+    });
     expect(read).not.toHaveBeenCalled();
-    for (const site of ["root", "dump"] as const)
+    for (const site of ["root", "dump", "docs"] as const)
       expect(await loadFederatedSiteIndex(site, "pt-BR", read)).toEqual({
         state: "ready",
         entries: [entry(site, "x", undefined, "pt-BR")],
       });
-    expect(read).toHaveBeenCalledTimes(2);
+    expect(read).toHaveBeenCalledTimes(3);
     expect(read).toHaveBeenCalledWith("root");
     expect(read).toHaveBeenCalledWith("dump");
+    expect(read).toHaveBeenCalledWith("docs");
   });
 
   it("is ready with entries, ready with a valid empty index, unavailable on failure or invalid data", async () => {

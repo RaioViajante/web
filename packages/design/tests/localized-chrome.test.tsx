@@ -77,7 +77,7 @@ describe("Shell", () => {
     ).toContain("Terms of Use");
     expect(
       body.querySelector("[data-lang-state]")?.getAttribute("data-lang-state"),
-    ).toBe("status");
+    ).toBe("disclosure");
   });
 
   it("renders shared Portuguese chrome around app-owned items, with no English fallback", () => {
@@ -142,12 +142,16 @@ describe("Shell", () => {
         "footer nav[aria-label='Sites do RaioViajante'] a",
       ),
     ];
-    // pt-BR does not participate: every cross-site link is English, and says so.
-    expect(sites.every((a) => a.getAttribute("hreflang") === "en")).toBe(true);
+    expect(sites.map((a) => a.getAttribute("hreflang"))).toEqual([
+      "pt-BR",
+      "pt-BR",
+      "pt-BR",
+      "en",
+    ]);
     expect(sites.map((a) => a.textContent)).toEqual([
-      "raioviajante.com (em inglês)",
-      "dump (em inglês)",
-      "docs (em inglês)",
+      "raioviajante.com",
+      "dump",
+      "docs",
       "lab (em inglês)",
     ]);
   });
@@ -469,22 +473,22 @@ describe("footer cross-site destinations", () => {
     ]);
   });
 
-  it("uses the registry: Root and Dump link each other in Portuguese and skip inactive hosts", () => {
-    const inactive = html(<Footer site="docs" locale="pt-BR" />);
+  it("uses the registry: active Portuguese hosts link Docs and skip Lab", () => {
+    const inactive = html(<Footer site="lab" locale="pt-BR" />);
     expect(inactive.innerHTML).not.toMatch(/\/pt/);
-    for (const site of ["root", "dump"] as const) {
+    for (const site of ["root", "dump", "docs"] as const) {
       const active = html(<Footer site={site} locale="pt-BR" />);
       const links = [...active.querySelectorAll("footer nav:first-of-type a")];
       expect(links.map((link) => link.getAttribute("href"))).toEqual([
         "https://raioviajante.com/pt",
         "https://dump.raioviajante.com/pt",
-        "https://docs.raioviajante.com",
+        "https://docs.raioviajante.com/pt/",
         "https://lab.raioviajante.com",
       ]);
       expect(links.map((link) => link.getAttribute("hreflang"))).toEqual([
         "pt-BR",
         "pt-BR",
-        "en",
+        "pt-BR",
         "en",
       ]);
     }
