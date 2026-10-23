@@ -38,8 +38,9 @@ pages are English-only; no Portuguese route is generated for them. A Portuguese
 document must have its own declared path and authored body, not an English
 fallback. A work with no public original retains a nonpublic provenance record
 before its original is withdrawn. `src/lib/identity.ts` validates routes and
-identities at build time; Portuguese participation in `site/` remains off until
-production verification and the separate activation change.
+identities at build time. Portuguese participation in `site/` is on, after
+production verification of the Portuguese endpoints. Coverage stays partial:
+only the Sweep guide is translated.
 
 ## Potential future information architecture
 
