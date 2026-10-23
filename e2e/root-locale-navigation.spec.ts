@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { base, isolate } from "./support";
 
 const expectLang = async (page: Page, lang: string) =>
-  expect(await page.evaluate(() => document.documentElement.lang)).toBe(lang);
+  expect(page.locator("html")).toHaveAttribute("lang", lang);
 
 test("Root keeps document language correct across locale history and English legal links", async ({
   page,
