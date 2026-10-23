@@ -25,6 +25,9 @@ minimumReleaseAgeExclude:
 #   byte for byte before and after and are identical. @vercel/og 1.0.3 drops
 #   sharp but does not load in Astro's prerender ("Dynamic require of fs"), so
 #   it is not used.
+# - zod: chromium-bidi accepts either ^3.25.0 or ^4.0.0, but the lockfile kept
+#   vulnerable 3.25.76. 4.6.7 fixes GHSA-mrhx-c7xc-m3w5.
 overrides:
   "fflate@0.7.3": "0.7.5"
   "sharp@0.34.5": "0.35.5"
+  "zod@^3.25.0 || ^4.0.0": "4.6.7"
