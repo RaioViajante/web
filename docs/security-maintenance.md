@@ -20,16 +20,24 @@ wrong production/development class; and an expired exception. Missing audit data
 fails too. The rules are pure code with fixture tests
 (`security/audit-policy.test.mjs`).
 
-### Temporary exceptions (decided 2026-10-07, expire 2026-12-06)
+### Temporary exceptions
 
-| Package            | Advisory            | Severity | Class                 | Why accepted                                                                                                                                                                                            |
-| ------------------ | ------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `braces` 3.0.3     | GHSA-vfj7-8cjw-p6xm | high     | development only      | Reached only through ESLint's glob matching (`eslint-config-next`, `eslint-plugin-astro`); no fixed release exists. Must never appear in a production path.                                             |
+There are currently no dependency-audit exceptions.
 
-This is not a permanent waiver. It expires 60 days after the decision.
-When the date passes, the gate fails and a person must review: fix or upgrade
-the dependency, or renew deliberately by editing the date in the JSON (never more
-than 60 days after a new decision date). Nothing extends it automatically.
+Any future exception is not a permanent waiver. It must expire no more than 60
+days after its decision. When the date passes, the gate fails and a person must
+review: fix or upgrade the dependency, or renew deliberately by editing the
+decision and expiry in the JSON. Nothing extends an exception automatically.
+
+The former `braces` exception (GHSA-vfj7-8cjw-p6xm) was removed after GitHub
+[withdrew the advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) on
+2026-10-23 because it was not practically exploitable. It is no longer reported
+by the full or production pnpm audit. The lockfile still includes `braces` 3.0.3
+only through development ESLint tooling (`eslint-config-next` and
+`eslint-plugin-astro`); `pnpm audit --prod` and `pnpm --prod why braces` report
+no production path. Version 3.0.3 remains the latest release, so there is no
+patched dependency update to make. The gate still fails on any new advisory,
+including a future one for this package.
 
 The former `sprintf-js` exception (GHSA-hp3w-g68c-fv3c) was removed after
 GitHub [withdrew the advisory](https://github.com/advisories/GHSA-hp3w-g68c-fv3c)
