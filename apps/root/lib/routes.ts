@@ -26,7 +26,7 @@ export type RoutePaths = Partial<Record<LocaleId, string>>;
 export const routes: Record<RouteKey, RoutePaths> = {
   home: { en: "/", "pt-BR": "/pt" },
   about: { en: "/about", "pt-BR": "/pt/about" },
-  projects: { en: "/projects" },
+  projects: { en: "/projects", "pt-BR": "/pt/projects" },
   contact: { en: "/contact", "pt-BR": "/pt/contact" },
   gallery: { en: "/gallery" },
   "this-site": { en: "/this-site" },
