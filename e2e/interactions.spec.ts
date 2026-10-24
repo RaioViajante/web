@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { readFileSync } from "node:fs";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import {
   base,
   inventory,
@@ -31,17 +31,23 @@ async function open(
   return health;
 }
 
-/** Tab until `selector` is focused, at most `max` presses; false if never. */
-async function tabTo(page: Page, selector: string, max = 40) {
+/**
+ * Tab until the target is focused, at most `max` presses; false if never. The
+ * target is a CSS selector or a Locator (which may match several elements).
+ */
+async function tabTo(page: Page, target: string | Locator, max = 40) {
   for (let i = 0; i < max; i++) {
     await page.keyboard.press("Tab");
-    if (
-      await page.evaluate(
-        (s) => document.activeElement?.matches(s) ?? false,
-        selector,
-      )
-    )
-      return true;
+    const focused =
+      typeof target === "string"
+        ? await page.evaluate(
+            (s) => document.activeElement?.matches(s) ?? false,
+            target,
+          )
+        : await target.evaluateAll((els) =>
+            els.includes(document.activeElement as Element),
+          );
+    if (focused) return true;
   }
   return false;
 }
@@ -104,12 +110,19 @@ for (const [size, viewport] of Object.entries(viewports))
       }) => {
         const health = await open(page, site, "/");
         await page.keyboard.press("Tab");
-        await expect(page.locator(".rv-skip")).toBeFocused();
+        await expect(
+          page.getByRole("link", { name: "Skip to content" }),
+        ).toBeFocused();
         await expectFocusRing(page, `${site} skip link`);
         // A nav link to another page is reachable, and Enter follows it.
-        expect(await tabTo(page, "nav.rv-nav a:not([aria-current])")).toBe(
-          true,
-        );
+        expect(
+          await tabTo(
+            page,
+            page
+              .getByRole("navigation", { name: "pages" })
+              .locator("a:not([aria-current])"),
+          ),
+        ).toBe(true);
         await expectFocusRing(page, `${site} nav link`);
         const target = await page.evaluate(
           () =>
@@ -269,9 +282,7 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
         innerHeight + 300,
     );
     test.skip(!far, "first article's comments are near the viewport");
-    await expect(page.locator(".comments [role=status]")).toHaveText(
-      /when you scroll/,
-    );
+    await expect(page.getByRole("status")).toHaveText(/when you scroll/);
     await expect(page.locator(SCRIPT)).toHaveCount(0);
     expect(external).toEqual([]);
     const axe = await new AxeBuilder({ page }).analyze();
@@ -291,12 +302,12 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
     await expect(button).toBeVisible();
     expect(await button.evaluate((el) => el.tagName)).toBe("BUTTON");
     await expect(page.locator(SCRIPT)).toHaveCount(0);
-    expect(await tabTo(page, ".comments button", 60)).toBe(true);
+    expect(await tabTo(page, button, 60)).toBe(true);
     await expectFocusRing(page, "Load comments");
     await page.keyboard.press("Enter");
     // The script loads once; the stub finishes it and the status goes away.
     await expect(page.locator(SCRIPT)).toHaveCount(1);
-    await expect(page.locator(".comments [role=status]")).toHaveCount(0);
+    await expect(page.getByRole("status")).toHaveCount(0);
     expect(health, health.join("\n")).toEqual([]);
   });
 
@@ -321,19 +332,19 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
           }),
     );
     await page.getByRole("button", { name: "Load comments" }).click();
-    await expect(page.locator(".comments [role=status]")).toHaveText(
+    await expect(page.getByRole("status")).toHaveText(
       "Comments could not be loaded.",
     );
     const retry = page.getByRole("button", { name: "Try again" });
     expect(await retry.evaluate((el) => el.tagName)).toBe("BUTTON");
     // Focus stays on the status text (set by the click) and the retry is the next stop.
-    await expect(page.locator(".comments [role=status]")).toBeFocused();
+    await expect(page.getByRole("status")).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(retry).toBeFocused();
     await expectFocusRing(page, "Try again");
     await page.keyboard.press("Enter");
     await expect(page.locator(SCRIPT)).toHaveCount(1);
-    await expect(page.locator(".comments [role=status]")).toHaveCount(0);
+    await expect(page.getByRole("status")).toHaveCount(0);
     expect(requests).toBe(2);
     // The aborted request is the only expected console noise.
     expect(
@@ -358,6 +369,8 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
 // "On this page" is a native disclosure on small screens so a long page opens
 // on its title, not on its table of contents; wide screens keep the list open.
 const tocNav = 'nav[aria-label="on this page"]';
+const tocLabel = (page: Page) =>
+  page.getByRole("navigation", { name: "on this page" });
 
 /** The sitemap page with the longest "on this page" list, read from the HTML. */
 async function longestToc(site: Site) {
@@ -469,7 +482,9 @@ test.describe("on this page (desktop)", () => {
       const { path, links: count } = await longestToc(site);
       const health = await open(page, site, path);
       await expect(page.locator(`${tocNav} summary`)).toBeHidden();
-      await expect(page.locator(`${tocNav} .rv-label`).first()).toBeVisible();
+      await expect(
+        tocLabel(page).getByText("ON THIS PAGE", { exact: true }),
+      ).toBeVisible();
       const links = page.locator(`${tocNav} a`);
       await expect(links).toHaveCount(count);
       for (const link of await links.all()) await expect(link).toBeVisible();
