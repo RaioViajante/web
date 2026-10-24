@@ -35,6 +35,7 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
           >
             {["all", "active", "done"].map((filter) => (
               <ToggleButton
+                data-testid={`filter-${filter}`}
                 key={filter}
                 pressed={filter === "all"}
                 data-filter={filter}
@@ -46,6 +47,7 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
         }
       >
         <div
+          data-testid="experiment-list"
           data-experiment-list
           data-count-copy={JSON.stringify({
             one: text.count(1),
@@ -53,7 +55,12 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
           })}
         >
           {experiments.map((e) => (
-            <article key={e.id} className="lab-entry" data-status={e.status}>
+            <article
+              data-testid="lab-entry"
+              key={e.id}
+              className="lab-entry"
+              data-status={e.status}
+            >
               <LeaderRow
                 href={experimentPath(e)}
                 label={
@@ -73,6 +80,7 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
           ))}
         </div>
         <p
+          data-testid="filter-result"
           className="rv-sr-only"
           role="status"
           aria-live="polite"

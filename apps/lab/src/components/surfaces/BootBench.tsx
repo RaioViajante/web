@@ -16,11 +16,12 @@ export function BootBench({
   output: BlockModel;
 }) {
   return (
-    <div data-boot>
+    <div data-testid="boot" data-boot>
       <LabBench
         caption="src/main.asm · e966889"
         where={
           <span
+            data-testid="progress"
             role="status"
             aria-live="polite"
             aria-atomic="true"
@@ -34,6 +35,7 @@ export function BootBench({
           <nav className="boot-select" aria-label="Source section">
             {sections.map((section, index) => (
               <ToggleButton
+                data-testid="boot-section"
                 key={section.title}
                 pressed={index === 0}
                 data-sound="success"
@@ -47,6 +49,7 @@ export function BootBench({
           <div className="boot-content">
             {sections.map((section, index) => (
               <div
+                data-testid="panel"
                 className="boot-panel"
                 data-panel={index}
                 hidden={index !== 0}
@@ -58,10 +61,12 @@ export function BootBench({
             ))}
             <BenchBand>
               <div className="boot-pager">
-                <ActionButton state="rejected" data-prev>
+                <ActionButton data-testid="prev" state="rejected" data-prev>
                   ← previous
                 </ActionButton>
-                <ActionButton data-next>next →</ActionButton>
+                <ActionButton data-testid="boot-next" data-next>
+                  next →
+                </ActionButton>
               </div>
             </BenchBand>
           </div>
@@ -78,6 +83,7 @@ export function BootBench({
       </p>
       <p>
         <a
+          data-testid="content-link"
           href="https://github.com/RaioViajante/x86-os-experiment/blob/e966889b56e613d92887338a1bc979674674a115/src/main.asm"
           data-sound="nav"
         >

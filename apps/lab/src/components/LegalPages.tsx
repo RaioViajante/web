@@ -19,7 +19,12 @@ export function TermsPage() {
               <p>
                 lab.raioviajante.com is run by RaioViajante, CNPJ
                 53.021.377/0001-93, as part of raioviajante.com. Questions go to{" "}
-                <a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a>
+                <a
+                  data-testid="content-link"
+                  href="mailto:mail@raioviajante.com"
+                >
+                  mail@raioviajante.com
+                </a>
                 .
               </p>
             ),
@@ -121,7 +126,12 @@ export function PrivacyPage() {
             body: (
               <p>
                 Questions about data on this site can be sent to{" "}
-                <a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a>
+                <a
+                  data-testid="content-link"
+                  href="mailto:mail@raioviajante.com"
+                >
+                  mail@raioviajante.com
+                </a>
                 .
               </p>
             ),
