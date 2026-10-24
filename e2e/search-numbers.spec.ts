@@ -12,15 +12,13 @@ for (const { site, query, title, number } of [
     await page.goto(
       base(site) + searchPath[site] + "?q=" + encodeURIComponent(query),
     );
-    const result = page
-      .locator("[data-search-result]")
-      .filter({ hasText: title });
+    const result = page.getByTestId("search-result").filter({ hasText: title });
     await expect(result).toHaveCount(1);
-    await expect(result.locator(".rv-result__number")).toHaveText(number);
-    const input = page.locator("[data-search-input]");
+    await expect(result.getByTestId("search-result-number")).toHaveText(number);
+    const input = page.getByTestId("search-input");
     await input.fill("no matching result");
-    await expect(page.locator("[data-search-result]")).toHaveCount(0);
+    await expect(page.getByTestId("search-result")).toHaveCount(0);
     await input.fill(query);
-    await expect(result.locator(".rv-result__number")).toHaveText(number);
+    await expect(result.getByTestId("search-result-number")).toHaveText(number);
   });
 }

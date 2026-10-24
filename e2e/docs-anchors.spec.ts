@@ -37,12 +37,14 @@ test.describe("docs anchors and search titles", () => {
     await isolate(page, []);
     await page.goto(base("docs") + page_);
     const headings = await page
-      .locator(".prose h2, .prose h3")
+      .locator('[data-testid="prose"] h2, [data-testid="prose"] h3')
       .evaluateAll((nodes) =>
         nodes.map((node) => ({
           id: node.id,
           tag: node.tagName,
-          number: node.querySelector(".rv-num")?.textContent ?? "",
+          number:
+            node.querySelector('[data-testid="heading-number"]')?.textContent ??
+            "",
           title: (node.lastElementChild ?? node).textContent ?? "",
         })),
       );
@@ -68,7 +70,7 @@ test.describe("docs anchors and search titles", () => {
   }) => {
     await isolate(page, []);
     await page.goto(base("docs") + page_);
-    const links = page.locator('nav[aria-label="on this page"] a');
+    const links = page.locator('[data-testid="navigation-toc"] a');
     const entries = await links.evaluateAll((nodes) =>
       nodes.map((node) => ({
         href: node.getAttribute("href") ?? "",
@@ -76,7 +78,7 @@ test.describe("docs anchors and search titles", () => {
       })),
     );
     const ids = await page
-      .locator(".prose h2")
+      .locator('[data-testid="prose"] h2')
       .evaluateAll((nodes) => nodes.map((node) => node.id));
     expect(entries.map((entry) => entry.href)).toEqual(
       ids.map((id) => `#${id}`),
@@ -133,7 +135,7 @@ test.describe("docs anchors and search titles", () => {
   }) => {
     await isolate(page, []);
     await page.goto(base("docs") + "/search/?q=classification");
-    const results = page.locator("[data-search-result]");
+    const results = page.getByTestId("search-result");
     await expect(results.first()).toBeVisible();
     // The page matches through its body; the section matches by its title.
     const section = results.filter({ hasText: "Classification" });
@@ -143,7 +145,7 @@ test.describe("docs anchors and search titles", () => {
       /\/projects\/sweep\/#classification$/,
     );
     await expect(section).not.toContainText(/01\.\d/);
-    await expect(section.locator(".rv-result__number")).toHaveText("02.");
+    await expect(section.getByTestId("search-result-number")).toHaveText("02.");
     await page.goto(base("docs") + "/search/?q=sweep%20classification");
     await expect(section).toHaveCount(1);
     await expect(section).toHaveAttribute(

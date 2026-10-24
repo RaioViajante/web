@@ -104,12 +104,15 @@ for (const [size, viewport] of Object.entries(viewports))
       }) => {
         const health = await open(page, site, "/");
         await page.keyboard.press("Tab");
-        await expect(page.locator(".rv-skip")).toBeFocused();
+        await expect(page.getByTestId("skip-link")).toBeFocused();
         await expectFocusRing(page, `${site} skip link`);
         // A nav link to another page is reachable, and Enter follows it.
-        expect(await tabTo(page, "nav.rv-nav a:not([aria-current])")).toBe(
-          true,
-        );
+        expect(
+          await tabTo(
+            page,
+            ':is([data-testid="navigation-pages"], [data-testid="navigation-toc"], [data-testid="navigation-experiments"]) :is([data-testid="navigation-link"], [data-testid="search-nav-link"]):not([aria-current])',
+          ),
+        ).toBe(true);
         await expectFocusRing(page, `${site} nav link`);
         const target = await page.evaluate(
           () =>
@@ -133,7 +136,7 @@ test.describe("search", () => {
       page,
     }) => {
       const health = await open(page, site, searchPath[site]);
-      const input = page.locator("[data-search-input]");
+      const input = page.getByTestId("search-input");
       await expect(input).toBeVisible();
       // The page focuses the input itself; it also has a name and is reachable.
       await expect(input).toBeFocused();
@@ -145,27 +148,28 @@ test.describe("search", () => {
       expect(name?.trim(), "search input has an accessible name").toBeTruthy();
 
       await input.fill("sweep");
-      const results = page.locator("[data-search-result]");
+      const results = page.getByTestId("search-result");
       await expect(results.first()).toBeVisible();
       const first = await results.first().getAttribute("href");
       await page.keyboard.press("ArrowDown");
       // Moving the selection moves aria-current.
       await expect(
-        page.locator("[data-search-result][aria-current=true]"),
+        page.locator('[data-testid="search-result"][aria-current=true]'),
       ).toHaveCount(1);
 
       // Scope buttons: Tab reaches them, Space toggles aria-pressed.
-      expect(await tabTo(page, '[data-search-scope="site"]', 6)).toBe(true);
+      expect(await tabTo(page, '[data-testid="search-scope-site"]', 6)).toBe(
+        true,
+      );
       await expectFocusRing(page, `${site} scope button`);
       await page.keyboard.press("Tab");
-      await expect(
-        page.locator('[data-search-scope="everywhere"]'),
-      ).toBeFocused();
+      await expect(page.getByTestId("search-scope-everywhere")).toBeFocused();
       await page.keyboard.press("Space");
-      await expect(
-        page.locator('[data-search-scope="everywhere"]'),
-      ).toHaveAttribute("aria-pressed", "true");
-      await expect(page.locator('[data-search-scope="site"]')).toHaveAttribute(
+      await expect(page.getByTestId("search-scope-everywhere")).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      );
+      await expect(page.getByTestId("search-scope-site")).toHaveAttribute(
         "aria-pressed",
         "false",
       );
@@ -184,7 +188,7 @@ test.describe("search", () => {
     page,
   }) => {
     await open(page, "root", "/search?q=sweep&utm_source=x");
-    await expect(page.locator("[data-search-input]")).toHaveValue("sweep");
+    await expect(page.getByTestId("search-input")).toHaveValue("sweep");
     expect(await page.locator("link[rel=canonical]").getAttribute("href")).toBe(
       "https://raioviajante.com/search",
     );
@@ -208,9 +212,9 @@ for (const [size, viewport] of Object.entries(viewports))
           await context.cookies(),
           "no cookie before any interaction",
         ).toEqual([]);
-        expect(await tabTo(page, "[data-sound-toggle]", 6)).toBe(true);
+        expect(await tabTo(page, '[data-testid="sound-toggle"]', 6)).toBe(true);
         await expectFocusRing(page, `${site} sound toggle`);
-        await expect(page.locator("[data-sound-toggle]")).toHaveAttribute(
+        await expect(page.getByTestId("sound-toggle")).toHaveAttribute(
           "aria-pressed",
           "false",
         );
@@ -220,11 +224,11 @@ for (const [size, viewport] of Object.entries(viewports))
         ).toEqual([]);
 
         await page.keyboard.press("Enter");
-        await expect(page.locator("[data-sound-toggle]")).toHaveAttribute(
+        await expect(page.getByTestId("sound-toggle")).toHaveAttribute(
           "aria-pressed",
           "true",
         );
-        await expect(page.locator("[data-sound-toggle]")).toBeFocused();
+        await expect(page.getByTestId("sound-toggle")).toBeFocused();
         const [cookie] = await context.cookies();
         expect(cookie?.name).toBe("rv-sound");
         expect(cookie?.value).toBe("on");
@@ -237,7 +241,7 @@ for (const [size, viewport] of Object.entries(viewports))
         );
 
         await page.keyboard.press("Space");
-        await expect(page.locator("[data-sound-toggle]")).toHaveAttribute(
+        await expect(page.getByTestId("sound-toggle")).toHaveAttribute(
           "aria-pressed",
           "false",
         );
@@ -265,13 +269,15 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
     await open(page, "dump", path, external);
     const far = await page.evaluate(
       () =>
-        document.querySelector(".comments")!.getBoundingClientRect().top >
+        document
+          .querySelector('[data-testid="comments"]')!
+          .getBoundingClientRect().top >
         innerHeight + 300,
     );
     test.skip(!far, "first article's comments are near the viewport");
-    await expect(page.locator(".comments [role=status]")).toHaveText(
-      /when you scroll/,
-    );
+    await expect(
+      page.getByTestId("comments-status").and(page.locator('[role="status"]')),
+    ).toHaveText(/when you scroll/);
     await expect(page.locator(SCRIPT)).toHaveCount(0);
     expect(external).toEqual([]);
     const axe = await new AxeBuilder({ page }).analyze();
@@ -287,16 +293,20 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
     });
     const path = await longArticle();
     const health = await open(page, "dump", path);
-    const button = page.getByRole("button", { name: "Load comments" });
+    const button = page
+      .getByTestId("comments-load")
+      .and(page.getByRole("button", { name: "Load comments" }));
     await expect(button).toBeVisible();
     expect(await button.evaluate((el) => el.tagName)).toBe("BUTTON");
     await expect(page.locator(SCRIPT)).toHaveCount(0);
-    expect(await tabTo(page, ".comments button", 60)).toBe(true);
+    expect(await tabTo(page, '[data-testid="comments-load"]', 60)).toBe(true);
     await expectFocusRing(page, "Load comments");
     await page.keyboard.press("Enter");
     // The script loads once; the stub finishes it and the status goes away.
     await expect(page.locator(SCRIPT)).toHaveCount(1);
-    await expect(page.locator(".comments [role=status]")).toHaveCount(0);
+    await expect(
+      page.getByTestId("comments-status").and(page.locator('[role="status"]')),
+    ).toHaveCount(0);
     expect(health, health.join("\n")).toEqual([]);
   });
 
@@ -320,20 +330,29 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
             body: "",
           }),
     );
-    await page.getByRole("button", { name: "Load comments" }).click();
-    await expect(page.locator(".comments [role=status]")).toHaveText(
-      "Comments could not be loaded.",
-    );
-    const retry = page.getByRole("button", { name: "Try again" });
+    await page
+      .getByTestId("comments-load")
+      .and(page.getByRole("button", { name: "Load comments" }))
+      .click();
+    await expect(
+      page.getByTestId("comments-status").and(page.locator('[role="status"]')),
+    ).toHaveText("Comments could not be loaded.");
+    const retry = page
+      .getByTestId("comments-retry")
+      .and(page.getByRole("button", { name: "Try again" }));
     expect(await retry.evaluate((el) => el.tagName)).toBe("BUTTON");
     // Focus stays on the status text (set by the click) and the retry is the next stop.
-    await expect(page.locator(".comments [role=status]")).toBeFocused();
+    await expect(
+      page.getByTestId("comments-status").and(page.locator('[role="status"]')),
+    ).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(retry).toBeFocused();
     await expectFocusRing(page, "Try again");
     await page.keyboard.press("Enter");
     await expect(page.locator(SCRIPT)).toHaveCount(1);
-    await expect(page.locator(".comments [role=status]")).toHaveCount(0);
+    await expect(
+      page.getByTestId("comments-status").and(page.locator('[role="status"]')),
+    ).toHaveCount(0);
     expect(requests).toBe(2);
     // The aborted request is the only expected console noise.
     expect(
@@ -357,7 +376,7 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
 
 // "On this page" is a native disclosure on small screens so a long page opens
 // on its title, not on its table of contents; wide screens keep the list open.
-const tocNav = 'nav[aria-label="on this page"]';
+const tocNav = '[data-testid="navigation-toc"]';
 
 /** The sitemap page with the longest "on this page" list, read from the HTML. */
 async function longestToc(site: Site) {
@@ -453,9 +472,9 @@ test.describe("on this page (mobile)", () => {
   for (const site of ["root", "lab"] as Site[])
     test(`${site}: no page list means no disclosure`, async ({ page }) => {
       await open(page, site, "/");
-      await expect(page.locator(`${tocNav}, .rv-sidebar summary`)).toHaveCount(
-        0,
-      );
+      await expect(
+        page.locator(`${tocNav}, [data-testid="sidebar"] summary`),
+      ).toHaveCount(0);
     });
 });
 
@@ -469,7 +488,9 @@ test.describe("on this page (desktop)", () => {
       const { path, links: count } = await longestToc(site);
       const health = await open(page, site, path);
       await expect(page.locator(`${tocNav} summary`)).toBeHidden();
-      await expect(page.locator(`${tocNav} .rv-label`).first()).toBeVisible();
+      await expect(
+        page.locator(`${tocNav} [data-testid="navigation-label"]`).first(),
+      ).toBeVisible();
       const links = page.locator(`${tocNav} a`);
       await expect(links).toHaveCount(count);
       for (const link of await links.all()) await expect(link).toBeVisible();
@@ -554,8 +575,9 @@ test.describe("reduced motion", () => {
       const avatarSrc = () =>
         page.evaluate(
           () =>
-            document.querySelector<HTMLImageElement>("[data-avatar-coin] img")
-              ?.src ?? "",
+            document.querySelector<HTMLImageElement>(
+              '[data-testid="avatar-toggle"] img',
+            )?.src ?? "",
         );
       const first = await avatarSrc();
       await page.waitForTimeout(1500);
@@ -568,8 +590,9 @@ test.describe("reduced motion", () => {
         avatarChanged: (await avatarSrc()) !== first,
         avatarDisabled: await page.evaluate(
           () =>
-            document.querySelector<HTMLButtonElement>("[data-avatar-coin]")
-              ?.disabled ?? null,
+            document.querySelector<HTMLButtonElement>(
+              '[data-testid="avatar-toggle"]',
+            )?.disabled ?? null,
         ),
       };
       await context.close();

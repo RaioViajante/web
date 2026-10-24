@@ -41,16 +41,24 @@ for (const width of [1440, 390, 320]) {
     await isolate(page, external);
     const health = watchHealth(page);
     await page.goto(base("root") + "/gallery");
-    const collection = page.locator("#gallery-collection");
-    const cover = page.getByRole("button", {
-      name: "Reveal the artwork collection",
-    });
+    const collection = page.getByTestId("gallery-collection");
+    const cover = page.getByTestId("gallery-cover").and(
+      page.getByRole("button", {
+        name: "Reveal the artwork collection",
+      }),
+    );
     await expect(cover).toBeVisible();
     await expect(collection).toBeHidden();
     await expect(
-      page.getByRole("navigation", { name: "Collection sections" }),
+      page
+        .getByTestId("gallery-sections")
+        .and(page.getByRole("navigation", { name: "Collection sections" })),
     ).toBeHidden();
-    await expect(page.getByRole("button", { name: /^View / })).toHaveCount(0);
+    await expect(
+      page
+        .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+        .and(page.getByRole("button", { name: /^View / })),
+    ).toHaveCount(0);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -71,7 +79,9 @@ for (const width of [1440, 390, 320]) {
     await expect(cover).toBeFocused();
     await expect(cover).toBeInViewport();
     await expect(
-      page.getByRole("heading", { name: "Branding", exact: true }),
+      page
+        .getByTestId("section-heading")
+        .and(page.getByRole("heading", { name: "Branding", exact: true })),
     ).toBeInViewport();
     await expect(
       collection.locator('button[aria-haspopup="dialog"]'),
@@ -79,26 +89,43 @@ for (const width of [1440, 390, 320]) {
     await expect(page.locator("main")).not.toContainText(
       /requiem|pale choir|concept art/i,
     );
-    await expect(page.locator(".gallery-sticker")).toHaveCount(30);
-    await expect(page.locator(".gallery-profile")).toHaveCount(2);
-    await expect(page.locator(".gallery-piece")).toHaveCount(9);
-    const sticker = page.getByRole("button", {
-      name: "View Work of art",
-      exact: true,
-    });
+    await expect(page.getByTestId("gallery-sticker")).toHaveCount(30);
+    await expect(page.getByTestId("gallery-profile")).toHaveCount(2);
+    await expect(page.getByTestId("gallery-piece")).toHaveCount(9);
+    const sticker = page
+      .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+      .and(
+        page.getByRole("button", {
+          name: "View Work of art",
+          exact: true,
+        }),
+      );
     await sticker.hover();
-    await expect(sticker.locator(".gallery-caption")).toHaveCSS("opacity", "1");
+    await expect(sticker.getByTestId("gallery-caption")).toHaveCSS(
+      "opacity",
+      "1",
+    );
     await sticker.click();
-    const dialog = page.getByRole("dialog");
+    const dialog = page
+      .getByTestId("gallery-dialog")
+      .and(page.getByRole("dialog"));
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole("heading")).toHaveText("Work of art");
     await expect(
-      dialog.getByRole("button", { name: "Previous artwork" }),
+      dialog.getByTestId("gallery-view-title").and(dialog.getByRole("heading")),
+    ).toHaveText("Work of art");
+    await expect(
+      dialog
+        .getByTestId("gallery-previous")
+        .and(dialog.getByRole("button", { name: "Previous artwork" })),
     ).toHaveText("←");
     await expect(
-      dialog.getByRole("button", { name: "Next artwork" }),
+      dialog
+        .getByTestId("gallery-next")
+        .and(dialog.getByRole("button", { name: "Next artwork" })),
     ).toHaveText("→");
-    for (const arrow of await dialog.locator(".gallery-arrow").all()) {
+    for (const arrow of await dialog
+      .locator('[data-testid="gallery-previous"], [data-testid="gallery-next"]')
+      .all()) {
       await expect
         .poll(async () => (await arrow.boundingBox())!.width)
         .toBeGreaterThanOrEqual(44);
@@ -107,14 +134,22 @@ for (const width of [1440, 390, 320]) {
         .toBeGreaterThanOrEqual(44);
     }
     await page.keyboard.press("ArrowLeft");
-    await expect(dialog.getByRole("heading")).toHaveText("Still compiling");
+    await expect(
+      dialog.getByTestId("gallery-view-title").and(dialog.getByRole("heading")),
+    ).toHaveText("Still compiling");
     await page.keyboard.press("ArrowRight");
     await dialog
-      .getByRole("button", { name: "Next artwork", exact: true })
+      .getByTestId("gallery-next")
+      .and(dialog.getByRole("button", { name: "Next artwork", exact: true }))
       .click();
-    await expect(dialog.getByRole("heading")).toHaveText("404");
+    await expect(
+      dialog.getByTestId("gallery-view-title").and(dialog.getByRole("heading")),
+    ).toHaveText("404");
     await dialog
-      .getByRole("button", { name: "Previous artwork", exact: true })
+      .getByTestId("gallery-previous")
+      .and(
+        dialog.getByRole("button", { name: "Previous artwork", exact: true }),
+      )
       .click();
     for (let i = 0; i < 8; i++) {
       await page.keyboard.press("Tab");
@@ -148,16 +183,22 @@ for (const width of [1440, 390, 320]) {
     await expect(dialog).toHaveCount(0);
     await expect(sticker).toBeFocused();
     await page
-      .getByRole("button", { name: "View Confused at the laptop" })
+      .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+      .and(page.getByRole("button", { name: "View Confused at the laptop" }))
       .click();
     await expect(
-      dialog.getByRole("link", { name: "download", exact: true }),
+      dialog
+        .getByTestId("gallery-download-link")
+        .and(dialog.getByRole("link", { name: "download", exact: true })),
     ).toHaveAttribute(
       "download",
       "raioviajante-profiles-confused-at-the-laptop.png",
     );
     const singlePromise = page.waitForEvent("download");
-    await dialog.getByRole("link", { name: "download", exact: true }).click();
+    await dialog
+      .getByTestId("gallery-download-link")
+      .and(dialog.getByRole("link", { name: "download", exact: true }))
+      .click();
     const single = await singlePromise;
     expect(single.suggestedFilename()).toBe(
       "raioviajante-profiles-confused-at-the-laptop.png",
@@ -165,23 +206,38 @@ for (const width of [1440, 390, 320]) {
     expect(readFileSync((await single.path())!)).toEqual(
       readFileSync("packages/design/assets/gallery/profile-laptop.png"),
     );
-    await dialog.getByRole("button", { name: "close", exact: true }).click();
+    await dialog
+      .getByTestId("gallery-close")
+      .and(dialog.getByRole("button", { name: "close", exact: true }))
+      .click();
     await expect(dialog).toHaveCount(0);
     await page
-      .getByRole("button", { name: "View Neon Code Lab Celebration" })
+      .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+      .and(page.getByRole("button", { name: "View Neon Code Lab Celebration" }))
       .click();
     await page.keyboard.press("ArrowLeft");
-    await expect(dialog.getByRole("heading")).toHaveText(
-      "Sad Man, Goofy Mirror Reflection",
-    );
+    await expect(
+      dialog.getByTestId("gallery-view-title").and(dialog.getByRole("heading")),
+    ).toHaveText("Sad Man, Goofy Mirror Reflection");
     await page.keyboard.press("Escape");
     await expect(dialog).toHaveCount(0);
-    await page.getByRole("button", { name: "download", exact: true }).click();
-    await expect(dialog.getByRole("checkbox")).toHaveCount(3);
-    await dialog.getByRole("checkbox", { name: /Profiles/ }).check();
+    await page
+      .getByTestId("gallery-download-open")
+      .and(page.getByRole("button", { name: "download", exact: true }))
+      .click();
+    await expect(
+      dialog
+        .getByTestId("gallery-category-checkbox")
+        .and(dialog.getByRole("checkbox")),
+    ).toHaveCount(3);
+    await dialog
+      .getByTestId("gallery-category-checkbox")
+      .and(dialog.getByRole("checkbox", { name: /Profiles/ }))
+      .check();
     const zipPromise = page.waitForEvent("download");
     await dialog
-      .getByRole("button", { name: "download .zip · 2 files" })
+      .getByTestId("gallery-download-confirm")
+      .and(dialog.getByRole("button", { name: "download .zip · 2 files" }))
       .click();
     const zip = await zipPromise;
     expect(zip.suggestedFilename()).toBe("raioviajante-profiles.zip");
@@ -198,11 +254,13 @@ for (const width of [1440, 390, 320]) {
     ]);
     if (width === 1440) {
       await dialog
-        .getByRole("button", { name: "select all", exact: true })
+        .getByTestId("gallery-select-all")
+        .and(dialog.getByRole("button", { name: "select all", exact: true }))
         .click();
       const allPromise = page.waitForEvent("download");
       await dialog
-        .getByRole("button", { name: "download .zip · 13 files" })
+        .getByTestId("gallery-download-confirm")
+        .and(dialog.getByRole("button", { name: "download .zip · 13 files" }))
         .click();
       const all = await allPromise;
       expect(all.suggestedFilename()).toBe("raioviajante-gallery.zip");
@@ -231,7 +289,8 @@ for (const width of [1440, 390, 320]) {
     await page.keyboard.press("Escape");
     await expect(dialog).toHaveCount(0);
     await page
-      .getByRole("link", { name: "04.3 personal", exact: true })
+      .getByTestId("gallery-section-link")
+      .and(page.getByRole("link", { name: "04.3 personal", exact: true }))
       .click();
     await expect(collection).toBeVisible();
     await expect(page.locator("#gallery-personal")).toBeFocused();
@@ -258,35 +317,52 @@ test("Gallery reduced motion and failed collection download", async ({
   await isolate(page, []);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(base("root") + "/gallery");
-  const cover = page.getByRole("button", {
-    name: "Reveal the artwork collection",
-  });
+  const cover = page.getByTestId("gallery-cover").and(
+    page.getByRole("button", {
+      name: "Reveal the artwork collection",
+    }),
+  );
   await expect(cover.locator("img")).toHaveCSS("animation-name", "none");
   await cover.press("Space");
-  await expect(page.locator("#gallery-collection")).toBeVisible();
+  await expect(page.getByTestId("gallery-collection")).toBeVisible();
   expect(
     await page
-      .locator(".gallery-redesign")
+      .getByTestId("gallery-redesign")
       .evaluate((el) => el.getAnimations({ subtree: true }).length),
   ).toBe(0);
-  await page.getByRole("button", { name: "View Search", exact: true }).click();
+  await page
+    .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+    .and(page.getByRole("button", { name: "View Search", exact: true }))
+    .click();
   expect(
     await page
-      .getByRole("dialog")
+      .getByTestId("gallery-dialog")
+      .and(page.getByRole("dialog"))
       .evaluate((node) => getComputedStyle(node).animationName),
   ).toBe("none");
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "download", exact: true }).click();
-  await page.getByRole("checkbox", { name: /Branding/ }).check();
+  await page
+    .getByTestId("gallery-download-open")
+    .and(page.getByRole("button", { name: "download", exact: true }))
+    .click();
+  await page
+    .getByTestId("gallery-category-checkbox")
+    .and(page.getByRole("checkbox", { name: /Branding/ }))
+    .check();
   await page.route("**/*branding-stickers*", (route) =>
     route.fulfill({ status: 503 }),
   );
-  await page.getByRole("button", { name: "download .zip · 2 files" }).click();
-  await expect(page.getByRole("status")).toHaveText(
-    "The collection could not be saved. Please try again.",
-  );
+  await page
+    .getByTestId("gallery-download-confirm")
+    .and(page.getByRole("button", { name: "download .zip · 2 files" }))
+    .click();
   await expect(
-    page.getByRole("button", { name: "download .zip · 2 files" }),
+    page.getByTestId("gallery-download-status").and(page.getByRole("status")),
+  ).toHaveText("The collection could not be saved. Please try again.");
+  await expect(
+    page
+      .getByTestId("gallery-download-confirm")
+      .and(page.getByRole("button", { name: "download .zip · 2 files" })),
   ).toBeEnabled();
 });
 
@@ -297,12 +373,21 @@ test("Gallery collection is available without JavaScript", async ({
   const page = await context.newPage();
   await isolate(page, []);
   await page.goto(base("root") + "/gallery");
-  await expect(page.locator("#gallery-collection")).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Branding/ })).toBeVisible();
+  await expect(page.getByTestId("gallery-collection")).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Reveal the artwork collection" }),
+    page
+      .getByTestId("section-heading")
+      .and(page.getByRole("heading", { name: /Branding/ })),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByTestId("gallery-cover")
+      .and(page.getByRole("button", { name: "Reveal the artwork collection" })),
   ).toHaveCount(0);
-  await page.getByRole("link", { name: "04.3 personal", exact: true }).click();
+  await page
+    .getByTestId("gallery-section-link")
+    .and(page.getByRole("link", { name: "04.3 personal", exact: true }))
+    .click();
   await expect(page).toHaveURL(/#gallery-personal$/);
   await context.close();
 });
@@ -326,14 +411,16 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
       () => (window as unknown as { galleryVoices: number }).galleryVoices,
     );
   await page.goto(base("root") + "/gallery");
-  const cover = page.getByRole("button", {
-    name: "Reveal the artwork collection",
-  });
+  const cover = page.getByTestId("gallery-cover").and(
+    page.getByRole("button", {
+      name: "Reveal the artwork collection",
+    }),
+  );
   await expect(cover).toHaveAttribute("data-sound", "gallery");
   await cover.hover();
   expect(await voices()).toBe(0);
-  await page.locator("[data-sound-toggle]").click();
-  await expect(page.locator("[data-sound-toggle]")).toHaveAttribute(
+  await page.getByTestId("sound-toggle").click();
+  await expect(page.getByTestId("sound-toggle")).toHaveAttribute(
     "aria-pressed",
     "true",
   );
@@ -357,27 +444,37 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   // voice may arrive once the animations and scroll settle.
   await page.waitForTimeout(800);
   expect(await voices()).toBe(beforeHover + 2);
-  const sticker = page.getByRole("button", {
-    name: "View Work of art",
-    exact: true,
-  });
+  const sticker = page
+    .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+    .and(
+      page.getByRole("button", {
+        name: "View Work of art",
+        exact: true,
+      }),
+    );
   await expect(
-    page.locator('#gallery-collection button[data-sound="gallery"]'),
+    page.locator(
+      '[data-testid="gallery-collection"] button[data-sound="gallery"]',
+    ),
   ).toHaveCount(41);
   await sticker.hover();
   const beforeClick = await voices();
   await sticker.click();
   expect(await voices()).toBe(beforeClick + 1);
-  const dialog = page.getByRole("dialog");
+  const dialog = page
+    .getByTestId("gallery-dialog")
+    .and(page.getByRole("dialog"));
   await expect(dialog).toBeVisible();
   for (let i = 0; i < 12; i++) await page.keyboard.press("ArrowRight");
-  await expect(dialog.getByRole("heading")).toHaveText("It works!");
+  await expect(
+    dialog.getByTestId("gallery-view-title").and(dialog.getByRole("heading")),
+  ).toHaveText("It works!");
   await page.keyboard.press("Escape");
   await expect(sticker).toBeFocused();
-  await expect(page.locator("#gallery-collection")).toBeVisible();
+  await expect(page.getByTestId("gallery-collection")).toBeVisible();
   // A synchronous burst across distinct artworks is bounded by the shared throttle.
   const beforeBurst = await voices();
-  await page.locator(".gallery-sticker").evaluateAll((els) => {
+  await page.getByTestId("gallery-sticker").evaluateAll((els) => {
     for (const el of els)
       el.dispatchEvent(
         new PointerEvent("pointerover", {
@@ -387,8 +484,8 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
       );
   });
   expect((await voices()) - beforeBurst).toBeLessThanOrEqual(1);
-  await page.locator("[data-sound-toggle]").click();
-  await expect(page.locator("[data-sound-toggle]")).toHaveAttribute(
+  await page.getByTestId("sound-toggle").click();
+  await expect(page.getByTestId("sound-toggle")).toHaveAttribute(
     "aria-pressed",
     "false",
   );
@@ -396,11 +493,17 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   await sticker.hover();
   await sticker.click();
   await expect(dialog).toBeVisible();
-  await dialog.getByRole("button", { name: "Next artwork" }).click();
-  await dialog.getByRole("button", { name: "Previous artwork" }).click();
+  await dialog
+    .getByTestId("gallery-next")
+    .and(dialog.getByRole("button", { name: "Next artwork" }))
+    .click();
+  await dialog
+    .getByTestId("gallery-previous")
+    .and(dialog.getByRole("button", { name: "Previous artwork" }))
+    .click();
   await page.keyboard.press("Escape");
   expect(await voices()).toBe(muted);
-  await page.locator("[data-sound-toggle]").click();
+  await page.getByTestId("sound-toggle").click();
   await page.emulateMedia({ reducedMotion: "reduce" });
   const reduced = await voices();
   await sticker.hover();
@@ -423,7 +526,7 @@ test("Gallery opening and immediate viewer activation remain independent", async
   await isolate(page, []);
   const health = watchHealth(page);
   await page.goto(base("root") + "/gallery");
-  await page.locator(".gallery-redesign").evaluate((el) => {
+  await page.getByTestId("gallery-redesign").evaluate((el) => {
     Object.assign(window, { revealStarts: 0 });
     el.addEventListener("animationstart", (event) => {
       if (
@@ -434,20 +537,28 @@ test("Gallery opening and immediate viewer activation remain independent", async
         (window as unknown as { revealStarts: number }).revealStarts++;
     });
   });
-  const cover = page.getByRole("button", {
-    name: "Reveal the artwork collection",
-  });
+  const cover = page.getByTestId("gallery-cover").and(
+    page.getByRole("button", {
+      name: "Reveal the artwork collection",
+    }),
+  );
   await cover.focus();
   await page.keyboard.press("Enter");
   await page.keyboard.press("Tab"); // Existing avatar control.
   await page.keyboard.press("Tab"); // First artwork, while the reveal runs.
-  const sticker = page.getByRole("button", {
-    name: "View Work of art",
-    exact: true,
-  });
+  const sticker = page
+    .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+    .and(
+      page.getByRole("button", {
+        name: "View Work of art",
+        exact: true,
+      }),
+    );
   await expect(sticker).toBeFocused();
   await page.keyboard.press("Enter");
-  const dialog = page.getByRole("dialog");
+  const dialog = page
+    .getByTestId("gallery-dialog")
+    .and(page.getByRole("dialog"));
   await expect(dialog).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
@@ -455,7 +566,7 @@ test("Gallery opening and immediate viewer activation remain independent", async
   await expect
     .poll(() =>
       page
-        .locator("#gallery-collection")
+        .getByTestId("gallery-collection")
         .evaluate((el) => el.getAnimations({ subtree: true }).length),
     )
     .toBe(0);
@@ -467,7 +578,7 @@ test("Gallery opening and immediate viewer activation remain independent", async
   await expect(dialog).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(sticker).toBeFocused();
-  await expect(page.locator("#gallery-collection")).toBeVisible();
+  await expect(page.getByTestId("gallery-collection")).toBeVisible();
   expect(
     await page.evaluate(
       () => (window as unknown as { revealStarts: number }).revealStarts,
@@ -479,7 +590,7 @@ test("Gallery opening and immediate viewer activation remain independent", async
 const galleryAlts = (page: Page) =>
   page
     .locator(
-      '#gallery-collection [role="img"], #gallery-collection img:not([alt=""])',
+      '[data-testid="gallery-collection"] [role="img"], [data-testid="gallery-collection"] img:not([alt=""])',
     )
     .evaluateAll((nodes) =>
       nodes.map(
@@ -500,9 +611,11 @@ for (const width of [1440, 390])
     const english = await galleryAlts(page);
     await page.goto(base("root") + "/pt/gallery");
     await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Um quebra-cabeça visual",
-    );
+    await expect(
+      page
+        .getByTestId("page-title")
+        .and(page.getByRole("heading", { level: 1 })),
+    ).toHaveText("Um quebra-cabeça visual");
     // Every alt text is translated; none is left in English or invented.
     const portuguese = await galleryAlts(page);
     expect(portuguese).toHaveLength(english.length);
@@ -510,14 +623,18 @@ for (const width of [1440, 390])
       expect(alt).not.toBe("");
       expect(alt).not.toBe(english[index]);
     });
-    const collection = page.locator("#gallery-collection");
-    const cover = page.getByRole("button", {
-      name: "Mostrar a coleção de arte",
-    });
+    const collection = page.getByTestId("gallery-collection");
+    const cover = page.getByTestId("gallery-cover").and(
+      page.getByRole("button", {
+        name: "Mostrar a coleção de arte",
+      }),
+    );
     await expect(cover).toBeVisible();
     await expect(collection).toBeHidden();
     await expect(
-      page.getByRole("navigation", { name: "Seções da coleção" }),
+      page
+        .getByTestId("gallery-sections")
+        .and(page.getByRole("navigation", { name: "Seções da coleção" })),
     ).toBeHidden();
     for (
       let i = 0;
@@ -530,25 +647,31 @@ for (const width of [1440, 390])
     await page.keyboard.press(width === 390 ? "Space" : "Enter");
     await expect(collection).toBeVisible();
     await expect(cover).toHaveAttribute("aria-expanded", "true");
-    await expect(page.locator(".gallery-cover-hint")).toHaveText(
+    await expect(page.getByTestId("gallery-cover-hint")).toHaveText(
       "clique para guardar tudo",
     );
     await expect(
-      page.getByRole("heading", { name: "Identidade visual", exact: true }),
+      page
+        .getByTestId("section-heading")
+        .and(
+          page.getByRole("heading", { name: "Identidade visual", exact: true }),
+        ),
     ).toBeInViewport();
     await expect(
       collection.locator('button[aria-haspopup="dialog"]'),
     ).toHaveCount(41);
-    await expect(page.locator(".gallery-sticker")).toHaveCount(30);
-    await expect(page.locator(".gallery-profile")).toHaveCount(2);
-    await expect(page.locator(".gallery-piece")).toHaveCount(9);
+    await expect(page.getByTestId("gallery-sticker")).toHaveCount(30);
+    await expect(page.getByTestId("gallery-profile")).toHaveCount(2);
+    await expect(page.getByTestId("gallery-piece")).toHaveCount(9);
     // Profile links keep their URLs; the video-source label is translated.
     const profileLinks = (path: string) =>
       page
         .goto(base("root") + path)
         .then(() =>
           page
-            .locator(".gallery-profile-links a")
+            .locator(
+              '[data-testid="gallery-profile-links"] [data-testid="gallery-profile-link"]',
+            )
             .evaluateAll((nodes) =>
               nodes.map((node) => [
                 node.getAttribute("href"),
@@ -559,39 +682,64 @@ for (const width of [1440, 390])
     const englishLinks = await profileLinks("/gallery");
     expect(await profileLinks("/pt/gallery")).toEqual(englishLinks);
     await page
-      .getByRole("button", { name: "Mostrar a coleção de arte" })
+      .getByTestId("gallery-cover")
+      .and(page.getByRole("button", { name: "Mostrar a coleção de arte" }))
       .click();
     await expect(
-      page.getByRole("navigation", {
-        name: "Perfis de Confused at the laptop",
-      }),
+      page.getByTestId("gallery-profile-links").and(
+        page.getByRole("navigation", {
+          name: "Perfis de Confused at the laptop",
+        }),
+      ),
     ).toContainText("Código dos Vídeos");
 
-    const sticker = page.getByRole("button", {
-      name: "Ver Work of art",
-      exact: true,
-    });
+    const sticker = page
+      .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+      .and(
+        page.getByRole("button", {
+          name: "Ver Work of art",
+          exact: true,
+        }),
+      );
     await sticker.hover();
     await sticker.click();
-    const dialog = page.getByRole("dialog");
+    const dialog = page
+      .getByTestId("gallery-dialog")
+      .and(page.getByRole("dialog"));
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByRole("heading")).toHaveText("Work of art");
+    await expect(
+      dialog.getByTestId("gallery-view-title").and(dialog.getByRole("heading")),
+    ).toHaveText("Work of art");
     await expect(dialog).toContainText("identidade visual · 1 / 30");
     await expect(dialog).toContainText("adesivo");
     await expect(dialog).toContainText("usado em");
     await expect(dialog).toContainText("capa da galeria");
     await expect(
-      dialog.getByRole("button", { name: "Obra anterior" }),
+      dialog
+        .getByTestId("gallery-previous")
+        .and(dialog.getByRole("button", { name: "Obra anterior" })),
     ).toHaveText("←");
     await expect(
-      dialog.getByRole("button", { name: "Próxima obra" }),
+      dialog
+        .getByTestId("gallery-next")
+        .and(dialog.getByRole("button", { name: "Próxima obra" })),
     ).toHaveText("→");
     await page.keyboard.press("ArrowLeft");
-    await expect(dialog.getByRole("heading")).toHaveText("Still compiling");
+    await expect(
+      dialog.getByTestId("gallery-view-title").and(dialog.getByRole("heading")),
+    ).toHaveText("Still compiling");
     await page.keyboard.press("ArrowRight");
-    await dialog.getByRole("button", { name: "Próxima obra" }).click();
-    await expect(dialog.getByRole("heading")).toHaveText("404");
-    await dialog.getByRole("button", { name: "Obra anterior" }).click();
+    await dialog
+      .getByTestId("gallery-next")
+      .and(dialog.getByRole("button", { name: "Próxima obra" }))
+      .click();
+    await expect(
+      dialog.getByTestId("gallery-view-title").and(dialog.getByRole("heading")),
+    ).toHaveText("404");
+    await dialog
+      .getByTestId("gallery-previous")
+      .and(dialog.getByRole("button", { name: "Obra anterior" }))
+      .click();
     for (let i = 0; i < 8; i++) {
       await page.keyboard.press("Tab");
       expect(
@@ -606,9 +754,12 @@ for (const width of [1440, 390])
     await expect(sticker).toBeFocused();
 
     await page
-      .getByRole("button", { name: "Ver Confused at the laptop" })
+      .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+      .and(page.getByRole("button", { name: "Ver Confused at the laptop" }))
       .click();
-    const link = dialog.getByRole("link", { name: "baixar", exact: true });
+    const link = dialog
+      .getByTestId("gallery-download-link")
+      .and(dialog.getByRole("link", { name: "baixar", exact: true }));
     await expect(link).toHaveAttribute(
       "download",
       "raioviajante-profiles-confused-at-the-laptop.png",
@@ -622,20 +773,36 @@ for (const width of [1440, 390])
     expect(readFileSync((await single.path())!)).toEqual(
       readFileSync("packages/design/assets/gallery/profile-laptop.png"),
     );
-    await dialog.getByRole("button", { name: "fechar", exact: true }).click();
+    await dialog
+      .getByTestId("gallery-close")
+      .and(dialog.getByRole("button", { name: "fechar", exact: true }))
+      .click();
     await expect(dialog).toHaveCount(0);
 
-    await page.getByRole("button", { name: "baixar", exact: true }).click();
-    await expect(dialog.getByRole("checkbox")).toHaveCount(3);
+    await page
+      .getByTestId("gallery-download-open")
+      .and(page.getByRole("button", { name: "baixar", exact: true }))
+      .click();
+    await expect(
+      dialog
+        .getByTestId("gallery-category-checkbox")
+        .and(dialog.getByRole("checkbox")),
+    ).toHaveCount(3);
     await expect(dialog).toContainText("Leve um pouco de arte com você");
     await expect(dialog).toContainText("Nada selecionado ainda.");
-    await dialog.getByRole("checkbox", { name: /Perfis/ }).check();
-    await expect(dialog.getByRole("status")).toHaveText(
-      "Será salvo como raioviajante-profiles.zip.",
-    );
+    await dialog
+      .getByTestId("gallery-category-checkbox")
+      .and(dialog.getByRole("checkbox", { name: /Perfis/ }))
+      .check();
+    await expect(
+      dialog
+        .getByTestId("gallery-download-status")
+        .and(dialog.getByRole("status")),
+    ).toHaveText("Será salvo como raioviajante-profiles.zip.");
     const zipPromise = page.waitForEvent("download");
     await dialog
-      .getByRole("button", { name: "baixar .zip · 2 arquivos" })
+      .getByTestId("gallery-download-confirm")
+      .and(dialog.getByRole("button", { name: "baixar .zip · 2 arquivos" }))
       .click();
     const zip = await zipPromise;
     expect(zip.suggestedFilename()).toBe("raioviajante-profiles.zip");
@@ -651,26 +818,40 @@ for (const width of [1440, 390])
       "raioviajante-profiles-confused-at-the-laptop.png",
       "raioviajante-profiles-hmm.png",
     ]);
-    await expect(dialog.getByRole("status")).toHaveText(
-      "raioviajante-profiles.zip salvo, 2 arquivos.",
-    );
+    await expect(
+      dialog
+        .getByTestId("gallery-download-status")
+        .and(dialog.getByRole("status")),
+    ).toHaveText("raioviajante-profiles.zip salvo, 2 arquivos.");
     await dialog
-      .getByRole("button", { name: "selecionar tudo", exact: true })
+      .getByTestId("gallery-select-all")
+      .and(dialog.getByRole("button", { name: "selecionar tudo", exact: true }))
       .click();
-    await expect(dialog.getByRole("status")).toHaveText(
+    await expect(
+      dialog
+        .getByTestId("gallery-download-status")
+        .and(dialog.getByRole("status")),
+    ).toHaveText(
       "Será salvo como raioviajante-gallery.zip, com uma pasta por categoria.",
     );
     await expect(
-      dialog.getByRole("button", { name: "baixar .zip · 13 arquivos" }),
+      dialog
+        .getByTestId("gallery-download-confirm")
+        .and(dialog.getByRole("button", { name: "baixar .zip · 13 arquivos" })),
     ).toBeEnabled();
     await expect(
-      dialog.getByRole("button", { name: "limpar seleção", exact: true }),
+      dialog
+        .getByTestId("gallery-select-all")
+        .and(
+          dialog.getByRole("button", { name: "limpar seleção", exact: true }),
+        ),
     ).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(dialog).toHaveCount(0);
 
     await page
-      .getByRole("link", { name: "04.3 pessoais", exact: true })
+      .getByTestId("gallery-section-link")
+      .and(page.getByRole("link", { name: "04.3 pessoais", exact: true }))
       .click();
     await expect(page.locator("#gallery-personal")).toBeFocused();
     expect(
@@ -688,35 +869,52 @@ test("Portuguese Gallery reduced motion and failed collection download", async (
   await isolate(page, []);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(base("root") + "/pt/gallery");
-  const cover = page.getByRole("button", {
-    name: "Mostrar a coleção de arte",
-  });
+  const cover = page.getByTestId("gallery-cover").and(
+    page.getByRole("button", {
+      name: "Mostrar a coleção de arte",
+    }),
+  );
   await expect(cover.locator("img")).toHaveCSS("animation-name", "none");
   await cover.press("Space");
-  await expect(page.locator("#gallery-collection")).toBeVisible();
+  await expect(page.getByTestId("gallery-collection")).toBeVisible();
   expect(
     await page
-      .locator(".gallery-redesign")
+      .getByTestId("gallery-redesign")
       .evaluate((el) => el.getAnimations({ subtree: true }).length),
   ).toBe(0);
-  await page.getByRole("button", { name: "Ver Search", exact: true }).click();
+  await page
+    .getByTestId(/^gallery-(?:sticker|profile-open|piece)$/)
+    .and(page.getByRole("button", { name: "Ver Search", exact: true }))
+    .click();
   expect(
     await page
-      .getByRole("dialog")
+      .getByTestId("gallery-dialog")
+      .and(page.getByRole("dialog"))
       .evaluate((node) => getComputedStyle(node).animationName),
   ).toBe("none");
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "baixar", exact: true }).click();
-  await page.getByRole("checkbox", { name: /Identidade visual/ }).check();
+  await page
+    .getByTestId("gallery-download-open")
+    .and(page.getByRole("button", { name: "baixar", exact: true }))
+    .click();
+  await page
+    .getByTestId("gallery-category-checkbox")
+    .and(page.getByRole("checkbox", { name: /Identidade visual/ }))
+    .check();
   await page.route("**/*branding-stickers*", (route) =>
     route.fulfill({ status: 503 }),
   );
-  await page.getByRole("button", { name: "baixar .zip · 2 arquivos" }).click();
-  await expect(page.getByRole("status")).toHaveText(
-    "Não foi possível salvar a coleção. Tente novamente.",
-  );
+  await page
+    .getByTestId("gallery-download-confirm")
+    .and(page.getByRole("button", { name: "baixar .zip · 2 arquivos" }))
+    .click();
   await expect(
-    page.getByRole("button", { name: "baixar .zip · 2 arquivos" }),
+    page.getByTestId("gallery-download-status").and(page.getByRole("status")),
+  ).toHaveText("Não foi possível salvar a coleção. Tente novamente.");
+  await expect(
+    page
+      .getByTestId("gallery-download-confirm")
+      .and(page.getByRole("button", { name: "baixar .zip · 2 arquivos" })),
   ).toBeEnabled();
 });
 
@@ -727,14 +925,21 @@ test("Portuguese Gallery collection is available without JavaScript", async ({
   const page = await context.newPage();
   await isolate(page, []);
   await page.goto(base("root") + "/pt/gallery");
-  await expect(page.locator("#gallery-collection")).toBeVisible();
+  await expect(page.getByTestId("gallery-collection")).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: /Identidade visual/ }),
+    page
+      .getByTestId("section-heading")
+      .and(page.getByRole("heading", { name: /Identidade visual/ })),
   ).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Mostrar a coleção de arte" }),
+    page
+      .getByTestId("gallery-cover")
+      .and(page.getByRole("button", { name: "Mostrar a coleção de arte" })),
   ).toHaveCount(0);
-  await page.getByRole("link", { name: "04.3 pessoais", exact: true }).click();
+  await page
+    .getByTestId("gallery-section-link")
+    .and(page.getByRole("link", { name: "04.3 pessoais", exact: true }))
+    .click();
   await expect(page).toHaveURL(/#gallery-personal$/);
   await context.close();
 });

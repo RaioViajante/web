@@ -9,31 +9,35 @@ test("Portuguese Lab publishes only the real Sweep counterpart with active LANG"
   await page.setViewportSize(viewports.mobile);
   await page.goto(`${base("lab")}/pt/`);
   await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
-  await expect(page.locator("[data-experiment-list] article")).toHaveCount(1);
-  await expect(page.locator("[data-experiment-list]")).toContainText(
+  await expect(
+    page.locator('[data-testid="experiment-list"] article'),
+  ).toHaveCount(1);
+  await expect(page.getByTestId("experiment-list")).toContainText(
     "classificador de arquivos",
   );
-  await expect(page.locator("[data-experiment-list]")).not.toContainText(
+  await expect(page.getByTestId("experiment-list")).not.toContainText(
     "execution states",
   );
-  await expect(page.locator(".rv-lang")).toHaveAttribute(
+  await expect(page.getByTestId("language-control")).toHaveAttribute(
     "data-lang-state",
     "link",
   );
-  await expect(page.locator(".rv-lang")).toContainText("LANG PT");
-  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/");
-  await page.locator(".rv-lang a").press("Enter");
+  await expect(page.getByTestId("language-control")).toContainText("LANG PT");
+  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
+    "href",
+    "/",
+  );
+  await page.getByTestId("language-counterpart").press("Enter");
   await expect(page).toHaveURL(`${base("lab")}/`);
-  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/pt/");
+  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
+    "href",
+    "/pt/",
+  );
   await page.goto(`${base("lab")}/pt/`);
-  await page.locator('[data-filter="done"]').click();
-  await expect(page.locator("[data-filter-result]")).toHaveText(
-    "0 experimentos",
-  );
-  await page.locator('[data-filter="all"]').click();
-  await expect(page.locator("[data-filter-result]")).toHaveText(
-    "1 experimento",
-  );
+  await page.getByTestId("filter-done").click();
+  await expect(page.getByTestId("filter-result")).toHaveText("0 experimentos");
+  await page.getByTestId("filter-all").click();
+  await expect(page.getByTestId("filter-result")).toHaveText("1 experimento");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth > innerWidth,
@@ -49,15 +53,15 @@ test("Portuguese classifier translates live output, preserves actual destination
   await page.setViewportSize(viewports.desktop);
   await page.goto(`${base("lab")}/pt/experiments/classificador-de-arquivos/`);
   await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
-  await expect(page.locator("main")).toContainText("executa aqui");
-  await expect(page.locator("[data-summary]")).toContainText("Imagens 1");
-  await page.locator("#filenames").fill("photo.png\nREADME");
-  await page.locator("[data-classify]").focus();
+  await expect(page.getByTestId("main-content")).toContainText("executa aqui");
+  await expect(page.getByTestId("summary")).toContainText("Imagens 1");
+  await page.getByTestId("filenames").fill("photo.png\nREADME");
+  await page.getByTestId("classify").focus();
   await page.keyboard.press("Enter");
-  await expect(page.locator("[data-summary]")).toHaveText(
+  await expect(page.getByTestId("summary")).toHaveText(
     "2 arquivos classificados · Imagens 1 · Documentos 0 · Arquivos compactados 0 · Outros 1",
   );
-  await expect(page.locator("tbody")).toContainText(
+  await expect(page.getByTestId("classifier-results")).toContainText(
     "~/Downloads/Images/photo.png",
   );
   await expect(
@@ -66,7 +70,7 @@ test("Portuguese classifier translates live output, preserves actual destination
     "href",
     "https://lab.raioviajante.com/experiments/filename-classifier/",
   );
-  await expect(page.locator(".rv-lang a")).toHaveAttribute(
+  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
     "href",
     "/experiments/filename-classifier/",
   );
@@ -79,14 +83,16 @@ test("Portuguese search is locale-pure and missing translations use the English 
   await isolate(page, []);
   await page.goto(`${base("lab")}/pt/search/`);
   await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
-  await expect(page.locator('[data-search-locale="pt-BR"]')).toBeVisible();
-  await expect(page.locator("[data-search-page]")).toHaveAttribute(
+  await expect(
+    page.locator('[data-testid="search-page"][data-search-locale="pt-BR"]'),
+  ).toBeVisible();
+  await expect(page.getByTestId("search-page")).toHaveAttribute(
     "data-search-state",
     "ready",
   );
-  await page.locator("[data-search-input]").fill("classificador");
-  await expect(page.locator("[data-search-result]")).toHaveCount(1);
-  await expect(page.locator("[data-search-result]")).toContainText(
+  await page.getByTestId("search-input").fill("classificador");
+  await expect(page.getByTestId("search-result")).toHaveCount(1);
+  await expect(page.getByTestId("search-result")).toContainText(
     "classificador de arquivos",
   );
   const index = await page.request.get(`${base("lab")}/pt/search-index.json`);
@@ -111,11 +117,11 @@ test("Portuguese search is locale-pure and missing translations use the English 
     "/experiments/boot-sector/",
   ]) {
     await page.goto(base("lab") + path);
-    await expect(page.locator(".rv-lang")).toHaveAttribute(
+    await expect(page.getByTestId("language-control")).toHaveAttribute(
       "data-lang-state",
       "disclosure",
     );
-    await expect(page.locator(".rv-lang details a")).toHaveAttribute(
+    await expect(page.getByTestId("language-home")).toHaveAttribute(
       "href",
       "/pt/",
     );
@@ -130,37 +136,40 @@ test("every Portuguese Lab suggestion finds a published Portuguese experiment in
 }) => {
   await isolate(page, []);
   await page.goto(`${base("lab")}/pt/search/`);
-  await expect(page.locator("[data-search-page]")).toHaveAttribute(
+  await expect(page.getByTestId("search-page")).toHaveAttribute(
     "data-search-state",
     "ready",
   );
   for (const scope of ["site", "everywhere"]) {
-    await page.locator(`[data-search-scope="${scope}"]`).click();
-    await page.locator("[data-search-input]").fill("no-match-for-lab");
+    await page.locator(`[data-testid="search-scope-${scope}"]`).click();
+    await page.getByTestId("search-input").fill("no-match-for-lab");
     const suggestions = page.locator(
-      `[data-search-suggestions="${scope}"] [data-search-suggestion]`,
+      `[data-testid="search-suggestions-${scope}"] [data-testid="search-suggestion"]`,
     );
     await expect(suggestions.first()).toBeVisible();
     const terms = await suggestions.allTextContents();
     expect(terms).toEqual(["classificador de arquivos", "sweep"]);
     for (const [index, term] of terms.entries()) {
       const button = page
-        .locator(`[data-search-suggestions="${scope}"]`)
-        .getByRole("button", { name: term, exact: true });
+        .locator(`[data-testid="search-suggestions-${scope}"]`)
+        .getByTestId("search-suggestion")
+        .and(
+          page
+            .locator(`[data-testid="search-suggestions-${scope}"]`)
+            .getByRole("button", { name: term, exact: true }),
+        );
       if (index === 0) {
         await button.focus();
         await expect(button).toBeFocused();
         await page.keyboard.press("Enter");
       } else await button.click();
-      await expect(page.locator("[data-search-input]")).toHaveValue(term);
-      await expect(page.locator("[data-search-input]")).toBeFocused();
-      await expect(
-        page.locator("[data-search-result]").first(),
-      ).toHaveAttribute(
+      await expect(page.getByTestId("search-input")).toHaveValue(term);
+      await expect(page.getByTestId("search-input")).toBeFocused();
+      await expect(page.getByTestId("search-result").first()).toHaveAttribute(
         "href",
         `${base("lab")}/pt/experiments/classificador-de-arquivos/`,
       );
-      await page.locator("[data-search-input]").fill("no-match-for-lab");
+      await page.getByTestId("search-input").fill("no-match-for-lab");
     }
   }
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
@@ -180,7 +189,7 @@ test("Lab avatar keeps language-specific names with and without reduced motion",
   ] as const) {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto(base("lab") + path);
-    const avatar = page.locator(".avatar-coin");
+    const avatar = page.getByTestId("avatar-toggle");
     await expect(avatar).toHaveAttribute("aria-label", interactive);
     await avatar.focus();
     await expect(avatar).toBeFocused();

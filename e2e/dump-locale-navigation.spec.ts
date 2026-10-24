@@ -46,13 +46,21 @@ test("Dump keeps locale-pure navigation and document history", async ({
   await expectLang(page, "en");
   await page.goto(`${base("dump")}/pt`);
   await expectLang(page, "pt-BR");
-  await expect(page.locator(".rv-lang a[href='/']")).toHaveCount(1);
+  await expect(
+    page.locator("[data-testid=\"language-counterpart\"][href='/']"),
+  ).toHaveCount(1);
   await expect(page.getByRole("link", { name: "RSS" })).toHaveCount(0);
 
-  await page.getByRole("link", { name: /arquivo/ }).click();
+  await page
+    .getByTestId("navigation-link")
+    .and(page.getByRole("link", { name: /arquivo/ }))
+    .click();
   await expect(page).toHaveURL(`${base("dump")}/pt/archive`);
   await expectLang(page, "pt-BR");
-  await page.getByRole("link", { name: /tags/ }).click();
+  await page
+    .getByTestId("navigation-link")
+    .and(page.getByRole("link", { name: /tags/ }))
+    .click();
   await expect(page).toHaveURL(`${base("dump")}/pt/tags`);
   await expectLang(page, "pt-BR");
 
@@ -66,8 +74,15 @@ test("Dump keeps locale-pure navigation and document history", async ({
   await expectLang(page, "pt-BR");
 
   await page
-    .getByRole("navigation", { name: "Informações legais" })
-    .getByRole("link", { name: "Termos de Uso (em inglês)" })
+    .getByTestId("footer-legal")
+    .and(page.getByRole("navigation", { name: "Informações legais" }))
+    .getByTestId("footer-legal-link")
+    .and(
+      page
+        .getByTestId("footer-legal")
+        .and(page.getByRole("navigation", { name: "Informações legais" }))
+        .getByRole("link", { name: "Termos de Uso (em inglês)" }),
+    )
     .click();
   await expect(page).toHaveURL(`${base("dump")}/terms`);
   await expectLang(page, "en");
@@ -85,12 +100,26 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   expect(response?.status()).toBe(200);
   await expectLang(page, "pt-BR");
   await expect(
-    page.getByRole("link", { name: /Talvez isso vire alguma coisa um dia/ }),
+    page
+      .getByTestId(
+        /^(?:content-link|leader-link|navigation-link|search-nav-link)$/,
+      )
+      .and(
+        page.getByRole("link", {
+          name: /Talvez isso vire alguma coisa um dia/,
+        }),
+      ),
   ).toHaveAttribute("href", translatedPath);
   await expect(
-    page.getByRole("link", {
-      name: /Traduzir o site sem fingir que tudo já existe/,
-    }),
+    page
+      .getByTestId(
+        /^(?:content-link|leader-link|navigation-link|search-nav-link)$/,
+      )
+      .and(
+        page.getByRole("link", {
+          name: /Traduzir o site sem fingir que tudo já existe/,
+        }),
+      ),
   ).toHaveAttribute("href", originalPath);
   await expect(
     page.getByText("Maybe This Can Be Something Someday", { exact: true }),
@@ -114,12 +143,14 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   ).toHaveAttribute("href", `${canonicalDumpOrigin}${translatedPath}`);
   await expect(
     page.locator(
-      ".rv-lang a[href='/posts/maybe-this-can-be-something-someday']",
+      "[data-testid=\"language-counterpart\"][href='/posts/maybe-this-can-be-something-someday']",
     ),
   ).toHaveCount(1);
-  await expect(page.getByRole("heading", { name: "Comentários" })).toHaveCount(
-    1,
-  );
+  await expect(
+    page
+      .getByTestId("section-heading")
+      .and(page.getByRole("heading", { name: "Comentários" })),
+  ).toHaveCount(1);
 
   response = await page.goto(base("dump") + originalPath);
   expect(response?.status()).toBe(200);
@@ -129,15 +160,17 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
     `${canonicalDumpOrigin}${originalPath}`,
   );
   await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
-  await expect(page.locator(".rv-lang")).toHaveAttribute(
+  await expect(page.getByTestId("language-control")).toHaveAttribute(
     "data-lang-state",
     "disclosure",
   );
-  await page.locator(".rv-lang summary").click();
-  await expect(page.locator(".rv-lang details a")).toHaveAttribute("href", "/");
-  await expect(page.getByRole("heading", { name: "Comentários" })).toHaveCount(
-    1,
-  );
+  await page.getByTestId("language-summary").click();
+  await expect(page.getByTestId("language-home")).toHaveAttribute("href", "/");
+  await expect(
+    page
+      .getByTestId("section-heading")
+      .and(page.getByRole("heading", { name: "Comentários" })),
+  ).toHaveCount(1);
 
   response = await page.goto(`${base("dump")}/pt/archive`);
   expect(response?.status()).toBe(200);
@@ -152,16 +185,16 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
     await expect(page.locator(`a[href="/pt/tags/${slug}"]`)).toHaveCount(1);
 
   await page.goto(`${base("dump")}/pt/tags/pessoal`);
-  await expect(page.locator(".rv-lang a")).toHaveAttribute(
+  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
     "href",
     "/tags/personal",
   );
   await page.goto(`${base("dump")}/tags/osdev`);
-  await expect(page.locator(".rv-lang")).toHaveAttribute(
+  await expect(page.getByTestId("language-control")).toHaveAttribute(
     "data-lang-state",
     "disclosure",
   );
-  await expect(page.locator(".rv-lang details a")).toHaveAttribute(
+  await expect(page.getByTestId("language-home")).toHaveAttribute(
     "href",
     "/pt",
   );
@@ -260,25 +293,23 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
     ]),
   );
 
-  const search = page.locator("[data-search-page]");
-  const input = page.locator("[data-search-input]");
+  const search = page.getByTestId("search-page");
+  const input = page.getByTestId("search-input");
   await expect(search).toHaveAttribute("data-search-state", "ready");
   await expect(input).toBeFocused();
-  await expect(page.locator("a[data-lang-search]")).toHaveAttribute(
-    "href",
-    "/search",
-  );
+  await expect(
+    page.locator('a[data-testid="language-counterpart"]'),
+  ).toHaveAttribute("href", "/search");
 
   await input.fill("Traduzir");
-  let result = page.locator("[data-search-result]");
+  let result = page.getByTestId("search-result");
   await expect(result).toHaveCount(1);
   await expect(result).toContainText(
     "Traduzir o site sem fingir que tudo já existe",
   );
-  await expect(page.locator("a[data-lang-search]")).toHaveAttribute(
-    "href",
-    "/search?q=Traduzir",
-  );
+  await expect(
+    page.locator('a[data-testid="language-counterpart"]'),
+  ).toHaveAttribute("href", "/search?q=Traduzir");
   // The index states canonical origins; the e2e harness maps them to the
   // local server when the client renders a result.
   await expect(result).toHaveAttribute(
@@ -287,15 +318,15 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
   );
 
   await input.fill("mensagem de erro");
-  result = page.locator("[data-search-result]");
+  result = page.getByTestId("search-result");
   await expect(result).toHaveCount(1);
   await expect(result).toContainText("Talvez isso vire alguma coisa um dia");
 
   await input.fill("nenhum resultado publicado");
-  await expect(page.locator("[data-search-result]")).toHaveCount(0);
-  await expect(page.locator("[data-search-empty]")).toBeVisible();
+  await expect(page.getByTestId("search-result")).toHaveCount(0);
+  await expect(page.getByTestId("search-empty")).toBeVisible();
 
-  await page.locator('[data-search-scope="everywhere"]').click();
+  await page.getByTestId("search-scope-everywhere").click();
   await expect(search).toHaveAttribute("data-search-state", "ready");
   expect(rootRequests).toBe(1);
   expect(docsRequests).toBe(1);
@@ -303,7 +334,7 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
   expect(external).toEqual([]);
 
   await input.fill("Traduzir");
-  await expect(page.locator("[data-search-result]")).toHaveCount(1);
+  await expect(page.getByTestId("search-result")).toHaveCount(1);
   await input.press("Enter");
   await expect(page).toHaveURL(
     `${base("dump")}/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe`,
@@ -331,10 +362,16 @@ test("Dump dynamic misses use localized server-rendered 404 documents", async ({
       ),
   ).toEqual(expect.arrayContaining([expect.stringMatching(/noindex/)]));
   await expect(
-    page.getByRole("heading", { name: "Procurei em todo lugar." }),
+    page
+      .getByTestId("page-title")
+      .and(page.getByRole("heading", { name: "Procurei em todo lugar." })),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /início \(em inglês\)/ }),
+    page
+      .getByTestId(
+        /^(?:content-link|leader-link|navigation-link|search-nav-link)$/,
+      )
+      .and(page.getByRole("link", { name: /início \(em inglês\)/ })),
   ).toHaveAttribute("hreflang", "en");
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
   await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
@@ -420,6 +457,10 @@ test("English post comments keep the lazy Giscus boundary", async ({
 }) => {
   await page.goto(`${base("dump")}/posts/maybe-this-can-be-something-someday`);
   await expectLang(page, "en");
-  await expect(page.getByRole("heading", { name: "Comments" })).toHaveCount(1);
-  await expect(page.locator(".comments")).toHaveCount(1);
+  await expect(
+    page
+      .getByTestId("section-heading")
+      .and(page.getByRole("heading", { name: "Comments" })),
+  ).toHaveCount(1);
+  await expect(page.getByTestId("comments")).toHaveCount(1);
 });
