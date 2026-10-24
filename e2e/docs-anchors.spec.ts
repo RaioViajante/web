@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { base, isolate } from "./support";
 
 // Visible section numbers are presentation: heading ids, "on this page" hrefs
@@ -6,6 +6,27 @@ import { base, isolate } from "./support";
 // real built Docs content.
 
 const page_ = "/projects/sweep/";
+
+/**
+ * Smooth fragment navigation enters the viewport before it reaches the
+ * heading's scroll-margin destination. Wait for that destination so a
+ * following history traversal cannot interrupt and record the prior scroll.
+ */
+async function expectAnchorSettled(page: Page, selector: string) {
+  const heading = page.locator(selector);
+  await expect(heading).toBeInViewport();
+  await expect
+    .poll(() =>
+      heading.evaluate((element) => {
+        const top = element.getBoundingClientRect().top;
+        const margin = Number.parseFloat(
+          getComputedStyle(element).scrollMarginTop,
+        );
+        return Math.abs(top - margin);
+      }),
+    )
+    .toBeLessThanOrEqual(1);
+}
 
 test.describe("docs anchors and search titles", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
@@ -64,21 +85,21 @@ test.describe("docs anchors and search titles", () => {
 
     await links.nth(0).click();
     await expect(page).toHaveURL(new RegExp(`#${ids[0]}$`));
-    await expect(page.locator(`[id="${ids[0]}"]`)).toBeInViewport();
+    await expectAnchorSettled(page, `[id="${ids[0]}"]`);
     await links.nth(2).click();
     await expect(page).toHaveURL(/#classification$/);
-    await expect(page.locator("#classification")).toBeInViewport();
+    await expectAnchorSettled(page, "#classification");
     await page.goBack();
     await expect(page).toHaveURL(new RegExp(`#${ids[0]}$`));
-    await expect(page.locator(`[id="${ids[0]}"]`)).toBeInViewport();
+    await expectAnchorSettled(page, `[id="${ids[0]}"]`);
     await page.goForward();
     await expect(page).toHaveURL(/#classification$/);
-    await expect(page.locator("#classification")).toBeInViewport();
+    await expectAnchorSettled(page, "#classification");
 
     // A direct load of the semantic fragment reaches the heading.
     await page.goto("about:blank");
     await page.goto(base("docs") + page_ + "#classification");
-    await expect(page.locator("#classification")).toBeInViewport();
+    await expectAnchorSettled(page, "#classification");
   });
 
   test("search entries have clean titles, semantic fragments and no number field", async () => {
@@ -131,6 +152,6 @@ test.describe("docs anchors and search titles", () => {
     );
     await section.click();
     await expect(page).toHaveURL(/\/projects\/sweep\/#classification$/);
-    await expect(page.locator("#classification")).toBeInViewport();
+    await expectAnchorSettled(page, "#classification");
   });
 });
