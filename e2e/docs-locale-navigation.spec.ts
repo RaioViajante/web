@@ -52,8 +52,9 @@ test("English Docs links only declared counterparts and discloses untranslated p
   ]) {
     await page.goto(base("docs") + path);
     const disclosure = page.locator('.rv-lang[data-lang-state="disclosure"]');
-    await expect(disclosure.locator("summary")).toContainText(
-      "Português (Brasil)",
+    await expect(disclosure.locator("summary")).toHaveText("LANG EN");
+    await expect(disclosure.locator("summary")).toHaveAccessibleName(
+      "Language: English. Check Portuguese availability.",
     );
     await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(
       0,

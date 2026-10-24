@@ -11,7 +11,24 @@ One visual identity for four sites with four different jobs.
 | docs             | reference               | left nav + "on this page", search, callouts, CLI reference            |
 | lab              | running things          | benches, fidelity, notebook                                           |
 
-The frame never changes between sites: sound toggle, sidebar, centered page header, numbered sections, footer. Only what lives inside the frame does.
+The frame never changes between sites: owner location clock, sound toggle, language control, sidebar, centered page header, numbered sections, footer. Only what lives inside the frame does.
+
+### Owner location clock
+
+The shared utility row reads the owner's current location from
+`site/owner-location.ts`. When traveling, edit only `ownerLocation.label` and
+`ownerLocation.timeZone`, using a short label and an IANA timezone, then deploy
+all four applications. For Dublin, for example:
+
+```ts
+export const ownerLocation = {
+  label: "DUB",
+  timeZone: "Europe/Dublin",
+} as const;
+```
+
+The clock is not visitor-configurable and never uses browser location,
+geolocation, IP detection or the visitor's local timezone.
 
 ---
 

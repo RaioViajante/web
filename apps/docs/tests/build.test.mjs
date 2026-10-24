@@ -57,10 +57,10 @@ test("a cold-cache production build keeps semantic headings in the search index"
 	assert.match(home, /href="\/pt\/projetos\/sweep\/"/);
 	assert.doesNotMatch(home, /href="\/projects\/sweep\/cli\/"/);
 	assert.match(home, /data-lang-state="link"/);
-	assert.match(home, /LANG<!-- --> <span lang="pt-BR">PT<\/span>/);
-	assert.match(home, /<a href="\/" lang="en" hrefLang="en"[^>]*>English<\/a>/);
-	assert.match(enHome, /<a href="\/pt\/" lang="pt-BR" hrefLang="pt-BR"[^>]*>Português \(Brasil\)<\/a>/);
-	assert.match(en, /<a href="\/pt\/projetos\/sweep\/" lang="pt-BR"/);
+	assert.match(home, /<span class="rv-utility__label">LANG<\/span>(?:<!-- -->)? <span class="rv-utility__value" lang="pt-BR">PT<\/span>/);
+	assert.match(home, /<a href="\/" hrefLang="en" aria-label="Idioma: Português \(Brasil\)\. Mudar para inglês\."/);
+	assert.match(enHome, /<a href="\/pt\/" hrefLang="pt-BR" aria-label="Language: English\. Switch to Portuguese\."/);
+	assert.match(en, /<a href="\/pt\/projetos\/sweep\/" hrefLang="pt-BR"/);
 	assert.match(untranslated, /data-lang-state="disclosure"/);
 	assert.match(untranslated, /href="\/pt\/" hrefLang="pt-BR"/);
 	assert.doesNotMatch(untranslated, /href="\/pt\/projects\/sweep\/cli\/"|hreflang="pt-BR"/);

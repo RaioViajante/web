@@ -3,6 +3,7 @@ export { SearchNavItem, SearchPage, type SearchEntry } from "./search";
 export {
   Footer,
   NavGroup,
+  OwnerClock,
   Shell,
   SoundToggle,
   type NavItem,

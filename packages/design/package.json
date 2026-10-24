@@ -17,6 +17,7 @@
     "./sound": "./sound/index.ts",
     "./behavior": "./behavior.ts",
     "./behavior-react": "./behavior-react.tsx",
+    "./clock": "./clock.ts",
     "./gallery": "./components/gallery.ts",
     "./avatar": "./components/avatar.ts",
     "./theme-color": "./theme-color.ts",

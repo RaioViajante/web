@@ -10,6 +10,7 @@ import {
   type LocaleId,
 } from "../../../site/locales";
 import { CONTACT, SITES, type SiteId } from "../../../site/sites";
+import { ownerLocation } from "../../../site/owner-location";
 
 export interface NavItem {
   label: string;
@@ -102,8 +103,28 @@ export function SoundToggle({ locale }: { locale: LocaleId }) {
       aria-pressed="false"
       aria-label={sound.aria(false)}
     >
-      {sound.label} <span aria-hidden="true">{sound.off}</span>
+      <span className="rv-utility__label">{sound.label}</span>{" "}
+      <span className="rv-sound__value" aria-hidden="true">
+        {sound.off}
+      </span>
     </button>
+  );
+}
+
+/** The owner's configured local time; shared behavior replaces the stable placeholder. */
+export function OwnerClock({ locale }: { locale: LocaleId }) {
+  const label = ownerLocation.label;
+  const accessibleLabel = catalogFor(locale).clock.aria(label);
+  return (
+    <div className="rv-clock">
+      <span className="rv-utility__label" aria-hidden="true">
+        {label}
+      </span>
+      <span className="rv-sr-only">{accessibleLabel}: </span>
+      <time className="rv-utility__value" data-owner-clock="">
+        --:--
+      </time>
+    </div>
   );
 }
 
@@ -260,8 +281,9 @@ export function Shell({
       </a>
       <div className="rv-shell">
         <header className="rv-sound">
-          <LanguageControl site={site} locale={locale} {...language} />
+          <OwnerClock locale={locale} />
           <SoundToggle locale={locale} />
+          <LanguageControl site={site} locale={locale} {...language} />
         </header>
         <aside className="rv-sidebar">
           <NavGroup
