@@ -193,6 +193,142 @@ export const artworks: readonly Artwork[] = [
     "RaioViajante looking at a mirror that reflects him as a donkey",
   ),
 ];
+/** Replaces `{name}` placeholders; the copy keeps whole sentences so word order can differ. */
+export function fill(
+  template: string,
+  values: Record<string, string | number>,
+) {
+  return template.replace(/\{(\w+)\}/g, (_, key) => String(values[key]));
+}
+
+export type Plural = { one: string; other: string };
+export const plural = (forms: Plural, n: number) =>
+  fill(n === 1 ? forms.one : forms.other, { n });
+
+/**
+ * Every user-facing Gallery string that is not artwork data. Titles are
+ * proper names or artistic titles and are never part of the copy. Artwork data
+ * is not duplicated per locale: `alts`, `uses`, `stickerAlt` and `linkLabels`
+ * only override the English values and are absent for English.
+ */
+export type GalleryCopy = {
+  categories: Record<
+    Category,
+    { title: string; description: string; note: string }
+  >;
+  stickerAlt?: string;
+  alts?: Record<string, string>;
+  uses?: Record<string, string>;
+  linkLabels?: Record<string, string>;
+  kinds: Record<Category, { type: string; group: string }>;
+  ui: {
+    sections: string;
+    collection: string;
+    reveal: string;
+    coverAlt: string;
+    hintOpen: string;
+    hintClosed: string;
+    avatar: string;
+    avatarFlip: string;
+    avatarStill: string;
+    avatarMeta: string;
+    avatarFrames: string;
+    avatarFrame: string;
+    view: string;
+    profilesOf: string;
+    close: string;
+    download: string;
+    previous: string;
+    next: string;
+    usedOn: string;
+    downloadLabel: string;
+    downloadTitle: string;
+    downloadIntro: string;
+    legend: string;
+    files: Plural;
+    clear: string;
+    selectAll: string;
+    saves: string;
+    savesFolders: string;
+    nothing: string;
+    packing: string;
+    saved: string;
+    failed: string;
+    busy: string;
+    zip: string;
+    zipCount: string;
+  };
+};
+
+export const galleryCopy: GalleryCopy = {
+  categories: Object.fromEntries(
+    categories.map(({ id, title, description, note }) => [
+      id,
+      { title, description, note },
+    ]),
+  ) as GalleryCopy["categories"],
+  kinds: {
+    branding: { type: "sticker", group: "branding" },
+    profiles: { type: "profile picture", group: "profiles" },
+    personal: { type: "personal", group: "personal" },
+  },
+  ui: {
+    sections: "Collection sections",
+    collection: "Collection",
+    reveal: "Reveal the artwork collection",
+    coverAlt: "RaioViajante under a sign that reads work of art",
+    hintOpen: "click to put everything back",
+    hintClosed: "click the sticker",
+    avatar: "Avatar",
+    avatarFlip: "Flip RaioViajante avatar",
+    avatarStill: "Illustrated RaioViajante character",
+    avatarMeta: "index pages · 10 frames",
+    avatarFrames: "Avatar animation, ten frames",
+    avatarFrame: "Avatar frame {n}",
+    view: "View {title}",
+    profilesOf: "{title} profiles",
+    close: "close",
+    download: "download",
+    previous: "Previous artwork",
+    next: "Next artwork",
+    usedOn: "used on",
+    downloadLabel: "Download",
+    downloadTitle: "Take some art with you",
+    downloadIntro: "Pick the categories you want. Only those are saved.",
+    legend: "Categories",
+    files: { one: "{n} file", other: "{n} files" },
+    clear: "clear selection",
+    selectAll: "select all",
+    saves: "Saves as {filename}.",
+    savesFolders: "Saves as {filename}, one folder per category.",
+    nothing: "Nothing selected yet.",
+    packing: "Packing {i} of {n}…",
+    saved: "{filename} saved, {files}.",
+    failed: "The collection could not be saved. Please try again.",
+    busy: "packing…",
+    zip: "download .zip",
+    zipCount: "download .zip · {files}",
+  },
+};
+
+/** An artwork with the locale's alt text, use and profile-link labels; titles and files are unchanged. */
+export function localizeArtwork(artwork: Artwork, copy: GalleryCopy): Artwork {
+  const use =
+    artwork.use === undefined
+      ? undefined
+      : (copy.uses?.[artwork.use] ?? artwork.use);
+  const alt =
+    copy.alts?.[artwork.id] ??
+    (artwork.cell !== undefined && copy.stickerAlt
+      ? fill(copy.stickerAlt, { title: artwork.title })
+      : artwork.alt);
+  const links = artwork.links?.map((link) => ({
+    ...link,
+    label: copy.linkLabels?.[link.category] ?? link.label,
+  }));
+  return { ...artwork, alt, use, links };
+}
+
 export function peers(artwork: Artwork) {
   return artworks.filter((item) => item.category === artwork.category);
 }

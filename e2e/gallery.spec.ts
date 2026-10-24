@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -474,4 +474,267 @@ test("Gallery opening and immediate viewer activation remain independent", async
     ),
   ).toBe(starts);
   expect(health).toEqual([]);
+});
+
+const galleryAlts = (page: Page) =>
+  page
+    .locator(
+      '#gallery-collection [role="img"], #gallery-collection img:not([alt=""])',
+    )
+    .evaluateAll((nodes) =>
+      nodes.map(
+        (node) =>
+          node.getAttribute("aria-label") ?? node.getAttribute("alt") ?? "",
+      ),
+    );
+
+for (const width of [1440, 390])
+  test(`Portuguese Gallery viewer, keyboard and downloads at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: width === 1440 ? 900 : 844 });
+    const external: string[] = [];
+    await isolate(page, external);
+    const health = watchHealth(page);
+    await page.goto(base("root") + "/gallery");
+    const english = await galleryAlts(page);
+    await page.goto(base("root") + "/pt/gallery");
+    await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Um quebra-cabeça visual",
+    );
+    // Every alt text is translated; none is left in English or invented.
+    const portuguese = await galleryAlts(page);
+    expect(portuguese).toHaveLength(english.length);
+    portuguese.forEach((alt, index) => {
+      expect(alt).not.toBe("");
+      expect(alt).not.toBe(english[index]);
+    });
+    const collection = page.locator("#gallery-collection");
+    const cover = page.getByRole("button", {
+      name: "Mostrar a coleção de arte",
+    });
+    await expect(cover).toBeVisible();
+    await expect(collection).toBeHidden();
+    await expect(
+      page.getByRole("navigation", { name: "Seções da coleção" }),
+    ).toBeHidden();
+    for (
+      let i = 0;
+      i < 30 && !(await cover.evaluate((el) => el === document.activeElement));
+      i++
+    )
+      await page.keyboard.press("Tab");
+    await expect(cover).toBeFocused();
+    await expect(cover).toHaveCSS("outline-style", "solid");
+    await page.keyboard.press(width === 390 ? "Space" : "Enter");
+    await expect(collection).toBeVisible();
+    await expect(cover).toHaveAttribute("aria-expanded", "true");
+    await expect(page.locator(".gallery-cover-hint")).toHaveText(
+      "clique para guardar tudo",
+    );
+    await expect(
+      page.getByRole("heading", { name: "Identidade visual", exact: true }),
+    ).toBeInViewport();
+    await expect(
+      collection.locator('button[aria-haspopup="dialog"]'),
+    ).toHaveCount(41);
+    await expect(page.locator(".gallery-sticker")).toHaveCount(30);
+    await expect(page.locator(".gallery-profile")).toHaveCount(2);
+    await expect(page.locator(".gallery-piece")).toHaveCount(9);
+    // Profile links keep their URLs; the video-source label is translated.
+    const profileLinks = (path: string) =>
+      page
+        .goto(base("root") + path)
+        .then(() =>
+          page
+            .locator(".gallery-profile-links a")
+            .evaluateAll((nodes) =>
+              nodes.map((node) => [
+                node.getAttribute("href"),
+                node.getAttribute("rel"),
+              ]),
+            ),
+        );
+    const englishLinks = await profileLinks("/gallery");
+    expect(await profileLinks("/pt/gallery")).toEqual(englishLinks);
+    await page
+      .getByRole("button", { name: "Mostrar a coleção de arte" })
+      .click();
+    await expect(
+      page.getByRole("navigation", {
+        name: "Perfis de Confused at the laptop",
+      }),
+    ).toContainText("Código dos Vídeos");
+
+    const sticker = page.getByRole("button", {
+      name: "Ver Work of art",
+      exact: true,
+    });
+    await sticker.hover();
+    await sticker.click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole("heading")).toHaveText("Work of art");
+    await expect(dialog).toContainText("identidade visual · 1 / 30");
+    await expect(dialog).toContainText("adesivo");
+    await expect(dialog).toContainText("usado em");
+    await expect(dialog).toContainText("capa da galeria");
+    await expect(
+      dialog.getByRole("button", { name: "Obra anterior" }),
+    ).toHaveText("←");
+    await expect(
+      dialog.getByRole("button", { name: "Próxima obra" }),
+    ).toHaveText("→");
+    await page.keyboard.press("ArrowLeft");
+    await expect(dialog.getByRole("heading")).toHaveText("Still compiling");
+    await page.keyboard.press("ArrowRight");
+    await dialog.getByRole("button", { name: "Próxima obra" }).click();
+    await expect(dialog.getByRole("heading")).toHaveText("404");
+    await dialog.getByRole("button", { name: "Obra anterior" }).click();
+    for (let i = 0; i < 8; i++) {
+      await page.keyboard.press("Tab");
+      expect(
+        await page.evaluate(() =>
+          Boolean(document.activeElement?.closest("dialog")),
+        ),
+      ).toBe(true);
+    }
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(sticker).toBeFocused();
+
+    await page
+      .getByRole("button", { name: "Ver Confused at the laptop" })
+      .click();
+    const link = dialog.getByRole("link", { name: "baixar", exact: true });
+    await expect(link).toHaveAttribute(
+      "download",
+      "raioviajante-profiles-confused-at-the-laptop.png",
+    );
+    const singlePromise = page.waitForEvent("download");
+    await link.click();
+    const single = await singlePromise;
+    expect(single.suggestedFilename()).toBe(
+      "raioviajante-profiles-confused-at-the-laptop.png",
+    );
+    expect(readFileSync((await single.path())!)).toEqual(
+      readFileSync("packages/design/assets/gallery/profile-laptop.png"),
+    );
+    await dialog.getByRole("button", { name: "fechar", exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+
+    await page.getByRole("button", { name: "baixar", exact: true }).click();
+    await expect(dialog.getByRole("checkbox")).toHaveCount(3);
+    await expect(dialog).toContainText("Leve um pouco de arte com você");
+    await expect(dialog).toContainText("Nada selecionado ainda.");
+    await dialog.getByRole("checkbox", { name: /Perfis/ }).check();
+    await expect(dialog.getByRole("status")).toHaveText(
+      "Será salvo como raioviajante-profiles.zip.",
+    );
+    const zipPromise = page.waitForEvent("download");
+    await dialog
+      .getByRole("button", { name: "baixar .zip · 2 arquivos" })
+      .click();
+    const zip = await zipPromise;
+    expect(zip.suggestedFilename()).toBe("raioviajante-profiles.zip");
+    const zipPath = (await zip.path())!;
+    expect(
+      execFileSync("unzip", ["-t", zipPath], { encoding: "utf8" }),
+    ).toContain("No errors detected");
+    expect(
+      execFileSync("unzip", ["-Z1", zipPath], { encoding: "utf8" })
+        .trim()
+        .split("\n"),
+    ).toEqual([
+      "raioviajante-profiles-confused-at-the-laptop.png",
+      "raioviajante-profiles-hmm.png",
+    ]);
+    await expect(dialog.getByRole("status")).toHaveText(
+      "raioviajante-profiles.zip salvo, 2 arquivos.",
+    );
+    await dialog
+      .getByRole("button", { name: "selecionar tudo", exact: true })
+      .click();
+    await expect(dialog.getByRole("status")).toHaveText(
+      "Será salvo como raioviajante-gallery.zip, com uma pasta por categoria.",
+    );
+    await expect(
+      dialog.getByRole("button", { name: "baixar .zip · 13 arquivos" }),
+    ).toBeEnabled();
+    await expect(
+      dialog.getByRole("button", { name: "limpar seleção", exact: true }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+
+    await page
+      .getByRole("link", { name: "04.3 pessoais", exact: true })
+      .click();
+    await expect(page.locator("#gallery-personal")).toBeFocused();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    expect(external).toEqual([]);
+    expect(health).toEqual([]);
+  });
+
+test("Portuguese Gallery reduced motion and failed collection download", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(base("root") + "/pt/gallery");
+  const cover = page.getByRole("button", {
+    name: "Mostrar a coleção de arte",
+  });
+  await expect(cover.locator("img")).toHaveCSS("animation-name", "none");
+  await cover.press("Space");
+  await expect(page.locator("#gallery-collection")).toBeVisible();
+  expect(
+    await page
+      .locator(".gallery-redesign")
+      .evaluate((el) => el.getAnimations({ subtree: true }).length),
+  ).toBe(0);
+  await page.getByRole("button", { name: "Ver Search", exact: true }).click();
+  expect(
+    await page
+      .getByRole("dialog")
+      .evaluate((node) => getComputedStyle(node).animationName),
+  ).toBe("none");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "baixar", exact: true }).click();
+  await page.getByRole("checkbox", { name: /Identidade visual/ }).check();
+  await page.route("**/*branding-stickers*", (route) =>
+    route.fulfill({ status: 503 }),
+  );
+  await page.getByRole("button", { name: "baixar .zip · 2 arquivos" }).click();
+  await expect(page.getByRole("status")).toHaveText(
+    "Não foi possível salvar a coleção. Tente novamente.",
+  );
+  await expect(
+    page.getByRole("button", { name: "baixar .zip · 2 arquivos" }),
+  ).toBeEnabled();
+});
+
+test("Portuguese Gallery collection is available without JavaScript", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await isolate(page, []);
+  await page.goto(base("root") + "/pt/gallery");
+  await expect(page.locator("#gallery-collection")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /Identidade visual/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Mostrar a coleção de arte" }),
+  ).toHaveCount(0);
+  await page.getByRole("link", { name: "04.3 pessoais", exact: true }).click();
+  await expect(page).toHaveURL(/#gallery-personal$/);
+  await context.close();
 });

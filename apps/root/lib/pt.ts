@@ -1,9 +1,10 @@
 // Root's Portuguese (pt-BR) editorial copy. App-owned and manually authored:
 // the shared UI strings live in packages/design's catalog. Only pages that ship
-// in Portuguese appear here (Home, About, Projects, Contact, This site, Setup,
-// Search and the 404); the other Root pages are English-only. Names, handles, the email
+// in Portuguese appear here (Home, About, Projects, Contact, Gallery, This site,
+// Setup, Search and the 404); the other Root pages are English-only. Names, handles, the email
 // address and tool names are not translated.
 
+import type { GalleryCopy } from "./gallery.ts";
 import { projects, type Project, type ProjectName } from "./projects.ts";
 import type { RouteKey } from "./routes.ts";
 import { localizedPath, participates } from "../../../site/locales.ts";
@@ -46,6 +47,11 @@ export const ptPageSeo: Partial<
     description:
       "Entre em contato com RaioViajante por e-mail para conversar sobre ideias, dúvidas, feedback ou colaboração.",
   },
+  gallery: {
+    title: "galeria",
+    description:
+      "Uma coleção pessoal de ilustrações de personagens, desenhos e experimentos visuais.",
+  },
   "this-site": {
     title: "este site",
     description:
@@ -68,6 +74,7 @@ export const ptSearchDescriptions: Partial<Record<RouteKey, string>> = {
   about: "Sobre RaioViajante",
   projects: "Projetos e trabalhos",
   contact: "Formas de entrar em contato",
+  gallery: "Arte e imagens",
   "this-site": "Como este site é construído",
   setup: "Ferramentas e setup",
 };
@@ -77,6 +84,7 @@ export const ptNavigation = [
   { key: "about" as const, label: "sobre" },
   { key: "projects" as const, label: "projetos" },
   { key: "contact" as const, label: "contato" },
+  { key: "gallery" as const, label: "galeria" },
   { key: "this-site" as const, label: "este site" },
 ];
 
@@ -260,6 +268,104 @@ export const ptContact = {
   firstStepTitle: "Um primeiro passo simples",
   firstStep:
     "Algumas linhas de contexto bastam para começar. Não precisa preparar um briefing formal.",
+};
+
+export const ptGallery = {
+  label: "galeria",
+  title: "Um quebra-cabeça visual",
+  line: "Ilustrações, personagens e cenas do mundo do RaioViajante, organizadas como um quadro.",
+};
+
+/** Artwork titles stay as supplied (proper names and artistic titles); everything else is translated. */
+export const ptGalleryCopy: GalleryCopy = {
+  categories: {
+    branding: {
+      title: "Identidade visual",
+      description:
+        "O personagem, em adesivos. Alguns têm uma função nestes sites: passe o mouse para ver onde.",
+      note: "folha de adesivos + quadros do avatar",
+    },
+    profiles: {
+      title: "Perfis",
+      description: "Onde o RaioViajante aparece fora destes sites.",
+      note: "fotos de perfil",
+    },
+    personal: {
+      title: "Pessoais",
+      description:
+        "Desenhados sem outro motivo além da vontade. Fixados na ordem em que surgiram.",
+      note: "ilustrações",
+    },
+  },
+  stickerAlt: "Adesivo do RaioViajante: {title}",
+  alts: {
+    "profile-laptop":
+      "RaioViajante coçando a cabeça diante de um laptop, com dois pontos de interrogação ao lado",
+    "profile-hmm": "RaioViajante com a mão no queixo, olhando para cima",
+    lab: "RaioViajante de jaleco segurando um frasco verde entre tanques luminosos etiquetados com linguagens",
+    portrait:
+      "Retrato pintado de RaioViajante com uma camiseta escura sobre fundo roxo",
+    castle:
+      "RaioViajante correndo por um cemitério em direção a um castelo sob a lua cheia",
+    cow: "Uma vaca fofa dizendo muhh sobre fundo roxo",
+    cats: "Três gatos pretos de olhos laranja, um deles segurando um peixe",
+    sunset:
+      "RaioViajante tocando ukulele sob uma árvore, ao pôr do sol, à beira-mar",
+    calves: "Dois bezerros brincando, um deles pulando",
+    hospital:
+      "RaioViajante em uma cama de hospital ao lado de um monitor que exibe código binário",
+    mirror: "RaioViajante olhando para um espelho que o reflete como um burro",
+  },
+  uses: {
+    "gallery cover": "capa da galeria",
+    "404 · every site": "404 · todos os sites",
+    "search · every site": "busca · todos os sites",
+    "empty search": "busca vazia",
+    "profile picture": "foto de perfil",
+  },
+  linkLabels: { source: "Código dos Vídeos" },
+  kinds: {
+    branding: { type: "adesivo", group: "identidade visual" },
+    profiles: { type: "foto de perfil", group: "perfis" },
+    personal: { type: "pessoal", group: "pessoais" },
+  },
+  ui: {
+    sections: "Seções da coleção",
+    collection: "Coleção",
+    reveal: "Mostrar a coleção de arte",
+    coverAlt: "RaioViajante sob uma placa que diz “work of art”",
+    hintOpen: "clique para guardar tudo",
+    hintClosed: "clique no adesivo",
+    avatar: "Avatar",
+    avatarFlip: "Virar o avatar do RaioViajante",
+    avatarStill: "Personagem ilustrado do RaioViajante",
+    avatarMeta: "páginas iniciais · 10 quadros",
+    avatarFrames: "Animação do avatar, dez quadros",
+    avatarFrame: "Quadro {n} do avatar",
+    view: "Ver {title}",
+    profilesOf: "Perfis de {title}",
+    close: "fechar",
+    download: "baixar",
+    previous: "Obra anterior",
+    next: "Próxima obra",
+    usedOn: "usado em",
+    downloadLabel: "Download",
+    downloadTitle: "Leve um pouco de arte com você",
+    downloadIntro: "Escolha as categorias que quiser. Só elas são salvas.",
+    legend: "Categorias",
+    files: { one: "{n} arquivo", other: "{n} arquivos" },
+    clear: "limpar seleção",
+    selectAll: "selecionar tudo",
+    saves: "Será salvo como {filename}.",
+    savesFolders: "Será salvo como {filename}, com uma pasta por categoria.",
+    nothing: "Nada selecionado ainda.",
+    packing: "Compactando {i} de {n}…",
+    saved: "{filename} salvo, {files}.",
+    failed: "Não foi possível salvar a coleção. Tente novamente.",
+    busy: "compactando…",
+    zip: "baixar .zip",
+    zipCount: "baixar .zip · {files}",
+  },
 };
 
 export const ptThisSite = {

@@ -18,10 +18,14 @@ import {
   artworks,
   categories,
   categoryFiles,
+  fill,
+  localizeArtwork,
   peers,
+  plural,
   stepArtwork,
   type Artwork,
   type Category,
+  type GalleryCopy,
 } from "../lib/gallery";
 
 function Picture({
@@ -70,12 +74,18 @@ function Picture({
   );
 }
 
-function ProfileLinks({ artwork }: { artwork: Artwork }) {
+function ProfileLinks({
+  artwork,
+  copy,
+}: {
+  artwork: Artwork;
+  copy: GalleryCopy;
+}) {
   if (!artwork.links) return null;
   return (
     <nav
       className="gallery-profile-links"
-      aria-label={`${artwork.title} profiles`}
+      aria-label={fill(copy.ui.profilesOf, { title: artwork.title })}
     >
       {artwork.links.map((link, index) => (
         <span key={link.href}>
@@ -95,12 +105,14 @@ function GalleryDialog({
   onKeyDown,
   children,
   compact = false,
+  closeLabel,
 }: {
   titleId: string;
   onDismiss: () => void;
   onKeyDown?: (event: KeyboardEvent<HTMLDialogElement>) => void;
   children: ReactNode;
   compact?: boolean;
+  closeLabel: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -177,14 +189,21 @@ function GalleryDialog({
         onClick={close}
         autoFocus
       >
-        close
+        {closeLabel}
       </button>
       {children}
     </dialog>
   );
 }
 
-function CollectionDownload({ onDismiss }: { onDismiss: () => void }) {
+function CollectionDownload({
+  onDismiss,
+  copy,
+}: {
+  onDismiss: () => void;
+  copy: GalleryCopy;
+}) {
+  const { ui } = copy;
   const [selected, setSelected] = useState<Category[]>([]);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
@@ -206,7 +225,7 @@ function CollectionDownload({ onDismiss }: { onDismiss: () => void }) {
         await import("../lib/gallery-download");
       const entries = [];
       for (const [index, file] of files.entries()) {
-        setStatus(`Packing ${index + 1} of ${files.length}…`);
+        setStatus(fill(ui.packing, { i: index + 1, n: files.length }));
         const response = await fetch(file.src, { signal: controller.signal });
         if (!response.ok) throw new Error("Unavailable artwork");
         entries.push({
@@ -216,10 +235,11 @@ function CollectionDownload({ onDismiss }: { onDismiss: () => void }) {
       }
       if (controller.signal.aborted) return;
       saveGalleryBlob(galleryZip(entries), filename);
-      setStatus(`${filename} saved, ${files.length} files.`);
+      setStatus(
+        fill(ui.saved, { filename, files: plural(ui.files, files.length) }),
+      );
     } catch {
-      if (!controller.signal.aborted)
-        setStatus("The collection could not be saved. Please try again.");
+      if (!controller.signal.aborted) setStatus(ui.failed);
     } finally {
       if (!controller.signal.aborted) setBusy(false);
     }
@@ -228,15 +248,16 @@ function CollectionDownload({ onDismiss }: { onDismiss: () => void }) {
     <GalleryDialog
       titleId="gallery-download-title"
       onDismiss={onDismiss}
+      closeLabel={ui.close}
       compact
     >
       <header className="gallery-download-header">
-        <span className="rv-label">Download</span>
-        <h2 id="gallery-download-title">Take some art with you</h2>
-        <p>Pick the categories you want. Only those are saved.</p>
+        <span className="rv-label">{ui.downloadLabel}</span>
+        <h2 id="gallery-download-title">{ui.downloadTitle}</h2>
+        <p>{ui.downloadIntro}</p>
       </header>
       <fieldset disabled={busy} className="gallery-download-options">
-        <legend className="rv-sr-only">Categories</legend>
+        <legend className="rv-sr-only">{ui.legend}</legend>
         {categories.map((category) => (
           <label key={category.id}>
             <input
@@ -258,10 +279,10 @@ function CollectionDownload({ onDismiss }: { onDismiss: () => void }) {
               }}
             />
             <span>
-              {category.title}
-              <small>{category.note}</small>
+              {copy.categories[category.id].title}
+              <small>{copy.categories[category.id].note}</small>
             </span>
-            <small>{categoryFiles(category.id).length} files</small>
+            <small>{plural(ui.files, categoryFiles(category.id).length)}</small>
           </label>
         ))}
       </fieldset>
@@ -278,16 +299,16 @@ function CollectionDownload({ onDismiss }: { onDismiss: () => void }) {
           setStatus("");
         }}
       >
-        {selected.length === categories.length
-          ? "clear selection"
-          : "select all"}
+        {selected.length === categories.length ? ui.clear : ui.selectAll}
       </button>
       <footer className="gallery-download-footer">
         <p role="status">
           {status ||
             (files.length
-              ? `Saves as ${filename}${selected.length > 1 ? ", one folder per category." : "."}`
-              : "Nothing selected yet.")}
+              ? fill(selected.length > 1 ? ui.savesFolders : ui.saves, {
+                  filename,
+                })
+              : ui.nothing)}
         </p>
         <button
           type="button"
@@ -296,15 +317,21 @@ function CollectionDownload({ onDismiss }: { onDismiss: () => void }) {
           onClick={download}
         >
           {busy
-            ? "packing…"
-            : `download .zip${files.length ? ` · ${files.length} files` : ""}`}
+            ? ui.busy
+            : files.length
+              ? fill(ui.zipCount, { files: plural(ui.files, files.length) })
+              : ui.zip}
         </button>
       </footer>
     </GalleryDialog>
   );
 }
 
-export function GalleryBoard() {
+export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
+  const { ui } = copy;
+  const items = artworks.map((item) => localizeArtwork(item, copy));
+  const step = (item: Artwork, direction: number) =>
+    localizeArtwork(stepArtwork(item, direction), copy);
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<Artwork | null>(null);
   const [downloadOpen, setDownloadOpen] = useState(false);
@@ -331,11 +358,7 @@ export function GalleryBoard() {
   }
   return (
     <div className="gallery-redesign" data-open={open}>
-      <nav
-        className="gallery-jumps"
-        aria-label="Collection sections"
-        hidden={!open}
-      >
+      <nav className="gallery-jumps" aria-label={ui.sections} hidden={!open}>
         {categories.map((category, index) => (
           <a
             key={category.id}
@@ -345,20 +368,21 @@ export function GalleryBoard() {
               go(`gallery-${category.id}`);
             }}
           >
-            <span>04.{index + 1}</span> {category.title.toLowerCase()}
+            <span>04.{index + 1}</span>{" "}
+            {copy.categories[category.id].title.toLowerCase()}
           </a>
         ))}
       </nav>
       <section className="gallery-collection-intro">
         <div className="gallery-section-heading" hidden={!open}>
-          <SectionHeading number="04." title="Collection" />
+          <SectionHeading number="04." title={ui.collection} />
           <button
             type="button"
             className="gallery-control"
             aria-haspopup="dialog"
             onClick={() => setDownloadOpen(true)}
           >
-            download
+            {ui.download}
           </button>
         </div>
         <div className="gallery-cover">
@@ -367,19 +391,19 @@ export function GalleryBoard() {
             ref={cover}
             aria-expanded={open}
             aria-controls="gallery-collection"
-            aria-label="Reveal the artwork collection"
+            aria-label={ui.reveal}
             data-sound="gallery"
             onClick={() => setOpen((value) => !value)}
           >
             <Image
               {...art.workOfArt}
-              alt="RaioViajante under a sign that reads work of art"
+              alt={ui.coverAlt}
               sizes="160px"
               priority
             />
           </button>
           <span className="gallery-cover-hint">
-            {open ? "click to put everything back" : "click the sticker"}
+            {open ? ui.hintOpen : ui.hintClosed}
           </span>
         </div>
       </section>
@@ -394,24 +418,27 @@ export function GalleryBoard() {
               number={`04.${index + 1}`}
               title={
                 <span id={`gallery-${category.id}`} tabIndex={-1}>
-                  {category.title}
+                  {copy.categories[category.id].title}
                 </span>
               }
             />
-            <p>{category.description}</p>
+            <p>{copy.categories[category.id].description}</p>
             {category.id === "branding" ? (
               <div className="gallery-branding">
                 <div className="gallery-avatar">
-                  <AvatarCoin />
+                  <AvatarCoin
+                    label={ui.avatarFlip}
+                    reducedMotionLabel={ui.avatarStill}
+                  />
                   <div className="gallery-avatar-sequence">
                     <div className="gallery-meta">
-                      <span>Avatar</span>
+                      <span>{ui.avatar}</span>
                       <span className="gallery-dots" />
-                      <span>index pages · 10 frames</span>
+                      <span>{ui.avatarMeta}</span>
                     </div>
                     <div
                       className="gallery-frames"
-                      aria-label="Avatar animation, ten frames"
+                      aria-label={ui.avatarFrames}
                     >
                       {avatarFrames.map((src, i) => (
                         <figure key={src}>
@@ -419,7 +446,7 @@ export function GalleryBoard() {
                             src={src}
                             width={44}
                             height={44}
-                            alt={`Avatar frame ${i + 1}`}
+                            alt={fill(ui.avatarFrame, { n: i + 1 })}
                             loading="lazy"
                             unoptimized
                           />
@@ -432,7 +459,7 @@ export function GalleryBoard() {
                   </div>
                 </div>
                 <div className="gallery-stickers">
-                  {artworks
+                  {items
                     .filter((item) => item.category === "branding")
                     .map((item) => (
                       <button
@@ -441,7 +468,7 @@ export function GalleryBoard() {
                         className="gallery-sticker"
                         onClick={() => setView(item)}
                         data-sound="gallery"
-                        aria-label={`View ${item.title}`}
+                        aria-label={fill(ui.view, { title: item.title })}
                         aria-haspopup="dialog"
                       >
                         <Picture artwork={item} />
@@ -461,7 +488,7 @@ export function GalleryBoard() {
                     : "gallery-collage"
                 }
               >
-                {artworks
+                {items
                   .filter((item) => item.category === category.id)
                   .map((item) =>
                     category.id === "profiles" ? (
@@ -469,7 +496,7 @@ export function GalleryBoard() {
                         <button
                           type="button"
                           data-sound="gallery"
-                          aria-label={`View ${item.title}`}
+                          aria-label={fill(ui.view, { title: item.title })}
                           aria-haspopup="dialog"
                           onClick={() => setView(item)}
                         >
@@ -478,7 +505,7 @@ export function GalleryBoard() {
                         <div>
                           {item.title}
                           {item.use && <small>{item.use}</small>}
-                          <ProfileLinks artwork={item} />
+                          <ProfileLinks artwork={item} copy={copy} />
                         </div>
                       </div>
                     ) : (
@@ -487,7 +514,7 @@ export function GalleryBoard() {
                         type="button"
                         className={`gallery-piece gallery-piece--${item.id}`}
                         data-sound="gallery"
-                        aria-label={`View ${item.title}`}
+                        aria-label={fill(ui.view, { title: item.title })}
                         aria-haspopup="dialog"
                         onClick={() => setView(item)}
                       >
@@ -504,15 +531,16 @@ export function GalleryBoard() {
         <GalleryDialog
           titleId="gallery-view-title"
           onDismiss={() => setView(null)}
+          closeLabel={ui.close}
           onKeyDown={(event) => {
             if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
               event.preventDefault();
-              setView(stepArtwork(view, event.key === "ArrowLeft" ? -1 : 1));
+              setView(step(view, event.key === "ArrowLeft" ? -1 : 1));
             }
           }}
         >
           <header className="gallery-view-header">
-            {view.category} ·{" "}
+            {copy.kinds[view.category].group} ·{" "}
             {peers(view).findIndex((item) => item.id === view.id) + 1} /{" "}
             {peers(view).length}
           </header>
@@ -529,16 +557,16 @@ export function GalleryBoard() {
               <button
                 type="button"
                 className="gallery-control gallery-arrow"
-                aria-label="Previous artwork"
-                onClick={() => setView(stepArtwork(view, -1))}
+                aria-label={ui.previous}
+                onClick={() => setView(step(view, -1))}
               >
                 <span aria-hidden="true">←</span>
               </button>
               <button
                 type="button"
                 className="gallery-control gallery-arrow"
-                aria-label="Next artwork"
-                onClick={() => setView(stepArtwork(view, 1))}
+                aria-label={ui.next}
+                onClick={() => setView(step(view, 1))}
               >
                 <span aria-hidden="true">→</span>
               </button>
@@ -553,22 +581,16 @@ export function GalleryBoard() {
               <div className="gallery-meta">
                 <h2 id="gallery-view-title">{view.title}</h2>
                 <span className="gallery-dots" />
-                <span>
-                  {view.category === "branding"
-                    ? "sticker"
-                    : view.category === "profiles"
-                      ? "profile picture"
-                      : "personal"}
-                </span>
+                <span>{copy.kinds[view.category].type}</span>
               </div>
               {view.use && (
                 <div className="gallery-meta">
-                  <span>used on</span>
+                  <span>{ui.usedOn}</span>
                   <span className="gallery-dots" />
                   <span>{view.use}</span>
                 </div>
               )}
-              <ProfileLinks artwork={view} />
+              <ProfileLinks artwork={view} copy={copy} />
             </div>
             {view.download && (
               <a
@@ -576,14 +598,17 @@ export function GalleryBoard() {
                 href={view.download.src}
                 download={view.download.filename}
               >
-                download
+                {ui.download}
               </a>
             )}
           </footer>
         </GalleryDialog>
       )}
       {downloadOpen && (
-        <CollectionDownload onDismiss={() => setDownloadOpen(false)} />
+        <CollectionDownload
+          onDismiss={() => setDownloadOpen(false)}
+          copy={copy}
+        />
       )}
     </div>
   );
