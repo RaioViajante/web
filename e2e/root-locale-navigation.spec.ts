@@ -488,3 +488,113 @@ test("Root legal pages state the same audited facts in English and Portuguese", 
     "o texto que você digita não é enviado a eles",
   );
 });
+
+test("every Root search suggestion finds a published entry in its own locale and scope", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  // Federated search reads each host's index at its production origin; serve
+  // the locally built index of every host instead of leaving the machine.
+  const origins = {
+    root: "https://raioviajante.com",
+    dump: "https://dump.raioviajante.com",
+    docs: "https://docs.raioviajante.com",
+    lab: "https://lab.raioviajante.com",
+  } as const;
+  for (const locale of ["", "/pt"])
+    for (const site of Object.keys(origins) as (keyof typeof origins)[]) {
+      const path = `${locale}/search-index.json`;
+      const response = await fetch(`${base(site)}${path}`);
+      if (!response.ok) continue;
+      const body = await response.text();
+      await page.route(
+        (url) =>
+          url.pathname === path &&
+          (url.origin === base(site) || url.origin === origins[site]),
+        (route) =>
+          route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            headers: { "access-control-allow-origin": "*" },
+            body,
+          }),
+      );
+    }
+
+  // Each suggestion and a selector for the entry it must lead to, per scope.
+  const published = {
+    "/pt/search": {
+      site: {
+        sobre: '[href$="/pt/about"]',
+        projetos: '[href$="/pt/projects"]',
+        galeria: '[href$="/pt/gallery"]',
+        setup: '[href$="/pt/setup"]',
+      },
+      everywhere: {
+        traduzir: '[href^="https://dump.raioviajante.com/pt/posts/"]',
+        classificação: '[href^="https://docs.raioviajante.com/pt/projetos/"]',
+        classificador: '[href^="https://lab.raioviajante.com/pt/experiments/"]',
+      },
+    },
+    "/search": {
+      site: {
+        projects: '[href$="/projects"]',
+        setup: '[href$="/setup"]',
+        about: '[href$="/about"]',
+        gallery: '[href$="/gallery"]',
+      },
+      everywhere: {
+        assembly: '[href^="https://dump.raioviajante.com/posts/"]',
+        cli: '[href^="https://docs.raioviajante.com/projects/"]',
+        classifier: '[href^="https://lab.raioviajante.com/experiments/"]',
+      },
+    },
+  } as const;
+
+  for (const [path, scopes] of Object.entries(published)) {
+    const portuguese = path.startsWith("/pt");
+    await page.goto(base("root") + path);
+    await expect(page.locator("[data-search-page]")).toHaveAttribute(
+      "data-search-state",
+      "ready",
+    );
+    const input = page.getByRole("searchbox", {
+      name: portuguese ? "BUSCAR" : "SEARCH",
+    });
+    for (const [scope, entries] of Object.entries(scopes)) {
+      await page
+        .getByRole("group", {
+          name: portuguese ? "Escopo da busca" : "Search scope",
+        })
+        .locator(`[data-search-scope="${scope}"]`)
+        .click();
+      await input.fill("no-match-for-root");
+      const line = page.locator(`[data-search-suggestions="${scope}"]`);
+      const buttons = line.getByRole("button");
+      await expect(buttons.first()).toBeVisible();
+      const terms = await buttons.allTextContents();
+      expect(terms).toEqual(Object.keys(entries));
+      for (const [index, term] of terms.entries()) {
+        const button = line.getByRole("button", { name: term, exact: true });
+        if (index === 0) {
+          await button.focus();
+          await expect(button).toBeFocused();
+          await page.keyboard.press("Enter");
+        } else await button.click();
+        await expect(input).toHaveValue(term);
+        await expect(input).toBeFocused();
+        // Federated indexes load asynchronously and the page re-renders when
+        // they arrive, so this retries until the entry shows up.
+        await expect(
+          page
+            .locator(
+              `[data-search-result]${entries[term as keyof typeof entries]}`,
+            )
+            .first(),
+        ).toBeVisible();
+        await input.fill("no-match-for-root");
+        await expect(buttons.first()).toBeVisible();
+      }
+    }
+  }
+});
