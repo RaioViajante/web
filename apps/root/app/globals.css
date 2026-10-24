@@ -83,6 +83,11 @@ html {
   color: var(--fg-3);
 }
 
+.rv-section p.setup-disclosure {
+  margin: 0 0 38.72px 66px;
+  color: var(--fg-2);
+}
+
 .setup-gear {
   margin-bottom: 38.72px;
 }
@@ -171,7 +176,8 @@ html {
   }
 
   .rv-section p.home-feed-note,
-  .rv-section p.setup-empty {
+  .rv-section p.setup-empty,
+  .rv-section p.setup-disclosure {
     margin-left: 0;
   }
 }

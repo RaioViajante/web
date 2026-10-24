@@ -16,7 +16,9 @@ export const dynamic = "force-static";
  * Portuguese, so the shared search reads it.
  */
 export function GET() {
-  const entries: SearchEntry[] = ptNavigation.map(({ key, label }, index) => ({
+  // Setup is linked from the home page rather than the navigation, as in English.
+  const pages = [...ptNavigation, { key: "setup" as const, label: "setup" }];
+  const entries: SearchEntry[] = pages.map(({ key, label }, index) => ({
     site: "root",
     locale: "pt-BR",
     title: key === "home" ? "início" : (ptPageSeo[key]?.title ?? label),

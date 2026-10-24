@@ -5,19 +5,25 @@ import {
   Section,
 } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
-import { gear } from "../../lib/setup";
+import { affiliateDisclosure, gear } from "../../lib/setup";
 
-export const metadata = metadataFor("/setup");
+const path = "/setup";
+export const metadata = metadataFor(path);
 
 export default function Setup() {
   return (
-    <RootShell>
+    <RootShell current={path}>
       <PageHeader
         label="setup"
         title="Setup"
         line="The tools I use at my desk and on the road."
       />
       <Section number="00.1" title="Gear list" id="gear-heading">
+        {gear.some((item) => item.url) && (
+          <p className="setup-disclosure" id="affiliate-disclosure">
+            {affiliateDisclosure}
+          </p>
+        )}
         {gear.length === 0 ? (
           <p className="setup-empty">I&apos;m putting the list together.</p>
         ) : (

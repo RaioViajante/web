@@ -17,6 +17,7 @@ import {
   routes,
 } from "../lib/routes.ts";
 import { projects } from "../lib/projects.ts";
+import { affiliateDisclosure, gear } from "../lib/setup.ts";
 import {
   ptContact,
   ptDocsHome,
@@ -26,7 +27,9 @@ import {
   ptPageSeo,
   ptProjects,
   ptProjectsPage,
+  ptGearCategories,
   ptSearchDescriptions,
+  ptSetup,
   ptThisSite,
 } from "../lib/pt.ts";
 
@@ -113,8 +116,13 @@ test("counterparts are the other declared locales, never guessed", () => {
   assert.deepEqual(counterpartsOf("this-site", "pt-BR"), [
     { locale: "en", path: "/this-site" },
   ]);
-  for (const key of ["gallery", "setup"])
-    assert.deepEqual(counterpartsOf(key, "en"), [], key);
+  assert.deepEqual(counterpartsOf("setup", "en"), [
+    { locale: "pt-BR", path: "/pt/setup" },
+  ]);
+  assert.deepEqual(counterpartsOf("setup", "pt-BR"), [
+    { locale: "en", path: "/setup" },
+  ]);
+  assert.deepEqual(counterpartsOf("gallery", "en"), []);
 });
 
 test("legal pages stay English-only until reviewed Portuguese text exists", () => {
@@ -134,6 +142,7 @@ test("the shipped Portuguese pages include the translated This Site route", () =
       "/pt/contact",
       "/pt/projects",
       "/pt/search",
+      "/pt/setup",
       "/pt/this-site",
     ],
   );
@@ -153,10 +162,11 @@ test("Root participation activates only its published Portuguese routes", () => 
     "projects",
     "contact",
     "this-site",
+    "setup",
     "search",
   ])
     assert.ok(routes[key]["pt-BR"], key);
-  for (const key of ["gallery", "setup", "terms", "privacy"])
+  for (const key of ["gallery", "terms", "privacy"])
     assert.equal(routes[key]["pt-BR"], undefined, key);
 });
 
@@ -177,6 +187,7 @@ test("rollback disables Root participation while its Portuguese routes stay publ
       "/pt/contact",
       "/pt/projects",
       "/pt/search",
+      "/pt/setup",
       "/pt/this-site",
     ],
   );
@@ -227,6 +238,25 @@ test("Portuguese This Site has route, SEO, search and page copy", () => {
   assert.equal(ptThisSite.builtItems.length, 5);
   for (const value of Object.values(ptThisSite).flat())
     assert.ok(typeof value === "string" && value.length > 0);
+});
+
+test("Portuguese Setup translates the copy and keeps the gear facts", () => {
+  assert.equal(routes.setup["pt-BR"], "/pt/setup");
+  assert.equal(ptPageSeo.setup?.title, "setup");
+  assert.equal(ptSearchDescriptions.setup, "Ferramentas e setup");
+  for (const value of Object.values(ptSetup))
+    assert.ok(typeof value === "string" && value.length > 0);
+  for (const item of gear)
+    assert.ok(ptGearCategories[item.category], item.category);
+});
+
+test("Setup discloses affiliate links in both languages", () => {
+  assert.ok(gear.some((item) => item.url));
+  assert.match(affiliateDisclosure, /affiliate links/);
+  assert.match(affiliateDisclosure, /commission/);
+  assert.match(ptSetup.disclosure, /links de afiliado/);
+  assert.match(ptSetup.disclosure, /comissão/);
+  assert.ok(gear.every((item) => !item.url || item.url.startsWith("https://")));
 });
 
 test("Portuguese projects localize presentation and preserve stable facts", () => {

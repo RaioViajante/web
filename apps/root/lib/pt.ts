@@ -1,7 +1,7 @@
 // Root's Portuguese (pt-BR) editorial copy. App-owned and manually authored:
 // the shared UI strings live in packages/design's catalog. Only pages that ship
-// in Portuguese appear here (Home, About, Projects, Contact, This site, Search
-// and the 404); the other Root pages are English-only. Names, handles, the email
+// in Portuguese appear here (Home, About, Projects, Contact, This site, Setup,
+// Search and the 404); the other Root pages are English-only. Names, handles, the email
 // address and tool names are not translated.
 
 import { projects, type Project, type ProjectName } from "./projects.ts";
@@ -51,6 +51,11 @@ export const ptPageSeo: Partial<
     description:
       "Como o raioviajante.com é construído, projetado e conectado ao Dump, Docs e Lab.",
   },
+  setup: {
+    title: "setup",
+    description:
+      "Os computadores, as ferramentas e os softwares do setup de trabalho de RaioViajante.",
+  },
   search: {
     title: "Busca",
     description: "Encontre páginas, projetos e textos do RaioViajante.",
@@ -64,6 +69,7 @@ export const ptSearchDescriptions: Partial<Record<RouteKey, string>> = {
   projects: "Projetos e trabalhos",
   contact: "Formas de entrar em contato",
   "this-site": "Como este site é construído",
+  setup: "Ferramentas e setup",
 };
 
 export const ptNavigation = [
@@ -81,6 +87,8 @@ export const ptHome = {
   latestWriting: "Últimos textos",
   noWriting: "Ainda não há textos em português.",
   englishWriting: "Ver os textos em inglês no Dump →",
+  otherLinks: "Outros links",
+  setupValue: "equipamento",
   avatarLabel: "Virar o avatar do RaioViajante",
   /** Notes and descriptions of the primary links, keyed by their category. */
   linkCopy: {
@@ -274,6 +282,32 @@ export const ptThisSite = {
   repositoryAfter:
     ". Para informações sobre o uso dos textos ou das ilustrações do site, consulte os ",
   terms: "Termos de Uso (em inglês)",
+};
+
+/** Portuguese names of the English gear categories; product names stay as supplied. */
+export const ptGearCategories: Record<string, string> = {
+  laptop: "notebook",
+  monitor: "monitor",
+  keyboard: "teclado",
+  mouse: "mouse",
+  earbuds: "fones de ouvido",
+  microphone: "microfone",
+  webcam: "webcam",
+  hub: "hub",
+  console: "console",
+  "acoustic guitar": "violão",
+};
+
+export const ptSetup = {
+  label: "setup",
+  title: "Setup",
+  line: "As ferramentas que uso na minha mesa e na estrada.",
+  gearTitle: "Lista de equipamentos",
+  disclosure:
+    "Alguns links abaixo são links de afiliado. Se você comprar por eles, posso receber uma comissão, sem custo adicional para você.",
+  empty: "Estou montando a lista.",
+  link: "Link:",
+  noLink: "Nenhum link confiável disponível.",
 };
 
 export const ptNotFound = {
