@@ -1,6 +1,7 @@
 import "./gallery.css";
 import { metadataFor } from "../../lib/seo";
 import { PageHeader } from "@raioviajante/design/components";
+import { galleryCopy } from "../../lib/gallery";
 import { GalleryBoard } from "../../components/GalleryBoard";
 import { RootShell } from "../../components/RootShell";
 
@@ -14,7 +15,7 @@ export default function Gallery() {
         title="A visual puzzle"
         line="Illustrations, characters and scenes from RaioViajante's world, arranged like a board."
       />
-      <GalleryBoard />
+      <GalleryBoard copy={galleryCopy} />
     </RootShell>
   );
 }

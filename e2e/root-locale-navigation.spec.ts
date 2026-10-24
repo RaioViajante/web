@@ -295,3 +295,52 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
     }),
   );
 });
+
+test("Root publishes the Portuguese Gallery counterpart across navigation, SEO and search", async ({
+  page,
+  request,
+}) => {
+  await isolate(page, []);
+  const root = base("root");
+
+  await page.goto(`${root}/pt/gallery`);
+  await expectLang(page, "pt-BR");
+  await expect(
+    page.locator('nav a[href="/pt/gallery"][aria-current="page"]').first(),
+  ).toBeVisible();
+  await expect(page.locator('.rv-lang a[hreflang="en"]')).toHaveAttribute(
+    "href",
+    "/gallery",
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://raioviajante.com/pt/gallery",
+  );
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]'),
+  ).toHaveAttribute("href", "https://raioviajante.com/gallery");
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="pt-BR"]'),
+  ).toHaveAttribute("href", "https://raioviajante.com/pt/gallery");
+
+  await page.goto(`${root}/gallery`);
+  await expectLang(page, "en");
+  await expect(page.locator(".rv-lang a")).toHaveAttribute(
+    "href",
+    "/pt/gallery",
+  );
+
+  const sitemap = await (await request.get(`${root}/sitemap.xml`)).text();
+  expect(sitemap).toContain("<loc>https://raioviajante.com/pt/gallery</loc>");
+  const search = await (
+    await request.get(`${root}/pt/search-index.json`)
+  ).json();
+  expect(search).toContainEqual(
+    expect.objectContaining({
+      locale: "pt-BR",
+      title: "galeria",
+      href: "https://raioviajante.com/pt/gallery",
+      description: "Arte e imagens",
+    }),
+  );
+});
