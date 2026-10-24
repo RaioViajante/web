@@ -67,37 +67,49 @@ a:hover {
   grid-row: 1;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  gap: 0 24px;
   padding: 30.4px 0 33px;
+  font-size: 14.08px;
+  line-height: 1.82;
 }
 .rv-sound button {
   background: none;
   border: 0;
   color: var(--fg);
   font: inherit;
-  font-size: 14.08px;
-  line-height: 1.82;
   min-height: var(--touch);
-  padding: 0 12px;
+  padding: 0 8px;
   cursor: pointer;
 }
-.rv-sound span {
+.rv-utility__label {
+  color: var(--fg);
+}
+.rv-utility__value,
+.rv-sound__value {
   color: var(--fg-2);
 }
-/* LANG: a status, a link, or a native disclosure; beside the sound toggle */
-.rv-sound {
-  flex-wrap: wrap;
+.rv-sound button[aria-pressed="true"] .rv-sound__value {
+  color: var(--fg);
+}
+/* The owner's clock is a noninteractive fact in the shared utility row. */
+.rv-clock {
+  display: flex;
   align-items: center;
-  column-gap: 12px;
+  gap: 1ch;
+  min-height: var(--touch);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* LANG: a status, a link, or a native disclosure; beside the sound toggle */
+.rv-lang {
+  color: var(--fg);
 }
 .rv-lang {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   min-height: var(--touch);
-  font-size: 14.08px;
-  line-height: 1.82;
-  color: var(--fg-2);
   max-width: 100%;
 }
 .rv-lang a,
@@ -105,9 +117,32 @@ a:hover {
   display: inline-flex;
   align-items: center;
   min-height: var(--touch);
-  padding: 0 12px;
+  padding: 0 8px;
   color: var(--fg);
   cursor: pointer;
+  text-decoration: none;
+}
+.rv-lang summary {
+  list-style: none;
+}
+.rv-lang summary::-webkit-details-marker {
+  display: none;
+}
+.rv-sound__value,
+.rv-lang .rv-utility__value {
+  transition: color var(--ease-nav) ease;
+}
+.rv-sound button[aria-pressed="false"]:hover .rv-sound__value,
+.rv-sound button[aria-pressed="false"]:focus-visible .rv-sound__value,
+.rv-lang a:hover .rv-utility__value,
+.rv-lang a:focus-visible .rv-utility__value,
+.rv-lang summary:hover .rv-utility__value,
+.rv-lang summary:focus-visible .rv-utility__value {
+  color: var(--hover-link);
+}
+.rv-sound button[aria-pressed="true"]:hover .rv-sound__value,
+.rv-sound button[aria-pressed="true"]:focus-visible .rv-sound__value {
+  color: var(--hover-label);
 }
 .rv-lang__details {
   max-width: 100%;
@@ -116,7 +151,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0 12px 8px;
+  padding: 0 8px 8px;
   max-width: 100%;
   overflow-wrap: anywhere;
 }
@@ -725,6 +760,10 @@ kbd {
   a.rv-leader,
   a.rv-leader > span:first-child,
   .rv-footer a {
+    transition: none;
+  }
+  .rv-sound__value,
+  .rv-lang .rv-utility__value {
     transition: none;
   }
   a.rv-leader:hover .rv-leader__value,

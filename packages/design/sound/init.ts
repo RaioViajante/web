@@ -20,7 +20,7 @@ function paint(button: Element, enabled: boolean) {
     button.setAttribute("aria-pressed", pressed);
   if (button.getAttribute("aria-label") !== label)
     button.setAttribute("aria-label", label);
-  const state = button.querySelector("span");
+  const state = button.querySelector(".rv-sound__value");
   if (state && state.textContent !== text) state.textContent = text;
 }
 

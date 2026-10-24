@@ -51,7 +51,10 @@ export function LanguageControl({
   const target = LOCALE_IDS.find((id) => id !== locale);
   const compact = (
     <span>
-      {LANG_TOKEN} <span lang={current.htmlLang}>{current.label}</span>
+      <span className="rv-utility__label">{LANG_TOKEN}</span>{" "}
+      <span className="rv-utility__value" lang={current.htmlLang}>
+        {current.label}
+      </span>
     </span>
   );
   if (
@@ -60,19 +63,14 @@ export function LanguageControl({
     !isParticipating(site, target)
   )
     return (
-      <div
-        data-testid="language-control"
-        className="rv-lang"
-        data-lang-state="status"
-      >
+      <div className="rv-lang" data-lang-state="status">
         <span aria-hidden="true">{compact}</span>
-        <span data-testid="language-status" className="rv-sr-only">
+        <span className="rv-sr-only">
           {catalog.lang.statusAria(current.name)}
         </span>
       </div>
     );
   const other = LOCALES[target];
-  const name = <span lang={other.htmlLang}>{other.name}</span>;
   const targetWord = catalog.lang.names[target];
   const searchHref = search
     ? searchLocaleHref(site, locale, target, "", isParticipating)
@@ -80,36 +78,30 @@ export function LanguageControl({
   const href = searchHref ?? counterpart;
   return (
     <nav
-      data-testid="language-control"
       className="rv-lang"
       aria-label={catalog.lang.navAria(current.name)}
       data-lang-state={href ? "link" : "disclosure"}
     >
       {href ? (
-        <>
-          {compact} <span aria-hidden="true">·</span>{" "}
-          <a
-            data-testid="language-counterpart"
-            href={href}
-            lang={other.htmlLang}
-            hrefLang={other.hreflang}
-            data-sound="nav"
-            {...(search ? { "data-lang-search": "" } : {})}
-          >
-            {other.name}
-          </a>
-        </>
+        <a
+          href={href}
+          hrefLang={other.hreflang}
+          aria-label={catalog.lang.switchAria(current.name, targetWord)}
+          data-sound="nav"
+          {...(search ? { "data-lang-search": "" } : {})}
+        >
+          {compact}
+        </a>
       ) : (
-        <details data-testid="language-disclosure" className="rv-lang__details">
-          <summary data-testid="language-summary">
-            {compact} <span aria-hidden="true">·</span> {name}
+        <details className="rv-lang__details">
+          <summary
+            aria-label={catalog.lang.availabilityAria(current.name, targetWord)}
+          >
+            {compact}
           </summary>
           <div className="rv-lang__panel">
-            <p data-testid="language-message">
-              {catalog.lang.unavailable(targetWord)}
-            </p>
+            <p>{catalog.lang.unavailable(targetWord)}</p>
             <a
-              data-testid="language-home"
               href={localizedPath(site, target, "/")}
               hrefLang={other.hreflang}
               data-sound="nav"

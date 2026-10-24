@@ -34,11 +34,19 @@ export interface SharedCatalog {
     /** Accessible name and action for the toggle. */
     aria: (enabled: boolean) => string;
   };
+  clock: {
+    /** Accessible description before the quiet, non-live time value. */
+    aria: (location: string) => string;
+  };
   lang: {
     /** Accessible name of the control while it is only a status. */
     statusAria: (current: string) => string;
     /** Accessible name of the navigation holding the choice. */
     navAria: (current: string) => string;
+    /** Accessible name when the compact control links to a counterpart. */
+    switchAria: (current: string, target: string) => string;
+    /** Accessible name when the compact control opens availability details. */
+    availabilityAria: (current: string, target: string) => string;
     /** Language names as written in this catalog's language, by locale. */
     names: Record<LocaleId, string>;
     unavailable: (target: string) => string;
@@ -119,9 +127,16 @@ export const catalogs = {
       aria: (enabled) =>
         `Sound ${enabled ? "on" : "off"}. Click to ${enabled ? "mute" : "enable"}.`,
     },
+    clock: {
+      aria: (location) => `Owner's local time in ${location}`,
+    },
     lang: {
       statusAria: (current) => `Language: ${current}`,
       navAria: (current) => `Language. Current: ${current}`,
+      switchAria: (current, target) =>
+        `Language: ${current}. Switch to ${target}.`,
+      availabilityAria: (current, target) =>
+        `Language: ${current}. Check ${target} availability.`,
       names: { en: "English", "pt-BR": "Portuguese" },
       unavailable: (target) => `This page is not available in ${target}.`,
       home: (target) => `Go to ${target} home →`,
@@ -201,9 +216,16 @@ export const catalogs = {
       aria: (enabled) =>
         `Som ${enabled ? "ligado" : "desligado"}. Clique para ${enabled ? "silenciar" : "ativar"}.`,
     },
+    clock: {
+      aria: (location) => `Hora local do proprietário em ${location}`,
+    },
     lang: {
       statusAria: (current) => `Idioma: ${current}`,
       navAria: (current) => `Idioma. Atual: ${current}`,
+      switchAria: (current, target) =>
+        `Idioma: ${current}. Mudar para ${target}.`,
+      availabilityAria: (current, target) =>
+        `Idioma: ${current}. Verificar disponibilidade em ${target}.`,
       names: { en: "inglês", "pt-BR": "português" },
       unavailable: (target) => `Esta página não está disponível em ${target}.`,
       home: (target) => `Ir para a página inicial em ${target} →`,

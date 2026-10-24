@@ -5,35 +5,60 @@ import {
   renderLanguageControls,
   tabTo,
 } from "./lang-fixtures";
-import { base, isolate, searchPath, sites, viewports } from "./support";
+import {
+  base,
+  isolate,
+  searchPath,
+  sites,
+  viewports,
+  watchHealth,
+} from "./support";
 
 for (const site of sites)
-  test(`${site} home LANG links its real counterpart at phone width`, async ({
+  test(`${site} home has the shared clock and compact LANG at mobile and desktop widths`, async ({
     page,
   }) => {
     await isolate(page, []);
+    const health = watchHealth(page);
     await page.setViewportSize(viewports.mobile);
     await page.goto(base(site) + "/");
-    const lang = page.getByTestId("language-control");
+    const utilityRow = page.locator(".rv-sound");
+    const clock = utilityRow.locator(".rv-clock");
+    await expect(clock.locator('span[aria-hidden="true"]')).toHaveText("SP");
+    await expect(clock.locator("time")).toHaveText(/^\d{2}:\d{2}$/);
+    await expect(clock.locator(".rv-sr-only")).toHaveText(
+      "Owner's local time in SP:",
+    );
+    await expect(utilityRow.locator("[data-owner-clock]")).not.toHaveAttribute(
+      "aria-live",
+      /.*/,
+    );
+    await expect(utilityRow.locator("input, select")).toHaveCount(0);
+    const lang = page.locator(".rv-sound .rv-lang");
     await expect(lang).toHaveAttribute("data-lang-state", "link");
-    const link = lang
-      .getByTestId("language-counterpart")
-      .and(lang.getByRole("link", { name: "Português (Brasil)" }));
+    const link = lang.locator("a");
     const destination = site === "docs" || site === "lab" ? "/pt/" : "/pt";
+    await expect(link).toHaveText("LANG EN");
+    await expect(link).toHaveAccessibleName(
+      "Language: English. Switch to Portuguese.",
+    );
     await expect(link).toHaveAttribute("href", destination);
     await expect(link).toHaveAttribute("hreflang", "pt-BR");
     expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     expect(await overflows(page)).toBe(false);
-    await tabTo(page, '[data-testid="language-counterpart"]');
+    await page.setViewportSize(viewports.desktop);
+    expect(await overflows(page)).toBe(false);
+    expect(await inside(page, ".rv-sound")).toBe(true);
+    await tabTo(page, ".rv-lang a");
     expect(await link.evaluate((el) => el.matches(":focus-visible"))).toBe(
       true,
     );
     await axeClean(page);
     await link.press("Enter");
     await expect(page).toHaveURL(base(site) + destination);
-    await expect(
-      page.locator("[data-testid=\"language-counterpart\"][href='/']"),
-    ).toHaveCount(1);
+    await expect(page.locator(".rv-lang a[href='/']")).toHaveCount(1);
+    await expect(page.locator(".rv-lang a")).toHaveText("LANG PT");
+    expect(health).toEqual([]);
   });
 
 const overflows = (page: Page) =>
@@ -50,13 +75,60 @@ async function inside(page: Page, selector: string) {
 }
 
 async function axeClean(page: Page) {
-  const result = await new AxeBuilder({ page })
-    .include('[data-testid="shell-utilities"]')
-    .analyze();
+  const result = await new AxeBuilder({ page }).include(".rv-sound").analyze();
   expect(
     result.violations.map((v) => `${v.id}: ${v.nodes[0]?.target.join(" ")}`),
   ).toEqual([]);
 }
+
+const colorOf = (page: Page, selector: string) =>
+  page.locator(selector).evaluate((node) => getComputedStyle(node).color);
+
+test("the utility row keeps labels bright and applies hover only to state values", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  for (const viewport of [viewports.mobile, viewports.desktop]) {
+    await page.context().clearCookies();
+    await page.setViewportSize(viewport);
+    await page.goto(base("root") + "/");
+
+    const clockLabel = ".rv-clock .rv-utility__label";
+    const clockValue = ".rv-clock .rv-utility__value";
+    const sound = ".rv-sound button";
+    const soundLabel = `${sound} .rv-utility__label`;
+    const soundValue = `${sound} .rv-sound__value`;
+    const lang = ".rv-lang a";
+    const langLabel = `${lang} .rv-utility__label`;
+    const langValue = `${lang} .rv-utility__value`;
+
+    const primary = await colorOf(page, clockLabel);
+    const secondary = await colorOf(page, clockValue);
+    expect(primary).not.toBe(secondary);
+    expect(await colorOf(page, soundLabel)).toBe(primary);
+    expect(await colorOf(page, langLabel)).toBe(primary);
+    expect(await colorOf(page, soundValue)).toBe(secondary);
+    expect(await colorOf(page, langValue)).toBe(secondary);
+
+    await page.locator(sound).hover();
+    expect(await colorOf(page, soundLabel)).toBe(primary);
+    expect(await colorOf(page, soundValue)).not.toBe(secondary);
+    expect(await colorOf(page, clockValue)).toBe(secondary);
+
+    await page.locator(lang).hover();
+    expect(await colorOf(page, langLabel)).toBe(primary);
+    expect(await colorOf(page, langValue)).not.toBe(secondary);
+    expect(await colorOf(page, clockValue)).toBe(secondary);
+
+    await page.locator(sound).click();
+    await expect(page.locator(sound)).toHaveAttribute("aria-pressed", "true");
+    await page.locator("main h1").hover();
+    expect(await colorOf(page, soundValue)).toBe(primary);
+    expect(await colorOf(page, soundLabel)).toBe(primary);
+  }
+});
 
 // Real LanguageControl markup, rendered once per state (see lang-fixtures.ts).
 let controls: Awaited<ReturnType<typeof renderControls>>;
@@ -80,19 +152,19 @@ test.describe("the real interactive LanguageControl at phone width", () => {
 
   test("direct counterpart link", async ({ page }) => {
     await mountLanguageControl(page, controls.link);
-    const control = page.getByTestId("language-control");
+    const control = page.locator(".rv-sound .rv-lang");
     await expect(control).toHaveAttribute("data-lang-state", "link");
-    const link = control.getByTestId("language-counterpart");
-    await expect(link).toHaveText("Português (Brasil)");
-    await expect(link).toHaveAttribute("lang", "pt-BR");
+    const link = control.locator("a");
+    await expect(link).toHaveText("LANG EN");
+    await expect(link).toHaveAccessibleName(
+      "Language: English. Switch to Portuguese.",
+    );
     await expect(link).toHaveAttribute("hreflang", "pt-BR");
     await expect(link).toHaveAttribute("href", "/pt/guia/");
-    expect(
-      await height(page, '[data-testid="language-counterpart"]'),
-    ).toBeGreaterThanOrEqual(44);
+    expect(await height(page, ".rv-lang a")).toBeGreaterThanOrEqual(44);
     expect(await overflows(page)).toBe(false);
-    expect(await inside(page, '[data-testid="language-control"]')).toBe(true);
-    await tabTo(page, '[data-testid="language-counterpart"]');
+    expect(await inside(page, ".rv-lang")).toBe(true);
+    await tabTo(page, ".rv-lang a");
     expect(await link.evaluate((el) => el.matches(":focus-visible"))).toBe(
       true,
     );
@@ -106,35 +178,33 @@ test.describe("the real interactive LanguageControl at phone width", () => {
 
   test("no-counterpart disclosure", async ({ page }) => {
     await mountLanguageControl(page, controls.disclosure);
-    const control = page.getByTestId("language-control");
+    const control = page.locator(".rv-sound .rv-lang");
     await expect(control).toHaveAttribute("data-lang-state", "disclosure");
-    const details = control.getByTestId("language-disclosure");
-    const summary = details.getByTestId("language-summary");
-    await expect(summary).toContainText("Português (Brasil)");
-    await expect(summary.locator('[lang="pt-BR"]')).toHaveCount(1);
-    expect(
-      await height(page, '[data-testid="language-summary"]'),
-    ).toBeGreaterThanOrEqual(44);
-    await tabTo(page, '[data-testid="language-summary"]');
+    const details = control.locator("details");
+    const summary = details.locator("summary");
+    await expect(summary).toHaveText("LANG EN");
+    await expect(summary).toHaveAccessibleName(
+      "Language: English. Check Portuguese availability.",
+    );
+    expect(await height(page, ".rv-lang summary")).toBeGreaterThanOrEqual(44);
+    await tabTo(page, ".rv-lang summary");
     expect(await summary.evaluate((el) => el.matches(":focus-visible"))).toBe(
       true,
     );
     await expect(details).not.toHaveAttribute("open", "");
     await page.keyboard.press("Enter");
     await expect(details).toHaveAttribute("open", "");
-    await expect(details.getByTestId("language-message")).toHaveText(
+    await expect(details.locator("p")).toHaveText(
       "This page is not available in Portuguese.",
     );
-    const home = details.getByTestId("language-home");
+    const home = details.locator("a");
     await expect(home).toHaveAttribute("hreflang", "pt-BR");
     await expect(home).toHaveAttribute("href", "/pt/");
-    expect(
-      await height(page, '[data-testid="language-home"]'),
-    ).toBeGreaterThanOrEqual(44);
+    expect(await height(page, ".rv-lang details a")).toBeGreaterThanOrEqual(44);
     expect(await overflows(page)).toBe(false);
-    expect(await inside(page, '[data-testid="language-home"]')).toBe(true);
-    expect(await inside(page, '[data-testid="language-message"]')).toBe(true);
-    await tabTo(page, '[data-testid="language-home"]');
+    expect(await inside(page, ".rv-lang details a")).toBe(true);
+    expect(await inside(page, ".rv-lang details p")).toBe(true);
+    await tabTo(page, ".rv-lang details a");
     expect(await home.evaluate((el) => el.matches(":focus-visible"))).toBe(
       true,
     );
@@ -149,13 +219,13 @@ test.describe("the real interactive LanguageControl at phone width", () => {
     page,
   }) => {
     await mountLanguageControl(page, controls.ptDisclosure);
-    await page.getByTestId("language-summary").click();
-    await expect(page.getByTestId("language-message")).toHaveText(
+    await page.locator(".rv-lang summary").click();
+    await expect(page.locator(".rv-lang details p")).toHaveText(
       "Esta página não está disponível em inglês.",
     );
     expect(await overflows(page)).toBe(false);
-    expect(await inside(page, '[data-testid="language-message"]')).toBe(true);
-    expect(await inside(page, '[data-testid="language-home"]')).toBe(true);
+    expect(await inside(page, ".rv-lang details p")).toBe(true);
+    expect(await inside(page, ".rv-lang details a")).toBe(true);
     await axeClean(page);
   });
 });
@@ -168,9 +238,9 @@ test("the real search LANG link carries q and nothing else", async ({
     base("docs") + searchPath.docs + "?scope=everywhere&utm=x#frag",
   );
   await mountLanguageControl(page, controls.search);
-  const link = page.locator('a[data-testid="language-counterpart"]');
+  const link = page.locator("a[data-lang-search]");
   await expect(link).toHaveAttribute("href", "/pt/search/");
-  const input = page.getByTestId("search-input");
+  const input = page.locator("[data-search-input]");
   await input.fill("configuração nova");
   await expect(link).toHaveAttribute(
     "href",

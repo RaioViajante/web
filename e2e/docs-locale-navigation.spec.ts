@@ -13,25 +13,16 @@ test("Portuguese Docs navigation and LANG use real counterparts", async ({
     await page.goto(base("docs") + path);
     await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
     await expect(
-      page.locator(
-        '[data-testid="language-control"][data-lang-state="link"] a',
-      ),
+      page.locator('.rv-lang[data-lang-state="link"] a'),
     ).toHaveAttribute("href", counterpart);
-    await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
-      "hreflang",
-      "en",
-    );
+    await expect(page.locator(".rv-lang a")).toHaveAttribute("hreflang", "en");
+    await expect(page.locator('.rv-nav[data-nav="pages"] a')).toHaveCount(3);
     await expect(
-      page.locator('[data-testid="navigation-pages"] a'),
-    ).toHaveCount(3);
-    await expect(
-      page.locator('[data-testid="navigation-pages"] a[href^="/pt/"]'),
+      page.locator('.rv-nav[data-nav="pages"] a[href^="/pt/"]'),
     ).toHaveCount(3);
   }
   await page.goto(base("docs") + "/pt/search/?q=organização");
-  await expect(
-    page.locator('[data-testid="search-page"][data-search-locale="pt-BR"]'),
-  ).toBeVisible();
+  await expect(page.locator('[data-search-locale="pt-BR"]')).toBeVisible();
   await expect(page.locator('a[href="/pt/projetos/sweep/"]')).toBeVisible();
   await expect(page.locator('a[href*="/projects/sweep/cli/"]')).toHaveCount(0);
 });
@@ -47,11 +38,9 @@ test("English Docs links only declared counterparts and discloses untranslated p
     await page.goto(base("docs") + path);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(
-      page.locator(
-        '[data-testid="language-control"][data-lang-state="link"] a',
-      ),
+      page.locator('.rv-lang[data-lang-state="link"] a'),
     ).toHaveAttribute("href", counterpart);
-    await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
+    await expect(page.locator(".rv-lang a")).toHaveAttribute(
       "hreflang",
       "pt-BR",
     );
@@ -62,28 +51,21 @@ test("English Docs links only declared counterparts and discloses untranslated p
     "/raioviajante/repository-conventions/",
   ]) {
     await page.goto(base("docs") + path);
-    const disclosure = page.locator(
-      '[data-testid="language-control"][data-lang-state="disclosure"]',
-    );
-    await expect(disclosure.getByTestId("language-summary")).toContainText(
-      "Português (Brasil)",
+    const disclosure = page.locator('.rv-lang[data-lang-state="disclosure"]');
+    await expect(disclosure.locator("summary")).toHaveText("LANG EN");
+    await expect(disclosure.locator("summary")).toHaveAccessibleName(
+      "Language: English. Check Portuguese availability.",
     );
     await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(
       0,
     );
-    await disclosure.getByTestId("language-summary").focus();
+    await disclosure.locator("summary").focus();
     await page.keyboard.press("Enter");
-    await expect(disclosure.getByTestId("language-disclosure")).toHaveAttribute(
-      "open",
-      "",
-    );
-    await expect(disclosure.getByTestId("language-message")).toHaveText(
+    await expect(disclosure.locator("details")).toHaveAttribute("open", "");
+    await expect(disclosure.locator("p")).toHaveText(
       "This page is not available in Portuguese.",
     );
-    await expect(disclosure.getByTestId("language-home")).toHaveAttribute(
-      "href",
-      "/pt/",
-    );
+    await expect(disclosure.locator("a")).toHaveAttribute("href", "/pt/");
   }
 });
 
@@ -95,9 +77,9 @@ test("Docs search LANG carries q only, in both directions", async ({
     ["/pt/search/", "/search/"],
   ]) {
     await page.goto(base("docs") + path + "?scope=everywhere&utm=x#frag");
-    const link = page.locator('a[data-testid="language-counterpart"]');
+    const link = page.locator("a[data-lang-search]");
     await expect(link).toHaveAttribute("href", destination);
-    await page.getByTestId("search-input").fill("configuração nova");
+    await page.locator("[data-search-input]").fill("configuração nova");
     await expect(link).toHaveAttribute(
       "href",
       destination + "?q=configura%C3%A7%C3%A3o+nova",
@@ -143,12 +125,12 @@ test("Root and Dump Portuguese federation includes Docs and Lab", async ({
         requested.push(request.url());
     });
     await page.goto(base(site) + "/pt/search");
-    const search = page.getByTestId("search-page");
+    const search = page.locator("[data-search-page]");
     await expect(search).toHaveAttribute("data-search-state", "ready");
-    await page.getByTestId("search-input").fill("organização");
-    await page.getByTestId("search-scope-everywhere").click();
+    await page.locator("[data-search-input]").fill("organização");
+    await page.locator('[data-search-scope="everywhere"]').click();
     const result = page.locator(
-      '[data-testid="search-result"][href$="/pt/projetos/sweep/"]',
+      '[data-search-result][href$="/pt/projetos/sweep/"]',
     );
     await expect(result).toHaveCount(1);
     await expect(result).toContainText("Sweep");
@@ -161,7 +143,7 @@ test("Root and Dump Portuguese federation includes Docs and Lab", async ({
     expect(external).toEqual([]);
     expect(
       await page
-        .getByTestId("search-result")
+        .locator("[data-search-result]")
         .evaluateAll((rows) =>
           rows.every((row) => row.getAttribute("href")?.includes("/pt/")),
         ),
@@ -189,7 +171,7 @@ test("Portuguese avatar label remains localized with reduced motion", async ({
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(base("docs") + "/pt/");
-  await expect(page.getByTestId("avatar-toggle")).toHaveAttribute(
+  await expect(page.locator(".avatar-coin")).toHaveAttribute(
     "aria-label",
     "Personagem ilustrado do RaioViajante",
   );
