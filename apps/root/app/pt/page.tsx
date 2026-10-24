@@ -100,6 +100,20 @@ export default async function HomePt() {
           </>
         )}
       </Section>
+
+      <Section
+        number="00.3"
+        title={ptHome.otherLinks}
+        id="other-links-heading"
+        index
+      >
+        <LeaderRow
+          linkComponent={Link}
+          label="Setup"
+          value={ptHome.setupValue}
+          href={routes.setup["pt-BR"]!}
+        />
+      </Section>
     </RootShell>
   );
 }
