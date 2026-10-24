@@ -7,7 +7,7 @@ export const metadata = metadataFor("/terms");
 
 export default function Terms() {
   return (
-    <RootShell>
+    <RootShell current="/terms">
       <LegalPage
         site="root"
         title="Terms of Use"

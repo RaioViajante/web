@@ -6,7 +6,7 @@ export const metadata = metadataFor("/privacy");
 
 export default function Privacy() {
   return (
-    <RootShell>
+    <RootShell current="/privacy">
       <LegalPage
         site="root"
         title="Privacy Policy"

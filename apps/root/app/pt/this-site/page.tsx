@@ -48,7 +48,7 @@ export default async function ThisSitePt() {
             GitHub
           </a>
           {ptThisSite.repositoryAfter}
-          <Link href="/terms" hrefLang="en" data-sound="nav">
+          <Link href={routes.terms["pt-BR"]!} data-sound="nav">
             {ptThisSite.terms}
           </Link>
           .

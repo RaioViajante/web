@@ -133,9 +133,16 @@ test("counterparts are the other declared locales, never guessed", () => {
   ]);
 });
 
-test("legal pages stay English-only until reviewed Portuguese text exists", () => {
-  assert.deepEqual(Object.keys(routes.terms), ["en"]);
-  assert.deepEqual(Object.keys(routes.privacy), ["en"]);
+test("legal pages are declared in both languages with reciprocal counterparts", () => {
+  for (const key of ["terms", "privacy"]) {
+    assert.deepEqual(Object.keys(routes[key]), ["en", "pt-BR"]);
+    assert.deepEqual(counterpartsOf(key, "en"), [
+      { locale: "pt-BR", path: `/pt/${key}` },
+    ]);
+    assert.deepEqual(counterpartsOf(key, "pt-BR"), [
+      { locale: "en", path: `/${key}` },
+    ]);
+  }
 });
 
 test("the shipped Portuguese pages include the translated This Site route", () => {
@@ -149,9 +156,11 @@ test("the shipped Portuguese pages include the translated This Site route", () =
       "/pt/about",
       "/pt/contact",
       "/pt/gallery",
+      "/pt/privacy",
       "/pt/projects",
       "/pt/search",
       "/pt/setup",
+      "/pt/terms",
       "/pt/this-site",
     ],
   );
@@ -164,7 +173,8 @@ test("a path resolves to its route and locale, and an undeclared one does not", 
     key: "gallery",
     locale: "pt-BR",
   });
-  assert.equal(routeOfPath("/pt/terms"), undefined);
+  assert.deepEqual(routeOfPath("/pt/terms"), { key: "terms", locale: "pt-BR" });
+  assert.equal(routeOfPath("/pt/missing"), undefined);
 });
 
 test("Root participation activates only its published Portuguese routes", () => {
@@ -177,11 +187,11 @@ test("Root participation activates only its published Portuguese routes", () => 
     "gallery",
     "this-site",
     "setup",
+    "terms",
+    "privacy",
     "search",
   ])
     assert.ok(routes[key]["pt-BR"], key);
-  for (const key of ["terms", "privacy"])
-    assert.equal(routes[key]["pt-BR"], undefined, key);
 });
 
 test("rollback disables Root participation while its Portuguese routes stay published", (t) => {
@@ -200,9 +210,11 @@ test("rollback disables Root participation while its Portuguese routes stay publ
       "/pt/about",
       "/pt/contact",
       "/pt/gallery",
+      "/pt/privacy",
       "/pt/projects",
       "/pt/search",
       "/pt/setup",
+      "/pt/terms",
       "/pt/this-site",
     ],
   );
