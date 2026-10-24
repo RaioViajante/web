@@ -25,7 +25,12 @@ export default function Terms() {
               <p>
                 dump.raioviajante.com is run by RaioViajante, CNPJ
                 53.021.377/0001-93, as part of raioviajante.com. Questions go to{" "}
-                <a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a>
+                <a
+                  data-testid="content-link"
+                  href="mailto:mail@raioviajante.com"
+                >
+                  mail@raioviajante.com
+                </a>
                 .
               </p>
             ),
@@ -58,7 +63,10 @@ export default function Terms() {
                 need a GitHub account to comment, GitHub&apos;s own terms apply,
                 and you are responsible for what you post. Spam, abuse and
                 off-topic comments may be hidden or removed. See the{" "}
-                <Link href="/privacy">Privacy Policy</Link> for what is stored.
+                <Link data-testid="content-link" href="/privacy">
+                  Privacy Policy
+                </Link>{" "}
+                for what is stored.
               </p>
             ),
           },

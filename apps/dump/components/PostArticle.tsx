@@ -59,8 +59,13 @@ export function PostArticle({
       counterpart={counterpart}
       toc={toc}
     >
-      <div className="rv-progress" data-reading-progress aria-hidden="true" />
-      <article className="post-article">
+      <div
+        data-testid="reading-progress"
+        className="rv-progress"
+        data-reading-progress
+        aria-hidden="true"
+      />
+      <article data-testid="post-article" className="post-article">
         <PageHeader
           label={`${portuguese ? copy.label : "Post"} · ${post.tags[0] ? tagPresentation(post.tags[0], post.locale).label : "dump"}`}
           title={post.title}
@@ -77,6 +82,7 @@ export function PostArticle({
                 const { label, slug } = tagPresentation(tag, post.locale);
                 return (
                   <Link
+                    data-testid="content-link"
                     key={tag}
                     href={tagPath(post.locale, slug)}
                     data-sound="nav"
@@ -121,6 +127,7 @@ export function PostArticle({
                   const { label, slug } = tagPresentation(tag, post.locale);
                   return (
                     <Link
+                      data-testid="content-link"
                       key={tag}
                       href={tagPath(post.locale, slug)}
                       data-sound="nav"

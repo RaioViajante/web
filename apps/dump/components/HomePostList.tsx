@@ -68,7 +68,7 @@ export function HomePostList({
           }
           avatar={<AvatarCoin />}
         />
-        <p className="home-empty">
+        <p data-testid="home-empty" className="home-empty">
           {locale === DEFAULT_LOCALE ? "No posts yet." : ptCopy.home.empty}
         </p>
       </>
@@ -91,6 +91,7 @@ export function HomePostList({
         index
       >
         <Link
+          data-testid="content-link"
           className="featured-post"
           data-sound="nav"
           href={postPath(latest)}

@@ -151,14 +151,20 @@ export function Comments({
   }, [start]);
 
   return (
-    <div className="comments">
+    <div data-testid="comments" className="comments">
       {status !== "loaded" && (
-        <p ref={statusRef} role="status" tabIndex={-1}>
+        <p
+          data-testid="comments-status"
+          ref={statusRef}
+          role="status"
+          tabIndex={-1}
+        >
           {text[status]}
         </p>
       )}
       {(status === "manual" || status === "failed") && (
         <button
+          data-testid={status === "failed" ? "comments-retry" : "comments-load"}
           type="button"
           className="rv-btn"
           onClick={() => {
@@ -170,7 +176,7 @@ export function Comments({
           {status === "failed" ? text.retry : text.load}
         </button>
       )}
-      <div ref={mountRef} />
+      <div data-testid="comments-widget" ref={mountRef} />
     </div>
   );
 }

@@ -73,23 +73,31 @@ describe("<PostArticle />", () => {
     expect(
       screen.getByRole("heading", { name: "Comentários" }),
     ).toBeInTheDocument();
-    expect(document.querySelector(".comments")).not.toBeNull();
+    expect(document.querySelector('[data-testid="comments"]')).not.toBeNull();
     expect(screen.queryByText("RSS")).not.toBeInTheDocument();
     expect(
-      document.querySelector(".rv-lang")?.getAttribute("data-lang-state"),
+      document
+        .querySelector('[data-testid="language-control"]')
+        ?.getAttribute("data-lang-state"),
     ).toBe("disclosure");
     expect(
-      document.querySelector(".rv-lang details a")?.getAttribute("href"),
+      document
+        .querySelector('[data-testid="language-home"]')
+        ?.getAttribute("href"),
     ).toBe("/");
   });
 
   it("does not present an English-only post's home as its translation", () => {
     render(<PostArticle post={post}>Article body.</PostArticle>);
     expect(
-      document.querySelector(".rv-lang")?.getAttribute("data-lang-state"),
+      document
+        .querySelector('[data-testid="language-control"]')
+        ?.getAttribute("data-lang-state"),
     ).toBe("disclosure");
     expect(
-      document.querySelector(".rv-lang details a")?.getAttribute("href"),
+      document
+        .querySelector('[data-testid="language-home"]')
+        ?.getAttribute("href"),
     ).toBe("/pt");
   });
 });
