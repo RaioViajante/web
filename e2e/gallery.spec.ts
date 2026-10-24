@@ -325,6 +325,14 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
     page.evaluate(
       () => (window as unknown as { galleryVoices: number }).galleryVoices,
     );
+  // Press the stationary pointer. `locator.click()` waits for the control's
+  // hover transition to settle and, when that outlasts its retries (a loaded
+  // runner), scrolls and moves the pointer: a real second entry that rightly
+  // plays another hover voice. This test is about one hover and one click.
+  const pressInPlace = async () => {
+    await page.mouse.down();
+    await page.mouse.up();
+  };
   await page.goto(base("root") + "/gallery");
   const cover = page.getByRole("button", {
     name: "Reveal the artwork collection",
@@ -351,7 +359,7 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
     ),
   );
   expect(await voices()).toBe(beforeHover + 1);
-  await cover.click();
+  await pressInPlace();
   expect(await voices()).toBe(beforeHover + 2);
   // The reveal re-hit-tests the stationary pointer; no late duplicate hover
   // voice may arrive once the animations and scroll settle.
@@ -366,7 +374,7 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   ).toHaveCount(41);
   await sticker.hover();
   const beforeClick = await voices();
-  await sticker.click();
+  await pressInPlace();
   expect(await voices()).toBe(beforeClick + 1);
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
