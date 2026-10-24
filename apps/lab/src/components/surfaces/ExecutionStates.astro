@@ -60,7 +60,6 @@ import { ExecutionBench } from "./ExecutionBench";
     }
     function record(text: string) {
       const item = document.createElement("li");
-      item.dataset.testid = "execution-history-entry";
       item.textContent = text;
       history.append(item);
     }

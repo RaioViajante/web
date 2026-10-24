@@ -170,12 +170,10 @@ describe("section numbers", () => {
   it("shows the number in front of each top-level h2 and leaves h3 alone", async () => {
     const html = await numbered("## One\n\n### Inner\n\n## Two\n");
     expect(html).toContain(
-      '<h2 data-testid="content-heading"><span class="rv-num" aria-hidden="true" data-testid="heading-number">01.</span><span data-testid="heading-title">One</span></h2>',
+      '<h2><span class="rv-num" aria-hidden="true">01.</span><span>One</span></h2>',
     );
-    expect(html).toContain(
-      '>01.1</span><span data-testid="heading-title">Two</span>',
-    );
-    expect(html).toContain('<h3 data-testid="content-heading">Inner</h3>');
+    expect(html).toContain(">01.1</span><span>Two</span>");
+    expect(html).toContain("<h3>Inner</h3>");
   });
 
   async function captured(markdown: string, captureHeadings = true) {
@@ -204,10 +202,10 @@ describe("section numbers", () => {
       "## Overview\n\n## New\n\n## Classification\n",
     );
     expect(String(before)).toContain(
-      '<h2 id="classification" data-testid="content-heading"><span class="rv-num" aria-hidden="true" data-testid="heading-number">01.1</span><span data-testid="heading-title">Classification</span></h2>',
+      '<h2 id="classification"><span class="rv-num" aria-hidden="true">01.1</span><span>Classification</span></h2>',
     );
     expect(String(after)).toContain(
-      '<h2 id="classification" data-testid="content-heading"><span class="rv-num" aria-hidden="true" data-testid="heading-number">01.2</span><span data-testid="heading-title">Classification</span></h2>',
+      '<h2 id="classification"><span class="rv-num" aria-hidden="true">01.2</span><span>Classification</span></h2>',
     );
     expect(headings(before).at(-1)).toEqual({
       depth: 2,
@@ -264,7 +262,7 @@ describe("section numbers", () => {
         },
       ]);
       expect(String(file)).toContain(
-        '<h2 id="classification" data-testid="content-heading"><span class="rv-num" aria-hidden="true" data-testid="heading-number">01.1</span><span data-testid="heading-title">Classification</span></h2>',
+        '<h2 id="classification"><span class="rv-num" aria-hidden="true">01.1</span><span>Classification</span></h2>',
       );
       if (_kind === "callout")
         expect(String(file)).toContain('class="callout"');

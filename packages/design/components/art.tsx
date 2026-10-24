@@ -64,7 +64,6 @@ export function Art({
   return (
     // eslint-disable-next-line @next/next/no-img-element -- shared across Next.js and Astro
     <img
-      data-testid="artwork-image"
       src={source.src}
       alt={alt}
       width={w}

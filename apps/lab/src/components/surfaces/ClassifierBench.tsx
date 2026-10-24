@@ -19,7 +19,6 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
   const text = classifierCopy[locale];
   return (
     <div
-      data-testid="classifier"
       data-classifier
       data-copy={JSON.stringify({
         categories: text.categories,
@@ -31,18 +30,13 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
     >
       <LabBench
         caption={text.caption}
-        where={
-          <ActionButton data-testid="reset" data-reset>
-            {text.reset}
-          </ActionButton>
-        }
+        where={<ActionButton data-reset>{text.reset}</ActionButton>}
       >
         <BenchBand>
           <div className="bench-inputs">
             <label>
               <span className="rv-label">{text.directory}</span>
               <input
-                data-testid="directory"
                 className="rv-input"
                 id="directory"
                 defaultValue="~/Downloads"
@@ -52,7 +46,6 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
             <label>
               <span className="rv-label">{text.filenames}</span>
               <textarea
-                data-testid="filenames"
                 className="rv-input"
                 id="filenames"
                 rows={5}
@@ -63,7 +56,7 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
             </label>
           </div>
           <div className="bench-actions">
-            <ActionButton data-testid="classify" primary data-classify>
+            <ActionButton primary data-classify>
               {text.try}
             </ActionButton>
             {[
@@ -73,7 +66,7 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
               ".config.toml",
               "song.mp3",
             ].map((name) => (
-              <ActionButton data-testid="sample" key={name} data-sample={name}>
+              <ActionButton key={name} data-sample={name}>
                 + {name}
               </ActionButton>
             ))}
@@ -91,34 +84,27 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
                   ))}
                 </tr>
               </thead>
-              <tbody data-testid="classifier-results">
+              <tbody>
                 {initialNames.map(classifyFilename).map((row) => (
-                  <tr data-testid="classifier-result" key={row.filename}>
-                    <th
-                      data-testid="classifier-filename"
-                      scope="row"
-                      className="tok-string"
-                    >
+                  <tr key={row.filename}>
+                    <th scope="row" className="tok-string">
                       {row.filename}
                     </th>
-                    <td data-testid="classifier-suffix" className="tok-number">
-                      {row.suffix || text.none}
-                    </td>
-                    <td data-testid="classifier-category" className="tok-type">
+                    <td className="tok-number">{row.suffix || text.none}</td>
+                    <td className="tok-type">
                       {
                         text.categories[
                           row.category as keyof typeof text.categories
                         ]
                       }
                     </td>
-                    <td data-testid="classifier-destination">{`~/Downloads/${row.category}/${row.filename}`}</td>
+                    <td>{`~/Downloads/${row.category}/${row.filename}`}</td>
                   </tr>
                 ))}
               </tbody>
             </TableBlock>
           </div>
           <p
-            data-testid="summary"
             className="classifier-counts"
             role="status"
             aria-live="polite"
@@ -132,7 +118,7 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
         </BenchBand>
       </LabBench>
       <Callout label={text.why}>
-        <span data-testid="filename-help" id="filename-help">
+        <span id="filename-help">
           {locale === "en" ? (
             <>
               Python 3.14 <code>Path.suffix</code> treats a leading dot as part

@@ -12,16 +12,10 @@ test("Root keeps document language correct across locale history and localized l
 
   await page.goto(`${base("root")}/`);
   await expectLang(page, "en");
-  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
-    "href",
-    "/pt",
-  );
-  await page.getByTestId("language-counterpart").click();
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/pt");
+  await page.locator(".rv-lang a").click();
   await expectLang(page, "pt-BR");
-  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
-    "href",
-    "/",
-  );
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/");
 
   await page.goBack({ waitUntil: "load" });
   await expectLang(page, "en");
@@ -29,15 +23,8 @@ test("Root keeps document language correct across locale history and localized l
   await expectLang(page, "pt-BR");
 
   await page
-    .getByTestId("footer-legal")
-    .and(page.getByRole("navigation", { name: "Informações legais" }))
-    .getByTestId("footer-legal-link")
-    .and(
-      page
-        .getByTestId("footer-legal")
-        .and(page.getByRole("navigation", { name: "Informações legais" }))
-        .getByRole("link", { name: "Termos de Uso", exact: true }),
-    )
+    .getByRole("navigation", { name: "Informações legais" })
+    .getByRole("link", { name: "Termos de Uso", exact: true })
     .click();
   await expect(page).toHaveURL(`${base("root")}/pt/terms`);
   await expectLang(page, "pt-BR");
@@ -48,15 +35,8 @@ test("Root keeps document language correct across locale history and localized l
 
   await page.goto(`${base("root")}/pt`);
   await page
-    .getByTestId("footer-legal")
-    .and(page.getByRole("navigation", { name: "Informações legais" }))
-    .getByTestId("footer-legal-link")
-    .and(
-      page
-        .getByTestId("footer-legal")
-        .and(page.getByRole("navigation", { name: "Informações legais" }))
-        .getByRole("link", { name: "Política de Privacidade", exact: true }),
-    )
+    .getByRole("navigation", { name: "Informações legais" })
+    .getByRole("link", { name: "Política de Privacidade", exact: true })
     .click();
   await expect(page).toHaveURL(`${base("root")}/pt/privacy`);
   await expectLang(page, "pt-BR");
@@ -71,48 +51,30 @@ test("Root offers no invented translations and links only active Portuguese host
 }) => {
   await isolate(page, []);
   await page.goto(`${base("root")}/projects`);
-  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
+  await expect(page.locator(".rv-lang a")).toHaveAttribute(
     "href",
     "/pt/projects",
   );
   await page.goto(`${base("root")}/pt/projects`);
   await expectLang(page, "pt-BR");
-  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
-    "href",
-    "/projects",
-  );
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/projects");
   await expect(
-    page
-      .getByTestId("page-title")
-      .and(page.getByRole("heading", { name: "Projetos" }))
-      .first(),
+    page.getByRole("heading", { name: "Projetos" }).first(),
   ).toBeVisible();
-  await expect(
-    page
-      .getByTestId("project-kind")
-      .and(page.getByText("ferramenta / automação")),
-  ).toBeVisible();
+  await expect(page.getByText("ferramenta / automação")).toBeVisible();
   await page.goto(`${base("root")}/pt`);
   await expect(page.locator("#projects-heading")).toContainText("Projetos");
-  await expect(page.getByTestId("preview-sweep")).toContainText(
+  await expect(page.locator("#preview-sweep")).toContainText(
     "Uma ferramenta em Python",
   );
   await page.goto(`${base("root")}/pt/contact`);
   await expectLang(page, "pt-BR");
-  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
-    "href",
-    "/contact",
-  );
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/contact");
   await expect(
-    page
-      .getByTestId("page-title")
-      .and(page.getByRole("heading", { name: "Vamos conversar" })),
+    page.getByRole("heading", { name: "Vamos conversar" }),
   ).toBeVisible();
   await page.goto(`${base("root")}/pt/about`);
-  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
-    "href",
-    "/about",
-  );
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/about");
   await expect(
     page.locator('main a[href="https://dump.raioviajante.com/pt"]'),
   ).toHaveAttribute("hreflang", "pt-BR");
@@ -122,9 +84,7 @@ test("Root offers no invented translations and links only active Portuguese host
   await expect(
     page.locator('main a[href="https://lab.raioviajante.com/pt/"]'),
   ).toHaveAttribute("hreflang", "pt-BR");
-  const footer = page.locator(
-    '[data-testid="footer-sites"] [data-testid="footer-site-link"]',
-  );
+  const footer = page.locator("footer nav:first-of-type a");
   await expect(footer.nth(0)).toHaveAttribute(
     "href",
     "https://raioviajante.com/pt",
@@ -162,28 +122,18 @@ test("Root publishes the Portuguese This Site counterpart across navigation, SEO
   await page.goto(`${root}/pt/this-site`);
   await expectLang(page, "pt-BR");
   await expect(
-    page
-      .getByTestId("page-title")
-      .and(page.getByRole("heading", { name: "raioviajante.com" })),
+    page.getByRole("heading", { name: "raioviajante.com" }),
   ).toBeVisible();
   await expect(page.locator("#site-heading").locator("..")).toContainText(
     "Este é o ponto de partida para os sites do RaioViajante.",
   );
   await expect(page.locator("#built-heading + ul li")).toHaveCount(5);
+  await expect(page.locator('.rv-lang a[hreflang="en"]')).toHaveAttribute(
+    "href",
+    "/this-site",
+  );
   await expect(
-    page.locator('[data-testid="language-counterpart"][hreflang="en"]'),
-  ).toHaveAttribute("href", "/this-site");
-  await expect(
-    page
-      .getByTestId("main-content")
-      .and(page.getByRole("main"))
-      .getByTestId("content-link")
-      .and(
-        page
-          .getByTestId("main-content")
-          .and(page.getByRole("main"))
-          .getByRole("link", { name: "Termos de Uso" }),
-      ),
+    page.getByRole("main").getByRole("link", { name: "Termos de Uso" }),
   ).toHaveAttribute("href", "/pt/terms");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
@@ -210,7 +160,7 @@ test("Root publishes the Portuguese This Site counterpart across navigation, SEO
 
   await page.goto(`${root}/this-site`);
   await expectLang(page, "en");
-  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
+  await expect(page.locator(".rv-lang a")).toHaveAttribute(
     "href",
     "/pt/this-site",
   );
@@ -239,14 +189,12 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
 
   await page.goto(`${root}/pt/setup`);
   await expectLang(page, "pt-BR");
-  await expect(
-    page.getByTestId("page-title").and(page.getByRole("heading", { level: 1 })),
-  ).toHaveText("Setup");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Setup");
   await expect(page.locator("#gear-heading")).toContainText(
     "Lista de equipamentos",
   );
-  await expect(page.getByTestId("setup-gear")).toHaveCount(14);
-  const disclosure = page.getByTestId("affiliate-disclosure");
+  await expect(page.locator(".setup-gear")).toHaveCount(14);
+  const disclosure = page.locator("#affiliate-disclosure");
   await expect(disclosure).toBeVisible();
   await expect(disclosure).toContainText("links de afiliado");
   await expect(disclosure).toContainText("comissão");
@@ -257,14 +205,14 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
         document
           .getElementById("affiliate-disclosure")!
           .compareDocumentPosition(
-            document.querySelector('[data-testid="setup-gear-link"]')!,
+            document.querySelector(".setup-gear__link a")!,
           ) & Node.DOCUMENT_POSITION_FOLLOWING,
     ),
   ).toBeTruthy();
   const english = await (async () => {
     await page.goto(`${root}/setup`);
     return page
-      .locator('[data-testid="setup-gear-link"]')
+      .locator(".setup-gear__link a")
       .evaluateAll((links) =>
         links.map((link) => [
           link.getAttribute("href"),
@@ -272,14 +220,14 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
         ]),
       );
   })();
-  await expect(page.getByTestId("affiliate-disclosure")).toContainText(
+  await expect(page.locator("#affiliate-disclosure")).toContainText(
     "affiliate links",
   );
-  await expect(page.getByTestId("affiliate-disclosure")).toContainText(
+  await expect(page.locator("#affiliate-disclosure")).toContainText(
     "commission",
   );
   await page.goto(`${root}/pt/setup`);
-  const links = page.locator('[data-testid="setup-gear-link"]');
+  const links = page.locator(".setup-gear__link a");
   expect(
     await links.evaluateAll((nodes) =>
       nodes.map((link) => [
@@ -290,11 +238,9 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
   ).toEqual(english);
   expect(english.length).toBe(8);
   for (const [, rel] of english) expect(rel).toBe("sponsored");
-  await expect(
-    page
-      .getByTestId("setup-gear-source")
-      .and(page.getByText("Nenhum link confiável disponível.")),
-  ).toHaveCount(6);
+  await expect(page.getByText("Nenhum link confiável disponível.")).toHaveCount(
+    6,
+  );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     "https://raioviajante.com/pt/setup",
@@ -305,9 +251,10 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
   await expect(
     page.locator('link[rel="alternate"][hreflang="pt-BR"]'),
   ).toHaveAttribute("href", "https://raioviajante.com/pt/setup");
-  await expect(
-    page.locator('[data-testid="language-counterpart"][hreflang="en"]'),
-  ).toHaveAttribute("href", "/setup");
+  await expect(page.locator('.rv-lang a[hreflang="en"]')).toHaveAttribute(
+    "href",
+    "/setup",
+  );
 
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto(`${root}/pt/setup`);
@@ -330,10 +277,7 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
 
   await page.goto(`${root}/setup`);
   await expectLang(page, "en");
-  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
-    "href",
-    "/pt/setup",
-  );
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/pt/setup");
 
   const sitemap = await (await request.get(`${root}/sitemap.xml`)).text();
   expect(sitemap).toContain("<loc>https://raioviajante.com/pt/setup</loc>");
@@ -362,9 +306,10 @@ test("Root publishes the Portuguese Gallery counterpart across navigation, SEO a
   await expect(
     page.locator('nav a[href="/pt/gallery"][aria-current="page"]').first(),
   ).toBeVisible();
-  await expect(
-    page.locator('[data-testid="language-counterpart"][hreflang="en"]'),
-  ).toHaveAttribute("href", "/gallery");
+  await expect(page.locator('.rv-lang a[hreflang="en"]')).toHaveAttribute(
+    "href",
+    "/gallery",
+  );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     "https://raioviajante.com/pt/gallery",
@@ -378,7 +323,7 @@ test("Root publishes the Portuguese Gallery counterpart across navigation, SEO a
 
   await page.goto(`${root}/gallery`);
   await expectLang(page, "en");
-  await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
+  await expect(page.locator(".rv-lang a")).toHaveAttribute(
     "href",
     "/pt/gallery",
   );
@@ -425,25 +370,17 @@ for (const [key, heading, summary, updated, englishUpdated, internal] of [
 
     await page.goto(`${root}/${key}`);
     await expectLang(page, "en");
+    await expect(page.getByText("In short")).toBeVisible();
     await expect(
-      page.getByTestId("section-heading").and(page.getByText("In short")),
+      page.getByText(`last updated ${englishUpdated}`),
     ).toBeVisible();
-    await expect(
-      page
-        .getByTestId("page-meta-item")
-        .and(page.getByText(`last updated ${englishUpdated}`)),
-    ).toBeVisible();
-    await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
+    await expect(page.locator(".rv-lang a")).toHaveAttribute(
       "href",
       `/pt/${key}`,
     );
-    const footer = page
-      .getByTestId("footer-legal")
-      .and(page.getByRole("navigation", { name: "Legal" }));
+    const footer = page.getByRole("navigation", { name: "Legal" });
     await expect(
-      footer
-        .getByTestId("footer-legal-link")
-        .and(footer.getByRole("link", { name: "Terms of Use" })),
+      footer.getByRole("link", { name: "Terms of Use" }),
     ).toHaveAttribute("href", "/terms");
     const englishFacts = await page
       .locator("main a[href^='mailto:'], main a[href^='https://']")
@@ -451,30 +388,14 @@ for (const [key, heading, summary, updated, englishUpdated, internal] of [
 
     await page.goto(`${root}/pt/${key}`);
     await expectLang(page, "pt-BR");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
+    await expect(page.getByText("Em resumo")).toBeVisible();
+    await expect(page.getByText(summary).first()).toBeVisible();
+    await expect(page.getByText(`última atualização ${updated}`)).toBeVisible();
     await expect(
-      page
-        .getByTestId("page-title")
-        .and(page.getByRole("heading", { level: 1 })),
-    ).toHaveText(heading);
-    await expect(
-      page.getByTestId("section-heading").and(page.getByText("Em resumo")),
+      page.getByText(`Última atualização: ${updated}.`),
     ).toBeVisible();
-    await expect(
-      page.getByTestId("leader-value").and(page.getByText(summary)).first(),
-    ).toBeVisible();
-    await expect(
-      page
-        .getByTestId("page-meta-item")
-        .and(page.getByText(`última atualização ${updated}`)),
-    ).toBeVisible();
-    await expect(
-      page
-        .getByTestId("legal-updated")
-        .and(page.getByText(`Última atualização: ${updated}.`)),
-    ).toBeVisible();
-    await expect(page.getByTestId("main-content")).not.toContainText(
-      englishUpdated,
-    );
+    await expect(page.locator("main")).not.toContainText(englishUpdated);
     // External references and contact data are identical to the English page.
     expect(
       await page
@@ -482,38 +403,28 @@ for (const [key, heading, summary, updated, englishUpdated, internal] of [
         .evaluateAll((nodes) => nodes.map((n) => n.getAttribute("href"))),
     ).toEqual(englishFacts);
     if (key === "privacy")
-      await expect(page.getByTestId("main-content")).toContainText(
+      await expect(page.locator("main")).toContainText(
         "CNPJ 53.021.377/0001-93",
       );
-    await expect(page.getByTestId("site-footer")).toContainText(
+    await expect(page.locator("footer")).toContainText(
       "CNPJ: 53.021.377/0001-93",
     );
     // Internal legal links stay in Portuguese; the footer no longer names English.
     if (internal)
       await expect(page.locator(`main a[href="${internal}"]`)).toHaveCount(1);
-    const legal = page
-      .getByTestId("footer-legal")
-      .and(page.getByRole("navigation", { name: "Informações legais" }));
+    const legal = page.getByRole("navigation", { name: "Informações legais" });
     await expect(
-      legal
-        .getByTestId("footer-legal-link")
-        .and(legal.getByRole("link", { name: "Termos de Uso", exact: true })),
+      legal.getByRole("link", { name: "Termos de Uso", exact: true }),
     ).toHaveAttribute("href", "/pt/terms");
     await expect(
-      legal
-        .getByTestId("footer-legal-link")
-        .and(
-          legal.getByRole("link", {
-            name: "Política de Privacidade",
-            exact: true,
-          }),
-        ),
+      legal.getByRole("link", { name: "Política de Privacidade", exact: true }),
     ).toHaveAttribute("href", "/pt/privacy");
     await expect(legal.locator("a[hreflang]")).toHaveCount(0);
     await expect(legal).not.toContainText("em inglês");
-    await expect(
-      page.locator('[data-testid="language-counterpart"][hreflang="en"]'),
-    ).toHaveAttribute("href", `/${key}`);
+    await expect(page.locator('.rv-lang a[hreflang="en"]')).toHaveAttribute(
+      "href",
+      `/${key}`,
+    );
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       "href",
       `https://raioviajante.com/pt/${key}`,
@@ -533,9 +444,9 @@ for (const [key, heading, summary, updated, englishUpdated, internal] of [
         () => document.documentElement.scrollWidth <= window.innerWidth,
       ),
     ).toBe(true);
-    const link = legal
-      .getByTestId("footer-legal-link")
-      .and(legal.getByRole("link", { name: heading, exact: true }));
+    const link = page
+      .getByRole("navigation", { name: "Informações legais" })
+      .getByRole("link", { name: heading, exact: true });
     await link.focus();
     await expect(link).toBeFocused();
     await expect(link).toBeVisible();
@@ -559,7 +470,7 @@ test("Root legal pages state the same audited facts in English and Portuguese", 
 }) => {
   await isolate(page, []);
   const root = base("root");
-  const main = page.getByTestId("main-content");
+  const main = page.locator("main");
 
   await page.goto(`${root}/terms`);
   await expect(main).toContainText("affiliate links");

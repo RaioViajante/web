@@ -75,14 +75,9 @@ export default async function TermsPt() {
                 Dump, Docs, Lab, GitHub e outros destinos com link são sites
                 separados. Consulte as informações de cada um ao visitá-los.
                 Alguns links da página{" "}
-                <Link data-testid="content-link" href={routes.setup["pt-BR"]!}>
-                  Setup
-                </Link>{" "}
-                são links de afiliado, conforme indicado nela. Nossa{" "}
-                <Link
-                  data-testid="content-link"
-                  href={routes.privacy["pt-BR"]!}
-                >
+                <Link href={routes.setup["pt-BR"]!}>Setup</Link> são links de
+                afiliado, conforme indicado nela. Nossa{" "}
+                <Link href={routes.privacy["pt-BR"]!}>
                   Política de Privacidade
                 </Link>{" "}
                 descreve o tratamento de dados neste site raiz.
@@ -96,18 +91,13 @@ export default async function TermsPt() {
                 <p>
                   Dúvidas sobre este site ou sobre estes termos podem ser
                   enviadas para{" "}
-                  <a
-                    data-testid="content-link"
-                    href="mailto:mail@raioviajante.com"
-                  >
+                  <a href="mailto:mail@raioviajante.com">
                     mail@raioviajante.com
                   </a>
                   . A versão atual destes termos continuará disponível nesta
                   página quando for atualizada.
                 </p>
-                <p data-testid="legal-updated">
-                  Última atualização: 24 de outubro de 2026.
-                </p>
+                <p>Última atualização: 24 de outubro de 2026.</p>
               </>
             ),
           },

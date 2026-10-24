@@ -35,15 +35,11 @@ export default function ThisSite() {
       <Section number="05.2" title="Repository" id="repository-heading">
         <p>
           The code for this site and the other RaioViajante web apps is on{" "}
-          <a
-            data-testid="content-link"
-            href="https://github.com/RaioViajante/web"
-            data-sound="nav"
-          >
+          <a href="https://github.com/RaioViajante/web" data-sound="nav">
             GitHub
           </a>
           . For information about using the site&apos;s text or artwork, see the{" "}
-          <Link data-testid="content-link" href="/terms" data-sound="nav">
+          <Link href="/terms" data-sound="nav">
             Terms of Use
           </Link>
           .

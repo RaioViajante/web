@@ -22,5 +22,5 @@ test("Astro persists semantic headings even when its later collection contains n
     { depth: 2, slug: "overview", text: "Overview", number: "01." },
     { depth: 2, slug: "classification", text: "Classification", number: "01.1" },
   ]);
-  assert.match(code, /id="classification" data-testid="content-heading"><span class="rv-num" aria-hidden="true" data-testid="heading-number">01\.1<\/span><span data-testid="heading-title">Classification<\/span>/);
+  assert.match(code, /id="classification"><span class="rv-num" aria-hidden="true">01\.1<\/span><span>Classification<\/span>/);
 });

@@ -52,7 +52,7 @@ const next = neighbor(pages[index + 1], copy.next);
 
 	<div class="page-foot">
 		{updated && <span>{copy.lastUpdated} {updated}</span>}
-		<a data-testid="content-link" href={editUrl(entry)}>{copy.edit} ↗</a>
+		<a href={editUrl(entry)}>{copy.edit} ↗</a>
 	</div>
 	<Pager locale={locale} prev={previous} next={next} />
 </DocsShell>

@@ -56,8 +56,7 @@ export async function renderLanguageControls<T extends Record<string, Props>>(
 /** Replaces the page's real LANG status with the given real control markup. */
 export async function mountLanguageControl(page: Page, html: string) {
   await page.evaluate((markup) => {
-    document.querySelector('[data-testid="language-control"]')!.outerHTML =
-      markup;
+    document.querySelector(".rv-sound .rv-lang")!.outerHTML = markup;
   }, html);
 }
 

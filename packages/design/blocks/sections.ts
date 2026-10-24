@@ -60,8 +60,6 @@ export function rehypeNumberSections({ captureHeadings = false } = {}) {
       };
     },
   ) => {
-    for (const node of headingElements(tree))
-      node.properties["data-testid"] = "content-heading";
     // Opt in for Astro: its normal heading collection runs after numbering.
     // Preserve text before mutation, keyed by the actual node, never position.
     const headings = new Map<Element, SectionHeading>();
@@ -92,11 +90,7 @@ export function rehypeNumberSections({ captureHeadings = false } = {}) {
       const number: Element = {
         type: "element",
         tagName: "span",
-        properties: {
-          className: ["rv-num"],
-          ariaHidden: "true",
-          "data-testid": "heading-number",
-        },
+        properties: { className: ["rv-num"], ariaHidden: "true" },
         children: [{ type: "text", value: label }],
       };
       // Keep inline code/emphasis in one flex item so the title wraps as text.
@@ -105,7 +99,7 @@ export function rehypeNumberSections({ captureHeadings = false } = {}) {
         {
           type: "element",
           tagName: "span",
-          properties: { "data-testid": "heading-title" },
+          properties: {},
           children: node.children,
         },
       ];

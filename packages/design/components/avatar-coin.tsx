@@ -23,7 +23,6 @@ export function AvatarCoin({
 } = {}) {
   return (
     <button
-      data-testid="avatar-toggle"
       type="button"
       className="avatar-coin"
       aria-label={label}
@@ -38,7 +37,6 @@ export function AvatarCoin({
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- shared across Next.js and Astro */}
       <img
-        data-testid="avatar-image"
         className="rv-avatar"
         src={avatarFrames[AVATAR_REST_FRAME]}
         alt=""

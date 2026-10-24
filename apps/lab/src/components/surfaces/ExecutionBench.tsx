@@ -7,14 +7,10 @@ import {
 } from "@raioviajante/design/components";
 export function ExecutionBench() {
   return (
-    <div data-testid="execution" data-execution>
+    <div data-execution>
       <LabBench
         caption="bench · simulated in this browser"
-        where={
-          <ActionButton data-testid="new-example" data-new>
-            new example
-          </ActionButton>
-        }
+        where={<ActionButton data-new>new example</ActionButton>}
       >
         <BenchBand>
           <div
@@ -35,7 +31,6 @@ export function ExecutionBench() {
             <label>
               <span className="rv-label">Exit code · succeed / fail</span>
               <input
-                data-testid="exit-code"
                 className="rv-input"
                 id="exit-code"
                 type="number"
@@ -49,7 +44,6 @@ export function ExecutionBench() {
             <label>
               <span className="rv-label">Failure message</span>
               <input
-                data-testid="failure-message"
                 className="rv-input"
                 id="failure-message"
                 defaultValue="Example failure"
@@ -59,7 +53,6 @@ export function ExecutionBench() {
           <div className="bench-actions">
             {["start", "succeed", "fail", "cancel"].map((action) => (
               <ActionButton
-                data-testid="operation"
                 key={action}
                 primary={action === "start"}
                 state={
@@ -74,7 +67,6 @@ export function ExecutionBench() {
             ))}
           </div>
           <p
-            data-testid="feedback"
             className="bench-feedback"
             role="status"
             aria-live="polite"
@@ -84,11 +76,7 @@ export function ExecutionBench() {
             Sample execution. Try an operation, including one this state
             rejects.
           </p>
-          <p
-            data-testid="availability"
-            className="bench-help"
-            data-availability
-          >
+          <p className="bench-help" data-availability>
             Accepted now: start, cancel. Rejected now: succeed, fail.
           </p>
           <p className="bench-help">
@@ -107,7 +95,7 @@ export function ExecutionBench() {
             ].map((field) => (
               <div key={field} style={{ display: "contents" }}>
                 <dt>{field}</dt>
-                <dd data-testid="field" data-field={field}>
+                <dd data-field={field}>
                   {field === "status" ? "QUEUED" : "—"}
                 </dd>
               </div>
@@ -116,8 +104,8 @@ export function ExecutionBench() {
           <p className="bench-help">Times come from this browser’s clock.</p>
         </BenchBand>
         <BenchBand label="History">
-          <ol data-testid="history" className="bench-history" data-history>
-            <li data-testid="execution-history-entry">created → QUEUED</li>
+          <ol className="bench-history" data-history>
+            <li>created → QUEUED</li>
           </ol>
         </BenchBand>
       </LabBench>
@@ -146,7 +134,6 @@ export function ExecutionBench() {
               ["cancel", "QUEUED · RUNNING", "CANCELLED", "finishedAt"],
             ].map((row) => (
               <tr
-                data-testid="rule"
                 key={row[0]}
                 data-rule={row[0]}
                 className={

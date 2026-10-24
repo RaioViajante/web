@@ -25,12 +25,7 @@ export function ExperimentHeader({
         `${e.project} ${e.revision}`,
         ...(e.source
           ? [
-              <a
-                data-testid="content-link"
-                key="source"
-                href={e.source}
-                data-sound="nav"
-              >
+              <a key="source" href={e.source} data-sound="nav">
                 {textFor(e.locale).source}
               </a>,
             ]

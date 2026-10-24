@@ -31,13 +31,10 @@ it.each([
       ],
       title,
     );
-    expect(
-      document.querySelectorAll('[data-testid="search-result"]'),
-    ).toHaveLength(1);
-    expect(
-      document.querySelector('[data-testid="search-result-number"]')
-        ?.textContent,
-    ).toBe(number);
+    expect(document.querySelectorAll("[data-search-result]")).toHaveLength(1);
+    expect(document.querySelector(".rv-result__number")?.textContent).toBe(
+      number,
+    );
   },
 );
 
@@ -69,7 +66,7 @@ it("falls back to the filtered result position without supplied numbers", async 
     "sweep classification",
   );
   expect(
-    [...document.querySelectorAll('[data-testid="search-result-number"]')].map(
+    [...document.querySelectorAll(".rv-result__number")].map(
       (node) => node.textContent,
     ),
   ).toEqual(["01.", "02."]);
@@ -86,14 +83,12 @@ async function mount(entries: SearchEntry[], query: string) {
   stop = attachSearch();
   await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
   const input = document.querySelector<HTMLInputElement>(
-    '[data-testid="search-input"]',
+    "[data-search-input]",
   )!;
   input.value = query;
   input.dispatchEvent(new Event("input", { bubbles: true }));
   await vi.waitFor(() =>
-    expect(
-      document.querySelector('[data-testid="search-result"]'),
-    ).not.toBeNull(),
+    expect(document.querySelector("[data-search-result]")).not.toBeNull(),
   );
 }
 
@@ -114,12 +109,12 @@ it("fetches only the English index of its own site and shows dates in the page l
   expect(vi.mocked(fetch).mock.calls.map(([url]) => url)).toEqual([
     "/search-index.json",
   ]);
-  expect(
-    document.querySelector('[data-testid="search-result-note"]')?.textContent,
-  ).toBe("September 3, 2026");
+  expect(document.querySelector(".rv-result__note")?.textContent).toBe(
+    "September 3, 2026",
+  );
   expect(
     document
-      .querySelector('[data-testid="search-page"]')
+      .querySelector("[data-search-page]")
       ?.getAttribute("data-search-locale"),
   ).toBe("en");
 });
@@ -143,11 +138,11 @@ it.each([
   );
   stop = attachSearch();
   await vi.waitFor(() =>
-    expect(
-      document.querySelector('[data-testid="search-bubble"]')?.textContent,
-    ).toBe("search is unavailable right now."),
+    expect(document.querySelector("[data-search-bubble]")?.textContent).toBe(
+      "search is unavailable right now.",
+    ),
   );
-  expect(document.querySelector('[data-testid="search-result"]')).toBeNull();
+  expect(document.querySelector("[data-search-result]")).toBeNull();
 });
 
 it.each(["root", "dump", "docs", "lab"] as const)(
@@ -161,9 +156,7 @@ it.each(["root", "dump", "docs", "lab"] as const)(
       .mockResolvedValue({ ok: true, json: async () => [] });
     vi.stubGlobal("fetch", fetchMock);
     stop = attachSearch();
-    const page = document.querySelector<HTMLElement>(
-      '[data-testid="search-page"]',
-    )!;
+    const page = document.querySelector<HTMLElement>("[data-search-page]")!;
     await vi.waitFor(() => expect(page.dataset.searchState).toBe("ready"));
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(fetchMock).toHaveBeenCalledWith("/pt/search-index.json", {
@@ -171,9 +164,7 @@ it.each(["root", "dump", "docs", "lab"] as const)(
     });
     // Everywhere requests every other participating host.
     document
-      .querySelector<HTMLButtonElement>(
-        '[data-testid="search-scope-everywhere"]',
-      )!
+      .querySelector<HTMLButtonElement>('[data-search-scope="everywhere"]')!
       .click();
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(fetchMock).toHaveBeenCalledTimes(4);
@@ -189,7 +180,7 @@ it.each(["root", "dump", "docs", "lab"] as const)(
       );
     expect(page.dataset.searchState).toBe("ready");
     expect(
-      document.querySelector('[data-testid="search-bubble"]')?.textContent,
+      document.querySelector("[data-search-bubble]")?.textContent,
     ).not.toBe("search is unavailable right now.");
   },
 );
@@ -215,7 +206,7 @@ it("finds both reviewed Portuguese Dump posts from its local index", async () =>
 
   await mount([translated, original], "Traduzir");
   let result = document.querySelector<HTMLAnchorElement>(
-    '[data-testid="search-result"]',
+    "[data-search-result]",
   )!;
   expect(result.textContent).toContain(original.title);
   expect(new URL(result.href).pathname).toBe(
@@ -223,13 +214,11 @@ it("finds both reviewed Portuguese Dump posts from its local index", async () =>
   );
 
   const input = document.querySelector<HTMLInputElement>(
-    '[data-testid="search-input"]',
+    "[data-search-input]",
   )!;
   input.value = "mensagem de erro";
   input.dispatchEvent(new Event("input", { bubbles: true }));
-  result = document.querySelector<HTMLAnchorElement>(
-    '[data-testid="search-result"]',
-  )!;
+  result = document.querySelector<HTMLAnchorElement>("[data-search-result]")!;
   expect(result.textContent).toContain(translated.title);
   expect(new URL(result.href).pathname).toBe(
     "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia",
@@ -245,9 +234,7 @@ it("states ready for an active empty index and unavailable for a failed one", as
     vi.fn().mockResolvedValue({ ok: true, json: async () => [] }),
   );
   stop = attachSearch();
-  const page = document.querySelector<HTMLElement>(
-    '[data-testid="search-page"]',
-  )!;
+  const page = document.querySelector<HTMLElement>("[data-search-page]")!;
   await vi.waitFor(() => expect(page.dataset.searchState).toBe("ready"));
   stop();
   document.body.innerHTML = renderToStaticMarkup(
@@ -255,9 +242,7 @@ it("states ready for an active empty index and unavailable for a failed one", as
   );
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
   stop = attachSearch();
-  const failed = document.querySelector<HTMLElement>(
-    '[data-testid="search-page"]',
-  )!;
+  const failed = document.querySelector<HTMLElement>("[data-search-page]")!;
   await vi.waitFor(() =>
     expect(failed.dataset.searchState).toBe("unavailable"),
   );

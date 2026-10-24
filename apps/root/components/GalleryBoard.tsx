@@ -38,7 +38,6 @@ function Picture({
   if (artwork.cell !== undefined)
     return (
       <span
-        data-testid="gallery-sprite"
         className="gallery-sprite"
         data-cell={artwork.cell}
         role="img"
@@ -85,19 +84,13 @@ function ProfileLinks({
   if (!artwork.links) return null;
   return (
     <nav
-      data-testid="gallery-profile-links"
       className="gallery-profile-links"
       aria-label={fill(copy.ui.profilesOf, { title: artwork.title })}
     >
       {artwork.links.map((link, index) => (
         <span key={link.href}>
           {index > 0 && <span aria-hidden="true"> · </span>}
-          <a
-            data-testid="gallery-profile-link"
-            href={link.href}
-            rel={link.rel}
-            data-sound="nav"
-          >
+          <a href={link.href} rel={link.rel} data-sound="nav">
             {link.label}
           </a>
         </span>
@@ -150,7 +143,6 @@ function GalleryDialog({
   }
   return (
     <dialog
-      data-testid="gallery-dialog"
       ref={ref}
       className={`gallery-dialog${compact ? " gallery-dialog--download" : ""}`}
       aria-labelledby={titleId}
@@ -192,7 +184,6 @@ function GalleryDialog({
       }}
     >
       <button
-        data-testid="gallery-close"
         className="gallery-control gallery-close"
         type="button"
         onClick={close}
@@ -260,26 +251,16 @@ function CollectionDownload({
       closeLabel={ui.close}
       compact
     >
-      <header
-        data-testid="gallery-download-header"
-        className="gallery-download-header"
-      >
+      <header className="gallery-download-header">
         <span className="rv-label">{ui.downloadLabel}</span>
-        <h2 data-testid="gallery-download-title" id="gallery-download-title">
-          {ui.downloadTitle}
-        </h2>
+        <h2 id="gallery-download-title">{ui.downloadTitle}</h2>
         <p>{ui.downloadIntro}</p>
       </header>
-      <fieldset
-        data-testid="gallery-download-options"
-        disabled={busy}
-        className="gallery-download-options"
-      >
+      <fieldset disabled={busy} className="gallery-download-options">
         <legend className="rv-sr-only">{ui.legend}</legend>
         {categories.map((category) => (
           <label key={category.id}>
             <input
-              data-testid="gallery-category-checkbox"
               type="checkbox"
               checked={selected.includes(category.id)}
               onChange={(event) => {
@@ -306,7 +287,6 @@ function CollectionDownload({
         ))}
       </fieldset>
       <button
-        data-testid="gallery-select-all"
         type="button"
         className="gallery-select-all"
         disabled={busy}
@@ -321,11 +301,8 @@ function CollectionDownload({
       >
         {selected.length === categories.length ? ui.clear : ui.selectAll}
       </button>
-      <footer
-        data-testid="gallery-download-footer"
-        className="gallery-download-footer"
-      >
-        <p data-testid="gallery-download-status" role="status">
+      <footer className="gallery-download-footer">
+        <p role="status">
           {status ||
             (files.length
               ? fill(selected.length > 1 ? ui.savesFolders : ui.saves, {
@@ -334,7 +311,6 @@ function CollectionDownload({
               : ui.nothing)}
         </p>
         <button
-          data-testid="gallery-download-confirm"
           type="button"
           className="gallery-control gallery-primary"
           disabled={busy || !files.length}
@@ -381,20 +357,10 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
     target?.focus({ preventScroll: true });
   }
   return (
-    <div
-      data-testid="gallery-redesign"
-      className="gallery-redesign"
-      data-open={open}
-    >
-      <nav
-        data-testid="gallery-sections"
-        className="gallery-jumps"
-        aria-label={ui.sections}
-        hidden={!open}
-      >
+    <div className="gallery-redesign" data-open={open}>
+      <nav className="gallery-jumps" aria-label={ui.sections} hidden={!open}>
         {categories.map((category, index) => (
           <a
-            data-testid="gallery-section-link"
             key={category.id}
             href={`#gallery-${category.id}`}
             onClick={(event) => {
@@ -407,18 +373,10 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
           </a>
         ))}
       </nav>
-      <section
-        data-testid="gallery-collection-intro"
-        className="gallery-collection-intro"
-      >
-        <div
-          data-testid="gallery-section-heading"
-          className="gallery-section-heading"
-          hidden={!open}
-        >
+      <section className="gallery-collection-intro">
+        <div className="gallery-section-heading" hidden={!open}>
           <SectionHeading number="04." title={ui.collection} />
           <button
-            data-testid="gallery-download-open"
             type="button"
             className="gallery-control"
             aria-haspopup="dialog"
@@ -427,9 +385,8 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
             {ui.download}
           </button>
         </div>
-        <div data-testid="gallery-cover-container" className="gallery-cover">
+        <div className="gallery-cover">
           <button
-            data-testid="gallery-cover"
             type="button"
             ref={cover}
             aria-expanded={open}
@@ -445,16 +402,12 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
               priority
             />
           </button>
-          <span data-testid="gallery-cover-hint" className="gallery-cover-hint">
+          <span className="gallery-cover-hint">
             {open ? ui.hintOpen : ui.hintClosed}
           </span>
         </div>
       </section>
-      <div
-        data-testid="gallery-collection"
-        id="gallery-collection"
-        hidden={!open}
-      >
+      <div id="gallery-collection" hidden={!open}>
         {categories.map((category, index) => (
           <section
             className={`gallery-section gallery-section--${category.id}`}
@@ -471,26 +424,19 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
             />
             <p>{copy.categories[category.id].description}</p>
             {category.id === "branding" ? (
-              <div data-testid="gallery-branding" className="gallery-branding">
-                <div data-testid="gallery-avatar" className="gallery-avatar">
+              <div className="gallery-branding">
+                <div className="gallery-avatar">
                   <AvatarCoin
                     label={ui.avatarFlip}
                     reducedMotionLabel={ui.avatarStill}
                   />
-                  <div
-                    data-testid="gallery-avatar-sequence"
-                    className="gallery-avatar-sequence"
-                  >
-                    <div data-testid="gallery-meta" className="gallery-meta">
+                  <div className="gallery-avatar-sequence">
+                    <div className="gallery-meta">
                       <span>{ui.avatar}</span>
-                      <span
-                        data-testid="gallery-dots"
-                        className="gallery-dots"
-                      />
+                      <span className="gallery-dots" />
                       <span>{ui.avatarMeta}</span>
                     </div>
                     <div
-                      data-testid="gallery-frames"
                       className="gallery-frames"
                       aria-label={ui.avatarFrames}
                     >
@@ -512,15 +458,11 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                     </div>
                   </div>
                 </div>
-                <div
-                  data-testid="gallery-stickers"
-                  className="gallery-stickers"
-                >
+                <div className="gallery-stickers">
                   {items
                     .filter((item) => item.category === "branding")
                     .map((item) => (
                       <button
-                        data-testid="gallery-sticker"
                         key={item.id}
                         type="button"
                         className="gallery-sticker"
@@ -530,10 +472,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                         aria-haspopup="dialog"
                       >
                         <Picture artwork={item} />
-                        <span
-                          data-testid="gallery-caption"
-                          className="gallery-caption"
-                        >
+                        <span className="gallery-caption">
                           {item.title}
                           {item.use && <small>{item.use}</small>}
                         </span>
@@ -553,13 +492,8 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                   .filter((item) => item.category === category.id)
                   .map((item) =>
                     category.id === "profiles" ? (
-                      <div
-                        data-testid="gallery-profile"
-                        className="gallery-profile"
-                        key={item.id}
-                      >
+                      <div className="gallery-profile" key={item.id}>
                         <button
-                          data-testid="gallery-profile-open"
                           type="button"
                           data-sound="gallery"
                           aria-label={fill(ui.view, { title: item.title })}
@@ -576,7 +510,6 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                       </div>
                     ) : (
                       <button
-                        data-testid="gallery-piece"
                         key={item.id}
                         type="button"
                         className={`gallery-piece gallery-piece--${item.id}`}
@@ -606,10 +539,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
             }
           }}
         >
-          <header
-            data-testid="gallery-view-header"
-            className="gallery-view-header"
-          >
+          <header className="gallery-view-header">
             {copy.kinds[view.category].group} ·{" "}
             {peers(view).findIndex((item) => item.id === view.id) + 1} /{" "}
             {peers(view).length}
@@ -623,12 +553,8 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
             >
               <Picture artwork={view} viewing />
             </div>
-            <div
-              data-testid="gallery-view-navigation"
-              className="gallery-view-navigation"
-            >
+            <div className="gallery-view-navigation">
               <button
-                data-testid="gallery-previous"
                 type="button"
                 className="gallery-control gallery-arrow"
                 aria-label={ui.previous}
@@ -637,7 +563,6 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                 <span aria-hidden="true">←</span>
               </button>
               <button
-                data-testid="gallery-next"
                 type="button"
                 className="gallery-control gallery-arrow"
                 aria-label={ui.next}
@@ -647,27 +572,21 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
               </button>
             </div>
           </div>
-          <footer
-            data-testid="gallery-view-footer"
-            className="gallery-view-footer"
-          >
+          <footer className="gallery-view-footer">
             <div
-              data-testid="gallery-view-description"
               className="gallery-view-description"
               aria-live="polite"
               aria-atomic="true"
             >
-              <div data-testid="gallery-meta" className="gallery-meta">
-                <h2 data-testid="gallery-view-title" id="gallery-view-title">
-                  {view.title}
-                </h2>
-                <span data-testid="gallery-dots" className="gallery-dots" />
+              <div className="gallery-meta">
+                <h2 id="gallery-view-title">{view.title}</h2>
+                <span className="gallery-dots" />
                 <span>{copy.kinds[view.category].type}</span>
               </div>
               {view.use && (
-                <div data-testid="gallery-meta" className="gallery-meta">
+                <div className="gallery-meta">
                   <span>{ui.usedOn}</span>
-                  <span data-testid="gallery-dots" className="gallery-dots" />
+                  <span className="gallery-dots" />
                   <span>{view.use}</span>
                 </div>
               )}
@@ -675,7 +594,6 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
             </div>
             {view.download && (
               <a
-                data-testid="gallery-download-link"
                 className="gallery-control"
                 href={view.download.src}
                 download={view.download.filename}

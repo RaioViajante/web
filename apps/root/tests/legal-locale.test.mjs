@@ -72,7 +72,7 @@ for (const key of ["terms", "privacy"]) {
       count(en, /^\s{12}title: "/gm),
     );
     assert.equal(count(pt, /label: "/g), count(en, /label: "/g));
-    assert.equal(count(pt, /<p(?:\s[^>]*)?>/g), count(en, /<p(?:\s[^>]*)?>/g));
+    assert.equal(count(pt, /<p>/g), count(en, /<p>/g));
     const external = (source) =>
       (source.match(/href="(?:mailto:|https:)[^"]+"/g) ?? []).sort();
     assert.deepEqual(external(pt), external(en));

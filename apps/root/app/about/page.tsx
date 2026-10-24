@@ -46,27 +46,15 @@ export default function About() {
           RaioViajante is the place where I bring together projects, writing,
           documentation and things I discover along the way. Some ideas become
           software. Others become notes on{" "}
-          <a
-            data-testid="content-link"
-            href="https://dump.raioviajante.com"
-            data-sound="nav"
-          >
+          <a href="https://dump.raioviajante.com" data-sound="nav">
             Dump
           </a>
           , documentation on{" "}
-          <a
-            data-testid="content-link"
-            href="https://docs.raioviajante.com"
-            data-sound="nav"
-          >
+          <a href="https://docs.raioviajante.com" data-sound="nav">
             Docs
           </a>{" "}
           or experiments in{" "}
-          <a
-            data-testid="content-link"
-            href="https://lab.raioviajante.com"
-            data-sound="nav"
-          >
+          <a href="https://lab.raioviajante.com" data-sound="nav">
             Lab
           </a>
           .

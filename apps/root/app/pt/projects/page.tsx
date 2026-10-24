@@ -43,11 +43,7 @@ export default async function ProjectsPt() {
             .replace(/\/$/, "");
 
           return (
-            <article
-              data-testid="project-entry"
-              className="project-entry"
-              key={project.name}
-            >
+            <article className="project-entry" key={project.name}>
               <LeaderRow
                 linkComponent={Link}
                 label={project.name}
@@ -55,19 +51,15 @@ export default async function ProjectsPt() {
                 href={project.href}
               />
               <p className="project-description">{project.description}</p>
-              <p data-testid="project-detail" className="project-detail">
+              <p className="project-detail">
                 <strong>{ptProjectsPage.type}</strong>{" "}
-                <span data-testid="project-kind">{project.kind}</span>
+                <span>{project.kind}</span>
               </p>
-              <p data-testid="project-detail" className="project-detail">
+              <p className="project-detail">
                 <strong>
                   {repository ? ptProjectsPage.repository : ptProjectsPage.url}
                 </strong>{" "}
-                <a
-                  data-testid="content-link"
-                  href={project.href}
-                  data-sound="nav"
-                >
+                <a href={project.href} data-sound="nav">
                   {address}
                 </a>
               </p>

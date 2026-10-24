@@ -80,11 +80,7 @@ export default async function Home() {
           />
         ))}
         <p className="home-feed-note">
-          <a
-            data-testid="content-link"
-            href="https://dump.raioviajante.com"
-            data-sound="nav"
-          >
+          <a href="https://dump.raioviajante.com" data-sound="nav">
             from dump.raioviajante.com
           </a>
         </p>

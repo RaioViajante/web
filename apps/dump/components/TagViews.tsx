@@ -25,7 +25,7 @@ export function TagIndex({
 }) {
   if (!tags.length)
     return (
-      <p data-testid="tags-empty" className="tags-empty">
+      <p className="tags-empty">
         {locale === DEFAULT_LOCALE ? "No tags yet." : ptCopy.tags.empty}
       </p>
     );

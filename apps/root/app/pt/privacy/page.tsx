@@ -39,12 +39,7 @@ export default async function PrivacyPt() {
               <p>
                 Este site é operado sob o CNPJ 53.021.377/0001-93. Para dúvidas
                 sobre seus dados, escreva para{" "}
-                <a
-                  data-testid="content-link"
-                  href="mailto:mail@raioviajante.com"
-                >
-                  mail@raioviajante.com
-                </a>
+                <a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a>
                 .
               </p>
             ),
@@ -101,10 +96,7 @@ export default async function PrivacyPt() {
                 fornecidos por e-mail ou para solicitar acesso, correção ou
                 exclusão, quando aplicável. A autoridade brasileira de proteção
                 de dados explica os direitos previstos na LGPD em seu{" "}
-                <a
-                  data-testid="content-link"
-                  href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares"
-                >
+                <a href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares">
                   guia para titulares de dados
                 </a>
                 .
@@ -119,9 +111,7 @@ export default async function PrivacyPt() {
                   Esta página será atualizada quando as práticas de dados do
                   site mudarem.
                 </p>
-                <p data-testid="legal-updated">
-                  Última atualização: 24 de outubro de 2026.
-                </p>
+                <p>Última atualização: 24 de outubro de 2026.</p>
               </>
             ),
           },

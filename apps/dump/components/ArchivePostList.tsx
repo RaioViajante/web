@@ -48,7 +48,7 @@ export function ArchivePostList({
 }) {
   if (!posts.length)
     return (
-      <p data-testid="archive-empty" className="archive-empty">
+      <p className="archive-empty">
         {locale === DEFAULT_LOCALE ? "No posts yet." : ptCopy.archive.empty}
       </p>
     );

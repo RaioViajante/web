@@ -48,10 +48,9 @@ describe("<Comments contentId={CONTENT_ID} />", () => {
   });
 
   it("renders the container immediately, without loading giscus", () => {
-    render(<Comments contentId={CONTENT_ID} />);
+    const { container } = render(<Comments contentId={CONTENT_ID} />);
 
-    expect(screen.getByTestId("comments")).toBeInTheDocument();
-    expect(screen.getByTestId("comments-status")).toHaveRole("status");
+    expect(container.querySelector("div.comments")).toBeInTheDocument();
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
   });
 
@@ -63,10 +62,7 @@ describe("<Comments contentId={CONTENT_ID} />", () => {
       render(<Comments contentId={CONTENT_ID} />);
       // No scroll or intersection needed.
       expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
-      expect(screen.getByTestId("comments-status")).toHaveRole("status");
-      expect(screen.getByTestId("comments-status")).toHaveTextContent(
-        "Loading comments",
-      );
+      expect(screen.getByRole("status")).toHaveTextContent("Loading comments");
       // A late intersection must not add a second script.
       const observer = MockIntersectionObserver.instances.at(-1);
       if (observer) act(() => observer.trigger(true));
@@ -102,10 +98,7 @@ describe("<Comments contentId={CONTENT_ID} />", () => {
 
   it("shows a local status instead of contacting giscus", () => {
     render(<Comments contentId={CONTENT_ID} />);
-    expect(screen.getByTestId("comments-status")).toHaveRole("status");
-    expect(screen.getByTestId("comments-status")).toHaveTextContent(
-      /when you scroll/,
-    );
+    expect(screen.getByRole("status")).toHaveTextContent(/when you scroll/);
     expect(document.querySelector("iframe")).not.toBeInTheDocument();
   });
 
@@ -116,14 +109,11 @@ describe("<Comments contentId={CONTENT_ID} />", () => {
     intersectFirst();
     intersectFirst();
     expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
-    expect(screen.getByTestId("comments-status")).toHaveRole("status");
-    expect(screen.getByTestId("comments-status")).toHaveTextContent(
-      "Loading comments",
-    );
+    expect(screen.getByRole("status")).toHaveTextContent("Loading comments");
     act(() => {
       document.querySelector(SCRIPT_SELECTOR)!.dispatchEvent(new Event("load"));
     });
-    expect(screen.queryByTestId("comments-status")).not.toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   it("without IntersectionObserver waits for an explicit button press", () => {
@@ -131,9 +121,7 @@ describe("<Comments contentId={CONTENT_ID} />", () => {
       .IntersectionObserver;
     render(<Comments contentId={CONTENT_ID} />);
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
-    const button = screen.getByTestId("comments-load");
-    expect(button).toHaveRole("button");
-    expect(button).toHaveAccessibleName("Load comments");
+    const button = screen.getByRole("button", { name: "Load comments" });
     fireEvent.click(button);
     fireEvent.click(button);
     expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
@@ -146,11 +134,7 @@ describe("<Comments contentId={CONTENT_ID} />", () => {
     container.innerHTML = renderToString(<Comments contentId={CONTENT_ID} />);
     document.body.appendChild(container);
     render(<Comments contentId={CONTENT_ID} />, { container, hydrate: true });
-    expect(screen.getByTestId("comments-load")).toHaveRole("button");
-    expect(screen.getByTestId("comments-load")).toHaveAccessibleName(
-      "Load comments",
-    );
-    expect(screen.getByTestId("comments-load")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Load comments" })).toBeVisible();
     expect(document.querySelector(SCRIPT_SELECTOR)).not.toBeInTheDocument();
     container.remove();
   });
@@ -159,22 +143,17 @@ describe("<Comments contentId={CONTENT_ID} />", () => {
     delete (global as unknown as { IntersectionObserver?: unknown })
       .IntersectionObserver;
     render(<Comments contentId={CONTENT_ID} />);
-    const button = screen.getByTestId("comments-load");
-    expect(button).toHaveRole("button");
-    expect(button).toHaveAccessibleName("Load comments");
+    const button = screen.getByRole("button", { name: "Load comments" });
     button.focus();
     fireEvent.click(button);
-    expect(screen.getByTestId("comments-status")).toHaveRole("status");
-    expect(screen.getByTestId("comments-status")).toHaveFocus();
+    expect(screen.getByRole("status")).toHaveFocus();
   });
 
   it("moves focus into the widget when a keyboard reader's load finishes", () => {
     delete (global as unknown as { IntersectionObserver?: unknown })
       .IntersectionObserver;
     render(<Comments contentId={CONTENT_ID} />);
-    const button = screen.getByTestId("comments-load");
-    expect(button).toHaveRole("button");
-    expect(button).toHaveAccessibleName("Load comments");
+    const button = screen.getByRole("button", { name: "Load comments" });
     button.focus();
     fireEvent.click(button);
     const script = document.querySelector(SCRIPT_SELECTOR)!;
@@ -194,15 +173,8 @@ describe("<Comments contentId={CONTENT_ID} />", () => {
         .querySelector(SCRIPT_SELECTOR)!
         .dispatchEvent(new Event("error"));
     });
-    expect(screen.getByTestId("comments-status")).toHaveRole("status");
-    expect(screen.getByTestId("comments-status")).toHaveTextContent(
-      "could not be loaded",
-    );
-    expect(screen.getByTestId("comments-retry")).toHaveRole("button");
-    expect(screen.getByTestId("comments-retry")).toHaveAccessibleName(
-      "Try again",
-    );
-    fireEvent.click(screen.getByTestId("comments-retry"));
+    expect(screen.getByRole("status")).toHaveTextContent("could not be loaded");
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(document.querySelectorAll(SCRIPT_SELECTOR)).toHaveLength(1);
   });
 
@@ -275,8 +247,7 @@ describe("<Comments contentId={CONTENT_ID} />", () => {
 
   it("shows Portuguese status text on Portuguese pages", () => {
     render(<Comments contentId={CONTENT_ID} locale="pt-BR" />);
-    expect(screen.getByTestId("comments-status")).toHaveRole("status");
-    expect(screen.getByTestId("comments-status")).toHaveTextContent(
+    expect(screen.getByRole("status")).toHaveTextContent(
       /Os comentários carregam/,
     );
   });

@@ -56,15 +56,10 @@ export default function Terms() {
               <p>
                 Dump, docs, lab, GitHub and other linked destinations are
                 separate websites. Review their own information when you visit
-                them. Some links on the{" "}
-                <Link data-testid="content-link" href="/setup">
-                  setup
-                </Link>{" "}
-                page are affiliate links, as noted there. Our{" "}
-                <Link data-testid="content-link" href="/privacy">
-                  Privacy Policy
-                </Link>{" "}
-                describes data handling on this root site.
+                them. Some links on the <Link href="/setup">setup</Link> page
+                are affiliate links, as noted there. Our{" "}
+                <Link href="/privacy">Privacy Policy</Link> describes data
+                handling on this root site.
               </p>
             ),
           },
@@ -74,18 +69,13 @@ export default function Terms() {
               <>
                 <p>
                   Questions about this site or these terms can be sent to{" "}
-                  <a
-                    data-testid="content-link"
-                    href="mailto:mail@raioviajante.com"
-                  >
+                  <a href="mailto:mail@raioviajante.com">
                     mail@raioviajante.com
                   </a>
                   . The current version of these terms will remain available on
                   this page when updated.
                 </p>
-                <p data-testid="legal-updated">
-                  Last updated: October 24, 2026.
-                </p>
+                <p>Last updated: October 24, 2026.</p>
               </>
             ),
           },

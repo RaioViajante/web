@@ -112,19 +112,13 @@ describe("Shell", () => {
       html.indexOf('aria-label="on this page"'),
       html.indexOf('aria-label="experiments"'),
     );
-    expect(toc).toMatch(
-      /<details data-testid="navigation-disclosure" class="rv-nav__details">\s*<summary/,
-    );
+    expect(toc).toMatch(/<details class="rv-nav__details">\s*<summary/);
     expect(toc).not.toMatch(/<details[^>]* open/);
     expect(toc).toMatch(
       /<summary[^>]*>ON THIS PAGE <span aria-hidden="true">·<\/span> 1<\/summary>/,
     );
     expect(toc.indexOf("</summary>")).toBeLessThan(toc.indexOf('href="#code"'));
-    expect(
-      html.match(
-        /<details data-testid="navigation-disclosure" class="rv-nav__details"/g,
-      ),
-    ).toHaveLength(1);
+    expect(html.match(/<details class="rv-nav__details"/g)).toHaveLength(1);
     const withoutToc = renderToStaticMarkup(
       <Shell locale="en" site="root" pages={pages}>
         x
