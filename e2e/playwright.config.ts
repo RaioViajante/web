@@ -10,9 +10,9 @@ export default defineConfig({
   testMatch: "*.spec.ts",
   outputDir: ".results",
   globalSetup: "./global-setup.ts",
-  // One worker: the four apps are shared local servers and the pages are many
-  // but cheap; this keeps timings stable and failures reproducible.
-  workers: 1,
+  // Keep local runs reproducible while letting independent page audits share
+  // the CI load across two workers.
+  workers: process.env.CI ? 2 : 1,
   fullyParallel: false,
   // Failures must not be hidden by retries locally; CI can decide later.
   retries: 0,
