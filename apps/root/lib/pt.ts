@@ -303,6 +303,8 @@ export const ptSetup = {
   title: "Setup",
   line: "As ferramentas que uso na minha mesa e na estrada.",
   gearTitle: "Lista de equipamentos",
+  disclosure:
+    "Alguns links abaixo são links de afiliado. Se você comprar por eles, posso receber uma comissão, sem custo adicional para você.",
   empty: "Estou montando a lista.",
   link: "Link:",
   noLink: "Nenhum link confiável disponível.",

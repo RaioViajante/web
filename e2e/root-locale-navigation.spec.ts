@@ -196,6 +196,21 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
     "Lista de equipamentos",
   );
   await expect(page.locator(".setup-gear")).toHaveCount(14);
+  const disclosure = page.locator("#affiliate-disclosure");
+  await expect(disclosure).toBeVisible();
+  await expect(disclosure).toContainText("links de afiliado");
+  await expect(disclosure).toContainText("comissão");
+  // The disclosure precedes the first affiliate link in reading order.
+  expect(
+    await page.evaluate(
+      () =>
+        document
+          .getElementById("affiliate-disclosure")!
+          .compareDocumentPosition(
+            document.querySelector(".setup-gear__link a")!,
+          ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ),
+  ).toBeTruthy();
   const english = await (async () => {
     await page.goto(`${root}/setup`);
     return page
@@ -207,6 +222,12 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
         ]),
       );
   })();
+  await expect(page.locator("#affiliate-disclosure")).toContainText(
+    "affiliate links",
+  );
+  await expect(page.locator("#affiliate-disclosure")).toContainText(
+    "commission",
+  );
   await page.goto(`${root}/pt/setup`);
   const links = page.locator(".setup-gear__link a");
   expect(

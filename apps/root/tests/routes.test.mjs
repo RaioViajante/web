@@ -17,7 +17,7 @@ import {
   routes,
 } from "../lib/routes.ts";
 import { projects } from "../lib/projects.ts";
-import { gear } from "../lib/setup.ts";
+import { affiliateDisclosure, gear } from "../lib/setup.ts";
 import {
   ptContact,
   ptDocsHome,
@@ -248,6 +248,15 @@ test("Portuguese Setup translates the copy and keeps the gear facts", () => {
     assert.ok(typeof value === "string" && value.length > 0);
   for (const item of gear)
     assert.ok(ptGearCategories[item.category], item.category);
+});
+
+test("Setup discloses affiliate links in both languages", () => {
+  assert.ok(gear.some((item) => item.url));
+  assert.match(affiliateDisclosure, /affiliate links/);
+  assert.match(affiliateDisclosure, /commission/);
+  assert.match(ptSetup.disclosure, /links de afiliado/);
+  assert.match(ptSetup.disclosure, /comissão/);
+  assert.ok(gear.every((item) => !item.url || item.url.startsWith("https://")));
 });
 
 test("Portuguese projects localize presentation and preserve stable facts", () => {

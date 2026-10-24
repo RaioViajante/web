@@ -4,6 +4,9 @@ export interface GearItem {
   url?: string;
 }
 
+export const affiliateDisclosure =
+  "Some links below are affiliate links. If you buy through them, I may earn a commission at no extra cost to you.";
+
 export const gear: GearItem[] = [
   {
     name: "MacBook Air M5 · 24 GB / 1 TB",

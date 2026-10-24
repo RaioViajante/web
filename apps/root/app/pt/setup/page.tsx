@@ -32,6 +32,11 @@ export default async function SetupPt() {
         line={ptSetup.line}
       />
       <Section number="00.1" title={ptSetup.gearTitle} id="gear-heading">
+        {gear.some((item) => item.url) && (
+          <p className="setup-disclosure" id="affiliate-disclosure">
+            {ptSetup.disclosure}
+          </p>
+        )}
         {gear.length === 0 ? (
           <p className="setup-empty">{ptSetup.empty}</p>
         ) : (
