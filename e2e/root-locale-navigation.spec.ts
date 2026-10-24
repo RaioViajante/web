@@ -111,3 +111,73 @@ test("Root offers no invented translations and links only active Portuguese host
     page.locator('main a[href="https://lab.raioviajante.com/pt/"]'),
   ).toHaveAttribute("hreflang", "pt-BR");
 });
+
+test("Root publishes the Portuguese This Site counterpart across navigation, SEO and search", async ({
+  page,
+  request,
+}) => {
+  await isolate(page, []);
+  const root = base("root");
+
+  await page.goto(`${root}/pt/this-site`);
+  await expectLang(page, "pt-BR");
+  await expect(
+    page.getByRole("heading", { name: "raioviajante.com" }),
+  ).toBeVisible();
+  await expect(page.locator("#site-heading").locator("..")).toContainText(
+    "Este é o ponto de partida para os sites do RaioViajante.",
+  );
+  await expect(page.locator("#built-heading + ul li")).toHaveCount(5);
+  await expect(page.locator('.rv-lang a[hreflang="en"]')).toHaveAttribute(
+    "href",
+    "/this-site",
+  );
+  await expect(
+    page
+      .getByRole("main")
+      .getByRole("link", { name: "Termos de Uso (em inglês)" }),
+  ).toHaveAttribute("hreflang", "en");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://raioviajante.com/pt/this-site",
+  );
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]'),
+  ).toHaveAttribute("href", "https://raioviajante.com/this-site");
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="pt-BR"]'),
+  ).toHaveAttribute("href", "https://raioviajante.com/pt/this-site");
+
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto(`${root}/pt/this-site`);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  const navigationLink = page.locator('nav a[href="/pt/this-site"]').first();
+  await navigationLink.focus();
+  await expect(navigationLink).toBeFocused();
+  await expect(navigationLink).toBeVisible();
+
+  await page.goto(`${root}/this-site`);
+  await expectLang(page, "en");
+  await expect(page.locator(".rv-lang a")).toHaveAttribute(
+    "href",
+    "/pt/this-site",
+  );
+
+  const sitemap = await (await request.get(`${root}/sitemap.xml`)).text();
+  expect(sitemap).toContain("<loc>https://raioviajante.com/pt/this-site</loc>");
+  const search = await (
+    await request.get(`${root}/pt/search-index.json`)
+  ).json();
+  expect(search).toContainEqual(
+    expect.objectContaining({
+      locale: "pt-BR",
+      title: "este site",
+      href: "https://raioviajante.com/pt/this-site",
+      description: "Como este site é construído",
+    }),
+  );
+});

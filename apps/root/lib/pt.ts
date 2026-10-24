@@ -1,7 +1,7 @@
 // Root's Portuguese (pt-BR) editorial copy. App-owned and manually authored:
 // the shared UI strings live in packages/design's catalog. Only pages that ship
-// in Portuguese appear here (Home, About, Projects, Contact, Search and the
-// 404); the other Root pages are English-only. Names, handles, the email
+// in Portuguese appear here (Home, About, Projects, Contact, This site, Search
+// and the 404); the other Root pages are English-only. Names, handles, the email
 // address and tool names are not translated.
 
 import { projects, type Project, type ProjectName } from "./projects.ts";
@@ -46,6 +46,11 @@ export const ptPageSeo: Partial<
     description:
       "Entre em contato com RaioViajante por e-mail para conversar sobre ideias, dúvidas, feedback ou colaboração.",
   },
+  "this-site": {
+    title: "este site",
+    description:
+      "Como o raioviajante.com é construído, projetado e conectado ao Dump, Docs e Lab.",
+  },
   search: {
     title: "Busca",
     description: "Encontre páginas, projetos e textos do RaioViajante.",
@@ -58,6 +63,7 @@ export const ptSearchDescriptions: Partial<Record<RouteKey, string>> = {
   about: "Sobre RaioViajante",
   projects: "Projetos e trabalhos",
   contact: "Formas de entrar em contato",
+  "this-site": "Como este site é construído",
 };
 
 export const ptNavigation = [
@@ -65,6 +71,7 @@ export const ptNavigation = [
   { key: "about" as const, label: "sobre" },
   { key: "projects" as const, label: "projetos" },
   { key: "contact" as const, label: "contato" },
+  { key: "this-site" as const, label: "este site" },
 ];
 
 export const ptHome = {
@@ -245,6 +252,28 @@ export const ptContact = {
   firstStepTitle: "Um primeiro passo simples",
   firstStep:
     "Algumas linhas de contexto bastam para começar. Não precisa preparar um briefing formal.",
+};
+
+export const ptThisSite = {
+  label: "este site",
+  title: "raioviajante.com",
+  line: "Um pequeno espaço para meus projetos, textos e experimentos.",
+  siteTitle: "O site",
+  site: "Este é o ponto de partida para os sites do RaioViajante. Ele reúne meus projetos, textos recentes, ilustrações e informações de contato em um só lugar. Os textos ficam no Dump, a documentação no Docs e os experimentos no Lab. Cada um tem seu próprio site e propósito.",
+  builtTitle: "Como é construído",
+  builtItems: [
+    "Next.js, React e TypeScript no próprio site",
+    "CSS para o layout, a tipografia e a identidade visual",
+    "Ilustrações originais para o personagem e a galeria",
+    "O feed RSS público do Dump para mostrar os últimos textos na página inicial",
+    "Som opcional, com a preferência salva no seu navegador",
+  ],
+  repositoryTitle: "Repositório",
+  repositoryBefore:
+    "O código deste site e dos outros apps web do RaioViajante está no ",
+  repositoryAfter:
+    ". Para informações sobre o uso dos textos ou das ilustrações do site, consulte os ",
+  terms: "Termos de Uso (em inglês)",
 };
 
 export const ptNotFound = {

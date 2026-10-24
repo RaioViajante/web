@@ -5,7 +5,8 @@ import type { LocaleId } from "../../../site/locales.ts";
 // Counterparts, navigation, metadata, the sitemap, the search index and social
 // cards all derive from here, so a page exists in a locale only if it is
 // declared. The Portuguese tree is deliberately partial: Gallery, Setup,
-// This site, Terms and Privacy have no Portuguese page. Portuguese
+// This site has a Portuguese counterpart; Gallery, Setup, Terms and Privacy
+// remain English-only. Portuguese
 // paths mirror the English ones. This file imports types only, so a plain
 // Node test can load it.
 
@@ -29,7 +30,7 @@ export const routes: Record<RouteKey, RoutePaths> = {
   projects: { en: "/projects", "pt-BR": "/pt/projects" },
   contact: { en: "/contact", "pt-BR": "/pt/contact" },
   gallery: { en: "/gallery" },
-  "this-site": { en: "/this-site" },
+  "this-site": { en: "/this-site", "pt-BR": "/pt/this-site" },
   setup: { en: "/setup" },
   terms: { en: "/terms" },
   privacy: { en: "/privacy" },
