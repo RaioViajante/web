@@ -348,16 +348,16 @@ for (const [key, heading, summary, updated, englishUpdated, internal] of [
     "terms",
     "Termos de Uso",
     "licença de cada repositório",
-    "4 de outubro de 2026",
-    "October 4, 2026",
+    "24 de outubro de 2026",
+    "October 24, 2026",
     "/pt/privacy",
   ],
   [
     "privacy",
     "Política de Privacidade",
     "salva em um cookie",
-    "6 de outubro de 2026",
-    "October 6, 2026",
+    "24 de outubro de 2026",
+    "October 24, 2026",
     undefined,
   ],
 ] as const)
@@ -464,3 +464,27 @@ for (const [key, heading, summary, updated, englishUpdated, internal] of [
       ),
     ).toEqual([]);
   });
+
+test("Root legal pages state the same audited facts in English and Portuguese", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  const root = base("root");
+  const main = page.locator("main");
+
+  await page.goto(`${root}/terms`);
+  await expect(main).toContainText("affiliate links");
+  await expect(main.locator('a[href="/setup"]')).toHaveCount(1);
+  await page.goto(`${root}/pt/terms`);
+  await expect(main).toContainText("links de afiliado");
+  await expect(main.locator('a[href="/pt/setup"]')).toHaveCount(1);
+
+  await page.goto(`${root}/privacy`);
+  await expect(main).toContainText("browser's local storage");
+  await expect(main).toContainText("the text you type is not sent to them");
+  await page.goto(`${root}/pt/privacy`);
+  await expect(main).toContainText("armazenamento local");
+  await expect(main).toContainText(
+    "o texto que você digita não é enviado a eles",
+  );
+});

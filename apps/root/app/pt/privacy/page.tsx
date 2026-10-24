@@ -26,7 +26,7 @@ export default async function PrivacyPt() {
         site="root"
         locale="pt-BR"
         title="Política de Privacidade"
-        lastUpdated="6 de outubro de 2026"
+        lastUpdated="24 de outubro de 2026"
         inShort={[
           { label: "cadastro", value: "nenhum" },
           { label: "e-mail", value: "só o que você enviar" },
@@ -62,6 +62,18 @@ export default async function PrivacyPt() {
                   para rastreamento. A página inicial solicita o feed RSS
                   público de dump.raioviajante.com no servidor para exibir os
                   textos recentes.
+                </p>
+                <p>
+                  Versões anteriores do site guardavam essa mesma escolha de som
+                  no armazenamento local do seu navegador. O site apenas lê esse
+                  valor antigo até você alternar o som novamente, o que o
+                  remove.
+                </p>
+                <p>
+                  A busca funciona no seu navegador. Se você escolher buscar em
+                  todos os sites, seu navegador solicita os índices de busca dos
+                  outros sites raioviajante; o texto que você digita não é
+                  enviado a eles.
                 </p>
               </>
             ),
@@ -99,7 +111,7 @@ export default async function PrivacyPt() {
                   Esta página será atualizada quando as práticas de dados do
                   site mudarem.
                 </p>
-                <p>Última atualização: 6 de outubro de 2026.</p>
+                <p>Última atualização: 24 de outubro de 2026.</p>
               </>
             ),
           },

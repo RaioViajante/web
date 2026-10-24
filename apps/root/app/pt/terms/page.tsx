@@ -27,7 +27,7 @@ export default async function TermsPt() {
         site="root"
         locale="pt-BR"
         title="Termos de Uso"
-        lastUpdated="4 de outubro de 2026"
+        lastUpdated="24 de outubro de 2026"
         inShort={[
           { label: "contas", value: "nenhuma" },
           { label: "compras", value: "nenhuma" },
@@ -74,7 +74,9 @@ export default async function TermsPt() {
               <p>
                 Dump, Docs, Lab, GitHub e outros destinos com link são sites
                 separados. Consulte as informações de cada um ao visitá-los.
-                Nossa{" "}
+                Alguns links da página{" "}
+                <Link href={routes.setup["pt-BR"]!}>Setup</Link> são links de
+                afiliado, conforme indicado nela. Nossa{" "}
                 <Link href={routes.privacy["pt-BR"]!}>
                   Política de Privacidade
                 </Link>{" "}
@@ -95,7 +97,7 @@ export default async function TermsPt() {
                   . A versão atual destes termos continuará disponível nesta
                   página quando for atualizada.
                 </p>
-                <p>Última atualização: 4 de outubro de 2026.</p>
+                <p>Última atualização: 24 de outubro de 2026.</p>
               </>
             ),
           },

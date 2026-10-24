@@ -86,8 +86,32 @@ test("legal contact facts match site/ and the last-updated dates are unchanged",
   assert.ok(terms.includes(`mailto:${CONTACT.email}`));
   assert.ok(privacy.includes(`mailto:${CONTACT.email}`));
   assert.ok(privacy.includes(`CNPJ ${CONTACT.cnpj}`));
-  assert.match(read("../app/terms/page.tsx"), /October 4, 2026/);
-  assert.match(terms, /"4 de outubro de 2026"/);
-  assert.match(read("../app/privacy/page.tsx"), /October 6, 2026/);
-  assert.match(privacy, /"6 de outubro de 2026"/);
+  assert.match(read("../app/terms/page.tsx"), /October 24, 2026/);
+  assert.match(terms, /"24 de outubro de 2026"/);
+  assert.match(read("../app/privacy/page.tsx"), /October 24, 2026/);
+  assert.match(privacy, /"24 de outubro de 2026"/);
+});
+
+test("both languages disclose affiliate links, the legacy sound value and cross-host search", () => {
+  const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
+  const normalized = (path) => read(path).replace(/\s+/g, " ");
+  assert.match(normalized("../app/terms/page.tsx"), /affiliate links/);
+  assert.match(normalized("../app/pt/terms/page.tsx"), /links de afiliado/);
+  const en = normalized("../app/privacy/page.tsx");
+  const pt = normalized("../app/pt/privacy/page.tsx");
+  assert.match(en, /local storage/);
+  assert.match(pt, /armazenamento local/);
+  assert.match(en, /search indexes of the other raioviajante sites/);
+  assert.match(pt, /índices de busca dos outros sites raioviajante/);
+  // The English and Portuguese documents state no hosting practice or precedence clause.
+  for (const text of [
+    en,
+    pt,
+    normalized("../app/terms/page.tsx"),
+    normalized("../app/pt/terms/page.tsx"),
+  ])
+    assert.doesNotMatch(
+      text,
+      /Vercel|prevalece|prevails|precedence|precedência/i,
+    );
 });
