@@ -35,6 +35,14 @@ and local sockets. It runs nothing against public hosts.
   overflowing element, a broken image, a console error and a page error into a
   real page and requires the audit to name each, so a green run means something.
 
+## Test selectors
+
+Owned UI targets carry `data-testid`; interaction locators use those hooks while
+retaining accessible names, roles, visibility and keyboard assertions. Generic
+audits still inspect the real document, and metadata/third-party contracts keep
+their exact selectors. See [data-testid.md](data-testid.md) for the hook inventory,
+selector order and exceptions.
+
 ## Why Giscus is outside it
 
 Comments are third-party and cross-origin. Every non-local request is blocked

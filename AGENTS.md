@@ -80,6 +80,18 @@ current Git state (branch, status, recent log) before changing anything. Stage
 explicit files or hunks; never `git add -A` or `git add .`. Preserve unrelated
 uncommitted edits, including playground edits.
 
+## Test selectors
+
+- First-party interactive controls, test-observed output and their scoping regions
+  must expose stable `data-testid` attributes. Follow [docs/data-testid.md](docs/data-testid.md)
+  for naming, repeated instances, the selector fallback order and documented
+  structural/integration exceptions. Add the hook with the feature, not afterwards.
+- Browser interaction tests locate owned UI through `getByTestId`. Preserve role,
+  accessible-name, visibility, keyboard, state and geometry checks when migrating
+  a locator. Semantic intersections are constraints, never silent fallbacks.
+- Keep production behavior on its existing hooks; no application script or style
+  may depend on `data-testid`. Keep generic structural audits unrestricted.
+
 ## Validation and Git
 
 | Package | Scripts with `pnpm --filter @raioviajante/<package>` |
