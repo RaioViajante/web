@@ -86,19 +86,23 @@ function resultRow(entry: SearchEntry, index: number, locale: LocaleId) {
   row.className = "rv-result";
   row.href = entry.href;
   row.dataset.searchResult = "";
+  row.dataset.testid = "search-result";
   row.dataset.sound = "nav";
   // Links cannot be "selected"; the row Enter would open is the current one.
   if (index === 0) row.setAttribute("aria-current", "true");
   const number = document.createElement("span");
   number.className = "rv-result__number";
+  number.dataset.testid = "search-result-number";
   number.textContent = entry.number ?? String(index + 1).padStart(2, "0") + ".";
   const label = document.createElement("span");
+  label.dataset.testid = "search-result-title";
   label.textContent = entry.title;
   const dots = document.createElement("span");
   dots.className = "rv-result__dots";
   dots.setAttribute("aria-hidden", "true");
   const note = document.createElement("span");
   note.className = "rv-result__note";
+  note.dataset.testid = "search-result-note";
   note.textContent = entry.date
     ? formatSearchDate(entry.date, locale)
     : entry.site;

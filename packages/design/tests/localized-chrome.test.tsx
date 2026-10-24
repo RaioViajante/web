@@ -62,7 +62,9 @@ describe("Shell", () => {
         x
       </Shell>,
     );
-    expect(body.querySelector(".rv-skip")?.textContent).toBe("Skip to content");
+    expect(body.querySelector('[data-testid="skip-link"]')?.textContent).toBe(
+      "Skip to content",
+    );
     expect(
       [...body.querySelectorAll(".rv-nav > .rv-label")].map(
         (n) => n.textContent,
@@ -76,7 +78,9 @@ describe("Shell", () => {
       body.querySelector("footer nav[aria-label='Legal']")?.textContent,
     ).toContain("Terms of Use");
     expect(
-      body.querySelector("[data-lang-state]")?.getAttribute("data-lang-state"),
+      body
+        .querySelector('[data-testid="language-control"]')
+        ?.getAttribute("data-lang-state"),
     ).toBe("disclosure");
   });
 
@@ -93,7 +97,7 @@ describe("Shell", () => {
       </Shell>,
     );
     const text = body.textContent ?? "";
-    expect(body.querySelector(".rv-skip")?.textContent).toBe(
+    expect(body.querySelector('[data-testid="skip-link"]')?.textContent).toBe(
       "Pular para o conteúdo",
     );
     expect(text).toContain("PÁGINAS");
@@ -187,7 +191,7 @@ describe("sound toggle", () => {
     (locale, off, offAria, on, onAria) => {
       const body = html(<SoundToggle locale={locale} />);
       const button = body.querySelector<HTMLButtonElement>(
-        "[data-sound-toggle]",
+        '[data-testid="sound-toggle"]',
       )!;
       expect(button.textContent).toBe(off);
       expect(button.getAttribute("aria-label")).toBe(offAria);
@@ -207,7 +211,9 @@ describe("sound toggle", () => {
   it("stores no locale: only the existing sound cookie is written", () => {
     const body = html(<SoundToggle locale="pt-BR" />);
     const stop = initSound();
-    body.querySelector<HTMLButtonElement>("[data-sound-toggle]")!.click();
+    body
+      .querySelector<HTMLButtonElement>('[data-testid="sound-toggle"]')!
+      .click();
     expect(document.cookie).toBe("rv-sound=on");
     expect(localStorage.length).toBe(0);
     expect(sessionStorage.length).toBe(0);
@@ -283,7 +289,9 @@ describe("search copy", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
     const stop = attachSearch();
-    const page = document.querySelector<HTMLElement>("[data-search-page]")!;
+    const page = document.querySelector<HTMLElement>(
+      '[data-testid="search-page"]',
+    )!;
     return { page, stop };
   }
 
@@ -328,9 +336,9 @@ describe("search copy", () => {
       .mockResolvedValue({ ok: true, json: async () => [] });
     const { page, stop } = await mount("pt-BR", fetchMock);
     await vi.waitFor(() => expect(page.dataset.searchState).toBe("ready"));
-    expect(document.querySelector("[data-search-bubble]")?.textContent).toBe(
-      "o que você precisa consultar?",
-    );
+    expect(
+      document.querySelector('[data-testid="search-bubble"]')?.textContent,
+    ).toBe("o que você precisa consultar?");
     expect(fetchMock).toHaveBeenCalledWith("/pt/search-index.json", {
       mode: "cors",
     });
@@ -345,9 +353,9 @@ describe("search copy", () => {
     await vi.waitFor(() =>
       expect(page.dataset.searchState).toBe("unavailable"),
     );
-    expect(document.querySelector("[data-search-bubble]")?.textContent).toBe(
-      "a busca está indisponível agora.",
-    );
+    expect(
+      document.querySelector('[data-testid="search-bubble"]')?.textContent,
+    ).toBe("a busca está indisponível agora.");
     stop();
   });
 
@@ -390,11 +398,11 @@ describe("LANG search query carrying", () => {
     window.history.replaceState({}, "", "/search/?scope=everywhere&utm=x#frag");
     const stop = attachSearch();
     const link = document.querySelector<HTMLAnchorElement>(
-      "a[data-lang-search]",
+      'a[data-testid="language-counterpart"]',
     )!;
     expect(link.getAttribute("href")).toBe("/pt/search/");
     const input = document.querySelector<HTMLInputElement>(
-      "[data-search-input]",
+      '[data-testid="search-input"]',
     )!;
     input.value = "configuração nova";
     input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -421,7 +429,11 @@ describe("footer cross-site destinations", () => {
         isParticipating={participating as never}
       />,
     );
-    return [...body.querySelectorAll("footer nav:first-of-type a")].map((a) => [
+    return [
+      ...body.querySelectorAll(
+        '[data-testid="footer-sites"] [data-testid="footer-site-link"]',
+      ),
+    ].map((a) => [
       a.getAttribute("href"),
       a.getAttribute("hreflang"),
       a.textContent,
@@ -476,7 +488,11 @@ describe("footer cross-site destinations", () => {
   it("uses the registry: every Portuguese footer links all four localized homes", () => {
     for (const site of ["root", "dump", "docs", "lab"] as const) {
       const active = html(<Footer site={site} locale="pt-BR" />);
-      const links = [...active.querySelectorAll("footer nav:first-of-type a")];
+      const links = [
+        ...active.querySelectorAll(
+          '[data-testid="footer-sites"] [data-testid="footer-site-link"]',
+        ),
+      ];
       expect(links.map((link) => link.getAttribute("href"))).toEqual([
         "https://raioviajante.com/pt",
         "https://dump.raioviajante.com/pt",

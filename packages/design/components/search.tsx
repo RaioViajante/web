@@ -35,6 +35,7 @@ function Suggestions({
 }) {
   return (
     <p
+      data-testid={`search-suggestions-${scope}`}
       className="rv-search-suggestions"
       data-search-suggestions={scope}
       hidden={hidden}
@@ -47,6 +48,7 @@ function Suggestions({
           <Fragment key={term}>
             <span className="rv-search-suggestion">
               <button
+                data-testid="search-suggestion"
                 type="button"
                 data-search-suggestion={term}
                 data-sound="tab"
@@ -101,6 +103,7 @@ export function SearchNavItem({
 }) {
   return (
     <SiteLink
+      data-testid="search-nav-link"
       linkComponent={linkComponent}
       href={href}
       className="rv-search"
@@ -116,7 +119,7 @@ export function SearchNavItem({
         <img src={art.searchHeadStatic.src} width="30" height="30" alt="" />
         <span className="rv-peek__q">?</span>
       </span>
-      <span className="rv-search__key" data-search-key>
+      <span data-testid="search-key" className="rv-search__key" data-search-key>
         ⌘K
       </span>
     </SiteLink>
@@ -137,6 +140,7 @@ export function SearchPage({
   const { search } = catalogFor(locale);
   return (
     <section
+      data-testid="search-page"
       className="rv-search-page"
       data-search-page
       data-search-site={site}
@@ -144,7 +148,7 @@ export function SearchPage({
     >
       <header className="rv-search-page__header">
         <p className="rv-label">{search.eyebrow}</p>
-        <h1>{search.heading}</h1>
+        <h1 data-testid="page-title">{search.heading}</h1>
         <div className="rv-ask">
           <Art
             name="searchCharacter"
@@ -154,6 +158,7 @@ export function SearchPage({
             priority
           />
           <p
+            data-testid="search-bubble"
             className="rv-bubble"
             role="status"
             aria-live="polite"
@@ -167,6 +172,7 @@ export function SearchPage({
         {search.inputLabel}
       </label>
       <input
+        data-testid="search-input"
         id="rv-search-input"
         className="rv-search-input"
         type="search"
@@ -176,11 +182,13 @@ export function SearchPage({
         data-sound="typing"
       />
       <div
+        data-testid="search-scope"
         className="rv-search-scope"
         role="group"
         aria-label={search.scopeAria}
       >
         <button
+          data-testid="search-scope-site"
           type="button"
           data-search-scope="site"
           aria-pressed="true"
@@ -190,6 +198,7 @@ export function SearchPage({
         </button>
         <span aria-hidden="true"> · </span>
         <button
+          data-testid="search-scope-everywhere"
           type="button"
           data-search-scope="everywhere"
           aria-pressed="false"
@@ -198,9 +207,24 @@ export function SearchPage({
           {search.everywhere}
         </button>
       </div>
-      <div data-search-results aria-live="polite" />
-      <p className="rv-search-note" data-search-note role="status" hidden />
-      <div className="rv-search-empty" data-search-empty hidden>
+      <div
+        data-testid="search-results"
+        data-search-results
+        aria-live="polite"
+      />
+      <p
+        data-testid="search-note"
+        className="rv-search-note"
+        data-search-note
+        role="status"
+        hidden
+      />
+      <div
+        data-testid="search-empty"
+        className="rv-search-empty"
+        data-search-empty
+        hidden
+      >
         <Art
           name="searchNotFound"
           alt={search.emptyArtAlt}

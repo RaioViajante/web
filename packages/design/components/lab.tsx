@@ -78,6 +78,7 @@ export function ActionButton({
   if (className) classes.push(className);
   return (
     <button
+      data-testid="action-button"
       type="button"
       {...props}
       className={classes.join(" ")}
@@ -93,6 +94,7 @@ export function ToggleButton({
 }: ButtonHTMLAttributes<HTMLButtonElement> & { pressed: boolean }) {
   return (
     <button
+      data-testid="action-button"
       type="button"
       data-sound="click"
       {...props}

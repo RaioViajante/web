@@ -52,6 +52,7 @@ export function NavGroup({
 }: NavGroupProps) {
   const links = items.map((item, index) => (
     <SiteLink
+      data-testid="navigation-link"
       key={item.href}
       linkComponent={linkComponent}
       href={item.href}
@@ -65,15 +66,27 @@ export function NavGroup({
   ));
   return (
     <nav
+      data-testid={`navigation-${nav ?? (collapsible ? "toc" : "experiments")}`}
       className="rv-nav"
       aria-label={ariaLabel ?? label.toLowerCase()}
       data-nav={nav}
     >
       {collapsible ? (
         <>
-          <div className="rv-label rv-nav__heading">{label}</div>
-          <details className="rv-nav__details">
-            <summary className="rv-label rv-nav__summary">
+          <div
+            data-testid="navigation-label"
+            className="rv-label rv-nav__heading"
+          >
+            {label}
+          </div>
+          <details
+            data-testid="navigation-disclosure"
+            className="rv-nav__details"
+          >
+            <summary
+              data-testid="navigation-summary"
+              className="rv-label rv-nav__summary"
+            >
               {label} <span aria-hidden="true">·</span> {items.length}
             </summary>
             {links}
@@ -81,7 +94,9 @@ export function NavGroup({
         </>
       ) : (
         <>
-          <div className="rv-label">{label}</div>
+          <div data-testid="navigation-label" className="rv-label">
+            {label}
+          </div>
           {links}
         </>
       )}
@@ -95,6 +110,7 @@ export function SoundToggle({ locale }: { locale: LocaleId }) {
   const { sound } = catalogFor(locale);
   return (
     <button
+      data-testid="sound-toggle"
       type="button"
       data-sound-toggle=""
       data-sound-locale={locale}
@@ -164,6 +180,7 @@ export function Footer({
   const { footer, lang } = catalogFor(locale);
   const legal = (href: string, label: string, destination: LocaleId) => (
     <SiteLink
+      data-testid="footer-legal-link"
       // A Next layout can survive client navigation. Crossing languages must
       // reload the document so its root <html lang> is rendered afresh.
       linkComponent={destination === locale ? linkComponent : undefined}
@@ -181,13 +198,14 @@ export function Footer({
   );
   return (
     <footer className="rv-footer">
-      <nav aria-label={footer.sitesAria}>
+      <nav data-testid="footer-sites" aria-label={footer.sitesAria}>
         {SITES.map((item, index) => {
           const to = footerDestination(site, item, locale, isParticipating);
           return (
             <span key={item.id}>
               {index > 0 ? <span aria-hidden="true"> · </span> : null}
               <a
+                data-testid="footer-site-link"
                 href={to.href}
                 data-sound="nav"
                 {...(locale !== DEFAULT_LOCALE
@@ -204,12 +222,16 @@ export function Footer({
         })}
       </nav>
       <div>
-        <a href={`mailto:${CONTACT.email}`} data-sound="nav">
+        <a
+          data-testid="footer-email-link"
+          href={`mailto:${CONTACT.email}`}
+          data-sound="nav"
+        >
           {CONTACT.email}
         </a>
       </div>
       <div>CNPJ: {CONTACT.cnpj}</div>
-      <nav aria-label={footer.legalAria}>
+      <nav data-testid="footer-legal" aria-label={footer.legalAria}>
         {legal(termsHref, footer.terms, termsLocale)}
         <span aria-hidden="true"> · </span>
         {legal(privacyHref, footer.privacy, privacyLocale)}
@@ -255,15 +277,15 @@ export function Shell({
   const { shell } = catalogFor(locale);
   return (
     <>
-      <a className="rv-skip" href="#main">
+      <a data-testid="skip-link" className="rv-skip" href="#main">
         {shell.skip}
       </a>
       <div className="rv-shell">
-        <header className="rv-sound">
+        <header data-testid="shell-utilities" className="rv-sound">
           <LanguageControl site={site} locale={locale} {...language} />
           <SoundToggle locale={locale} />
         </header>
-        <aside className="rv-sidebar">
+        <aside data-testid="sidebar" className="rv-sidebar">
           <NavGroup
             label={shell.pages}
             ariaLabel={shell.pagesAria}
@@ -295,7 +317,7 @@ export function Shell({
         </aside>
         <div className="rv-main">
           <div className="rv-column">
-            <main id="main" tabIndex={-1}>
+            <main data-testid="main-content" id="main" tabIndex={-1}>
               {children}
             </main>
             <Footer {...footer} />

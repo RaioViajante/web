@@ -233,5 +233,10 @@ export function rehypeSoftBlocks() {
     flush();
     for (const { parent, start, count, node } of replacements.reverse())
       parent.children.splice(start, count, node);
+
+    visit(tree, "element", (node) => {
+      if (node.tagName === "a")
+        node.properties["data-testid"] ??= "content-link";
+    });
   };
 }

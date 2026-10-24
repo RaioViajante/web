@@ -60,9 +60,13 @@ export function LanguageControl({
     !isParticipating(site, target)
   )
     return (
-      <div className="rv-lang" data-lang-state="status">
+      <div
+        data-testid="language-control"
+        className="rv-lang"
+        data-lang-state="status"
+      >
         <span aria-hidden="true">{compact}</span>
-        <span className="rv-sr-only">
+        <span data-testid="language-status" className="rv-sr-only">
           {catalog.lang.statusAria(current.name)}
         </span>
       </div>
@@ -76,6 +80,7 @@ export function LanguageControl({
   const href = searchHref ?? counterpart;
   return (
     <nav
+      data-testid="language-control"
       className="rv-lang"
       aria-label={catalog.lang.navAria(current.name)}
       data-lang-state={href ? "link" : "disclosure"}
@@ -84,6 +89,7 @@ export function LanguageControl({
         <>
           {compact} <span aria-hidden="true">·</span>{" "}
           <a
+            data-testid="language-counterpart"
             href={href}
             lang={other.htmlLang}
             hrefLang={other.hreflang}
@@ -94,13 +100,16 @@ export function LanguageControl({
           </a>
         </>
       ) : (
-        <details className="rv-lang__details">
-          <summary>
+        <details data-testid="language-disclosure" className="rv-lang__details">
+          <summary data-testid="language-summary">
             {compact} <span aria-hidden="true">·</span> {name}
           </summary>
           <div className="rv-lang__panel">
-            <p>{catalog.lang.unavailable(targetWord)}</p>
+            <p data-testid="language-message">
+              {catalog.lang.unavailable(targetWord)}
+            </p>
             <a
+              data-testid="language-home"
               href={localizedPath(site, target, "/")}
               hrefLang={other.hreflang}
               data-sound="nav"

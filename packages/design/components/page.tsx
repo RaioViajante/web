@@ -30,8 +30,8 @@ export function IndexHeader({
           priority
         />
       )}
-      <h1>{name}</h1>
-      <p>{line}</p>
+      <h1 data-testid="page-title">{name}</h1>
+      <p data-testid="page-description">{line}</p>
       {meta}
     </header>
   );
@@ -55,9 +55,13 @@ export function PageHeader({
   return (
     <header className="rv-header">
       {children}
-      {label ? <div className="rv-label">{label}</div> : null}
-      <h1>{title}</h1>
-      {line ? <p>{line}</p> : null}
+      {label ? (
+        <div data-testid="page-label" className="rv-label">
+          {label}
+        </div>
+      ) : null}
+      <h1 data-testid="page-title">{title}</h1>
+      {line ? <p data-testid="page-description">{line}</p> : null}
       {meta?.length ? (
         <div className="rv-meta">
           {meta.map((item, index) => (
@@ -85,8 +89,8 @@ export function SectionHeading({
   id?: string;
 }) {
   return (
-    <h2 id={id}>
-      <span className="rv-num" aria-hidden="true">
+    <h2 data-testid="section-heading" id={id}>
+      <span data-testid="heading-number" className="rv-num" aria-hidden="true">
         {number}
       </span>
       {title}
@@ -112,7 +116,10 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section className={index ? "rv-section rv-section--index" : "rv-section"}>
+    <section
+      data-testid={id ? `section-${id}` : "section"}
+      className={index ? "rv-section rv-section--index" : "rv-section"}
+    >
       {headingExtra ? (
         <div className="rv-section__heading">
           <SectionHeading number={number} title={title} id={id} />
@@ -171,6 +178,7 @@ export function LeaderRow({
   );
   return href ? (
     <SiteLink
+      data-testid="leader-link"
       linkComponent={linkComponent}
       className="rv-leader"
       href={href}
@@ -212,6 +220,7 @@ export function Pager({
     <nav className="rv-pager" aria-label={pager.aria}>
       {prev ? (
         <SiteLink
+          data-testid="leader-link"
           linkComponent={linkComponent}
           href={prev.href}
           rel="prev"
@@ -225,6 +234,7 @@ export function Pager({
       )}
       {next ? (
         <SiteLink
+          data-testid="leader-link"
           linkComponent={linkComponent}
           href={next.href}
           rel="next"
@@ -262,5 +272,9 @@ export function RelatedRows({ items }: { items: RelatedItem[] }) {
 
 /** Wrapper that scopes the soft-block rhythm and inline-code styles. */
 export function Prose({ children }: { children: ReactNode }) {
-  return <div className="prose">{children}</div>;
+  return (
+    <div data-testid="prose" className="prose">
+      {children}
+    </div>
+  );
 }

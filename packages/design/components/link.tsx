@@ -26,8 +26,8 @@ export function SiteLink({
   linkComponent?: LinkComponent;
 }) {
   return Link && isInternal(href) ? (
-    <Link href={href} prefetch={false} {...props} />
+    <Link data-testid="content-link" href={href} prefetch={false} {...props} />
   ) : (
-    <a href={href} {...props} />
+    <a data-testid="content-link" href={href} {...props} />
   );
 }

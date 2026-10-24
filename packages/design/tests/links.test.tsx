@@ -44,9 +44,11 @@ describe("linkComponent", () => {
       <Footer locale="en" site="root" linkComponent={Link} />,
     );
     expect(html).toContain(
-      '<a href="https://dump.raioviajante.com" data-sound',
+      '<a data-testid="footer-site-link" href="https://dump.raioviajante.com" data-sound',
     );
-    expect(html).toContain('<a href="mailto:mail@raioviajante.com"');
+    expect(html).toContain(
+      '<a data-testid="footer-email-link" href="mailto:mail@raioviajante.com"',
+    );
     expect(html).not.toContain(
       'href="https://dump.raioviajante.com" data-app-link',
     );
@@ -66,7 +68,9 @@ describe("linkComponent", () => {
       />,
     );
     for (const href of ["/terms", "/privacy"]) {
-      expect(html).toContain(`<a href="${href}" data-sound`);
+      expect(html).toContain(
+        `<a data-testid="footer-legal-link" href="${href}" data-sound`,
+      );
       expect(html).not.toContain(`href="${href}" data-app-link`);
     }
   });

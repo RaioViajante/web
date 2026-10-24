@@ -48,7 +48,7 @@ function lineNode(
 }
 
 function preNode(panel: BlockPanel, model: BlockModel): Element {
-  return h("pre", { tabIndex: 0 }, [
+  return h("pre", { tabIndex: 0, "data-testid": "code-region" }, [
     h(
       "code",
       {},
@@ -116,7 +116,7 @@ export function buildBlock(model: BlockModel): Element {
 
   const copy = h(
     "button",
-    { type: "button", className: ["block__copy"] },
+    { type: "button", className: ["block__copy"], "data-testid": "block-copy" },
     model.variant === "terminal" ? "copy commands" : "copy",
   );
   const body: ElementContent[] = [];
@@ -125,7 +125,12 @@ export function buildBlock(model: BlockModel): Element {
     body.push(
       h(
         "div",
-        { className: ["block__tabs"], role: "tablist", ariaLabel: "Files" },
+        {
+          className: ["block__tabs"],
+          role: "tablist",
+          ariaLabel: "Files",
+          "data-testid": "block-tabs",
+        },
         [
           ...model.panels.map((panel, index) =>
             h(
@@ -133,6 +138,7 @@ export function buildBlock(model: BlockModel): Element {
               {
                 type: "button",
                 className: ["block__tab"],
+                "data-testid": "block-tab",
                 role: "tab",
                 id: `${id}-t${index}`,
                 ariaControls: `${id}-p${index}`,
@@ -151,6 +157,7 @@ export function buildBlock(model: BlockModel): Element {
           "div",
           {
             role: "tabpanel",
+            "data-testid": "block-panel",
             id: `${id}-p${index}`,
             ariaLabelledBy: `${id}-t${index}`,
             ...(index === 0 ? {} : { hidden: true }),
@@ -183,7 +190,11 @@ export function buildBlock(model: BlockModel): Element {
       h("div", { className: ["block__more"] }, [
         h(
           "button",
-          { type: "button", ariaExpanded: "false" },
+          {
+            type: "button",
+            ariaExpanded: "false",
+            "data-testid": "block-expand",
+          },
           `show all ${total} lines`,
         ),
       ]),
@@ -191,7 +202,7 @@ export function buildBlock(model: BlockModel): Element {
   }
 
   const meta = metaNode(model);
-  return h("div", { className: classes }, [
+  return h("div", { className: classes, "data-testid": "code-block" }, [
     ...(meta ? [meta] : []),
     h("div", { className: ["block__body"] }, body),
   ]);
