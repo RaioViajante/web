@@ -6,11 +6,11 @@ export const metadata = metadataFor("/privacy");
 
 export default function Privacy() {
   return (
-    <RootShell>
+    <RootShell current="/privacy">
       <LegalPage
         site="root"
         title="Privacy Policy"
-        lastUpdated="October 6, 2026"
+        lastUpdated="October 24, 2026"
         inShort={[
           { label: "registration", value: "none" },
           { label: "email", value: "only what you send" },
@@ -49,6 +49,16 @@ export default function Privacy() {
                   holds just that choice, and lasts one year. It is not used for
                   tracking. The home page requests the public RSS feed from
                   dump.raioviajante.com on the server to display recent posts.
+                </p>
+                <p>
+                  Older versions of the site kept the same sound choice in your
+                  browser&apos;s local storage. The site only reads that old
+                  value until you next switch sound, which removes it.
+                </p>
+                <p>
+                  Search runs in your browser. If you choose to search all
+                  sites, your browser requests the search indexes of the other
+                  raioviajante sites; the text you type is not sent to them.
                 </p>
               </>
             ),
@@ -89,7 +99,9 @@ export default function Privacy() {
                   This page will be updated when the site&apos;s data practices
                   change.
                 </p>
-                <p>Last updated: October 6, 2026.</p>
+                <p data-testid="legal-updated">
+                  Last updated: October 24, 2026.
+                </p>
               </>
             ),
           },

@@ -24,6 +24,17 @@ function navigation(locale: LocaleId): NavItem[] {
   }));
 }
 
+function legalLinks(locale: LocaleId) {
+  const terms = routes.terms[locale];
+  const privacy = routes.privacy[locale];
+  return {
+    termsHref: terms ?? routes.terms[DEFAULT_LOCALE],
+    privacyHref: privacy ?? routes.privacy[DEFAULT_LOCALE],
+    termsLocale: terms ? locale : DEFAULT_LOCALE,
+    privacyLocale: privacy ? locale : DEFAULT_LOCALE,
+  };
+}
+
 /**
  * The shared shell with root's pages in a locale. `current` is the page's own
  * path. The language control gets this page's real counterpart from the route
@@ -52,10 +63,9 @@ export function RootShell({
         search: current === searchHref,
         ...(counterpart ? { counterpart } : {}),
       }}
-      // Portuguese pages link the English legal text, which says so in words.
-      {...(locale !== DEFAULT_LOCALE
-        ? { termsLocale: DEFAULT_LOCALE, privacyLocale: DEFAULT_LOCALE }
-        : {})}
+      // A locale without its own reviewed legal text links the English
+      // documents, and the footer says so in words.
+      {...legalLinks(locale)}
       linkComponent={Link}
       pages={pages}
       currentPage={current}

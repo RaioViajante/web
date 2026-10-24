@@ -54,8 +54,7 @@ export default async function ThisSitePt() {
           {ptThisSite.repositoryAfter}
           <Link
             data-testid="content-link"
-            href="/terms"
-            hrefLang="en"
+            href={routes.terms["pt-BR"]!}
             data-sound="nav"
           >
             {ptThisSite.terms}

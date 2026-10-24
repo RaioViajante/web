@@ -67,7 +67,10 @@ export function PageHeader({
           {meta.map((item, index) => (
             <Fragment key={index}>
               {index > 0 ? <span aria-hidden="true">·</span> : null}
-              <span className={index === 0 ? "rv-status" : undefined}>
+              <span
+                data-testid="page-meta-item"
+                className={index === 0 ? "rv-status" : undefined}
+              >
                 {item}
               </span>
             </Fragment>
@@ -165,6 +168,7 @@ export function LeaderRow({
       <span className="rv-leader__dots" aria-hidden="true" />
       {value !== undefined ? (
         <span
+          data-testid="leader-value"
           className={
             wrapValue || (typeof value === "string" && value.length > 24)
               ? "rv-leader__value rv-leader__value--long"

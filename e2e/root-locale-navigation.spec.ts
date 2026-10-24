@@ -4,7 +4,7 @@ import { base, isolate } from "./support";
 const expectLang = async (page: Page, lang: string) =>
   expect(page.locator("html")).toHaveAttribute("lang", lang);
 
-test("Root keeps document language correct across locale history and English legal links", async ({
+test("Root keeps document language correct across locale history and localized legal links", async ({
   page,
 }) => {
   const external: string[] = [];
@@ -36,15 +36,15 @@ test("Root keeps document language correct across locale history and English leg
       page
         .getByTestId("footer-legal")
         .and(page.getByRole("navigation", { name: "Informações legais" }))
-        .getByRole("link", { name: "Termos de Uso (em inglês)" }),
+        .getByRole("link", { name: "Termos de Uso", exact: true }),
     )
     .click();
-  await expect(page).toHaveURL(`${base("root")}/terms`);
-  await expectLang(page, "en");
+  await expect(page).toHaveURL(`${base("root")}/pt/terms`);
+  await expectLang(page, "pt-BR");
   await page.goBack({ waitUntil: "load" });
   await expectLang(page, "pt-BR");
   await page.goForward({ waitUntil: "load" });
-  await expectLang(page, "en");
+  await expectLang(page, "pt-BR");
 
   await page.goto(`${base("root")}/pt`);
   await page
@@ -55,11 +55,11 @@ test("Root keeps document language correct across locale history and English leg
       page
         .getByTestId("footer-legal")
         .and(page.getByRole("navigation", { name: "Informações legais" }))
-        .getByRole("link", { name: "Política de Privacidade (em inglês)" }),
+        .getByRole("link", { name: "Política de Privacidade", exact: true }),
     )
     .click();
-  await expect(page).toHaveURL(`${base("root")}/privacy`);
-  await expectLang(page, "en");
+  await expect(page).toHaveURL(`${base("root")}/pt/privacy`);
+  await expectLang(page, "pt-BR");
   await page.goBack({ waitUntil: "load" });
   await expectLang(page, "pt-BR");
 
@@ -182,9 +182,9 @@ test("Root publishes the Portuguese This Site counterpart across navigation, SEO
         page
           .getByTestId("main-content")
           .and(page.getByRole("main"))
-          .getByRole("link", { name: "Termos de Uso (em inglês)" }),
+          .getByRole("link", { name: "Termos de Uso" }),
       ),
-  ).toHaveAttribute("hreflang", "en");
+  ).toHaveAttribute("href", "/pt/terms");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     "https://raioviajante.com/pt/this-site",
@@ -395,5 +395,185 @@ test("Root publishes the Portuguese Gallery counterpart across navigation, SEO a
       href: "https://raioviajante.com/pt/gallery",
       description: "Arte e imagens",
     }),
+  );
+});
+
+for (const [key, heading, summary, updated, englishUpdated, internal] of [
+  [
+    "terms",
+    "Termos de Uso",
+    "licença de cada repositório",
+    "24 de outubro de 2026",
+    "October 24, 2026",
+    "/pt/privacy",
+  ],
+  [
+    "privacy",
+    "Política de Privacidade",
+    "salva em um cookie",
+    "24 de outubro de 2026",
+    "October 24, 2026",
+    undefined,
+  ],
+] as const)
+  test(`Root publishes the Portuguese ${key} counterpart without changing the English document`, async ({
+    page,
+    request,
+  }) => {
+    await isolate(page, []);
+    const root = base("root");
+
+    await page.goto(`${root}/${key}`);
+    await expectLang(page, "en");
+    await expect(
+      page.getByTestId("section-heading").and(page.getByText("In short")),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByTestId("page-meta-item")
+        .and(page.getByText(`last updated ${englishUpdated}`)),
+    ).toBeVisible();
+    await expect(page.getByTestId("language-counterpart")).toHaveAttribute(
+      "href",
+      `/pt/${key}`,
+    );
+    const footer = page
+      .getByTestId("footer-legal")
+      .and(page.getByRole("navigation", { name: "Legal" }));
+    await expect(
+      footer
+        .getByTestId("footer-legal-link")
+        .and(footer.getByRole("link", { name: "Terms of Use" })),
+    ).toHaveAttribute("href", "/terms");
+    const englishFacts = await page
+      .locator("main a[href^='mailto:'], main a[href^='https://']")
+      .evaluateAll((nodes) => nodes.map((n) => n.getAttribute("href")));
+
+    await page.goto(`${root}/pt/${key}`);
+    await expectLang(page, "pt-BR");
+    await expect(
+      page
+        .getByTestId("page-title")
+        .and(page.getByRole("heading", { level: 1 })),
+    ).toHaveText(heading);
+    await expect(
+      page.getByTestId("section-heading").and(page.getByText("Em resumo")),
+    ).toBeVisible();
+    await expect(
+      page.getByTestId("leader-value").and(page.getByText(summary)).first(),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByTestId("page-meta-item")
+        .and(page.getByText(`última atualização ${updated}`)),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByTestId("legal-updated")
+        .and(page.getByText(`Última atualização: ${updated}.`)),
+    ).toBeVisible();
+    await expect(page.getByTestId("main-content")).not.toContainText(
+      englishUpdated,
+    );
+    // External references and contact data are identical to the English page.
+    expect(
+      await page
+        .locator("main a[href^='mailto:'], main a[href^='https://']")
+        .evaluateAll((nodes) => nodes.map((n) => n.getAttribute("href"))),
+    ).toEqual(englishFacts);
+    if (key === "privacy")
+      await expect(page.getByTestId("main-content")).toContainText(
+        "CNPJ 53.021.377/0001-93",
+      );
+    await expect(page.getByTestId("site-footer")).toContainText(
+      "CNPJ: 53.021.377/0001-93",
+    );
+    // Internal legal links stay in Portuguese; the footer no longer names English.
+    if (internal)
+      await expect(page.locator(`main a[href="${internal}"]`)).toHaveCount(1);
+    const legal = page
+      .getByTestId("footer-legal")
+      .and(page.getByRole("navigation", { name: "Informações legais" }));
+    await expect(
+      legal
+        .getByTestId("footer-legal-link")
+        .and(legal.getByRole("link", { name: "Termos de Uso", exact: true })),
+    ).toHaveAttribute("href", "/pt/terms");
+    await expect(
+      legal
+        .getByTestId("footer-legal-link")
+        .and(
+          legal.getByRole("link", {
+            name: "Política de Privacidade",
+            exact: true,
+          }),
+        ),
+    ).toHaveAttribute("href", "/pt/privacy");
+    await expect(legal.locator("a[hreflang]")).toHaveCount(0);
+    await expect(legal).not.toContainText("em inglês");
+    await expect(
+      page.locator('[data-testid="language-counterpart"][hreflang="en"]'),
+    ).toHaveAttribute("href", `/${key}`);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      `https://raioviajante.com/pt/${key}`,
+    );
+    await expect(
+      page.locator('link[rel="alternate"][hreflang="en"]'),
+    ).toHaveAttribute("href", `https://raioviajante.com/${key}`);
+    await expect(
+      page.locator('link[rel="alternate"][hreflang="pt-BR"]'),
+    ).toHaveAttribute("href", `https://raioviajante.com/pt/${key}`);
+
+    // Mobile: no overflow, keyboard focus reaches the footer legal links.
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto(`${root}/pt/${key}`);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    const link = legal
+      .getByTestId("footer-legal-link")
+      .and(legal.getByRole("link", { name: heading, exact: true }));
+    await link.focus();
+    await expect(link).toBeFocused();
+    await expect(link).toBeVisible();
+
+    const sitemap = await (await request.get(`${root}/sitemap.xml`)).text();
+    expect(sitemap).toContain(`<loc>https://raioviajante.com/pt/${key}</loc>`);
+    expect(sitemap).toContain(`<loc>https://raioviajante.com/${key}</loc>`);
+    const search = await (
+      await request.get(`${root}/pt/search-index.json`)
+    ).json();
+    // Legal pages are not in the English search index, so not in the Portuguese one.
+    expect(
+      search.filter((entry: { href: string }) =>
+        entry.href.endsWith(`/${key}`),
+      ),
+    ).toEqual([]);
+  });
+
+test("Root legal pages state the same audited facts in English and Portuguese", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  const root = base("root");
+  const main = page.getByTestId("main-content");
+
+  await page.goto(`${root}/terms`);
+  await expect(main).toContainText("affiliate links");
+  await expect(main.locator('a[href="/setup"]')).toHaveCount(1);
+  await page.goto(`${root}/pt/terms`);
+  await expect(main).toContainText("links de afiliado");
+  await expect(main.locator('a[href="/pt/setup"]')).toHaveCount(1);
+
+  await page.goto(`${root}/privacy`);
+  await expect(main).toContainText("browser's local storage");
+  await expect(main).toContainText("the text you type is not sent to them");
+  await page.goto(`${root}/pt/privacy`);
+  await expect(main).toContainText("armazenamento local");
+  await expect(main).toContainText(
+    "o texto que você digita não é enviado a eles",
   );
 });

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Art } from "./art";
 import { type LinkComponent } from "./link";
 import { LeaderRow, PageHeader, Section } from "./page";
-import type { LocaleId } from "../../../site/locales";
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 import { siteById, type SiteId } from "../../../site/sites";
 import { catalogFor } from "../catalog";
 
@@ -18,30 +18,35 @@ export interface LegalSection {
 export function LegalPage({
   site,
   title,
+  locale = DEFAULT_LOCALE,
   inShort,
   sections,
   lastUpdated,
 }: {
   site: SiteId;
-  title: "Terms of Use" | "Privacy Policy";
+  /** The document title in the page's language (the footer catalog names both). */
+  title: string;
+  /** The rendered locale: the language of the template's chrome. */
+  locale?: LocaleId;
   inShort: { label: string; value: ReactNode }[];
   sections: LegalSection[];
   /** Omit until the date is known; nothing renders in its place. */
   lastUpdated?: string;
 }) {
   const host = siteById(site).label;
+  const { legal } = catalogFor(locale);
   return (
     <>
       <PageHeader
-        label="LEGAL"
+        label={legal.label}
         title={title}
-        line={`${host} · the short version first`}
+        line={legal.line(host)}
         meta={[
-          ...(lastUpdated ? [`last updated ${lastUpdated}`] : []),
-          "applies to this site",
+          ...(lastUpdated ? [legal.updated(lastUpdated)] : []),
+          legal.applies,
         ]}
       />
-      <Section number="00." title="In short">
+      <Section number="00." title={legal.inShort}>
         {inShort.map((row) => (
           <LeaderRow key={row.label} label={row.label} value={row.value} />
         ))}

@@ -197,7 +197,7 @@ export function Footer({
     </SiteLink>
   );
   return (
-    <footer className="rv-footer">
+    <footer data-testid="site-footer" className="rv-footer">
       <nav data-testid="footer-sites" aria-label={footer.sitesAria}>
         {SITES.map((item, index) => {
           const to = footerDestination(site, item, locale, isParticipating);
