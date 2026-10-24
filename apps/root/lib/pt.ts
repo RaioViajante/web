@@ -1,9 +1,10 @@
 // Root's Portuguese (pt-BR) editorial copy. App-owned and manually authored:
 // the shared UI strings live in packages/design's catalog. Only pages that ship
-// in Portuguese appear here (Home, About, Contact, Search and the 404); the
-// other Root pages are English-only. Names, handles, the email address and tool
-// names are not translated.
+// in Portuguese appear here (Home, About, Projects, Contact, Search and the
+// 404); the other Root pages are English-only. Names, handles, the email
+// address and tool names are not translated.
 
+import { projects, type Project, type ProjectName } from "./projects.ts";
 import type { RouteKey } from "./routes.ts";
 import { localizedPath, participates } from "../../../site/locales.ts";
 import { siteOrigins, type SiteId } from "../../../site/sites.ts";
@@ -35,6 +36,11 @@ export const ptPageSeo: Partial<
     description:
       "Sobre RaioViajante: curiosidade, computação e a construção independente de coisas.",
   },
+  projects: {
+    title: "projetos",
+    description:
+      "Projetos e experimentos de software do RaioViajante, de ferramentas a linguagens de programação.",
+  },
   contact: {
     title: "contato",
     description:
@@ -50,18 +56,21 @@ export const ptPageSeo: Partial<
 export const ptSearchDescriptions: Partial<Record<RouteKey, string>> = {
   home: "Casa pessoal e últimos textos",
   about: "Sobre RaioViajante",
+  projects: "Projetos e trabalhos",
   contact: "Formas de entrar em contato",
 };
 
 export const ptNavigation = [
   { key: "home" as const, label: "início" },
   { key: "about" as const, label: "sobre" },
+  { key: "projects" as const, label: "projetos" },
   { key: "contact" as const, label: "contato" },
 ];
 
 export const ptHome = {
   line: "com curiosidade de sobra para construir por conta própria.",
   links: "Links",
+  projects: "Projetos",
   latestWriting: "Últimos textos",
   noWriting: "Ainda não há textos em português.",
   englishWriting: "Ver os textos em inglês no Dump →",
@@ -101,6 +110,63 @@ export const ptHome = {
       description: "Escreva sobre uma ideia, uma dúvida ou uma colaboração.",
     },
   } as Record<string, { label?: string; note: string; description: string }>,
+};
+
+const ptProjectCopy: Record<
+  ProjectName,
+  Pick<Project, "description" | "kind" | "stack" | "status">
+> = {
+  Hum: {
+    description:
+      "Um player de música para terminal construído em Rust. Uma exploração de como pode ser uma interface de música focada sem sair da linha de comando.",
+    kind: "software / música",
+    stack: "rust",
+    status: "explorando",
+  },
+  Sweep: {
+    description:
+      "Uma ferramenta em Python para organizar arquivos pessoais com regras previsíveis. Estou trabalhando na configuração e nos limites de segurança antes de dar à ferramenta mais autonomia sobre o sistema de arquivos.",
+    kind: "ferramenta / automação",
+    stack: "python",
+    status: "ativo",
+  },
+  Orbit: {
+    description:
+      "Um back-end de execução de tarefas construído com Java e Spring. No momento, ele modela tarefas, execuções e transições de estado válidas; o agendamento e a execução de processos ainda estão por vir.",
+    kind: "back-end / execução de tarefas",
+    stack: "java / spring",
+    status: "ativo",
+  },
+  Yanawa: {
+    description:
+      "Uma linguagem de programação orientada a aplicações em fase de projeto. O trabalho atual é definir sua forma e seu comportamento antes de implementar o compilador.",
+    kind: "design de linguagem",
+    stack: "design de linguagem",
+    status: "explorando",
+  },
+  Dump: {
+    description:
+      "textos técnicos, anotações e coisas aprendidas do jeito difícil",
+    kind: "escrita / notas técnicas",
+    stack: "next.js / mdx",
+    status: "ativo",
+  },
+};
+
+/** Localized presentation layered over the stable English project facts. */
+export const ptProjects: Project[] = projects.map((project) => ({
+  ...project,
+  ...ptProjectCopy[project.name],
+}));
+
+export const ptProjectsPage = {
+  label: "projetos",
+  title: "Projetos",
+  line: "Ferramentas, experimentos de software e textos.",
+  sectionTitle: "Projetos",
+  type: "Tipo:",
+  repository: "Repositório:",
+  url: "URL:",
 };
 
 export const ptAbout = {

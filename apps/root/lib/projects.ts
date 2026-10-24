@@ -8,7 +8,7 @@ export interface Project {
   href: string;
 }
 
-export const projects: Project[] = [
+export const projects = [
   {
     name: "Hum",
     description:
@@ -58,4 +58,6 @@ export const projects: Project[] = [
     status: "active",
     href: "https://dump.raioviajante.com",
   },
-];
+] as const satisfies readonly Project[];
+
+export type ProjectName = (typeof projects)[number]["name"];

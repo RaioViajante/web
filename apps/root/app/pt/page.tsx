@@ -8,9 +8,10 @@ import {
 import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { jsonLdScript } from "../../../../seo/structured-data";
 import { PreviewRow } from "../../components/PreviewRow";
+import { ProjectPreviewRow } from "../../components/ProjectPreviewRow";
 import { RootShell } from "../../components/RootShell";
 import { primaryLinks } from "../../lib/links";
-import { ptHome } from "../../lib/pt";
+import { ptHome, ptProjects } from "../../lib/pt";
 import { webPageJsonLd } from "../../lib/structured-data";
 import { metadataFor } from "../../lib/seo";
 import { routes } from "../../lib/routes";
@@ -57,6 +58,19 @@ export default async function HomePt() {
 
       <Section
         number="00.1"
+        title={ptHome.projects}
+        id="projects-heading"
+        index
+      >
+        {ptProjects
+          .filter((project) => project.name !== "Dump")
+          .map((project) => (
+            <ProjectPreviewRow key={project.name} project={project} />
+          ))}
+      </Section>
+
+      <Section
+        number="00.2"
         title={ptHome.latestWriting}
         id="writing-heading"
         index

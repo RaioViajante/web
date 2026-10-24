@@ -16,6 +16,7 @@ import {
   routeOfPath,
   routes,
 } from "../lib/routes.ts";
+import { projects } from "../lib/projects.ts";
 import {
   ptContact,
   ptDocsHome,
@@ -23,6 +24,8 @@ import {
   ptLabHome,
   ptNotFound,
   ptPageSeo,
+  ptProjects,
+  ptProjectsPage,
   ptSearchDescriptions,
 } from "../lib/pt.ts";
 
@@ -100,7 +103,10 @@ test("counterparts are the other declared locales, never guessed", () => {
   assert.deepEqual(counterpartsOf("contact", "en"), [
     { locale: "pt-BR", path: "/pt/contact" },
   ]);
-  for (const key of ["projects", "gallery", "this-site", "setup"])
+  assert.deepEqual(counterpartsOf("projects", "en"), [
+    { locale: "pt-BR", path: "/pt/projects" },
+  ]);
+  for (const key of ["gallery", "this-site", "setup"])
     assert.deepEqual(counterpartsOf(key, "en"), [], key);
 });
 
@@ -109,13 +115,13 @@ test("legal pages stay English-only until reviewed Portuguese text exists", () =
   assert.deepEqual(Object.keys(routes.privacy), ["en"]);
 });
 
-test("the shipped Portuguese pages are exactly Home, About, Contact and Search", () => {
+test("the shipped Portuguese pages are exactly Home, About, Projects, Contact and Search", () => {
   assert.deepEqual(
     declaredPages()
       .filter((page) => page.locale === "pt-BR")
       .map((page) => page.path)
       .sort(),
-    ["/pt", "/pt/about", "/pt/contact", "/pt/search"],
+    ["/pt", "/pt/about", "/pt/contact", "/pt/projects", "/pt/search"],
   );
   assert.deepEqual(publishedLocales(), ["en", "pt-BR"]);
 });
@@ -127,16 +133,9 @@ test("a path resolves to its route and locale, and an undeclared one does not", 
 
 test("Root participation activates only its published Portuguese routes", () => {
   assert.equal(participates("root", "pt-BR"), true);
-  for (const key of ["home", "about", "contact", "search"])
+  for (const key of ["home", "about", "projects", "contact", "search"])
     assert.ok(routes[key]["pt-BR"], key);
-  for (const key of [
-    "projects",
-    "gallery",
-    "this-site",
-    "setup",
-    "terms",
-    "privacy",
-  ])
+  for (const key of ["gallery", "this-site", "setup", "terms", "privacy"])
     assert.equal(routes[key]["pt-BR"], undefined, key);
 });
 
@@ -151,7 +150,7 @@ test("rollback disables Root participation while its Portuguese routes stay publ
       .filter(({ locale }) => locale === "pt-BR")
       .map(({ path }) => path)
       .sort(),
-    ["/pt", "/pt/about", "/pt/contact", "/pt/search"],
+    ["/pt", "/pt/about", "/pt/contact", "/pt/projects", "/pt/search"],
   );
   assert.equal(participates("dump", "pt-BR"), true);
 });
@@ -188,4 +187,25 @@ test("Portuguese Contact has complete route-facing copy", () => {
   assert.equal(ptContact.messageItems.length, 4);
   for (const value of Object.values(ptContact).flat())
     assert.ok(typeof value === "string" && value.length > 0);
+});
+
+test("Portuguese projects localize presentation and preserve stable facts", () => {
+  assert.equal(ptPageSeo.projects?.title, "projetos");
+  assert.equal(ptSearchDescriptions.projects, "Projetos e trabalhos");
+  assert.equal(ptProjectsPage.type, "Tipo:");
+  assert.equal(ptProjects.length, projects.length);
+  for (const [index, project] of projects.entries()) {
+    const translated = ptProjects[index];
+    assert.deepEqual(
+      {
+        name: translated.name,
+        year: translated.year,
+        href: translated.href,
+      },
+      { name: project.name, year: project.year, href: project.href },
+    );
+    assert.notEqual(translated.description, project.description);
+    assert.notEqual(translated.kind, project.kind);
+    assert.notEqual(translated.status, project.status);
+  }
 });
