@@ -12,6 +12,7 @@ import { initSound } from "./sound/init";
 import { attachScroll } from "./scroll";
 import { attachScrollRegions } from "./scroll-regions";
 import { attachSearch } from "./search/client";
+import { initOwnerClock, updateOwnerClocks } from "./clock";
 
 function fillRequestedPath() {
   document
@@ -22,6 +23,11 @@ function fillRequestedPath() {
     });
 }
 
+function refreshPageState() {
+  fillRequestedPath();
+  updateOwnerClocks();
+}
+
 export function startBehavior() {
   const stops = [
     initSound(),
@@ -30,10 +36,11 @@ export function startBehavior() {
     attachScroll(),
     attachScrollRegions(),
     attachAvatarCoin(),
+    initOwnerClock(),
   ];
-  fillRequestedPath();
+  refreshPageState();
   // Client-side navigation swaps the page without reloading the script.
-  const observer = new MutationObserver(fillRequestedPath);
+  const observer = new MutationObserver(refreshPageState);
   observer.observe(document.body, { childList: true, subtree: true });
   return () => {
     observer.disconnect();

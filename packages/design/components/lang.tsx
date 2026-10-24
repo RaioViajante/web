@@ -51,7 +51,10 @@ export function LanguageControl({
   const target = LOCALE_IDS.find((id) => id !== locale);
   const compact = (
     <span>
-      {LANG_TOKEN} <span lang={current.htmlLang}>{current.label}</span>
+      {LANG_TOKEN}{" "}
+      <span className="rv-utility__value" lang={current.htmlLang}>
+        {current.label}
+      </span>
     </span>
   );
   if (
@@ -68,7 +71,6 @@ export function LanguageControl({
       </div>
     );
   const other = LOCALES[target];
-  const name = <span lang={other.htmlLang}>{other.name}</span>;
   const targetWord = catalog.lang.names[target];
   const searchHref = search
     ? searchLocaleHref(site, locale, target, "", isParticipating)
@@ -81,22 +83,21 @@ export function LanguageControl({
       data-lang-state={href ? "link" : "disclosure"}
     >
       {href ? (
-        <>
-          {compact} <span aria-hidden="true">·</span>{" "}
-          <a
-            href={href}
-            lang={other.htmlLang}
-            hrefLang={other.hreflang}
-            data-sound="nav"
-            {...(search ? { "data-lang-search": "" } : {})}
-          >
-            {other.name}
-          </a>
-        </>
+        <a
+          href={href}
+          hrefLang={other.hreflang}
+          aria-label={catalog.lang.switchAria(current.name, targetWord)}
+          data-sound="nav"
+          {...(search ? { "data-lang-search": "" } : {})}
+        >
+          {compact}
+        </a>
       ) : (
         <details className="rv-lang__details">
-          <summary>
-            {compact} <span aria-hidden="true">·</span> {name}
+          <summary
+            aria-label={catalog.lang.availabilityAria(current.name, targetWord)}
+          >
+            {compact}
           </summary>
           <div className="rv-lang__panel">
             <p>{catalog.lang.unavailable(targetWord)}</p>

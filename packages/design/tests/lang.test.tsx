@@ -111,9 +111,11 @@ describe("LANG: both locales participate", () => {
     const link = body.querySelector("a")!;
     expect(state(body)).toBe("link");
     expect(link.getAttribute("href")).toBe("/pt/about/");
-    expect(link.getAttribute("lang")).toBe("pt-BR");
     expect(link.getAttribute("hreflang")).toBe("pt-BR");
-    expect(link.textContent).toBe("Português (Brasil)");
+    expect(link.textContent).toBe("LANG EN");
+    expect(link.getAttribute("aria-label")).toBe(
+      "Language: English. Switch to Portuguese.",
+    );
     expect(body.querySelector("details")).toBeNull();
   });
 
@@ -125,9 +127,11 @@ describe("LANG: both locales participate", () => {
     });
     const link = body.querySelector("a")!;
     expect(link.getAttribute("href")).toBe("/about/");
-    expect(link.getAttribute("lang")).toBe("en");
     expect(link.getAttribute("hreflang")).toBe("en");
-    expect(link.textContent).toBe("English");
+    expect(link.textContent).toBe("LANG PT");
+    expect(link.getAttribute("aria-label")).toBe(
+      "Idioma: Português (Brasil). Mudar para inglês.",
+    );
     expect(body.querySelector("nav")!.getAttribute("aria-label")).toBe(
       "Idioma. Atual: Português (Brasil)",
     );
@@ -137,8 +141,9 @@ describe("LANG: both locales participate", () => {
     const body = render({ isParticipating: both });
     expect(state(body)).toBe("disclosure");
     const summary = body.querySelector("summary")!;
-    expect(summary.querySelector("[lang='pt-BR']")?.textContent).toBe(
-      "Português (Brasil)",
+    expect(summary.textContent).toBe("LANG EN");
+    expect(summary.getAttribute("aria-label")).toBe(
+      "Language: English. Check Portuguese availability.",
     );
     expect(body.querySelector("p")?.textContent).toBe(
       "This page is not available in Portuguese.",
@@ -162,8 +167,9 @@ describe("LANG: both locales participate", () => {
     expect(home.getAttribute("href")).toBe("/"); // Root, no trailing-slash home change
     expect(home.getAttribute("hreflang")).toBe("en");
     expect(home.textContent).toBe("Ir para a página inicial em inglês →");
-    expect(body.querySelector("summary [lang='en']")?.textContent).toBe(
-      "English",
+    expect(body.querySelector("summary")?.textContent).toBe("LANG PT");
+    expect(body.querySelector("summary")?.getAttribute("aria-label")).toBe(
+      "Idioma: Português (Brasil). Verificar disponibilidade em inglês.",
     );
   });
 
