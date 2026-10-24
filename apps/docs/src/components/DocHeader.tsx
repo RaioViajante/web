@@ -27,14 +27,14 @@ export function DocHeader({
 		<PageHeader
 			label={
 				<>
-					<a href={localizedPath("docs", locale, "/")}>docs</a>
+					<a data-testid="content-link" href={localizedPath("docs", locale, "/")}>docs</a>
 					{crumbs.map((crumb, index) => (
 						<span key={`${index}-${crumb.label}`}>
 							{" / "}
 							{index === crumbs.length - 1 ? (
 								<span aria-current="page">{crumb.label}</span>
 							) : crumb.href ? (
-								<a href={crumb.href}>{crumb.label}</a>
+								<a data-testid="content-link" href={crumb.href}>{crumb.label}</a>
 							) : (
 								crumb.label
 							)}
@@ -47,7 +47,7 @@ export function DocHeader({
 			meta={[
 				status,
 				...meta,
-				...(source ? [<a key="source" href={source}>{copyFor(locale).source} ↗</a>] : []),
+				...(source ? [<a data-testid="content-link" key="source" href={source}>{copyFor(locale).source} ↗</a>] : []),
 			]}
 		/>
 	);
