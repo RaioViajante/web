@@ -14,7 +14,11 @@ export default function Contact() {
       />
       <Section number="03." title="Primary contact" id="contact-heading">
         <p>
-          <a href="mailto:mail@raioviajante.com" data-sound="nav">
+          <a
+            data-testid="content-link"
+            href="mailto:mail@raioviajante.com"
+            data-sound="nav"
+          >
             mail@raioviajante.com
           </a>
         </p>

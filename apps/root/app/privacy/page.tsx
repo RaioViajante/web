@@ -23,7 +23,12 @@ export default function Privacy() {
               <p>
                 This website is operated under CNPJ 53.021.377/0001-93. For
                 questions about your data, write to{" "}
-                <a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a>
+                <a
+                  data-testid="content-link"
+                  href="mailto:mail@raioviajante.com"
+                >
+                  mail@raioviajante.com
+                </a>
                 .
               </p>
             ),
@@ -66,7 +71,10 @@ export default function Privacy() {
                 email, or to request access, correction or deletion where
                 applicable. The Brazilian data protection authority explains the
                 rights available under the LGPD in its{" "}
-                <a href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares">
+                <a
+                  data-testid="content-link"
+                  href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares"
+                >
                   guide for data subjects
                 </a>
                 .

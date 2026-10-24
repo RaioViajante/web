@@ -90,6 +90,7 @@ export default async function HomePt() {
             <p className="home-feed-note">{ptHome.noWriting}</p>
             <p className="home-feed-note">
               <a
+                data-testid="content-link"
                 href="https://dump.raioviajante.com"
                 hrefLang="en"
                 data-sound="nav"

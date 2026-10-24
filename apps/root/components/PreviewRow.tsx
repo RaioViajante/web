@@ -29,7 +29,7 @@ export function PreviewRow({
         linkComponent={Link}
         rel={rel}
       />
-      <div className="row-preview" id={id} role="tooltip">
+      <div data-testid={id} className="row-preview" id={id} role="tooltip">
         <p>{description}</p>
         {meta ? <p className="row-preview-meta">{meta}</p> : null}
       </div>

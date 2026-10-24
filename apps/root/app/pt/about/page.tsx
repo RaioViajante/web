@@ -23,7 +23,12 @@ function Destination({
 }) {
   return (
     <>
-      <a href={href} hrefLang={hrefLang} data-sound="nav">
+      <a
+        data-testid="content-link"
+        href={href}
+        hrefLang={hrefLang}
+        data-sound="nav"
+      >
         {name}
       </a>
       {hrefLang === "en" ? ptAbout.englishNote : null}

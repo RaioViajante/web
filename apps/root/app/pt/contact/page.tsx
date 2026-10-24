@@ -28,7 +28,11 @@ export default async function ContactPt() {
       />
       <Section number="03." title={ptContact.primaryTitle} id="contact-heading">
         <p>
-          <a href="mailto:mail@raioviajante.com" data-sound="nav">
+          <a
+            data-testid="content-link"
+            href="mailto:mail@raioviajante.com"
+            data-sound="nav"
+          >
             mail@raioviajante.com
           </a>
         </p>

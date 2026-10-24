@@ -20,7 +20,11 @@ export default function Setup() {
       />
       <Section number="00.1" title="Gear list" id="gear-heading">
         {gear.some((item) => item.url) && (
-          <p className="setup-disclosure" id="affiliate-disclosure">
+          <p
+            data-testid="affiliate-disclosure"
+            className="setup-disclosure"
+            id="affiliate-disclosure"
+          >
             {affiliateDisclosure}
           </p>
         )}
@@ -28,13 +32,21 @@ export default function Setup() {
           <p className="setup-empty">I&apos;m putting the list together.</p>
         ) : (
           gear.map((item) => (
-            <div className="setup-gear" key={item.name}>
+            <div
+              data-testid="setup-gear"
+              className="setup-gear"
+              key={item.name}
+            >
               <LeaderRow label={item.name} value={item.category} />
-              <p className="setup-gear__link">
+              <p data-testid="setup-gear-source" className="setup-gear__link">
                 {item.url ? (
                   <>
                     <strong>Link:</strong>{" "}
-                    <a href={item.url} rel="sponsored">
+                    <a
+                      data-testid="setup-gear-link"
+                      href={item.url}
+                      rel="sponsored"
+                    >
                       {item.url.replace(/^https:\/\//, "")}
                     </a>
                   </>

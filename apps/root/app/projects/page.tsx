@@ -26,7 +26,11 @@ export default function Projects() {
             .replace(/\/$/, "");
 
           return (
-            <article className="project-entry" key={project.name}>
+            <article
+              data-testid="project-entry"
+              className="project-entry"
+              key={project.name}
+            >
               <LeaderRow
                 linkComponent={Link}
                 label={project.name}
@@ -34,12 +38,17 @@ export default function Projects() {
                 href={project.href}
               />
               <p className="project-description">{project.description}</p>
-              <p className="project-detail">
-                <strong>Type:</strong> <span>{project.kind}</span>
+              <p data-testid="project-detail" className="project-detail">
+                <strong>Type:</strong>{" "}
+                <span data-testid="project-kind">{project.kind}</span>
               </p>
-              <p className="project-detail">
+              <p data-testid="project-detail" className="project-detail">
                 <strong>{repository ? "Repo:" : "URL:"}</strong>{" "}
-                <a href={project.href} data-sound="nav">
+                <a
+                  data-testid="content-link"
+                  href={project.href}
+                  data-sound="nav"
+                >
                   {address}
                 </a>
               </p>

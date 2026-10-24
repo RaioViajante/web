@@ -44,11 +44,20 @@ export default async function ThisSitePt() {
       >
         <p>
           {ptThisSite.repositoryBefore}
-          <a href="https://github.com/RaioViajante/web" data-sound="nav">
+          <a
+            data-testid="content-link"
+            href="https://github.com/RaioViajante/web"
+            data-sound="nav"
+          >
             GitHub
           </a>
           {ptThisSite.repositoryAfter}
-          <Link href="/terms" hrefLang="en" data-sound="nav">
+          <Link
+            data-testid="content-link"
+            href="/terms"
+            hrefLang="en"
+            data-sound="nav"
+          >
             {ptThisSite.terms}
           </Link>
           .
