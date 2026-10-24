@@ -7,6 +7,13 @@ import { join } from "node:path";
 import { base, isolate, watchHealth } from "./support";
 import { galleryZip } from "../apps/root/lib/gallery-download";
 
+/** The "View …" buttons of one collection category, found by its region name. */
+function artworkButtons(page: Page, category: string) {
+  return page
+    .getByRole("region", { name: category, exact: true })
+    .getByRole("button", { name: /^(View|Ver) / });
+}
+
 test("Gallery ZIP preserves filenames, bytes, and CRC checks", async () => {
   const dir = mkdtempSync(join(tmpdir(), "gallery-zip-"));
   try {
@@ -79,9 +86,9 @@ for (const width of [1440, 390, 320]) {
     await expect(page.locator("main")).not.toContainText(
       /requiem|pale choir|concept art/i,
     );
-    await expect(page.locator(".gallery-sticker")).toHaveCount(30);
-    await expect(page.locator(".gallery-profile")).toHaveCount(2);
-    await expect(page.locator(".gallery-piece")).toHaveCount(9);
+    await expect(artworkButtons(page, "Branding")).toHaveCount(30);
+    await expect(artworkButtons(page, "Profiles")).toHaveCount(2);
+    await expect(artworkButtons(page, "Personal")).toHaveCount(9);
     const sticker = page.getByRole("button", {
       name: "View Work of art",
       exact: true,
@@ -98,7 +105,10 @@ for (const width of [1440, 390, 320]) {
     await expect(
       dialog.getByRole("button", { name: "Next artwork" }),
     ).toHaveText("→");
-    for (const arrow of await dialog.locator(".gallery-arrow").all()) {
+    for (const arrow of [
+      dialog.getByRole("button", { name: "Previous artwork" }),
+      dialog.getByRole("button", { name: "Next artwork" }),
+    ]) {
       await expect
         .poll(async () => (await arrow.boundingBox())!.width)
         .toBeGreaterThanOrEqual(44);
@@ -385,7 +395,7 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   await expect(page.locator("#gallery-collection")).toBeVisible();
   // A synchronous burst across distinct artworks is bounded by the shared throttle.
   const beforeBurst = await voices();
-  await page.locator(".gallery-sticker").evaluateAll((els) => {
+  await artworkButtons(page, "Branding").evaluateAll((els) => {
     for (const el of els)
       el.dispatchEvent(
         new PointerEvent("pointerover", {
@@ -547,9 +557,9 @@ for (const width of [1440, 390])
     await expect(
       collection.locator('button[aria-haspopup="dialog"]'),
     ).toHaveCount(41);
-    await expect(page.locator(".gallery-sticker")).toHaveCount(30);
-    await expect(page.locator(".gallery-profile")).toHaveCount(2);
-    await expect(page.locator(".gallery-piece")).toHaveCount(9);
+    await expect(artworkButtons(page, "Identidade visual")).toHaveCount(30);
+    await expect(artworkButtons(page, "Perfis")).toHaveCount(2);
+    await expect(artworkButtons(page, "Pessoais")).toHaveCount(9);
     // Profile links keep their URLs; the video-source label is translated.
     const profileLinks = (path: string) =>
       page

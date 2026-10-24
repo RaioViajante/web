@@ -36,15 +36,25 @@ test.describe("docs anchors and search titles", () => {
   }) => {
     await isolate(page, []);
     await page.goto(base("docs") + page_);
-    const headings = await page
-      .locator(".prose h2, .prose h3")
+    // The number is aria-hidden, so the title is the heading's own text without
+    // it; neither the wrapper class nor the child order matters for the title.
+    const main = page.getByRole("main");
+    const headings = await main
+      .getByRole("heading", { level: 2 })
+      .or(main.getByRole("heading", { level: 3 }))
       .evaluateAll((nodes) =>
-        nodes.map((node) => ({
-          id: node.id,
-          tag: node.tagName,
-          number: node.querySelector(".rv-num")?.textContent ?? "",
-          title: (node.lastElementChild ?? node).textContent ?? "",
-        })),
+        nodes.map((node) => {
+          const copy = node.cloneNode(true) as Element;
+          copy
+            .querySelectorAll('[aria-hidden="true"]')
+            .forEach((n) => n.remove());
+          return {
+            id: node.id,
+            tag: node.tagName,
+            number: node.querySelector(".rv-num")?.textContent ?? "",
+            title: copy.textContent ?? "",
+          };
+        }),
       );
     const h2 = headings.filter((heading) => heading.tag === "H2");
     expect(h2.length).toBeGreaterThan(3);
@@ -68,7 +78,9 @@ test.describe("docs anchors and search titles", () => {
   }) => {
     await isolate(page, []);
     await page.goto(base("docs") + page_);
-    const links = page.locator('nav[aria-label="on this page"] a');
+    const links = page
+      .getByRole("navigation", { name: "on this page" })
+      .getByRole("link");
     const entries = await links.evaluateAll((nodes) =>
       nodes.map((node) => ({
         href: node.getAttribute("href") ?? "",
@@ -76,7 +88,8 @@ test.describe("docs anchors and search titles", () => {
       })),
     );
     const ids = await page
-      .locator(".prose h2")
+      .getByRole("main")
+      .getByRole("heading", { level: 2 })
       .evaluateAll((nodes) => nodes.map((node) => node.id));
     expect(entries.map((entry) => entry.href)).toEqual(
       ids.map((id) => `#${id}`),
@@ -86,7 +99,7 @@ test.describe("docs anchors and search titles", () => {
     await links.nth(0).click();
     await expect(page).toHaveURL(new RegExp(`#${ids[0]}$`));
     await expectAnchorSettled(page, `[id="${ids[0]}"]`);
-    await links.nth(2).click();
+    await links.filter({ hasText: /Classification$/ }).click();
     await expect(page).toHaveURL(/#classification$/);
     await expectAnchorSettled(page, "#classification");
     await page.goBack();
