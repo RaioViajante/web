@@ -70,6 +70,14 @@ export interface SharedCatalog {
     /** Other hosts that do not publish the locale yet. */
     notPublished: (sites: string, language: string) => string;
   };
+  /** Chrome of the shared legal template; the legal text itself stays in the apps. */
+  legal: {
+    label: string;
+    line: (host: string) => string;
+    updated: (date: string) => string;
+    applies: string;
+    inShort: string;
+  };
   pager: {
     aria: string;
     previous: string;
@@ -147,6 +155,13 @@ export const catalogs = {
       notPublished: (sites, language) =>
         `${sites}: no ${language} results yet.`,
     },
+    legal: {
+      label: "LEGAL",
+      line: (host) => `${host} · the short version first`,
+      updated: (date) => `last updated ${date}`,
+      applies: "applies to this site",
+      inShort: "In short",
+    },
     pager: {
       aria: "Previous and next",
       previous: "← Previous",
@@ -223,6 +238,13 @@ export const catalogs = {
         `não consegui acessar ${sites}: mostrando o resto.`,
       notPublished: (sites, language) =>
         `${sites}: ainda sem resultados em ${language}.`,
+    },
+    legal: {
+      label: "JURÍDICO",
+      line: (host) => `${host} · a versão curta primeiro`,
+      updated: (date) => `última atualização ${date}`,
+      applies: "vale para este site",
+      inShort: "Em resumo",
     },
     pager: {
       aria: "Anterior e próximo",

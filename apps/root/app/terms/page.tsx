@@ -7,11 +7,11 @@ export const metadata = metadataFor("/terms");
 
 export default function Terms() {
   return (
-    <RootShell>
+    <RootShell current="/terms">
       <LegalPage
         site="root"
         title="Terms of Use"
-        lastUpdated="October 4, 2026"
+        lastUpdated="October 24, 2026"
         inShort={[
           { label: "accounts", value: "none" },
           { label: "purchases", value: "none" },
@@ -56,8 +56,10 @@ export default function Terms() {
               <p>
                 Dump, docs, lab, GitHub and other linked destinations are
                 separate websites. Review their own information when you visit
-                them. Our <Link href="/privacy">Privacy Policy</Link> describes
-                data handling on this root site.
+                them. Some links on the <Link href="/setup">setup</Link> page
+                are affiliate links, as noted there. Our{" "}
+                <Link href="/privacy">Privacy Policy</Link> describes data
+                handling on this root site.
               </p>
             ),
           },
@@ -73,7 +75,7 @@ export default function Terms() {
                   . The current version of these terms will remain available on
                   this page when updated.
                 </p>
-                <p>Last updated: October 4, 2026.</p>
+                <p>Last updated: October 24, 2026.</p>
               </>
             ),
           },

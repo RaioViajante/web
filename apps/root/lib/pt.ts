@@ -1,7 +1,8 @@
 // Root's Portuguese (pt-BR) editorial copy. App-owned and manually authored:
 // the shared UI strings live in packages/design's catalog. Only pages that ship
 // in Portuguese appear here (Home, About, Projects, Contact, Gallery, This site,
-// Setup, Search and the 404); the other Root pages are English-only. Names, handles, the email
+// Setup, Terms, Privacy, Search and the 404). The legal documents' bodies live
+// in their pages, beside the English originals. Names, handles, the email
 // address and tool names are not translated.
 
 import type { GalleryCopy } from "./gallery.ts";
@@ -61,6 +62,16 @@ export const ptPageSeo: Partial<
     title: "setup",
     description:
       "Os computadores, as ferramentas e os softwares do setup de trabalho de RaioViajante.",
+  },
+  terms: {
+    title: "termos de uso",
+    description:
+      "Termos de Uso de raioviajante.com: escopo, conteúdo, código e destinos externos.",
+  },
+  privacy: {
+    title: "política de privacidade",
+    description:
+      "Política de Privacidade de raioviajante.com: preferências, dados, contato e seus direitos.",
   },
   search: {
     title: "Busca",
@@ -387,7 +398,7 @@ export const ptThisSite = {
     "O código deste site e dos outros apps web do RaioViajante está no ",
   repositoryAfter:
     ". Para informações sobre o uso dos textos ou das ilustrações do site, consulte os ",
-  terms: "Termos de Uso (em inglês)",
+  terms: "Termos de Uso",
 };
 
 /** Portuguese names of the English gear categories; product names stay as supplied. */

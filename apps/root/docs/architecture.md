@@ -28,10 +28,10 @@ Root publishes a partial Portuguese tree and participates in Portuguese through
 [docs/i18n.md](../../../docs/i18n.md).
 
 - **Route registry.** `lib/routes.ts` declares which pages exist in which
-  locale (Home, About, Projects, Contact, Gallery, This Site, Setup and Search in
-  Portuguese at `/pt`, `/pt/about`, `/pt/projects`, `/pt/contact`,
-  `/pt/gallery`, `/pt/this-site`,
-  `/pt/setup`, `/pt/search`; every other page English-only). Navigation, metadata,
+  locale (every page: Home, About, Projects, Contact, Gallery, This Site, Setup,
+  Terms, Privacy and Search in Portuguese at `/pt`, `/pt/about`,
+  `/pt/projects`, `/pt/contact`, `/pt/gallery`, `/pt/this-site`, `/pt/setup`,
+  `/pt/terms`, `/pt/privacy`, `/pt/search`). Navigation, metadata,
   counterparts (`hreflang`), the sitemap, social cards and the search index all
   derive from it. `tests/routes.test.mjs` (`pnpm --filter @raioviajante/root
 test`, Node's built-in runner) checks that every declared path is a built page

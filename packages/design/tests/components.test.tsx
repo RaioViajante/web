@@ -223,6 +223,24 @@ describe("templates", () => {
     expect(html).toContain("01.");
   });
 
+  it("legal page: Portuguese chrome, English by default", () => {
+    const html = renderToStaticMarkup(
+      <LegalPage
+        site="root"
+        locale="pt-BR"
+        title="Termos de Uso"
+        lastUpdated="4 de outubro de 2026"
+        inShort={[{ label: "contas", value: "nenhuma" }]}
+        sections={[{ title: "Escopo", body: <p>x</p> }]}
+      />,
+    );
+    expect(html).toContain("última atualização 4 de outubro de 2026");
+    expect(html).toContain("Em resumo");
+    expect(html).toContain("a versão curta primeiro");
+    expect(html).toContain("vale para este site");
+    expect(html).not.toContain("In short");
+  });
+
   it("404 page: sticker, requested path slot, try instead", () => {
     const html = renderToStaticMarkup(
       <NotFoundPage
