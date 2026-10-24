@@ -62,17 +62,18 @@ test.describe("docs anchors and search titles", () => {
     );
     expect(entries[2]!.text).toMatch(/^01\.2\s*Classification$/);
 
+    await links.nth(0).click();
+    await expect(page).toHaveURL(new RegExp(`#${ids[0]}$`));
+    await expect(page.locator(`[id="${ids[0]}"]`)).toBeInViewport();
     await links.nth(2).click();
     await expect(page).toHaveURL(/#classification$/);
     await expect(page.locator("#classification")).toBeInViewport();
-    await links.nth(0).click();
-    await expect(page).toHaveURL(new RegExp(`#${ids[0]}$`));
     await page.goBack();
-    await expect(page).toHaveURL(/#classification$/);
-    await expect(page.locator("#classification")).toBeInViewport();
-    await page.goForward();
     await expect(page).toHaveURL(new RegExp(`#${ids[0]}$`));
     await expect(page.locator(`[id="${ids[0]}"]`)).toBeInViewport();
+    await page.goForward();
+    await expect(page).toHaveURL(/#classification$/);
+    await expect(page.locator("#classification")).toBeInViewport();
 
     // A direct load of the semantic fragment reaches the heading.
     await page.goto("about:blank");
