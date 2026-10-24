@@ -81,6 +81,55 @@ async function axeClean(page: Page) {
   ).toEqual([]);
 }
 
+const colorOf = (page: Page, selector: string) =>
+  page.locator(selector).evaluate((node) => getComputedStyle(node).color);
+
+test("the utility row keeps labels bright and applies hover only to state values", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  for (const viewport of [viewports.mobile, viewports.desktop]) {
+    await page.context().clearCookies();
+    await page.setViewportSize(viewport);
+    await page.goto(base("root") + "/");
+
+    const clockLabel = ".rv-clock .rv-utility__label";
+    const clockValue = ".rv-clock .rv-utility__value";
+    const sound = ".rv-sound button";
+    const soundLabel = `${sound} .rv-utility__label`;
+    const soundValue = `${sound} .rv-sound__value`;
+    const lang = ".rv-lang a";
+    const langLabel = `${lang} .rv-utility__label`;
+    const langValue = `${lang} .rv-utility__value`;
+
+    const primary = await colorOf(page, clockLabel);
+    const secondary = await colorOf(page, clockValue);
+    expect(primary).not.toBe(secondary);
+    expect(await colorOf(page, soundLabel)).toBe(primary);
+    expect(await colorOf(page, langLabel)).toBe(primary);
+    expect(await colorOf(page, soundValue)).toBe(secondary);
+    expect(await colorOf(page, langValue)).toBe(secondary);
+
+    await page.locator(sound).hover();
+    expect(await colorOf(page, soundLabel)).toBe(primary);
+    expect(await colorOf(page, soundValue)).not.toBe(secondary);
+    expect(await colorOf(page, clockValue)).toBe(secondary);
+
+    await page.locator(lang).hover();
+    expect(await colorOf(page, langLabel)).toBe(primary);
+    expect(await colorOf(page, langValue)).not.toBe(secondary);
+    expect(await colorOf(page, clockValue)).toBe(secondary);
+
+    await page.locator(sound).click();
+    await expect(page.locator(sound)).toHaveAttribute("aria-pressed", "true");
+    await page.locator("main h1").hover();
+    expect(await colorOf(page, soundValue)).toBe(primary);
+    expect(await colorOf(page, soundLabel)).toBe(primary);
+  }
+});
+
 // Real LanguageControl markup, rendered once per state (see lang-fixtures.ts).
 let controls: Awaited<ReturnType<typeof renderControls>>;
 const renderControls = () =>

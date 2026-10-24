@@ -103,7 +103,10 @@ export function SoundToggle({ locale }: { locale: LocaleId }) {
       aria-pressed="false"
       aria-label={sound.aria(false)}
     >
-      {sound.label} <span aria-hidden="true">{sound.off}</span>
+      <span className="rv-utility__label">{sound.label}</span>{" "}
+      <span className="rv-sound__value" aria-hidden="true">
+        {sound.off}
+      </span>
     </button>
   );
 }
@@ -114,7 +117,9 @@ export function OwnerClock({ locale }: { locale: LocaleId }) {
   const accessibleLabel = catalogFor(locale).clock.aria(label);
   return (
     <div className="rv-clock">
-      <span aria-hidden="true">{label}</span>
+      <span className="rv-utility__label" aria-hidden="true">
+        {label}
+      </span>
       <span className="rv-sr-only">{accessibleLabel}: </span>
       <time className="rv-utility__value" data-owner-clock="">
         --:--

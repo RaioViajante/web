@@ -57,7 +57,7 @@ test("a cold-cache production build keeps semantic headings in the search index"
 	assert.match(home, /href="\/pt\/projetos\/sweep\/"/);
 	assert.doesNotMatch(home, /href="\/projects\/sweep\/cli\/"/);
 	assert.match(home, /data-lang-state="link"/);
-	assert.match(home, /LANG<!-- --> <span class="rv-utility__value" lang="pt-BR">PT<\/span>/);
+	assert.match(home, /<span class="rv-utility__label">LANG<\/span>(?:<!-- -->)? <span class="rv-utility__value" lang="pt-BR">PT<\/span>/);
 	assert.match(home, /<a href="\/" hrefLang="en" aria-label="Idioma: Português \(Brasil\)\. Mudar para inglês\."/);
 	assert.match(enHome, /<a href="\/pt\/" hrefLang="pt-BR" aria-label="Language: English\. Switch to Portuguese\."/);
 	assert.match(en, /<a href="\/pt\/projetos\/sweep\/" hrefLang="pt-BR"/);

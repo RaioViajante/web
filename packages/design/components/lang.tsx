@@ -51,7 +51,7 @@ export function LanguageControl({
   const target = LOCALE_IDS.find((id) => id !== locale);
   const compact = (
     <span>
-      {LANG_TOKEN}{" "}
+      <span className="rv-utility__label">{LANG_TOKEN}</span>{" "}
       <span className="rv-utility__value" lang={current.htmlLang}>
         {current.label}
       </span>

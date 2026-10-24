@@ -4,7 +4,7 @@ import { startBehavior } from "../behavior";
 import { getSoundPlayer } from "../sound/player";
 
 const toggle = (label = "OFF") =>
-  `<div class="rv-sound"><button data-sound-toggle data-sound-locale="en" aria-pressed="false">SOUND <span>${label}</span></button></div>`;
+  `<div class="rv-sound"><button data-sound-toggle data-sound-locale="en" aria-pressed="false"><span class="rv-utility__label">SOUND</span> <span class="rv-sound__value">${label}</span></button></div>`;
 
 afterEach(() => {
   document.body.innerHTML = "";
@@ -40,14 +40,16 @@ describe("client-side navigation", () => {
     const player = getSoundPlayer();
     player.setEnabled(true);
     expect(
-      document.querySelector("[data-sound-toggle] span")?.textContent,
+      document.querySelector("[data-sound-toggle] .rv-sound__value")
+        ?.textContent,
     ).toBe("ON");
 
     // The router swaps the page: a new toggle, still marked OFF in the markup.
     document.body.innerHTML = toggle("OFF");
     await new Promise((resolve) => setTimeout(resolve));
     expect(
-      document.querySelector("[data-sound-toggle] span")?.textContent,
+      document.querySelector("[data-sound-toggle] .rv-sound__value")
+        ?.textContent,
     ).toBe("ON");
     expect(getSoundPlayer()).toBe(player);
     expect(contexts).toBeLessThanOrEqual(1);

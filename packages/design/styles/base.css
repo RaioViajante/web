@@ -82,8 +82,15 @@ a:hover {
   padding: 0 8px;
   cursor: pointer;
 }
-.rv-utility__value {
+.rv-utility__label {
+  color: var(--fg);
+}
+.rv-utility__value,
+.rv-sound__value {
   color: var(--fg-2);
+}
+.rv-sound button[aria-pressed="true"] .rv-sound__value {
+  color: var(--fg);
 }
 /* The owner's clock is a noninteractive fact in the shared utility row. */
 .rv-clock {
@@ -114,7 +121,6 @@ a:hover {
   color: var(--fg);
   cursor: pointer;
   text-decoration: none;
-  transition: color var(--ease-link) ease;
 }
 .rv-lang summary {
   list-style: none;
@@ -122,23 +128,21 @@ a:hover {
 .rv-lang summary::-webkit-details-marker {
   display: none;
 }
-.rv-sound button,
-.rv-sound button .rv-utility__value {
-  transition: color var(--ease-link) ease;
+.rv-sound__value,
+.rv-lang .rv-utility__value {
+  transition: color var(--ease-nav) ease;
 }
-.rv-sound button:hover,
-.rv-sound button:focus-visible,
-.rv-sound button:hover .rv-utility__value,
-.rv-sound button:focus-visible .rv-utility__value,
-.rv-lang a:hover,
-.rv-lang a:focus-visible,
-.rv-lang summary:hover,
-.rv-lang summary:focus-visible,
+.rv-sound button[aria-pressed="false"]:hover .rv-sound__value,
+.rv-sound button[aria-pressed="false"]:focus-visible .rv-sound__value,
 .rv-lang a:hover .rv-utility__value,
 .rv-lang a:focus-visible .rv-utility__value,
 .rv-lang summary:hover .rv-utility__value,
 .rv-lang summary:focus-visible .rv-utility__value {
   color: var(--hover-link);
+}
+.rv-sound button[aria-pressed="true"]:hover .rv-sound__value,
+.rv-sound button[aria-pressed="true"]:focus-visible .rv-sound__value {
+  color: var(--hover-label);
 }
 .rv-lang__details {
   max-width: 100%;
@@ -758,10 +762,8 @@ kbd {
   .rv-footer a {
     transition: none;
   }
-  .rv-sound button,
-  .rv-sound button .rv-utility__value,
-  .rv-lang a,
-  .rv-lang summary {
+  .rv-sound__value,
+  .rv-lang .rv-utility__value {
     transition: none;
   }
   a.rv-leader:hover .rv-leader__value,
