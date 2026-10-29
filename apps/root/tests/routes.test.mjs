@@ -283,10 +283,13 @@ test("Portuguese Gallery has route, SEO, search, page and widget copy", () => {
   assert.deepEqual(
     Object.keys(ptGalleryCopy.alts).sort(),
     [
+      "candle",
       "castle",
       "cats",
       "calves",
       "cow",
+      "ferry",
+      "forest",
       "hospital",
       "lab",
       "mirror",
