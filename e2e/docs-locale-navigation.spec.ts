@@ -1,40 +1,64 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 import { audit } from "./audit";
 import { base, isolate } from "./support";
+
+/** Every Docs page that exists in both languages: English path, Portuguese path. */
+const pairs = [
+  ["/", "/pt/"],
+  ["/projects/sweep/", "/pt/projetos/sweep/"],
+  ["/projects/sweep/cli/", "/pt/projetos/sweep/cli/"],
+  ["/raioviajante/design-language/", "/pt/raioviajante/linguagem-de-design/"],
+  [
+    "/raioviajante/repository-conventions/",
+    "/pt/raioviajante/convencoes-de-repositorio/",
+  ],
+  ["/terms/", "/pt/terms/"],
+  ["/privacy/", "/pt/privacy/"],
+  ["/search/", "/pt/search/"],
+] as const;
 
 test("Portuguese Docs navigation and LANG use real counterparts", async ({
   page,
 }) => {
-  for (const [path, counterpart] of [
-    ["/pt/", "/"],
-    ["/pt/projetos/sweep/", "/projects/sweep/"],
-    ["/pt/search/", "/search/"],
-  ]) {
+  for (const [counterpart, path] of pairs) {
     await page.goto(base("docs") + path);
     await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
     await expect(
       page.locator('.rv-lang[data-lang-state="link"] a'),
     ).toHaveAttribute("href", counterpart);
     await expect(page.locator(".rv-lang a")).toHaveAttribute("hreflang", "en");
-    await expect(page.locator('.rv-nav[data-nav="pages"] a')).toHaveCount(3);
+    // home, four documents and search, all in Portuguese and none missing
+    await expect(page.locator('.rv-nav[data-nav="pages"] a')).toHaveCount(6);
     await expect(
       page.locator('.rv-nav[data-nav="pages"] a[href^="/pt/"]'),
-    ).toHaveCount(3);
+    ).toHaveCount(6);
+    // The footer links the Portuguese legal pages, without an English qualifier.
+    const legal = page.getByRole("navigation", { name: "Informações legais" });
+    await expect(legal.getByRole("link")).toHaveText([
+      "Termos de Uso",
+      "Política de Privacidade",
+    ]);
+    await expect(legal.getByRole("link").first()).toHaveAttribute(
+      "href",
+      "/pt/terms/",
+    );
+    await expect(legal.getByRole("link").last()).toHaveAttribute(
+      "href",
+      "/pt/privacy/",
+    );
   }
   await page.goto(base("docs") + "/pt/search/?q=organização");
   await expect(page.locator('[data-search-locale="pt-BR"]')).toBeVisible();
-  await expect(page.locator('a[href="/pt/projetos/sweep/"]')).toBeVisible();
+  await expect(
+    page.locator('a[href="/pt/projetos/sweep/"]').first(),
+  ).toBeVisible();
   await expect(page.locator('a[href*="/projects/sweep/cli/"]')).toHaveCount(0);
 });
 
-test("English Docs links only declared counterparts and discloses untranslated pages", async ({
+test("English Docs links every Portuguese counterpart and nothing else", async ({
   page,
 }) => {
-  for (const [path, counterpart] of [
-    ["/", "/pt/"],
-    ["/projects/sweep/", "/pt/projetos/sweep/"],
-    ["/search/", "/pt/search/"],
-  ]) {
+  for (const [path, counterpart] of pairs) {
     await page.goto(base("docs") + path);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(
@@ -44,29 +68,99 @@ test("English Docs links only declared counterparts and discloses untranslated p
       "hreflang",
       "pt-BR",
     );
+    await expect(
+      page.locator('link[rel="alternate"][hreflang="pt-BR"]'),
+    ).toHaveAttribute("href", `https://docs.raioviajante.com${counterpart}`);
+    // English pages still link the English legal pages.
+    const legal = page.getByRole("navigation", { name: "Legal" });
+    await expect(legal.getByRole("link")).toHaveText([
+      "Terms of Use",
+      "Privacy Policy",
+    ]);
   }
-  for (const path of [
-    "/projects/sweep/cli/",
-    "/raioviajante/design-language/",
-    "/raioviajante/repository-conventions/",
-  ]) {
-    await page.goto(base("docs") + path);
-    const disclosure = page.locator('.rv-lang[data-lang-state="disclosure"]');
-    await expect(disclosure.locator("summary")).toHaveText("LANG EN");
-    await expect(disclosure.locator("summary")).toHaveAccessibleName(
-      "LANG EN — Language: English. Check Portuguese availability.",
-    );
-    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(
-      0,
-    );
-    await disclosure.locator("summary").focus();
-    await page.keyboard.press("Enter");
-    await expect(disclosure.locator("details")).toHaveAttribute("open", "");
-    await expect(disclosure.locator("p")).toHaveText(
-      "This page is not available in Portuguese.",
-    );
-    await expect(disclosure.locator("a")).toHaveAttribute("href", "/pt/");
+});
+
+test("Portuguese Docs home lists everything the English home lists", async ({
+  page,
+}) => {
+  await page.goto(base("docs") + "/");
+  const englishCount = await page.locator(".docs-entry").count();
+  const labels = (locator: Locator) =>
+    locator
+      .locator(".docs-entry .rv-leader span:first-child")
+      .allTextContents();
+  const english = await labels(page.locator("main"));
+  await page.goto(base("docs") + "/pt/");
+  await expect(page.locator(".docs-entry")).toHaveCount(englishCount);
+  // The projects that are not documented here are listed in both languages.
+  const portuguese = await labels(page.locator("main"));
+  expect(portuguese.slice(0, 4)).toEqual(["sweep", "hum", "orbit", "yanawa"]);
+  expect(portuguese.length).toBe(english.length);
+  await expect(page.getByText("ainda não documentado")).toHaveCount(2);
+  await expect(page.getByRole("heading", { level: 2 })).toHaveText([
+    "01.projetos/",
+    "02.raioviajante/",
+  ]);
+});
+
+test("Portuguese Docs search suggestions lead to results", async ({ page }) => {
+  await isolate(page, []);
+  await page.goto(base("docs") + "/pt/search/");
+  await expect(page.locator("[data-search-page]")).toHaveAttribute(
+    "data-search-state",
+    "ready",
+  );
+  const input = page.locator("[data-search-input]");
+  // Nothing matches yet: the empty state offers the suggestions.
+  await input.fill("zzzz-nada");
+  for (const scope of ["site", "everywhere"] as const) {
+    if (scope === "everywhere") {
+      await page.locator('[data-search-scope="everywhere"]').click();
+      await input.fill("zzzz-nada");
+    }
+    await expect(page.locator("[data-search-empty]")).toBeVisible();
+    const line = page.locator(`[data-search-suggestions="${scope}"]`);
+    await expect(line).toBeVisible();
+    const buttons = line.locator("[data-search-suggestion]");
+    const terms = await buttons.allTextContents();
+    expect(terms.length).toBeGreaterThanOrEqual(3);
+    for (const term of terms) {
+      await input.fill("zzzz-nada");
+      await line.locator("button", { hasText: term }).click();
+      await expect(input).toHaveValue(term);
+      await expect(
+        page.locator("[data-search-result]").first(),
+        `"${term}" (${scope}) finds something`,
+      ).toBeVisible();
+      await expect(page.locator("[data-search-empty]")).toBeHidden();
+    }
   }
+});
+
+test("Portuguese Docs blocks speak Portuguese and announce copying", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await isolate(page, []);
+  await page.goto(base("docs") + "/pt/projetos/sweep/");
+  const copy = page.locator(".block__copy").first();
+  await expect(copy).toHaveText("copiar");
+  await expect(page.locator(".callout__label")).toHaveText([
+    "Nota",
+    "Importante",
+    "Aviso",
+  ]);
+  await copy.focus();
+  await page.keyboard.press("Enter");
+  await expect(copy).toHaveText("copiado");
+  await expect(page.locator('[role="status"][data-block-status]')).toHaveText(
+    "copiado",
+  );
+  await expect(copy).toHaveText("copiar", { timeout: 5000 });
+  await expect(page.locator("pre").first()).toBeVisible();
+  // Nothing on the page keeps an English control word.
+  await expect(page.getByRole("button", { name: /^copy/i })).toHaveCount(0);
 });
 
 test("Docs search LANG carries q only, in both directions", async ({
@@ -157,7 +251,7 @@ test("Portuguese Docs pages remain accessible at mobile and desktop widths", asy
 }) => {
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ["/pt/", "/pt/projetos/sweep/", "/pt/search/"]) {
+    for (const [, path] of pairs) {
       expect(
         await audit(page, "docs", path, width),
         `${path} at ${width}px`,

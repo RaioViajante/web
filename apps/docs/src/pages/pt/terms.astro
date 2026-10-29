@@ -1,0 +1,14 @@
+---
+import { TermsPage } from "../../components/TermsPage";
+import DocsShell from "../../layouts/DocsShell.astro";
+---
+
+<DocsShell
+	title="Termos de Uso"
+	description="A versão curta de como usar docs.raioviajante.com."
+	current="/pt/terms/"
+	locale="pt-BR"
+	counterparts={[{ locale: "en", path: "/terms/" }]}
+>
+	<TermsPage locale="pt-BR" />
+</DocsShell>

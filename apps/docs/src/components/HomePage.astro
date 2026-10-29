@@ -1,0 +1,96 @@
+---
+import { LeaderRow, Section } from "@raioviajante/design/parts";
+import { DEFAULT_LOCALE, LOCALE_IDS, type LocaleId } from "../../../../site/locales";
+import { DocsIndexHeader } from "./DocsIndexHeader";
+import DocsShell from "../layouts/DocsShell.astro";
+import { copyFor, type ExternalProjectId } from "../lib/copy";
+import { getPages, homePath, navPages, pathOf } from "../lib/docs";
+import { childIndexes } from "../lib/nav";
+import { homeJsonLd } from "../lib/structured-data";
+
+/** The home page of one locale, built from that locale's documents and catalog. */
+const { locale } = Astro.props as { locale: LocaleId };
+const copy = copyFor(locale);
+
+/** Projects without documentation here: where each one points. */
+const external: { id: ExternalProjectId; href: string; destinationLanguage?: LocaleId }[] = [
+	{ id: "hum", href: "https://github.com/RaioViajante/hum" },
+	{
+		id: "orbit",
+		href: "https://dump.raioviajante.com/posts/building-orbit",
+		destinationLanguage: DEFAULT_LOCALE,
+	},
+	{
+		id: "yanawa",
+		href: "https://dump.raioviajante.com/posts/started-designing-a-language-before-i-could-compile-one",
+		destinationLanguage: DEFAULT_LOCALE,
+	},
+];
+
+const all = await getPages(locale);
+const nav = await navPages(locale);
+// A project's guide is followed by the pages listed under it (the Sweep CLI
+// reference): the note names them, so a guide without any shows no note.
+const notes = new Map(
+	all.map((entry, index) => {
+		const children = childIndexes(nav, index).map((child) => nav[child]!.label);
+		return [entry.id, children.length ? [copy.home.guide, ...children].join(" · ") : undefined];
+	}),
+);
+const pages = all.filter((entry) => !entry.data.sub);
+// A section with nothing to list is omitted and the numbers close the gap.
+const sections = [
+	{
+		key: "projects" as const,
+		entries: pages.filter((entry) => entry.data.group === "projects"),
+		listsExternal: true,
+	},
+	{
+		key: "raioviajante" as const,
+		entries: pages.filter((entry) => entry.data.group === "raioviajante"),
+		listsExternal: false,
+	},
+]
+	.filter((section) => section.entries.length || section.listsExternal)
+	.map((section, index) => ({ ...section, number: `${String(index + 1).padStart(2, "0")}.` }));
+const counterparts = LOCALE_IDS.filter((id) => id !== locale).map((id) => ({ locale: id, path: homePath(id) }));
+---
+
+<DocsShell
+	title={copy.home.title}
+	description={copy.description}
+	current={homePath(locale)}
+	locale={locale}
+	counterparts={counterparts}
+	fullTitle
+	jsonLd={homeJsonLd(locale)}
+>
+	<DocsIndexHeader line={copy.home.line} locale={locale} />
+
+	{
+		sections.map((section) => (
+			<Section number={section.number} title={copy.home.groups[section.key]} index>
+				{section.entries.map((entry) => (
+					<div class="docs-entry">
+						<LeaderRow label={entry.data.title.toLowerCase()} value={entry.data.status} href={pathOf(entry)} />
+						<p>{entry.data.summary}</p>
+						{notes.get(entry.id) && <p class="docs-entry__note">{notes.get(entry.id)}</p>}
+					</div>
+				))}
+				{section.listsExternal &&
+					external.map(({ id, href, destinationLanguage }) => (
+						<div class="docs-entry">
+							<LeaderRow
+								label={id}
+								value={copy.home.external[id].status}
+								href={href}
+								hrefLang={destinationLanguage && destinationLanguage !== locale ? destinationLanguage : undefined}
+							/>
+							<p>{copy.home.external[id].summary}</p>
+							{copy.home.external[id].note && <p class="docs-entry__note">{copy.home.external[id].note}</p>}
+						</div>
+					))}
+			</Section>
+		))
+	}
+</DocsShell>

@@ -1,18 +1,5 @@
 ---
-import { LeaderRow, Section } from "@raioviajante/design/parts";
-import { DocsIndexHeader } from "../../components/DocsIndexHeader";
-import DocsShell from "../../layouts/DocsShell.astro";
-import { getPages, pathOf } from "../../lib/docs";
-import { homeJsonLd } from "../../lib/structured-data";
-
-const pages = (await getPages("pt-BR")).filter((entry) => !entry.data.sub);
+import HomePage from "../../components/HomePage.astro";
 ---
-<DocsShell title="docs — documentação técnica do RaioViajante." description="Documentação técnica pública de projetos e sistemas do RaioViajante." current="/pt/" locale="pt-BR" counterparts={[{ locale: "en", path: "/" }]} fullTitle jsonLd={homeJsonLd("pt-BR")}>
-	<DocsIndexHeader line="documentação técnica de projetos e sistemas do RaioViajante." locale="pt-BR" />
-	<Section number="01." title="projetos/" index>
-		{pages.filter((entry) => entry.data.group === "projects").map((entry) => <div class="docs-entry"><LeaderRow label={entry.data.title.toLowerCase()} value={entry.data.status} href={pathOf(entry)} /><p>{entry.data.summary}</p></div>)}
-	</Section>
-	{pages.some((entry) => entry.data.group === "raioviajante") && <Section number="02." title="raioviajante/" index>
-		{pages.filter((entry) => entry.data.group === "raioviajante").map((entry) => <div class="docs-entry"><LeaderRow label={entry.data.title.toLowerCase()} value={entry.data.status} href={pathOf(entry)} /><p>{entry.data.summary}</p></div>)}
-	</Section>}
-</DocsShell>
+
+<HomePage locale="pt-BR" />

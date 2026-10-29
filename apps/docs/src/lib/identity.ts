@@ -17,7 +17,7 @@ export function updatedAt(record: { lastUpdated?: string }) {
 /** Static app routes cannot be occupied by a content entry. */
 const staticPaths = new Set([
 	...LOCALE_IDS.flatMap((locale) => ["/", "/search/", "/404/"].map((path) => localizedPath("docs", locale, path))),
-	"/privacy/", "/terms/",
+	...LOCALE_IDS.flatMap((locale) => ["/terms/", "/privacy/"].map((path) => localizedPath("docs", locale, path))),
 ]);
 
 /** Validate the declared public collection, including nonpublic original provenance. */
