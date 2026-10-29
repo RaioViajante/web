@@ -5,7 +5,7 @@ import {
   type LocaleId,
 } from "../../../site/locales";
 import { absoluteUrl, site } from "@/lib/site";
-import { ptPageSeo } from "@/lib/pt";
+import { dumpCopy } from "@/lib/copy";
 import { rssGuid } from "@/lib/rss-identity";
 import { tagPresentation } from "@/lib/tags";
 import type { Post } from "@/lib/posts";
@@ -30,16 +30,13 @@ export function rssPath(locale: LocaleId = DEFAULT_LOCALE): string {
 
 /** Channel text per locale. English is the site constants, unchanged. */
 function channelText(locale: LocaleId) {
-  if (locale === DEFAULT_LOCALE)
-    return {
-      title: site.name,
-      link: site.url,
-      description: site.description,
-    };
   return {
     title: site.name,
-    link: absoluteUrl(localizedPath("dump", locale, "/")),
-    description: ptPageSeo.home!.description,
+    link:
+      locale === DEFAULT_LOCALE
+        ? site.url
+        : absoluteUrl(localizedPath("dump", locale, "/")),
+    description: dumpCopy(locale).pageSeo.home.description,
   };
 }
 

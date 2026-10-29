@@ -2,8 +2,12 @@ import { PageHeader } from "@raioviajante/design/parts";
 
 import { ArchivePostList } from "@/components/ArchivePostList";
 import { DumpShell } from "@/components/DumpShell";
-import { getPublishedPosts, sortPostsNewestFirst } from "@/lib/posts";
-import { ptCopy } from "@/lib/pt";
+import { dumpCopy } from "@/lib/copy";
+import {
+  formatPostDate,
+  getPublishedPosts,
+  sortPostsNewestFirst,
+} from "@/lib/posts";
 import { routes } from "@/lib/routes";
 import { staticMetadata } from "@/lib/seo";
 
@@ -15,15 +19,19 @@ export const metadata = staticMetadata(path);
 export default function ArchivePagePt() {
   const posts = sortPostsNewestFirst(getPublishedPosts(locale));
   const first = posts[posts.length - 1];
+  const copy = dumpCopy(locale).archive;
   return (
     <DumpShell current={path} locale={locale}>
       <PageHeader
-        label={ptCopy.archive.label}
-        title={ptCopy.archive.title}
+        label={copy.label}
+        title={copy.title}
         line={
           first
-            ? `${posts.length} ${posts.length === 1 ? "texto" : "textos"} desde ${first.publishedAt}.`
-            : ptCopy.archive.emptyLine
+            ? copy.since(
+                posts.length,
+                formatPostDate(first.publishedAt, locale),
+              )
+            : copy.emptyLine
         }
       />
       <ArchivePostList posts={posts} locale={locale} />

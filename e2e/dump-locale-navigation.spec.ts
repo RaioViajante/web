@@ -47,7 +47,17 @@ test("Dump keeps locale-pure navigation and document history", async ({
   await page.goto(`${base("dump")}/pt`);
   await expectLang(page, "pt-BR");
   await expect(page.locator(".rv-lang a[href='/']")).toHaveCount(1);
-  await expect(page.getByRole("link", { name: "RSS" })).toHaveCount(0);
+  // The Follow section offers the Portuguese feed, never the English one.
+  await expect(page.getByRole("link", { name: "RSS" })).toHaveAttribute(
+    "href",
+    "/pt/rss.xml",
+  );
+  await expect(page.locator("a[href='/rss.xml']")).toHaveCount(0);
+  await expect(
+    page.locator('link[rel="alternate"][type="application/rss+xml"]'),
+  ).toHaveAttribute("href", "/pt/rss.xml");
+  // Every series part has a Portuguese version, so the section exists.
+  await expect(page.getByRole("heading", { name: /Séries/ })).toHaveCount(1);
 
   await page.getByRole("link", { name: /arquivo/ }).click();
   await expect(page).toHaveURL(`${base("dump")}/pt/archive`);
@@ -67,10 +77,23 @@ test("Dump keeps locale-pure navigation and document history", async ({
 
   await page
     .getByRole("navigation", { name: "Informações legais" })
-    .getByRole("link", { name: "Termos de Uso (em inglês)" })
+    .getByRole("link", { name: "Termos de Uso", exact: true })
     .click();
-  await expect(page).toHaveURL(`${base("dump")}/terms`);
-  await expectLang(page, "en");
+  await expect(page).toHaveURL(`${base("dump")}/pt/terms`);
+  await expectLang(page, "pt-BR");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Termos de Uso" }),
+  ).toBeVisible();
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/terms");
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]'),
+  ).toHaveAttribute("href", `${canonicalDumpOrigin}/terms`);
+  await page
+    .getByRole("navigation", { name: "Informações legais" })
+    .getByRole("link", { name: "Política de Privacidade", exact: true })
+    .click();
+  await expect(page).toHaveURL(`${base("dump")}/pt/privacy`);
+  await expectLang(page, "pt-BR");
   expect(external).toEqual([]);
 });
 
@@ -80,6 +103,8 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   const translatedPath = "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia";
   const originalPath =
     "/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe";
+  const englishTranslationPath =
+    "/posts/translating-the-site-without-pretending-everything-already-exists";
 
   let response = await page.goto(`${base("dump")}/pt`);
   expect(response?.status()).toBe(200);
@@ -128,13 +153,17 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
     "href",
     `${canonicalDumpOrigin}${originalPath}`,
   );
-  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
-  await expect(page.locator(".rv-lang")).toHaveAttribute(
-    "data-lang-state",
-    "disclosure",
-  );
-  await page.locator(".rv-lang summary").click();
-  await expect(page.locator(".rv-lang details a")).toHaveAttribute("href", "/");
+  // The Portuguese original has an English translation: a complete cluster
+  // whose x-default is the English member.
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]'),
+  ).toHaveAttribute("href", `${canonicalDumpOrigin}${englishTranslationPath}`);
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="x-default"]'),
+  ).toHaveAttribute("href", `${canonicalDumpOrigin}${englishTranslationPath}`);
+  await expect(
+    page.locator(`.rv-lang a[href="${englishTranslationPath}"]`),
+  ).toHaveCount(1);
   await expect(page.getByRole("heading", { name: "Comentários" })).toHaveCount(
     1,
   );
@@ -148,7 +177,16 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   response = await page.goto(`${base("dump")}/pt/tags`);
   expect(response?.status()).toBe(200);
   await expectLang(page, "pt-BR");
-  for (const slug of ["arquitetura", "dump", "meta", "pessoal", "web"])
+  for (const slug of [
+    "arquitetura",
+    "automacao",
+    "dump",
+    "meta",
+    "pessoal",
+    "seguranca",
+    "sistemas-distribuidos",
+    "web",
+  ])
     await expect(page.locator(`a[href="/pt/tags/${slug}"]`)).toHaveCount(1);
 
   await page.goto(`${base("dump")}/pt/tags/pessoal`);
@@ -156,14 +194,11 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
     "href",
     "/tags/personal",
   );
+  // Every English tag has a Portuguese page now, so its LANG link is direct.
   await page.goto(`${base("dump")}/tags/osdev`);
-  await expect(page.locator(".rv-lang")).toHaveAttribute(
-    "data-lang-state",
-    "disclosure",
-  );
-  await expect(page.locator(".rv-lang details a")).toHaveAttribute(
+  await expect(page.locator(".rv-lang a")).toHaveAttribute(
     "href",
-    "/pt",
+    "/pt/tags/osdev",
   );
 });
 
@@ -295,12 +330,54 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
   await expect(page.locator("[data-search-result]")).toHaveCount(0);
   await expect(page.locator("[data-search-empty]")).toBeVisible();
 
+  // Every suggestion on an empty result leads to results in the Portuguese index.
+  const siteTerms = page.locator(
+    '[data-search-suggestions="site"] [data-search-suggestion]',
+  );
+  expect(await siteTerms.allTextContents()).toEqual([
+    "orbit",
+    "assembly",
+    "linguagem",
+    "agendador",
+  ]);
+  for (const term of await siteTerms.allTextContents()) {
+    await input.fill("nenhum resultado publicado");
+    await expect(page.locator("[data-search-empty]")).toBeVisible();
+    await page
+      .locator(
+        `[data-search-suggestions="site"] [data-search-suggestion="${term}"]`,
+      )
+      .click();
+    await expect(input).toHaveValue(term);
+    await expect(page.locator("[data-search-result]").first()).toBeVisible();
+  }
+
   await page.locator('[data-search-scope="everywhere"]').click();
   await expect(search).toHaveAttribute("data-search-state", "ready");
   expect(rootRequests).toBe(1);
   expect(docsRequests).toBe(1);
   expect(labRequests).toBe(1);
   expect(external).toEqual([]);
+
+  // The "everywhere" suggestions find an entry on another host's Portuguese index.
+  const everywhereTerms = page.locator(
+    '[data-search-suggestions="everywhere"] [data-search-suggestion]',
+  );
+  expect(await everywhereTerms.allTextContents()).toEqual([
+    "galeria",
+    "sweep",
+    "classificador",
+  ]);
+  for (const term of await everywhereTerms.allTextContents()) {
+    await input.fill("nenhum resultado publicado");
+    await expect(page.locator("[data-search-empty]")).toBeVisible();
+    await page
+      .locator(
+        `[data-search-suggestions="everywhere"] [data-search-suggestion="${term}"]`,
+      )
+      .click();
+    await expect(page.locator("[data-search-result]").first()).toBeVisible();
+  }
 
   await input.fill("Traduzir");
   await expect(page.locator("[data-search-result]")).toHaveCount(1);

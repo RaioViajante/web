@@ -1,4 +1,3 @@
-import { DEFAULT_LOCALE } from "../../../site/locales";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -14,7 +13,8 @@ import { DumpShell } from "@/components/DumpShell";
 import { getPostDetails } from "@/lib/post-details";
 import { postCounterparts, postPath, tagPath } from "@/lib/inventory";
 import { formatPostDate } from "@/lib/posts";
-import { ptCopy } from "@/lib/pt";
+import { dumpCopy } from "@/lib/copy";
+import { routes } from "@/lib/routes";
 import { tagPresentation } from "@/lib/tags";
 import type { Post } from "@/lib/posts";
 
@@ -29,8 +29,8 @@ export function PostArticle({
   children: ReactNode;
 }) {
   const details = getPostDetails(post);
-  const portuguese = post.locale !== DEFAULT_LOCALE;
-  const copy = ptCopy.post;
+  const copy = dumpCopy(post.locale).post;
+  const date = (value: string) => formatPostDate(value, post.locale);
   const toc = [
     ...details.headings.map((heading) => ({
       label: heading.title,
@@ -38,12 +38,12 @@ export function PostArticle({
       number: heading.number,
     })),
     {
-      label: portuguese ? copy.keepReading : "Keep reading",
+      label: copy.keepReading,
       href: "#keep-reading",
       number: "02.",
     },
     {
-      label: portuguese ? copy.comments : "Comments",
+      label: copy.comments,
       href: "#comments",
       number: "03.",
     },
@@ -53,7 +53,7 @@ export function PostArticle({
 
   return (
     <DumpShell
-      current={post.locale === DEFAULT_LOCALE ? "/" : "/pt"}
+      current={routes.home[post.locale]}
       languagePath={postPath(post)}
       locale={post.locale}
       counterpart={counterpart}
@@ -62,16 +62,14 @@ export function PostArticle({
       <div className="rv-progress" data-reading-progress aria-hidden="true" />
       <article className="post-article">
         <PageHeader
-          label={`${portuguese ? copy.label : "Post"} · ${post.tags[0] ? tagPresentation(post.tags[0], post.locale).label : "dump"}`}
+          label={`${copy.label} · ${post.tags[0] ? tagPresentation(post.tags[0], post.locale).label : "dump"}`}
           title={post.title}
           line={post.description}
           meta={[
             <time key="published" dateTime={post.publishedAt}>
-              {portuguese
-                ? formatPostDate(post.publishedAt, post.locale)
-                : post.publishedAt}
+              {date(post.publishedAt)}
             </time>,
-            `${details.minutes} ${portuguese ? copy.minute : "min read"}`,
+            copy.minutesRead(details.minutes),
             <span key="tags" className="post-tags">
               {post.tags.map((tag) => {
                 const { label, slug } = tagPresentation(tag, post.locale);
@@ -91,29 +89,21 @@ export function PostArticle({
         <Prose>{children}</Prose>
         <div className="post-end">
           <LeaderRow
-            label={portuguese ? copy.published : "published"}
+            label={copy.published}
             value={
-              <time dateTime={post.publishedAt}>
-                {portuguese
-                  ? formatPostDate(post.publishedAt, post.locale)
-                  : post.publishedAt}
-              </time>
+              <time dateTime={post.publishedAt}>{date(post.publishedAt)}</time>
             }
           />
           {post.updatedAt && (
             <LeaderRow
-              label={portuguese ? copy.updated : "updated"}
+              label={copy.updated}
               value={
-                <time dateTime={post.updatedAt}>
-                  {portuguese
-                    ? formatPostDate(post.updatedAt, post.locale)
-                    : post.updatedAt}
-                </time>
+                <time dateTime={post.updatedAt}>{date(post.updatedAt)}</time>
               }
             />
           )}
           <LeaderRow
-            label={portuguese ? copy.tags : "tags"}
+            label={copy.tags}
             wrapValue
             value={
               <span className="post-tags">
@@ -133,22 +123,15 @@ export function PostArticle({
             }
           />
           {details.currentSeries && (
-            <LeaderRow
-              label={portuguese ? copy.series : "series"}
-              value={details.currentSeries.name}
-            />
+            <LeaderRow label={copy.series} value={details.currentSeries.name} />
           )}
           <LeaderRow
-            label={portuguese ? copy.source : "source"}
-            value={portuguese ? copy.edit : "edit on GitHub ↗"}
+            label={copy.source}
+            value={copy.edit}
             href={`${REPOSITORY_EDIT_URL}/${post.slug}.mdx`}
           />
         </div>
-        <Section
-          number="02."
-          title={portuguese ? copy.keepReading : "Keep reading"}
-          id="keep-reading"
-        >
+        <Section number="02." title={copy.keepReading} id="keep-reading">
           <Pager
             locale={post.locale}
             linkComponent={Link}
@@ -173,14 +156,16 @@ export function PostArticle({
             <div className="post-related">
               {details.related.length > 0 && (
                 <>
-                  <p className="rv-label">
-                    {portuguese ? copy.related : "Related by tag"}
-                  </p>
+                  <p className="rv-label">{copy.related}</p>
                   {details.related.map((item) => (
                     <LeaderRow
                       key={item.slug}
                       label={item.title}
-                      value={item.publishedAt.slice(5)}
+                      value={
+                        <time dateTime={item.publishedAt}>
+                          {date(item.publishedAt)}
+                        </time>
+                      }
                       href={postPath(item)}
                       linkComponent={Link}
                     />
@@ -189,7 +174,7 @@ export function PostArticle({
               )}
               {details.lab && (
                 <>
-                  <p className="rv-label">Try it</p>
+                  <p className="rv-label">{copy.labTry}</p>
                   <LeaderRow
                     label={details.lab.title}
                     value="lab ↗"
@@ -200,16 +185,8 @@ export function PostArticle({
             </div>
           )}
         </Section>
-        <Section
-          number="03."
-          title={portuguese ? copy.comments : "Comments"}
-          id="comments"
-        >
-          <p>
-            {portuguese
-              ? "Com tecnologia do GitHub Discussions."
-              : "Powered by GitHub Discussions."}
-          </p>
+        <Section number="03." title={copy.comments} id="comments">
+          <p>{copy.commentsPowered}</p>
           <Comments contentId={post.contentId} locale={post.locale} />
         </Section>
       </article>

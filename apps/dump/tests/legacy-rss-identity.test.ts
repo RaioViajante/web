@@ -98,13 +98,29 @@ describe("English /rss.xml against the production snapshot", () => {
     const extended = parseItems(
       renderRssFeed([added, ...getPublishedPosts("en")]),
     );
-    expect(extended).toHaveLength(fixture.items.length + 1);
+    const published = getPublishedPosts("en").length;
+    expect(extended).toHaveLength(published + 1);
+    expect(published).toBeGreaterThanOrEqual(fixture.items.length);
     expect(extended[0]).toMatchObject({
       guid: "tag:dump.raioviajante.com,2026:post/brand-new/en",
       isPermaLink: "false",
     });
     for (const recorded of fixture.items)
       expect(extended).toContainEqual(recorded);
+  });
+
+  it("gives the English translation of a Portuguese original the non-legacy tag GUID", () => {
+    const added = rendered().filter(
+      (item) => !fixture.items.some((recorded) => recorded.guid === item.guid),
+    );
+    expect(added).toEqual([
+      {
+        guid: "tag:dump.raioviajante.com,2026:post/traduzir-o-site-sem-fingir-que-tudo-ja-existe/en",
+        isPermaLink: "false",
+        link: `${PRODUCTION_ORIGIN}/posts/translating-the-site-without-pretending-everything-already-exists`,
+        pubDate: "Thu, 29 Oct 2026 00:00:00 GMT",
+      },
+    ]);
   });
 
   it("keeps the recorded channel contract", () => {

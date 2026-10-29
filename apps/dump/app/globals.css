@@ -81,18 +81,19 @@ html {
 }
 
 .archive-label {
-  display: flex;
-  gap: 28px;
+  display: grid;
+  grid-template-columns: 22ch minmax(0, 1fr); /* "30 de setembro de 2026" is the longest long date, so titles line up */
+  column-gap: 28px;
 }
 
 .archive-date {
-  flex: 0 0 5ch; /* "09-27" exactly, so every title lines up */
   color: var(--fg-3);
 }
 
 @media (max-width: 760px) {
+  /* The long date takes its own line above the title on narrow screens. */
   .archive-label {
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

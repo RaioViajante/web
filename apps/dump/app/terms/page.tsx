@@ -8,7 +8,7 @@ export const metadata = staticMetadata("/terms");
 
 export default function Terms() {
   return (
-    <DumpShell>
+    <DumpShell current="/terms">
       <LegalPage
         site="dump"
         title="Terms of Use"

@@ -3,7 +3,7 @@ import { PageHeader } from "@raioviajante/design/parts";
 import { DumpShell } from "@/components/DumpShell";
 import { TagIndex } from "@/components/TagViews";
 import { getAllTags } from "@/lib/posts";
-import { ptCopy } from "@/lib/pt";
+import { dumpCopy } from "@/lib/copy";
 import { routes } from "@/lib/routes";
 import { staticMetadata } from "@/lib/seo";
 
@@ -13,13 +13,10 @@ const path = routes.tags[locale]!;
 export const metadata = staticMetadata(path);
 
 export default function TagsPagePt() {
+  const copy = dumpCopy(locale).tags;
   return (
     <DumpShell current={path} locale={locale}>
-      <PageHeader
-        label={ptCopy.tags.label}
-        title={ptCopy.tags.title}
-        line={ptCopy.tags.line}
-      />
+      <PageHeader label={copy.label} title={copy.title} line={copy.line} />
       <TagIndex tags={getAllTags(locale)} locale={locale} />
     </DumpShell>
   );

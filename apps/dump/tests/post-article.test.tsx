@@ -40,8 +40,12 @@ describe("<PostArticle />", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: "Article title" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("2026-09-03")).toHaveLength(2);
-    expect(screen.getByText("2026-10-05")).toBeInTheDocument();
+    expect(screen.getAllByText("September 3, 2026")).toHaveLength(2);
+    expect(screen.getByText("October 5, 2026")).toBeInTheDocument();
+    expect(screen.getByText("2 min read")).toBeInTheDocument();
+    expect(
+      screen.getAllByText("September 3, 2026")[0]!.getAttribute("datetime"),
+    ).toBe("2026-09-03");
     expect(screen.getByText("Article description.")).toBeInTheDocument();
     expect(screen.getByText("Article body.")).toBeInTheDocument();
   });
@@ -63,6 +67,11 @@ describe("<PostArticle />", () => {
     );
 
     expect(screen.getAllByText("3 de setembro de 2026")).toHaveLength(2);
+    expect(screen.getByText("5 de outubro de 2026")).toBeInTheDocument();
+    expect(screen.getByText("2 min de leitura")).toBeInTheDocument();
+    expect(
+      screen.getByText("Com tecnologia do GitHub Discussions."),
+    ).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "pessoal" })[0]).toHaveAttribute(
       "href",
       "/pt/tags/pessoal",

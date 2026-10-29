@@ -7,7 +7,7 @@ export const metadata = staticMetadata("/privacy");
 
 export default function Privacy() {
   return (
-    <DumpShell>
+    <DumpShell current="/privacy">
       <LegalPage
         site="dump"
         title="Privacy Policy"

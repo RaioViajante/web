@@ -20,7 +20,9 @@ const RSS_TYPES = {
   "application/rss+xml": [{ url: "/rss.xml", title: "dump RSS" }],
 };
 const PT_RSS_TYPES = {
-  "application/rss+xml": [{ url: "/pt/rss.xml", title: "dump RSS" }],
+  "application/rss+xml": [
+    { url: "/pt/rss.xml", title: "dump RSS (português)" },
+  ],
 };
 const cluster = (en: string, pt: string) => ({
   en: `${PRODUCTION_ORIGIN}${en}`,
@@ -214,9 +216,15 @@ describe("dynamic route pages keep canonical and RSS together", () => {
       params: Promise.resolve(firstPost),
     });
 
-    expect(metadata.alternates).toEqual({
+    expect(metadata.alternates).toMatchObject({
       canonical: `/posts/${firstPost.slug}`,
       types: RSS_TYPES,
+    });
+    // An English-only work would have no `languages` at all; this one has a
+    // Portuguese counterpart, so its cluster is complete and reciprocal.
+    expect(metadata.alternates?.languages).toMatchObject({
+      en: `${PRODUCTION_ORIGIN}/posts/${firstPost.slug}`,
+      "x-default": `${PRODUCTION_ORIGIN}/posts/${firstPost.slug}`,
     });
   });
 
@@ -232,6 +240,29 @@ describe("dynamic route pages keep canonical and RSS together", () => {
       modifiedTime: "2026-10-05T00:00:00.000Z",
     });
     expect(metadata.alternates).toMatchObject({ canonical: `/posts/${slug}` });
+  });
+
+  it("the English translation of a Portuguese original has a reciprocal cluster with itself as x-default", async () => {
+    const { generateMetadata } = await import("@/app/posts/[slug]/page");
+    const slug =
+      "translating-the-site-without-pretending-everything-already-exists";
+    const metadata = await generateMetadata({
+      params: Promise.resolve({ slug }),
+    });
+    expect(metadata.alternates).toEqual({
+      canonical: `/posts/${slug}`,
+      languages: cluster(
+        `/posts/${slug}`,
+        "/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+      ),
+      types: RSS_TYPES,
+    });
+    expect(metadata.openGraph).toMatchObject({
+      type: "article",
+      locale: "en_US",
+      alternateLocale: ["pt_BR"],
+      publishedTime: "2026-10-29T00:00:00.000Z",
+    });
   });
 
   it("translated Portuguese post has a reciprocal cluster and localized article metadata", async () => {
@@ -273,7 +304,7 @@ describe("dynamic route pages keep canonical and RSS together", () => {
     });
   });
 
-  it("Portuguese-original post has a self-canonical without an invented counterpart", async () => {
+  it("Portuguese-original post has a self-canonical and a real English counterpart", async () => {
     const { generateMetadata } = await import("@/app/pt/posts/[slug]/page");
     const slug = "traduzir-o-site-sem-fingir-que-tudo-ja-existe";
     const metadata = await generateMetadata({
@@ -282,15 +313,19 @@ describe("dynamic route pages keep canonical and RSS together", () => {
 
     expect(metadata.alternates).toEqual({
       canonical: `/pt/posts/${slug}`,
+      languages: cluster(
+        "/posts/translating-the-site-without-pretending-everything-already-exists",
+        `/pt/posts/${slug}`,
+      ),
       types: PT_RSS_TYPES,
     });
     expect(metadata.openGraph).toMatchObject({
       type: "article",
       locale: "pt_BR",
+      alternateLocale: ["en_US"],
       url: `${PRODUCTION_ORIGIN}/pt/posts/${slug}`,
       publishedTime: "2026-10-19T00:00:00.000Z",
     });
-    expect(metadata.openGraph).not.toHaveProperty("alternateLocale");
   });
 
   it("tag page: canonical tag URL", async () => {

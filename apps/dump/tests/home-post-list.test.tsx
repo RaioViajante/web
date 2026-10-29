@@ -86,4 +86,73 @@ describe("<HomePostList />", () => {
     ).toHaveAttribute("href", "/pt/posts/construindo-orbit");
     expect(screen.queryByText(/1 part$/)).not.toBeInTheDocument();
   });
+
+  it("omits the series section in a locale with no series part and numbers the rest without a gap", () => {
+    const standalone: Post = {
+      ...posts[0]!,
+      slug: "texto-solto",
+      contentId: "texto-solto",
+      locale: "pt-BR",
+      originalLocale: "pt-BR",
+      title: "Texto solto",
+    };
+    const { container } = render(
+      <HomePostList posts={[standalone]} locale="pt-BR" />,
+    );
+
+    expect(screen.queryByRole("heading", { name: "Séries" })).toBeNull();
+    expect(container.querySelector("#series-heading")).toBeNull();
+    // Latest 00., no older months, so "Acompanhe" is 00.1.
+    const numbers = [...container.querySelectorAll("h2 .rv-num")].map(
+      (node) => node.textContent,
+    );
+    expect(numbers).toEqual(["00.", "00.1"]);
+  });
+
+  it("links the localized feed from the Follow section in each locale", () => {
+    const { container, unmount } = render(<HomePostList posts={posts} />);
+    expect(
+      container.querySelector("a[href='/rss.xml']")?.textContent,
+    ).toContain("RSS");
+    unmount();
+
+    const portuguese: Post = {
+      ...posts[0]!,
+      locale: "pt-BR",
+      originalLocale: "pt-BR",
+    };
+    const view = render(<HomePostList posts={[portuguese]} locale="pt-BR" />);
+    const link = view.container.querySelector("a[href='/pt/rss.xml']");
+    expect(link).not.toBeNull();
+    expect(link!.textContent).toContain("feed");
+    expect(view.container.querySelector("a[href='/rss.xml']")).toBeNull();
+  });
+
+  it("renders long dates in each locale with ISO datetime values", () => {
+    const { container, unmount } = render(
+      <HomePostList posts={posts} latestMinutes={1} />,
+    );
+    expect(screen.getByText("January 15, 2026")).toHaveAttribute(
+      "datetime",
+      "2026-01-15",
+    );
+    expect(screen.getByText(/^1 min read/)).toBeInTheDocument();
+    expect(
+      container.querySelector("time[datetime='2026-01-03']"),
+    ).toHaveTextContent("January 3, 2026");
+    unmount();
+
+    const portuguese = posts.map((post) => ({
+      ...post,
+      locale: "pt-BR" as const,
+    }));
+    render(
+      <HomePostList posts={portuguese} locale="pt-BR" latestMinutes={3} />,
+    );
+    expect(screen.getByText("15 de janeiro de 2026")).toHaveAttribute(
+      "datetime",
+      "2026-01-15",
+    );
+    expect(screen.getByText(/^3 min de leitura/)).toBeInTheDocument();
+  });
 });

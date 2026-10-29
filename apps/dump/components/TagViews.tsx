@@ -3,17 +3,19 @@ import { LeaderRow, Section } from "@raioviajante/design/parts";
 import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 
 import { postPath, tagPath } from "@/lib/inventory";
-import { ptCopy } from "@/lib/pt";
-import { sortPostsNewestFirst, type Post, type TagCount } from "@/lib/posts";
+import { dumpCopy } from "@/lib/copy";
+import {
+  formatPostDate,
+  sortPostsNewestFirst,
+  type Post,
+  type TagCount,
+} from "@/lib/posts";
 
 export function tagHref(
   slug: string,
   locale: LocaleId = DEFAULT_LOCALE,
 ): string {
   return tagPath(locale, slug);
-}
-export function formatTagPostDate(date: string): string {
-  return date.slice(2);
 }
 
 export function TagIndex({
@@ -23,22 +25,17 @@ export function TagIndex({
   tags: TagCount[];
   locale?: LocaleId;
 }) {
-  if (!tags.length)
-    return (
-      <p className="tags-empty">
-        {locale === DEFAULT_LOCALE ? "No tags yet." : ptCopy.tags.empty}
-      </p>
-    );
-  const portuguese = locale !== DEFAULT_LOCALE;
+  const copy = dumpCopy(locale).tags;
+  if (!tags.length) return <p className="tags-empty">{copy.empty}</p>;
   const groups = [
     {
-      label: portuguese ? ptCopy.tags.recurring : "Recurring",
+      label: copy.recurring,
       number: "02.",
       recurring: true,
       items: tags.filter((item) => item.count > 1),
     },
     {
-      label: portuguese ? ptCopy.tags.once : "Once so far",
+      label: copy.once,
       number: "02.1",
       recurring: false,
       items: tags.filter((item) => item.count === 1),
@@ -70,7 +67,13 @@ export function TagIndex({
   );
 }
 
-export function TagPostList({ posts }: { posts: Post[] }) {
+export function TagPostList({
+  posts,
+  locale = DEFAULT_LOCALE,
+}: {
+  posts: Post[];
+  locale?: LocaleId;
+}) {
   return (
     <ol className="tag-post-list">
       {sortPostsNewestFirst(posts).map((post) => (
@@ -79,7 +82,7 @@ export function TagPostList({ posts }: { posts: Post[] }) {
             label={post.title}
             value={
               <time dateTime={post.publishedAt}>
-                {post.publishedAt.slice(5)}
+                {formatPostDate(post.publishedAt, locale)}
               </time>
             }
             href={postPath(post)}

@@ -1,12 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 
 import TagPage, { generateStaticParams } from "@/app/tags/[tag]/page";
-import {
-  formatTagPostDate,
-  TagIndex,
-  TagPostList,
-  tagHref,
-} from "@/components/TagViews";
+import { TagIndex, TagPostList, tagHref } from "@/components/TagViews";
 import { getAllTags, getPostsByTagId } from "@/lib/posts";
 import type { Post, TagCount } from "@/lib/posts";
 
@@ -100,12 +95,18 @@ describe("<TagPostList />", () => {
     );
   });
 
-  it("renders UTC-safe compact dates with semantic full dates", () => {
-    render(<TagPostList posts={posts} />);
+  it("renders UTC-safe long dates with ISO datetime values in both locales", () => {
+    const { unmount } = render(<TagPostList posts={posts} />);
 
-    expect(formatTagPostDate("2026-01-01")).toBe("26-01-01");
     const newest = screen.getAllByRole("listitem")[0]!;
-    expect(within(newest).getByText("09-03")).toHaveAttribute(
+    expect(within(newest).getByText("September 3, 2026")).toHaveAttribute(
+      "datetime",
+      "2026-09-03",
+    );
+    unmount();
+
+    render(<TagPostList posts={posts} locale="pt-BR" />);
+    expect(screen.getByText("3 de setembro de 2026")).toHaveAttribute(
       "datetime",
       "2026-09-03",
     );
@@ -144,6 +145,8 @@ describe("tag routes", () => {
 
   it("renders an established English case alias through the authoritative tag id", async () => {
     mockGetPostsByTagId.mockReturnValue(posts);
+    // The synthetic tag has no published Portuguese page, so no counterpart.
+    mockGetAllTags.mockReturnValue([]);
 
     render(await TagPage({ params: Promise.resolve({ tag: "OSDEV" }) }));
 

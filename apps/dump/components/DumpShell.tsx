@@ -3,21 +3,15 @@ import type { ReactNode } from "react";
 import { Shell, type NavItem } from "@raioviajante/design/shell";
 import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 import { SearchNavItem } from "@raioviajante/design/search";
-import { ptCopy } from "@/lib/pt";
+import { dumpCopy } from "@/lib/copy";
 import { counterpartsOf, routeOfPath, routes } from "@/lib/routes";
 
-const englishPages: NavItem[] = [
-  { label: "posts", href: "/" },
-  { label: "archive", href: "/archive" },
-  { label: "tags", href: "/tags" },
-];
-
 function navigation(locale: LocaleId): NavItem[] {
-  if (locale === DEFAULT_LOCALE) return englishPages;
+  const { shell } = dumpCopy(locale);
   return [
-    { label: ptCopy.shell.posts, href: routes.home[locale]! },
-    { label: ptCopy.shell.archive, href: routes.archive[locale]! },
-    { label: ptCopy.shell.tags, href: routes.tags[locale]! },
+    { label: shell.posts, href: routes.home[locale]! },
+    { label: shell.archive, href: routes.archive[locale]! },
+    { label: shell.tags, href: routes.tags[locale]! },
   ];
 }
 
@@ -57,9 +51,10 @@ export function DumpShell({
           ? { counterpart: counterpart ?? staticCounterpart }
           : {}),
       }}
-      {...(locale !== DEFAULT_LOCALE
-        ? { termsLocale: DEFAULT_LOCALE, privacyLocale: DEFAULT_LOCALE }
-        : {})}
+      termsHref={routes.terms[locale] ?? routes.terms[DEFAULT_LOCALE]}
+      privacyHref={routes.privacy[locale] ?? routes.privacy[DEFAULT_LOCALE]}
+      termsLocale={routes.terms[locale] ? locale : DEFAULT_LOCALE}
+      privacyLocale={routes.privacy[locale] ? locale : DEFAULT_LOCALE}
       linkComponent={Link}
       pages={pages}
       currentPage={current}

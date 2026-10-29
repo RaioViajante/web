@@ -108,7 +108,22 @@ presentation rather than request text.
 
 Series (`lib/post-details.ts`) list `contentIds` in reading order, so every
 localized version of a part belongs to its series. Series are not derived from
-tags. The reader UI belongs to a later issue.
+tags. The home page shows only the parts that exist in the page's locale and
+omits the section when there are none.
+
+### Translations
+
+Every English-original post has a Portuguese version, and the Portuguese
+original has an English version. A new translation gets its own file, its own
+slug in its own language, the work's `contentId`, `originalLocale` unchanged,
+and `publishedAt` set to the day that translation first went public (never the
+original's date); `updatedAt` stays unset unless there is an explicit material
+update. Tags are ids, so the translation carries the same list, and each id
+needs a presentation in the translation's locale (`content/tags.json`). The
+translation contains everything its original contains: same headings, code
+blocks, links and directives, in the same order. Code stays verbatim; natural
+language inside code comments and short quoted prose in `text` fences is
+translated. A new English item uses the non-legacy tag GUID in the feed.
 
 ### Drafts
 

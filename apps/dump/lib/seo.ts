@@ -12,48 +12,13 @@ import {
   tagPath,
 } from "./inventory";
 import { getAllTags, getPublishedPosts, type Post } from "./posts";
-import { ptCopy, ptPageSeo } from "./pt";
-import { declaredPages, type RouteKey } from "./routes";
+import { dumpCopy } from "./copy";
+import { declaredPages } from "./routes";
 import { alternatesFor, site } from "./site";
-
-const english: Record<RouteKey, { title: string; description: string }> = {
-  home: {
-    title: "dump — a memory dump, hopefully readable.",
-    description:
-      "Computer science notes, projects, devlogs, and technology writing by RaioViajante.",
-  },
-  archive: {
-    title: "Archive",
-    description: "Every post on dump, newest first, grouped by year and month.",
-  },
-  tags: {
-    title: "Tags",
-    description: "Browse dump posts by recurring topics and technologies.",
-  },
-  terms: {
-    title: "Terms of Use",
-    description: "The short version of how to use dump.raioviajante.com.",
-  },
-  privacy: {
-    title: "Privacy Policy",
-    description: "What dump.raioviajante.com stores and who sees it.",
-  },
-  search: {
-    title: "Search",
-    description:
-      "Search posts on dump and pages across the RaioViajante ecosystem.",
-  },
-};
-
-const copyFor = (key: RouteKey, locale: LocaleId) =>
-  locale === DEFAULT_LOCALE ? english[key] : ptPageSeo[key];
 
 export const staticPages: PageSeo[] = declaredPages().map(
   ({ key, locale, path, counterparts }) => {
-    const copy = copyFor(key, locale);
-    if (!copy)
-      throw new Error(`Route "${key}" is declared in ${locale} without copy`);
-    return { path, locale, counterparts, ...copy };
+    return { path, locale, counterparts, ...dumpCopy(locale).pageSeo[key] };
   },
 );
 
@@ -76,28 +41,19 @@ export function getSeoPages(): PageSeo[] {
         path: tagPath(locale, slug),
         locale,
         counterparts: tagCounterparts(locale, id),
-        title:
-          locale === DEFAULT_LOCALE
-            ? `Posts tagged "${label}"`
-            : `Textos com a tag "${label}"`,
-        description:
-          locale === DEFAULT_LOCALE
-            ? `Technical writing and project notes tagged "${label}" on dump.`
-            : `Textos técnicos e notas de projeto com a tag "${label}" no dump.`,
+        title: dumpCopy(locale).tagPageSeo.title(label),
+        description: dumpCopy(locale).tagPageSeo.description(label),
       })),
     ),
   ];
 }
 
-export const notFoundPages: PageSeo[] = [
-  { ...notFoundSeo, locale: DEFAULT_LOCALE },
-  {
-    ...notFoundSeo,
-    ...ptCopy.notFound.metadata,
-    path: `${LOCALES["pt-BR"].urlPrefix}${notFoundSeo.path}`,
-    locale: "pt-BR",
-  },
-];
+export const notFoundPages: PageSeo[] = LOCALE_IDS.map((locale) => ({
+  ...notFoundSeo,
+  ...dumpCopy(locale).notFound.metadata,
+  path: `${LOCALES[locale].urlPrefix}${notFoundSeo.path}`,
+  locale,
+}));
 
 export function metadataFor(page: PageSeo) {
   const metadata = pageMetadata(site.url, site.name, page);
