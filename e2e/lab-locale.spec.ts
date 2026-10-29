@@ -2,20 +2,31 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { base, isolate, viewports } from "./support";
 
-test("Portuguese Lab publishes only the real Sweep counterpart with active LANG", async ({
+test("Portuguese Lab lists every experiment with active LANG and count-aware filters", async ({
   page,
 }) => {
   await isolate(page, []);
   await page.setViewportSize(viewports.mobile);
   await page.goto(`${base("lab")}/pt/`);
   await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
-  await expect(page.locator("[data-experiment-list] article")).toHaveCount(1);
-  await expect(page.locator("[data-experiment-list]")).toContainText(
+  await expect(page.locator("[data-experiment-list] article")).toHaveCount(3);
+  for (const title of [
     "classificador de arquivos",
-  );
+    "estados de execução",
+    "setor de boot",
+  ])
+    await expect(page.locator("[data-experiment-list]")).toContainText(title);
   await expect(page.locator("[data-experiment-list]")).not.toContainText(
     "execution states",
   );
+  await expect(page.locator("main time").first()).toHaveAttribute(
+    "datetime",
+    "2026-09-13",
+  );
+  await expect(page.locator("main time").first()).toHaveText(
+    "13 de setembro de 2026",
+  );
+  await expect(page.locator("section:has(#notebook) a")).toHaveCount(3);
   await expect(page.locator(".rv-lang")).toHaveAttribute(
     "data-lang-state",
     "link",
@@ -28,11 +39,15 @@ test("Portuguese Lab publishes only the real Sweep counterpart with active LANG"
   await page.goto(`${base("lab")}/pt/`);
   await page.locator('[data-filter="done"]').click();
   await expect(page.locator("[data-filter-result]")).toHaveText(
-    "0 experimentos",
+    "1 experimento",
+  );
+  await page.locator('[data-filter="active"]').click();
+  await expect(page.locator("[data-filter-result]")).toHaveText(
+    "2 experimentos",
   );
   await page.locator('[data-filter="all"]').click();
   await expect(page.locator("[data-filter-result]")).toHaveText(
-    "1 experimento",
+    "3 experimentos",
   );
   expect(
     await page.evaluate(
@@ -50,12 +65,19 @@ test("Portuguese classifier translates live output, preserves actual destination
   await page.goto(`${base("lab")}/pt/experiments/classificador-de-arquivos/`);
   await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
   await expect(page.locator("main")).toContainText("executa aqui");
-  await expect(page.locator("[data-summary]")).toContainText("Imagens 1");
+  await expect(page.locator("[data-summary]")).toContainText("Images 1");
   await page.locator("#filenames").fill("photo.png\nREADME");
   await page.locator("[data-classify]").focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("[data-summary]")).toHaveText(
-    "2 arquivos classificados · Imagens 1 · Documentos 0 · Arquivos compactados 0 · Outros 1",
+    "2 arquivos classificados · Images 1 · Documents 0 · Archives 0 · Other 1",
+  );
+  await expect(
+    page.locator("tbody tr").first().locator("td").nth(1),
+  ).toHaveText("Images (imagens)");
+  await page.locator("#filenames").fill("photo.png");
+  await expect(page.locator("[data-summary]")).toHaveText(
+    "1 arquivo classificado · Images 1 · Documents 0 · Archives 0 · Other 0",
   );
   await expect(page.locator("tbody")).toContainText(
     "~/Downloads/Images/photo.png",
@@ -73,7 +95,7 @@ test("Portuguese classifier translates live output, preserves actual destination
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
-test("Portuguese search is locale-pure and missing translations use the English 404 fallback", async ({
+test("Portuguese search is locale-pure, English slugs under /pt use the English 404 and English pages link their counterparts", async ({
   page,
 }) => {
   await isolate(page, []);
@@ -93,6 +115,16 @@ test("Portuguese search is locale-pure and missing translations use the English 
   expect(index.ok()).toBe(true);
   expect(await index.json()).toEqual([
     expect.objectContaining({
+      contentId: "003",
+      locale: "pt-BR",
+      href: "https://lab.raioviajante.com/pt/experiments/setor-de-boot/",
+    }),
+    expect.objectContaining({
+      contentId: "002",
+      locale: "pt-BR",
+      href: "https://lab.raioviajante.com/pt/experiments/estados-de-execucao/",
+    }),
+    expect.objectContaining({
       contentId: "001",
       locale: "pt-BR",
       href: "https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/",
@@ -106,26 +138,28 @@ test("Portuguese search is locale-pure and missing translations use the English 
   expect(html).toContain('<html lang="en"');
   expect(html).toContain('name="robots" content="noindex, follow"');
   expect(html).not.toContain('rel="canonical"');
-  for (const path of [
-    "/experiments/execution-states/",
-    "/experiments/boot-sector/",
-  ]) {
+  for (const [path, counterpart] of [
+    ["/experiments/execution-states/", "/pt/experiments/estados-de-execucao/"],
+    ["/experiments/boot-sector/", "/pt/experiments/setor-de-boot/"],
+    ["/terms/", "/pt/terms/"],
+    ["/privacy/", "/pt/privacy/"],
+  ] as const) {
     await page.goto(base("lab") + path);
     await expect(page.locator(".rv-lang")).toHaveAttribute(
       "data-lang-state",
-      "disclosure",
+      "link",
     );
-    await expect(page.locator(".rv-lang details a")).toHaveAttribute(
+    await expect(page.locator(".rv-lang a")).toHaveAttribute(
       "href",
-      "/pt/",
+      counterpart,
     );
     await expect(
       page.locator('link[rel="alternate"][hreflang="pt-BR"]'),
-    ).toHaveCount(0);
+    ).toHaveAttribute("href", `https://lab.raioviajante.com${counterpart}`);
   }
 });
 
-test("every Portuguese Lab suggestion finds a published Portuguese experiment in both scopes", async ({
+test("every Portuguese Lab suggestion leads to the experiment it names in both scopes", async ({
   page,
 }) => {
   await isolate(page, []);
@@ -142,7 +176,12 @@ test("every Portuguese Lab suggestion finds a published Portuguese experiment in
     );
     await expect(suggestions.first()).toBeVisible();
     const terms = await suggestions.allTextContents();
-    expect(terms).toEqual(["classificador de arquivos", "sweep"]);
+    expect(terms).toEqual(["classificador", "execução", "boot"]);
+    const destination = {
+      classificador: "classificador-de-arquivos",
+      execução: "estados-de-execucao",
+      boot: "setor-de-boot",
+    } as const;
     for (const [index, term] of terms.entries()) {
       const button = page
         .locator(`[data-search-suggestions="${scope}"]`)
@@ -155,11 +194,10 @@ test("every Portuguese Lab suggestion finds a published Portuguese experiment in
       await expect(page.locator("[data-search-input]")).toHaveValue(term);
       await expect(page.locator("[data-search-input]")).toBeFocused();
       await expect(
-        page.locator("[data-search-result]").first(),
-      ).toHaveAttribute(
-        "href",
-        `${base("lab")}/pt/experiments/classificador-de-arquivos/`,
-      );
+        page.locator(
+          `[data-search-result][href="${base("lab")}/pt/experiments/${destination[term as keyof typeof destination]}/"]`,
+        ),
+      ).toHaveCount(1);
       await page.locator("[data-search-input]").fill("no-match-for-lab");
     }
   }
@@ -196,5 +234,145 @@ test("Lab avatar keeps language-specific names with and without reduced motion",
     await expect(avatar).toHaveAttribute("aria-label", interactive);
     await expect(avatar).toBeEnabled();
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  }
+});
+
+test("Portuguese execution states bench words every outcome and behaves like the English one", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  for (const viewport of [viewports.desktop, viewports.mobile]) {
+    await page.setViewportSize(viewport);
+    await page.goto(`${base("lab")}/pt/experiments/estados-de-execucao/`);
+    await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
+    const feedback = page.locator("[data-feedback]");
+    await expect(feedback).toHaveAttribute("role", "status");
+    await expect(page.locator("[data-availability]")).toHaveText(
+      "Aceitas agora: iniciar, cancelar. Rejeitadas agora: concluir com sucesso, falhar.",
+    );
+    // A dotted (rejected) control stays clickable and leaves the state alone.
+    await page.locator('[data-operation="succeed"]').click({ force: true });
+    await expect(feedback).toContainText(
+      "Operação “concluir com sucesso” rejeitada: Só execuções em andamento podem ser concluídas com sucesso.",
+    );
+    await expect(feedback).toContainText("O estado continua QUEUED.");
+    await expect(page.locator('[data-field="status"]')).toHaveText("QUEUED");
+    await page.locator('[data-operation="start"]').focus();
+    await page.keyboard.press("Enter");
+    await expect(feedback).toHaveText("Operação “iniciar” aceita → RUNNING.");
+    await expect(page.locator('[data-field="status"]')).toHaveText("RUNNING");
+    await page.locator("#failure-message").fill("   ");
+    await page.locator('[data-operation="fail"]').click();
+    await expect(feedback).toContainText(
+      "A mensagem de erro não pode estar em branco",
+    );
+    await page.locator("#failure-message").fill("boom");
+    await page.locator("#exit-code").fill("7");
+    await page.locator('[data-operation="fail"]').click();
+    await expect(page.locator('[data-field="status"]')).toHaveText("FAILED");
+    await expect(page.locator('[data-field="exitCode"]')).toHaveText("7");
+    await expect(page.locator("[data-history] li").last()).toHaveText(
+      "aceita: falhar → FAILED",
+    );
+    await page.locator("[data-new]").click();
+    await expect(feedback).toContainText(
+      "Nova execução de exemplo criada em QUEUED",
+    );
+    await expect(page.locator("#failure-message")).toHaveValue(
+      "Falha de exemplo",
+    );
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth > innerWidth,
+      ),
+    ).toBe(false);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  }
+});
+
+test("Portuguese boot sector bench keeps the source exact and words the progress", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  await page.setViewportSize(viewports.mobile);
+  await page.goto(`${base("lab")}/pt/experiments/setor-de-boot/`);
+  await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
+  const progress = page.locator("[data-progress]");
+  await expect(progress).toHaveText("1 / 5 · entrada");
+  await page.locator("[data-prev]").click({ force: true });
+  await expect(progress).toHaveText("rejeitado: não há seção anterior · 1 / 5");
+  await page.locator("[data-next]").click();
+  await expect(progress).toHaveText("2 / 5 · inicialização");
+  await expect(page.locator('[data-panel="1"]')).toContainText(
+    "mov sp, 0x7C00",
+  );
+  await page.locator('[data-section="1"]').focus();
+  await page.keyboard.press("End");
+  await expect(progress).toHaveText("5 / 5 · fim do setor");
+  await expect(page.locator('[data-panel="4"]')).toContainText("dw 0xAA55");
+  await expect(page.locator('[data-panel="4"]')).toContainText("55 AA");
+  await page.locator("[data-next]").click({ force: true });
+  await expect(progress).toHaveText("rejeitado: não há próxima seção · 5 / 5");
+  await expect(page.locator("main")).toContainText(
+    "resultado documentado · qemu",
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+  ).toBe(false);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("Portuguese Terms and Privacy are declared, linked from the footer without the English qualifier and accessible", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  await page.setViewportSize(viewports.mobile);
+  for (const [path, title, other, counterpart] of [
+    ["/pt/terms/", "Termos de Uso", "/pt/privacy/", "/terms/"],
+    ["/pt/privacy/", "Política de Privacidade", "/pt/terms/", "/privacy/"],
+  ] as const) {
+    await page.goto(base("lab") + path);
+    await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
+    await expect(page.locator("h1")).toHaveText(title);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      `https://lab.raioviajante.com${path}`,
+    );
+    await expect(
+      page.locator('link[rel="alternate"][hreflang="en"]'),
+    ).toHaveAttribute("href", `https://lab.raioviajante.com${counterpart}`);
+    await expect(
+      page.locator('link[rel="alternate"][hreflang="x-default"]'),
+    ).toHaveAttribute("href", `https://lab.raioviajante.com${counterpart}`);
+    await expect(page.locator(".rv-lang a")).toHaveAttribute(
+      "href",
+      counterpart,
+    );
+    const footer = page.locator("footer nav[aria-label] a", {
+      hasText: /Termos de Uso|Política de Privacidade/,
+    });
+    await expect(footer).toHaveCount(2);
+    for (const link of await footer.all()) {
+      await expect(link).not.toContainText("em inglês");
+      await expect(link).not.toHaveAttribute("hreflang", /./);
+      expect(["/pt/terms/", "/pt/privacy/"]).toContain(
+        await link.getAttribute("href"),
+      );
+    }
+    await expect(page.locator(`main a[href="${other}"]`)).toHaveCount(1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth > innerWidth,
+      ),
+    ).toBe(false);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  }
+  // The social card of each Portuguese page exists.
+  for (const card of ["terms", "privacy", "experiments/setor-de-boot"]) {
+    const response = await page.request.get(`${base("lab")}/og/pt/${card}.png`);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("image/png");
   }
 });
