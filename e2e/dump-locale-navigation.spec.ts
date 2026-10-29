@@ -59,10 +59,11 @@ test("Dump keeps locale-pure navigation and document history", async ({
   // Every series part has a Portuguese version, so the section exists.
   await expect(page.getByRole("heading", { name: /Séries/ })).toHaveCount(1);
 
-  await page.getByRole("link", { name: /arquivo/ }).click();
+  // By destination: post titles now contain "arquivo" too.
+  await page.locator("a[href='/pt/archive']").first().click();
   await expect(page).toHaveURL(`${base("dump")}/pt/archive`);
   await expectLang(page, "pt-BR");
-  await page.getByRole("link", { name: /tags/ }).click();
+  await page.locator("a[href='/pt/tags']").first().click();
   await expect(page).toHaveURL(`${base("dump")}/pt/tags`);
   await expectLang(page, "pt-BR");
 
