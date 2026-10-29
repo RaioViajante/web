@@ -31,16 +31,28 @@ RaioViajante section contains the design language and repository conventions
 pages.
 
 Each English page declares its existing collection entry ID as `contentId`, along
-with `locale`, `originalLocale` and its existing public `path`. The Portuguese
-collection publishes the Sweep guide at `/pt/projetos/sweep/`, sharing its
-`contentId` with the English guide. The CLI reference and both RaioViajante
-pages are English-only; no Portuguese route is generated for them. A Portuguese
-document must have its own declared path and authored body, not an English
-fallback. A work with no public original retains a nonpublic provenance record
-before its original is withdrawn. `src/lib/identity.ts` validates routes and
-identities at build time. Portuguese participation in `site/` is on, after
-production verification of the Portuguese endpoints. Coverage stays partial:
-only the Sweep guide is translated.
+with `locale`, `originalLocale` and its existing public `path`. Every English
+document has a Portuguese version under `src/content/docs/pt/`, sharing its
+`contentId` and declaring its own localized `path`:
+
+| `contentId` | English | Portuguese |
+| --- | --- | --- |
+| `projects/sweep` | `/projects/sweep/` | `/pt/projetos/sweep/` |
+| `projects/sweep/cli` | `/projects/sweep/cli/` | `/pt/projetos/sweep/cli/` |
+| `raioviajante/design-language` | `/raioviajante/design-language/` | `/pt/raioviajante/linguagem-de-design/` |
+| `raioviajante/repository-conventions` | `/raioviajante/repository-conventions/` | `/pt/raioviajante/convencoes-de-repositorio/` |
+
+Terms and Privacy also exist in both languages (`/terms/`, `/pt/terms/`,
+`/privacy/`, `/pt/privacy/`). A Portuguese document must have its own declared
+path and authored body, never an English fallback, and must contain everything
+its original does; `tests/translation-parity.test.mjs` compares headings,
+callouts, tables, lists, paragraphs, code blocks and links. A work with no public
+original retains a nonpublic provenance record before its original is withdrawn.
+`src/lib/identity.ts` validates routes and identities at build time. Portuguese
+participation in `site/` is on, after production verification of the Portuguese
+endpoints. Coverage is complete today (4 of 4 documents), but nothing requires
+it: a future document may exist in one language only, and then it is absent from
+the other language's navigation and its `LANG` offers the other home.
 
 ## Potential future information architecture
 

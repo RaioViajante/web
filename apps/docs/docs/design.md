@@ -33,6 +33,16 @@ toggle remain.
   before it in `order` and numbered `01.1`, `01.2`, … (`src/lib/nav.ts`). Its
   breadcrumb is the folder, that page as a link, then its own sidebar label, and
   the home page notes the pages listed under each project guide.
+- Interface text is in `src/lib/copy.ts`, a typed `Record<LocaleId, DocsCopy>`
+  (home titles and rows, folder names, search titles and suggestions, update
+  labels). Components read it by locale; nothing branches on a locale inline.
+  The home page of both locales is `src/components/HomePage.astro`, and Terms
+  and Privacy keep one complete text per locale in their components. Dates go
+  through `src/lib/date.ts`. The Docs 404 stays English (see
+  [docs/i18n.md](../../../docs/i18n.md#404-behavior)).
+- Block controls and callout labels are localized by the shared pipeline: it
+  reads each document's `locale` frontmatter, so Portuguese pages render
+  `copiar`, `Nota`, `Aviso` and the rest at build time.
 - `src/pages/[...slug].astro` renders every documentation page: breadcrumb
   label, status word and meta row, numbered sections, steps, tables, callouts,
   "last updated" and "edit this page on GitHub", and previous/next. The

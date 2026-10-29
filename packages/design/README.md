@@ -16,7 +16,7 @@ styles/      tokens.css, base.css, blocks.css, search.css (styles.css imports th
 fonts/       Noto Sans Mono: Latin variable WOFF2 for pages, TTF weights for social cards
 assets/      character/, stickers/, search/ (search/head/ static head, source/), gallery/, icons/
 sound/       Web Audio synthesis, sound map, shared preference, player
-blocks/      Shiki theme, highlighting, markup builder, rehype/remark plugins, client behavior
+blocks/      Shiki theme, highlighting, markup builder, rehype/remark plugins, client behavior (words come from the catalog's `blocks` section, by locale)
 components/  Shell, page parts, soft blocks, lab bench, legal and 404 templates
 behavior.ts  one client script: sound, blocks, search, scroll, avatar, 404 path
 social-image.tsx  renders the social cards (metadata conventions live in the
