@@ -82,13 +82,13 @@ for (const width of [1440, 390, 320]) {
     ).toBeInViewport();
     await expect(
       collection.locator('button[aria-haspopup="dialog"]'),
-    ).toHaveCount(41);
+    ).toHaveCount(44);
     await expect(page.locator("main")).not.toContainText(
       /requiem|pale choir|concept art/i,
     );
     await expect(artworkButtons(page, "Branding")).toHaveCount(30);
     await expect(artworkButtons(page, "Profiles")).toHaveCount(2);
-    await expect(artworkButtons(page, "Personal")).toHaveCount(9);
+    await expect(artworkButtons(page, "Personal")).toHaveCount(12);
     const sticker = page.getByRole("button", {
       name: "View Work of art",
       exact: true,
@@ -182,7 +182,7 @@ for (const width of [1440, 390, 320]) {
       .click();
     await page.keyboard.press("ArrowLeft");
     await expect(dialog.getByRole("heading")).toHaveText(
-      "Sad Man, Goofy Mirror Reflection",
+      "A Little Light in the Dark",
     );
     await page.keyboard.press("Escape");
     await expect(dialog).toHaveCount(0);
@@ -212,7 +212,7 @@ for (const width of [1440, 390, 320]) {
         .click();
       const allPromise = page.waitForEvent("download");
       await dialog
-        .getByRole("button", { name: "download .zip · 13 files" })
+        .getByRole("button", { name: "download .zip · 16 files" })
         .click();
       const all = await allPromise;
       expect(all.suggestedFilename()).toBe("raioviajante-gallery.zip");
@@ -225,7 +225,7 @@ for (const width of [1440, 390, 320]) {
       })
         .trim()
         .split("\n");
-      expect(entries).toHaveLength(13);
+      expect(entries).toHaveLength(16);
       expect(new Set(entries.map((name) => name.split("/")[0]))).toEqual(
         new Set(["branding", "profiles", "personal"]),
       );
@@ -381,7 +381,7 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   });
   await expect(
     page.locator('#gallery-collection button[data-sound="gallery"]'),
-  ).toHaveCount(41);
+  ).toHaveCount(44);
   await sticker.hover();
   const beforeClick = await voices();
   await pressInPlace();
@@ -556,10 +556,10 @@ for (const width of [1440, 390])
     ).toBeInViewport();
     await expect(
       collection.locator('button[aria-haspopup="dialog"]'),
-    ).toHaveCount(41);
+    ).toHaveCount(44);
     await expect(artworkButtons(page, "Identidade visual")).toHaveCount(30);
     await expect(artworkButtons(page, "Perfis")).toHaveCount(2);
-    await expect(artworkButtons(page, "Pessoais")).toHaveCount(9);
+    await expect(artworkButtons(page, "Pessoais")).toHaveCount(12);
     // Profile links keep their URLs; the video-source label is translated.
     const profileLinks = (path: string) =>
       page
@@ -679,7 +679,7 @@ for (const width of [1440, 390])
       "Será salvo como raioviajante-gallery.zip, com uma pasta por categoria.",
     );
     await expect(
-      dialog.getByRole("button", { name: "baixar .zip · 13 arquivos" }),
+      dialog.getByRole("button", { name: "baixar .zip · 16 arquivos" }),
     ).toBeEnabled();
     await expect(
       dialog.getByRole("button", { name: "limpar seleção", exact: true }),
