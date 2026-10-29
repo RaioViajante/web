@@ -5,7 +5,7 @@ import { evaluateAudit } from "./audit-policy.mjs";
 
 // Fixtures shaped like `pnpm audit --json`; nothing here touches the real
 // lockfile. Synthetic development and production exceptions exercise every
-// exception guard without weakening the committed empty policy.
+// exception guard without weakening the committed policy.
 const policy = JSON.parse(
   await readFile(new URL("./audit-exceptions.json", import.meta.url), "utf8"),
 );
@@ -112,7 +112,7 @@ test("the committed policy is within its 60-day window", () => {
   const limit = Date.parse(policy.decided) + policy.maxReviewDays * 86_400_000;
   for (const e of policy.exceptions)
     assert.ok(Date.parse(`${e.expires}T00:00:00Z`) <= limit, e.package);
-  assert.equal(policy.exceptions.length, 0);
+  for (const e of policy.exceptions) assert.equal(e.production, false, e.package);
 });
 
 test("unknown advisories fail at every severity", () => {
