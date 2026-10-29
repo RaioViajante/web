@@ -650,7 +650,10 @@ export interface RssItem {
 
 /** The tag GUID of an English feed item: fixed host, fixed year, `en`, a kebab contentId. */
 function tagGuidPattern(site: Site) {
-  const host = new URL(siteOrigins[site]).hostname.replace(/\./g, "\\.");
+  const host = new URL(siteOrigins[site]).hostname.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&",
+  );
   return new RegExp(`^tag:${host},2026:post/[a-z0-9]+(?:-[a-z0-9]+)*/en$`);
 }
 
