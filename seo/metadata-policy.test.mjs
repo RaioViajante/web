@@ -390,6 +390,30 @@ test("rss rules", () => {
   );
 });
 
+test("rss accepts the tag GUID of a new English item and nothing else", () => {
+  const tagItem = (guid, flag = "false") =>
+    `<?xml version="1.0"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><link>https://dump.raioviajante.com</link><atom:link href="https://dump.raioviajante.com/rss.xml" rel="self" type="application/rss+xml" /><item><title>Foo</title><link>${dumpPost}</link><guid isPermaLink="${flag}">${guid}</guid><pubDate>Thu, 15 Jan 2026 00:00:00 GMT</pubDate></item></channel></rss>`;
+  const problems = (guid, flag) =>
+    checkRss("dump", tagItem(guid, flag), [dumpPost]).problems.join("\n");
+  const valid = "tag:dump.raioviajante.com,2026:post/some-work-1/en";
+  assert.equal(problems(valid), "");
+  // The permalink GUID of a legacy item is still accepted.
+  assert.equal(problems(dumpPost, "true"), "");
+  // A tag GUID is never a permalink.
+  assert.match(problems(valid, "true"), /must be isPermaLink="false"/);
+  for (const wrong of [
+    "tag:other.raioviajante.com,2026:post/some-work/en",
+    "tag:dump.raioviajante.com,2025:post/some-work/en",
+    "tag:dump.raioviajante.com,2026:post/some-work/pt-BR",
+    "tag:dump.raioviajante.com,2026:post/Some_Work/en",
+    "tag:dump.raioviajante.com,2026:post//en",
+    "tag:dump.raioviajante.com,2026:page/some-work/en",
+    "tag:dumpXraioviajante.com,2026:post/some-work/en",
+    "https://dump.raioviajante.com/posts/other",
+  ])
+    assert.match(problems(wrong), /guid differs from link/, wrong);
+});
+
 // JSON-LD ---------------------------------------------------------------
 const post = () => ({
   "@type": "BlogPosting",
