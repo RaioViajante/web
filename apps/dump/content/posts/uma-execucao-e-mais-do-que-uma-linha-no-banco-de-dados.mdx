@@ -61,7 +61,7 @@ timeoutSeconds
 enabled
 ```
 
-Uma Execução deve representar uma rodada concreta desse Job.
+Uma Execução deve representar uma execução concreta desse Job.
 
 Se o mesmo comando de backup acabar rodando dez vezes, não quero dez Jobs com dez versões ligeiramente diferentes da configuração.
 
@@ -256,7 +256,7 @@ criar uma Execução e verificar que ela começa como `QUEUED`;
 
 iniciá-la e verificar `RUNNING` e `startedAt`;
 
-fazê-la ter sucesso e verificar `SUCCEEDED`, o código de saída e `finishedAt`;
+marcá-la como bem-sucedida e verificar `SUCCEEDED`, o código de saída e `finishedAt`;
 
 fazê-la falhar e verificar a mensagem de erro e os timestamps;
 
@@ -387,7 +387,7 @@ Não interrompe um processo do sistema operacional, porque o Orbit ainda não te
 
 Essa distinção parece óbvia quando escrita.
 
-É exatamente o tipo de coisa que fica borrada quando um projeto tem um nome atraente e um README que diz “agendador de jobs distribuído.”
+É exatamente o tipo de coisa que fica borrada quando um projeto tem um nome atraente e um README que diz “agendador de jobs distribuído”.
 
 ## Fazer isso primeiro ainda faz sentido
 

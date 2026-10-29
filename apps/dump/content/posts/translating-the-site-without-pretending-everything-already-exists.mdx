@@ -16,7 +16,7 @@ Translating a site looks, at first glance, like a job of swapping texts. In this
 
 If a text exists in English, that does not mean it already exists in Portuguese. If a route has the `/pt` prefix, it also should not carry English content just to avoid an empty spot. The site needs to be able to say “this version exists” and “this one does not exist yet” without mixing the two answers.
 
-## A Work and Its Versions
+## A work and its versions
 
 dump separates the identity of the content from the identity of the route. Each work has a stable `contentId`; each localized version has its own `locale`, slug and publication cycle.
 
@@ -24,7 +24,7 @@ A translation can, for example, share the `maybe-this-can-be-something-someday` 
 
 This also allows the reverse path: a text can be born in Portuguese and remain a valid work even without an English version. `originalLocale` records that origin; it does not define which language matters more.
 
-## Partial Has to Be a Normal State
+## Partial has to be a normal state
 
 The goal here is not to maintain a perfectly symmetrical table. Some pages will have versions in both languages; others may keep existing in only one of them.
 
@@ -32,7 +32,7 @@ That is why lists of texts, the archive, tags, related texts, series and previou
 
 This behavior is stricter, but it keeps the answer honest. A missing page returns `404`; it does not get a Portuguese frame around an English text.
 
-## The URL Chooses the Language
+## The URL chooses the language
 
 On this site, the language comes from the URL. The English routes stay unprefixed, while the Portuguese ones live under `/pt`.
 
@@ -40,7 +40,7 @@ This avoids making the same URL change depending on the browser, a cookie or the
 
 Localized slugs are independent. This choice costs a little more inventory, because every path has to be declared and validated, but it avoids turning translation into a presentation detail.
 
-## Publishing Is Not the Same as Announcing
+## Publishing is not the same as announcing
 
 During the first stage of this rollout, the Portuguese routes can exist before the rest of the ecosystem starts pointing to them. The project treats publishing and announcing as different steps.
 
@@ -48,7 +48,7 @@ While that first stage is in validation, the pages are reached directly and chec
 
 Once that initial publication is verified in production, a separate stage may turn on announcing across hosts. It is a decision specific to this project, not a universal rule for multilingual sites.
 
-## What Is Left for Later
+## What is left for later
 
 Not every integration arrives together with the first pages.
 
@@ -58,7 +58,7 @@ The English comments also stay tied to the current path of each page. During thi
 
 Automatic links to Lab demos follow the same caution: if a real Portuguese version does not exist, the Portuguese text does not present the English destination as if it were an equivalent. An editorial link to English material can still exist, as long as it says so clearly and declares `hreflang="en"`.
 
-## Dates Belong to the Published Version
+## Dates belong to the published version
 
 The translation does not inherit the date of the original. Each version gets `publishedAt` with the date of its first public publication, recorded by the project's editorial process.
 

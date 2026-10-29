@@ -170,19 +170,19 @@ O canal é dono do orçamento compartilhado e do caminho de cancelamento dessa o
 Conceitualmente, a estrutura agora é:
 
 ```text
-caller wall-clock deadline
+deadline de relógio de parede do chamador
             |
-            | convert once
+            | converter uma vez
             v
-one monotonic operation endpoint
+um único ponto de término monotônico da operação
             |
-            +-- queueing
+            +-- fila
             +-- pacing
-            +-- page 1
-            +-- retry wait
-            +-- page 1 retry
-            +-- page 2
-            +-- active transport attempts
+            +-- página 1
+            +-- espera do retry
+            +-- retry da página 1
+            +-- página 2
+            +-- tentativas de transporte ativas
 ```
 
 Tudo o que está abaixo do ponto de término consome o mesmo orçamento.

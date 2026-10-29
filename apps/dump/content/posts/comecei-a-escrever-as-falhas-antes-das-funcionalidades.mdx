@@ -115,7 +115,7 @@ Antes de boa parte dessa automação existir, eu precisava decidir quanta autori
 
 Cancelamento e retries também fazem parte dessa conversa.
 
-Um retry não é automaticamente inofensivo só porque a primeira tentativa falhou. Uma operação pode ter efeitos que quem a chamou não consegue repetir com segurança. O cancelamento não é apenas um resultado de erro se o trabalho já está esperando, sendo ritmado ou viajando pelo transporte.
+Um retry não é automaticamente inofensivo só porque a primeira tentativa falhou. Uma operação pode ter efeitos que quem a chamou não consegue repetir com segurança. O cancelamento não é apenas um resultado de erro se o trabalho já está esperando, aguardando o intervalo de pacing ou trafegando pelo transporte.
 
 O tratamento de deadlines é um ponto em que uma restrição documentada já chegou à implementação e à revisão.
 
@@ -123,7 +123,7 @@ Outras questões de automação e recuperação continuam como restrições docu
 
 ## Eu tinha mais decisões do que produto
 
-Em algum momento, o repositório tinha acumulado ADRs, issues, milestones e notas de segurança mais rápido do que funcionalidades visíveis.
+Em algum momento, o repositório tinha acumulado ADRs, issues, marcos e notas de segurança mais rápido do que funcionalidades visíveis.
 
 Isso parecia um pouco ridículo.
 

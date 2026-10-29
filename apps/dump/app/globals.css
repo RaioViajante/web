@@ -82,7 +82,8 @@ html {
 
 .archive-label {
   display: grid;
-  grid-template-columns: 22ch minmax(0, 1fr); /* "30 de setembro de 2026" is the longest long date, so titles line up */
+  /* 23ch fits the longest long date ("22 de fevereiro de 2026"), so titles line up */
+  grid-template-columns: 23ch minmax(0, 1fr);
   column-gap: 28px;
 }
 
@@ -90,8 +91,8 @@ html {
   color: var(--fg-3);
 }
 
-@media (max-width: 760px) {
-  /* The long date takes its own line above the title on narrow screens. */
+@media (max-width: 1000px) {
+  /* With the sidebar beside it the column is narrow: the long date takes its own line above the title. */
   .archive-label {
     grid-template-columns: minmax(0, 1fr);
   }
