@@ -1,6 +1,19 @@
 {
   "_readme": "The reviewed dependency advisories that `pnpm audit:check` tolerates, and nothing else. Each exception is temporary: it expires on the date below and the gate then fails until a person reviews it. Dates are never extended automatically. Details: docs/security-maintenance.md.",
-  "decided": "2026-10-23",
+  "decided": "2026-10-29",
   "maxReviewDays": 60,
-  "exceptions": []
+  "exceptions": [
+    {
+      "package": "deepmerge",
+      "advisory": "GHSA-gcqx-w48m-w2h4",
+      "summary": "mergeObject() allows prototype poisoning of returned objects",
+      "severity": "low",
+      "production": false,
+      "versions": ["4.3.1"],
+      "reachedThrough": ["jest"],
+      "patched": "none",
+      "expires": "2026-12-28",
+      "rationale": "Only Jest's configuration loading (jest-config) in dump's test tooling reaches it, never in production and never with untrusted input. 4.3.1 is the latest release and the advisory has no fixed version. It must stay out of every production dependency path."
+    }
+  ]
 }

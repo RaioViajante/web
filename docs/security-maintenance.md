@@ -22,12 +22,23 @@ fails too. The rules are pure code with fixture tests
 
 ### Temporary exceptions
 
-There are currently no dependency-audit exceptions.
+There is currently one dependency-audit exception, reviewed on 2026-10-29 and
+expiring 2026-12-28: `deepmerge` 4.3.1 (GHSA-gcqx-w48m-w2h4, low, prototype
+poisoning in `mergeObject()`). Only Jest's `jest-config` reaches it, in dump's
+test tooling; `pnpm audit --prod` reports no production path. 4.3.1 is the latest
+release and the advisory has no patched version, so there is nothing to upgrade.
 
-Any future exception is not a permanent waiver. It must expire no more than 60
+Any exception is not a permanent waiver. It must expire no more than 60
 days after its decision. When the date passes, the gate fails and a person must
 review: fix or upgrade the dependency, or renew deliberately by editing the
 decision and expiry in the JSON. Nothing extends an exception automatically.
+
+The former `satori` advisory (GHSA-wx4j-mvgx-mqwp, SVG escaping, fixed in
+0.33.5) is not an exception: `@vercel/og` 0.11.1 pins `satori` 0.25.0 exactly, so
+a `pnpm-workspace.yaml` override moves it to 0.33.5. The generated social images
+of docs and lab were compared before and after and are byte for byte identical.
+Remove the override when `@vercel/og` ships the fix on a version this repository
+can use.
 
 The former `braces` exception (GHSA-vfj7-8cjw-p6xm) was removed after GitHub
 [withdrew the advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) on
@@ -120,7 +131,7 @@ manually, read-only, no secrets, nothing regenerated or committed:
 **Limit:** GitHub disables scheduled workflows in a public repository after
 about 60 days without repository activity, so this is not a guarantee. Review by
 hand: `security.txt` (`Expires` 2027-10-01) before its renewal window opens on
-2027-09-01, and the exceptions before 2026-12-06, whether or not Actions still
+2027-09-01, and the exceptions before 2026-12-28, whether or not Actions still
 runs. No bot files issues; that would need write access and would stop with the
 schedule.
 

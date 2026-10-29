@@ -124,7 +124,7 @@ submitting anything.
 | What                 | When                                                         | How                                                                                       |
 | -------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
 | security.txt renewal | before the window opens on 2027-09-01 (`Expires` 2027-10-01) | [security-txt.md](security-txt.md#renewal); the guard fails inside 30 days                |
-| Audit exceptions     | before 2026-12-06 (braces)                                   | re-run `pnpm audit`, then remove or renew in `security/audit-exceptions.json`             |
+| Audit exceptions     | before 2026-12-28 (deepmerge)                                | re-run `pnpm audit`, then remove or renew in `security/audit-exceptions.json`             |
 | Scheduled workflows  | weekly Monday (maintenance) and Wednesday (CodeQL)           | GitHub disables schedules after about 60 days without activity: review by hand            |
 | Dependabot (actions) | weekly                                                       | review the pull request; pnpm packages are reviewed by hand until GitHub supports pnpm 12 |
 
