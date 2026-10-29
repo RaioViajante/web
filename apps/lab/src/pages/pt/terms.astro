@@ -1,0 +1,16 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { TermsPage } from "../../components/LegalPages";
+import { textFor } from "../../lib/copy";
+import { routeCounterparts } from "../../lib/routes";
+const text = textFor("pt-BR").legal.terms;
+---
+
+<BaseLayout
+  locale="pt-BR"
+  pageTitle={text.title}
+  description={text.description}
+  counterparts={routeCounterparts("terms", "pt-BR")}
+>
+  <TermsPage locale="pt-BR" />
+</BaseLayout>

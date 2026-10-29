@@ -1,11 +1,16 @@
 ---
+import { DEFAULT_LOCALE } from "../../../../site/locales";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { PrivacyPage } from "../components/LegalPages";
+import { textFor } from "../lib/copy";
+import { routeCounterparts } from "../lib/routes";
+const text = textFor(DEFAULT_LOCALE).legal.privacy;
 ---
 
 <BaseLayout
-  pageTitle="Privacy Policy"
-  description="Privacy Policy for lab.raioviajante.com."
+  pageTitle={text.title}
+  description={text.description}
+  counterparts={routeCounterparts("privacy", DEFAULT_LOCALE)}
 >
-  <PrivacyPage />
+  <PrivacyPage locale={DEFAULT_LOCALE} />
 </BaseLayout>
