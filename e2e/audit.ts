@@ -38,7 +38,11 @@ export async function audit(
   expect(await page.evaluate(() => window.innerWidth)).toBe(width);
 
   // Accessibility first, before anything scrolls and triggers lazy third-party UI.
-  const axe = await new AxeBuilder({ page }).analyze();
+  // `label-content-name-mismatch` (WCAG 2.5.3) is experimental in axe, so it is
+  // off by default; enable it so every page in both locales is checked.
+  const axe = await new AxeBuilder({ page })
+    .options({ rules: { "label-content-name-mismatch": { enabled: true } } })
+    .analyze();
   for (const violation of axe.violations)
     for (const node of violation.nodes.slice(0, 3))
       problems.push(

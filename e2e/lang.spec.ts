@@ -40,7 +40,7 @@ for (const site of sites)
     const destination = site === "docs" || site === "lab" ? "/pt/" : "/pt";
     await expect(link).toHaveText("LANG EN");
     await expect(link).toHaveAccessibleName(
-      "Language: English. Switch to Portuguese.",
+      "LANG EN — Language: English. Switch to Portuguese.",
     );
     await expect(link).toHaveAttribute("href", destination);
     await expect(link).toHaveAttribute("hreflang", "pt-BR");
@@ -60,6 +60,51 @@ for (const site of sites)
     await expect(page.locator(".rv-lang a")).toHaveText("LANG PT");
     expect(health).toEqual([]);
   });
+
+// WCAG 2.5.3 Label in Name: the accessible name of LANG starts with the text it
+// shows. axe's `label-content-name-mismatch` rule is experimental, so it is not
+// in the default rule set that audit() runs; it is enabled here by name, on the
+// live DOM of every app in both locales and both widths, and on the control's
+// markup in each of its states.
+const faces = { en: "LANG EN", "pt-BR": "LANG PT" } as const;
+for (const site of sites)
+  for (const [locale, path] of [
+    ["en", "/"],
+    ["pt-BR", site === "docs" || site === "lab" ? "/pt/" : "/pt"],
+  ] as const)
+    for (const [width, viewport] of Object.entries(viewports))
+      test(`${site} ${locale} home: LANG name contains its visible label at ${width} width`, async ({
+        page,
+      }) => {
+        await isolate(page, []);
+        await page.setViewportSize(viewport);
+        await page.goto(base(site) + path);
+        const control = page
+          .locator(".rv-sound .rv-lang")
+          .locator("a, summary, .rv-sr-only")
+          .first();
+        await expect(control).toHaveAccessibleName(
+          new RegExp(`^${faces[locale]} — .{10,}`),
+        );
+        await expect(page.locator(".rv-sound .rv-lang")).toContainText(
+          faces[locale],
+        );
+        const result = await new AxeBuilder({ page })
+          .options({
+            rules: { "label-content-name-mismatch": { enabled: true } },
+          })
+          .analyze();
+        expect(
+          result.violations.map(
+            (v) =>
+              `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
+          ),
+        ).toEqual([]);
+        expect(
+          result.passes.some((p) => p.id === "label-content-name-mismatch"),
+          "the experimental rule actually ran",
+        ).toBe(true);
+      });
 
 const overflows = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
@@ -157,7 +202,7 @@ test.describe("the real interactive LanguageControl at phone width", () => {
     const link = control.locator("a");
     await expect(link).toHaveText("LANG EN");
     await expect(link).toHaveAccessibleName(
-      "Language: English. Switch to Portuguese.",
+      "LANG EN — Language: English. Switch to Portuguese.",
     );
     await expect(link).toHaveAttribute("hreflang", "pt-BR");
     await expect(link).toHaveAttribute("href", "/pt/guia/");
@@ -184,7 +229,7 @@ test.describe("the real interactive LanguageControl at phone width", () => {
     const summary = details.locator("summary");
     await expect(summary).toHaveText("LANG EN");
     await expect(summary).toHaveAccessibleName(
-      "Language: English. Check Portuguese availability.",
+      "LANG EN — Language: English. Check Portuguese availability.",
     );
     expect(await height(page, ".rv-lang summary")).toBeGreaterThanOrEqual(44);
     await tabTo(page, ".rv-lang summary");
