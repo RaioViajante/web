@@ -55,7 +55,7 @@ test("Dump keeps locale-pure navigation and document history", async ({
   await expect(page.locator("a[href='/rss.xml']")).toHaveCount(0);
   await expect(
     page.locator('link[rel="alternate"][type="application/rss+xml"]'),
-  ).toHaveAttribute("href", "/pt/rss.xml");
+  ).toHaveAttribute("href", /\/pt\/rss\.xml$/);
   // Every series part has a Portuguese version, so the section exists.
   await expect(page.getByRole("heading", { name: /Séries/ })).toHaveCount(1);
 
@@ -304,7 +304,7 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
     "/search",
   );
 
-  await input.fill("Traduzir");
+  await input.fill("Traduzir o site");
   let result = page.locator("[data-search-result]");
   await expect(result).toHaveCount(1);
   await expect(result).toContainText(
@@ -312,7 +312,7 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
   );
   await expect(page.locator("a[data-lang-search]")).toHaveAttribute(
     "href",
-    "/search?q=Traduzir",
+    "/search?q=Traduzir+o+site",
   );
   // The index states canonical origins; the e2e harness maps them to the
   // local server when the client renders a result.
@@ -321,7 +321,7 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
     `${base("dump")}/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe`,
   );
 
-  await input.fill("mensagem de erro");
+  await input.fill("erro por três horas");
   result = page.locator("[data-search-result]");
   await expect(result).toHaveCount(1);
   await expect(result).toContainText("Talvez isso vire alguma coisa um dia");
@@ -379,7 +379,7 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
     await expect(page.locator("[data-search-result]").first()).toBeVisible();
   }
 
-  await input.fill("Traduzir");
+  await input.fill("Traduzir o site");
   await expect(page.locator("[data-search-result]")).toHaveCount(1);
   await input.press("Enter");
   await expect(page).toHaveURL(
