@@ -30,7 +30,7 @@ Node.js 24 or newer, pnpm (recorded in `package.json`).
 
 For UI changes, run `pnpm build && pnpm preview` and check in a browser:
 
-- Routes return 200: `/`, `/experiments/filename-classifier/`, `/experiments/execution-states/`, `/experiments/boot-sector/`.
+- Routes return 200: `/`, `/experiments/filename-classifier/`, `/experiments/execution-states/`, `/experiments/boot-sector/`, and their Portuguese counterparts `/pt/`, `/pt/experiments/classificador-de-arquivos/`, `/pt/experiments/estados-de-execucao/`, `/pt/experiments/setor-de-boot/`, plus `/pt/terms/`, `/pt/privacy/` and `/pt/search/`.
 - Search, Terms, Privacy and unknown routes use the shared shell.
 - Retired routes return 404 without redirects: `/experiments/parser-playground/`, `/experiments/cron-visualizer/`, `/experiments/filesystem-classifier/`.
 - The dark palette on the homepage and on direct navigation to an experiment route.
@@ -42,6 +42,7 @@ For UI changes, run `pnpm build && pnpm preview` and check in a browser:
 - Classifier: compare the four initial examples and `PHOTO.PNG`, `README`, `archive.tar.gz`, `.hidden`, and `notes.final.txt` with Sweep's referenced classifier and Python 3.14 `Path.suffix`. Verify long filenames wrap and input is treated as text.
 - Execution states: test all five states against all four operations. Rejections preserve every field. Check nonzero success, zero-code failure, blank failure messages, queued cancellation without a start time, and a fresh example after completion. Browser integer input represents Java's signed `int`; it adds no exit-code success convention.
 - Boot sector: compare displayed instructions with the referenced assembly. Verify the documented-result wording, `dw 0xAA55` explanation, and keyboard section selection, previous/next and copy. Do not generate bytes or claim fresh QEMU verification.
+- Drive every bench in both languages: the same inputs must give the same state, counts and accepted/rejected outcomes, with the live-region text in the page's language. Check the Portuguese counts for 0, 1 and several files or experiments.
 - Check labeled controls, table headers, live feedback, and visible keyboard focus. Exercise long input and expanded code at every responsive width.
 - Verify actual document titles, favicon, internal links, and unauthenticated access to every rendered source link. A source link is published only while its repository is publicly accessible.
 - Keep sibling repositories read-only while verifying provenance; do not build, install dependencies, or generate artifacts there.

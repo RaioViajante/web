@@ -12,14 +12,43 @@ The initial collection was published in Lab on 2026-09-13:
 | 002 | execution states    | active | Orbit `cd97666`: Execution lifecycle rules and domain tests             |
 | 001 | filename classifier | active | Sweep `3544d36`: final-extension classifier and tests                   |
 
-The first manually authored Portuguese version is `001`, **classificador de
-arquivos**, at `/pt/experiments/classificador-de-arquivos/`. Its `contentId` is
-`001`, its original locale is English, and its source facts remain the same.
-`002` and `003` have no Portuguese version or alternate. The classifier's
-Portuguese category labels are display text; the preview destination retains
-the actual English category directory names used by Sweep. The Portuguese
-home, search index and bench include only this authored translation. The
-`created` value describes the experiment, not when the translation was published.
+Every experiment has an English and a Brazilian Portuguese version. The
+Portuguese versions are authored by hand, keep the English `contentId` (the
+experiment `id`) and `originalLocale: en`, and live at independent slugs:
+
+| ID  | English slug          | Portuguese slug             |
+| --- | --------------------- | --------------------------- |
+| 003 | `boot-sector`         | `setor-de-boot`             |
+| 002 | `execution-states`    | `estados-de-execucao`       |
+| 001 | `filename-classifier` | `classificador-de-arquivos` |
+
+Stable facts (`id`, `project`, `revision`, `created`, `source`, `status`,
+`fidelity`, `surface`) are inherited from the English record and checked by
+`validateExperiments`; only the authored text differs. The `created` value
+describes the experiment, not when a translation was published.
+
+Visible labels and strings are never raw keys. `status` and `fidelity` render
+through the locale catalog (`src/lib/copy.ts`), `created` renders as a long
+date in the page locale with the ISO value in `<time datetime>`, and the
+fidelity and related rows of each surface live in
+`src/data/experiment-content.ts`. Related rows that point to English-only
+material (the Dump posts, the learning notes) say so in words ("em inglês"),
+carry `hreflang="en"` and mark the English title with `lang="en"`.
+
+Technical identifiers stay exact in both languages: Orbit's status values
+(`QUEUED`, `RUNNING`, ...) and field names, Sweep's category values (`Images`,
+`Documents`, `Archives`, `Other`), assembly, registers, hex values and
+revisions. The Portuguese classifier shows the program's category value in the
+table and in the live summary, flagged `lang="en"`, with a descriptive
+translation in parentheses only beside the table cell (`Images (imagens)`), so
+the destination path (`~/Downloads/Images/...`) and the category column always
+agree. Operation names (`start`, `succeed`, `fail`, `cancel`) are Orbit's
+method names: Portuguese buttons and messages use verbs ("iniciar",
+"concluir com sucesso", "falhar", "cancelar") and the transition table shows
+the identifier next to the verb.
+
+The English pages do not render an experiment's `notes`; the Portuguese pages
+always have (`showNotes` in the catalog keeps that difference explicit).
 
 The classifier reproduces Python 3.14 POSIX suffix behavior, lowercases the suffix, and applies Sweep's category sets. It does not inspect files. Execution states reproduces the domain guards, including cancellation from queued/running, nonblank failure messages, and no success/failure restriction on integer exit-code values. Its timestamps are browser samples; no commands run or state persists. The boot page uses real assembly excerpts with comments omitted and attributes its result to the learning notes. It contains no generated machine bytes or emulator.
 
