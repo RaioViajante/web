@@ -1,17 +1,37 @@
 ---
 import { ExecutionBench } from "./ExecutionBench";
+import type { LocaleId } from "../../../../../site/locales";
+interface Props {
+  locale: LocaleId;
+}
+const { locale } = Astro.props;
 ---
 
-<ExecutionBench />
+<ExecutionBench locale={locale} />
 <script>
   import {
+    ExecutionRejection,
+    isAllowed,
     newExecution,
     transition,
     type Operation,
   } from "../../lib/execution-states";
+  import { availabilityText } from "../../lib/execution-view";
+  import type { ExecutionCopy } from "../../lib/bench-copy";
+  import { fill } from "../../lib/template";
   import { playSound } from "@raioviajante/design/sound";
   const container = document.querySelector<HTMLElement>("[data-execution]");
   if (container) {
+    // Rendered into the page at build time; never read from the browser.
+    const text = JSON.parse(container.dataset.copy!) as Pick<
+      ExecutionCopy,
+      | "operations"
+      | "availability"
+      | "none"
+      | "defaultFailureMessage"
+      | "messages"
+      | "reasons"
+    >;
     let state = newExecution();
     const feedback = container.querySelector<HTMLElement>("[data-feedback]")!;
     const history =
@@ -20,31 +40,23 @@ import { ExecutionBench } from "./ExecutionBench";
     const message =
       container.querySelector<HTMLInputElement>("#failure-message")!;
     function render() {
-      const accepted: string[] = [];
-      const rejected: string[] = [];
       container!
         .querySelectorAll<HTMLButtonElement>("[data-operation]")
         .forEach((button) => {
-          const action = button.dataset.operation!;
-          const allowed =
-            action === "start"
-              ? state.status === "QUEUED"
-              : action === "cancel"
-                ? ["QUEUED", "RUNNING"].includes(state.status)
-                : state.status === "RUNNING";
+          const action = button.dataset.operation as Operation;
+          const allowed = isAllowed(state.status, action);
           button.classList.toggle("rv-btn--rejected", !allowed);
           button.classList.toggle(
             "rv-btn--primary",
             action === "start" && allowed,
           );
           button.setAttribute("aria-disabled", String(!allowed));
-          (allowed ? accepted : rejected).push(action);
           container!
             .querySelector(`[data-rule="${action}"]`)!
             .classList.toggle("is-available", allowed);
         });
       container!.querySelector("[data-availability]")!.textContent =
-        `Accepted now: ${accepted.join(", ") || "none"}. Rejected now: ${rejected.join(", ") || "none"}.`;
+        availabilityText(text, state.status);
       container!.querySelectorAll<HTMLElement>(".rv-state").forEach((mark) => {
         const current = mark.textContent === state.status;
         mark.classList.toggle("rv-state--current", current);
@@ -58,9 +70,9 @@ import { ExecutionBench } from "./ExecutionBench";
           field.textContent = value === null ? "—" : String(value);
         });
     }
-    function record(text: string) {
+    function record(line: string) {
       const item = document.createElement("li");
-      item.textContent = text;
+      item.textContent = line;
       history.append(item);
     }
     container
@@ -68,15 +80,14 @@ import { ExecutionBench } from "./ExecutionBench";
       .forEach((button) => {
         button.addEventListener("click", () => {
           const operation = button.dataset.operation as Operation;
+          const label = text.operations[operation];
           try {
             if (
               state.status === "RUNNING" &&
               (operation === "succeed" || operation === "fail") &&
               !code.checkValidity()
             ) {
-              throw new Error(
-                "Enter an integer exit code between -2147483648 and 2147483647 for this example",
-              );
+              throw new RangeError(text.reasons["exit-code-range"]);
             }
             state = transition(
               state,
@@ -86,14 +97,36 @@ import { ExecutionBench } from "./ExecutionBench";
               new Date().toISOString(),
             );
             render();
-            feedback.textContent = `${operation} accepted → ${state.status}.`;
-            record(`accepted: ${operation} → ${state.status}`);
+            feedback.textContent = fill(text.messages.accepted, {
+              operation: label,
+              status: state.status,
+            });
+            record(
+              fill(text.messages.historyAccepted, {
+                operation: label,
+                status: state.status,
+              }),
+            );
             playSound("success");
           } catch (error) {
             const reason =
-              error instanceof Error ? error.message : "Operation rejected";
-            feedback.textContent = `${operation} rejected: ${reason}. State remains ${state.status}.`;
-            record(`rejected: ${operation} from ${state.status}: ${reason}`);
+              error instanceof ExecutionRejection
+                ? text.reasons[error.code]
+                : error instanceof Error
+                  ? error.message
+                  : String(error);
+            feedback.textContent = fill(text.messages.rejected, {
+              operation: label,
+              reason,
+              status: state.status,
+            });
+            record(
+              fill(text.messages.historyRejected, {
+                operation: label,
+                status: state.status,
+                reason,
+              }),
+            );
             playSound("reject");
           }
         });
@@ -104,12 +137,11 @@ import { ExecutionBench } from "./ExecutionBench";
         playSound("success");
         state = newExecution();
         code.value = "0";
-        message.value = "Example failure";
+        message.value = text.defaultFailureMessage;
         history.replaceChildren();
-        record("created → QUEUED");
+        record(text.messages.created);
         render();
-        feedback.textContent =
-          "New sample execution created in QUEUED. This is not a lifecycle transition.";
+        feedback.textContent = text.messages.newExample;
       });
   }
 </script>

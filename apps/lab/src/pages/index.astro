@@ -3,12 +3,14 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { websiteJsonLd } from "../../../../seo/structured-data";
 import { LabIndex } from "../components/LabIndex";
 import { origin } from "../lib/seo";
+import { routeCounterparts } from "../lib/routes";
+import { copy } from "../lib/copy";
 ---
 
 <BaseLayout
-  counterparts={[{ locale: "pt-BR", path: "/pt/" }]}
+  counterparts={routeCounterparts("home", "en")}
   jsonLd={[
-    websiteJsonLd(origin, "lab", "lab.raioviajante.com — things may break.", {
+    websiteJsonLd(origin, "lab", copy.en.description, {
       languages: ["en", "pt-BR"],
     }),
   ]}

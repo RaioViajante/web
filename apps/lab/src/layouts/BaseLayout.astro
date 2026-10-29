@@ -9,7 +9,11 @@ import "@raioviajante/design/styles.css";
 import "../styles/lab.css";
 import { LabFrame } from "../components/LabFrame";
 import { formatTitle } from "../lib/site";
-import { LOCALES, type LocaleId } from "../../../../site/locales";
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  type LocaleId,
+} from "../../../../site/locales";
 import type { Counterpart } from "../../../../seo/locale";
 import { textFor } from "../lib/copy";
 interface Props {
@@ -23,10 +27,10 @@ interface Props {
 }
 const {
   pageTitle,
-  description = "lab.raioviajante.com — things may break.",
+  locale = DEFAULT_LOCALE,
+  description = textFor(locale).description,
   current = Astro.url.pathname,
   jsonLd,
-  locale = "en",
   counterparts,
 } = Astro.props;
 const color = await themeColor();

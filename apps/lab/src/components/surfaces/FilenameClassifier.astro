@@ -10,51 +10,80 @@ const { locale } = Astro.props;
 <ClassifierBench locale={locale} />
 <script>
   import { classifyFilename } from "../../lib/filename-classifier";
+  import {
+    categoryParts,
+    emptyCounts,
+    summaryParts,
+    type TextPart,
+  } from "../../lib/classifier-view";
+  import type { ClassifierCategory } from "../../lib/bench-copy";
+  import type { LocaleId } from "../../../../../site/locales";
   import { playSound } from "@raioviajante/design/sound";
   const container = document.querySelector<HTMLElement>("[data-classifier]")!;
+  // Rendered into the page at build time; never read from the browser.
+  const locale = container.dataset.locale as LocaleId;
   const text = JSON.parse(container.dataset.copy!) as {
-    categories: Record<string, string>;
     none: string;
-    file: string;
-    files: string;
-    classified: string;
+    categoryGloss: Record<ClassifierCategory, string | null>;
+    categoryLang: string | null;
+    summary: { one: string; other: string };
   };
   const names = container.querySelector<HTMLTextAreaElement>("#filenames")!;
   const directory = container.querySelector<HTMLInputElement>("#directory")!;
   const body = container.querySelector("tbody")!;
   const summary = container.querySelector("[data-summary]")!;
   const initial = names.value;
+  function nodes(parts: TextPart[]): Node[] {
+    return parts.map((part) => {
+      if (!part.lang) return document.createTextNode(part.text);
+      const span = document.createElement("span");
+      span.lang = part.lang;
+      span.textContent = part.text;
+      return span;
+    });
+  }
   function render(sound = false) {
     const results = names.value
       .split(/\r?\n/)
       .filter((name) => name.length > 0)
       .map(classifyFilename);
-    const counts = { Images: 0, Documents: 0, Archives: 0, Other: 0 };
+    const counts = emptyCounts();
     const dir = directory.value.replace(/\/+$/, "");
     body.replaceChildren(
       ...results.map((row) => {
-        counts[row.category as keyof typeof counts]++;
+        const category = row.category as ClassifierCategory;
+        counts[category]++;
         const tr = document.createElement("tr");
         [
-          row.filename,
-          row.suffix || text.none,
-          text.categories[row.category],
-          `${dir}/${row.category}/${row.filename}`,
-        ].forEach((value, index) => {
+          [{ text: row.filename }],
+          [{ text: row.suffix || text.none }],
+          categoryParts(
+            category,
+            text.categoryGloss[category],
+            text.categoryLang ?? undefined,
+          ),
+          [{ text: `${dir}/${row.category}/${row.filename}` }],
+        ].forEach((parts, index) => {
           const cell = document.createElement(index === 0 ? "th" : "td");
           if (index === 0) cell.setAttribute("scope", "row");
           cell.className = ["tok-string", "tok-number", "tok-type", ""][index];
-          cell.textContent = value;
+          cell.replaceChildren(...nodes(parts));
           tr.append(cell);
         });
         return tr;
       }),
     );
-    summary.textContent = `${results.length} ${results.length === 1 ? text.file : text.files} ${text.classified} · ${Object.entries(
-      counts,
-    )
-      .map(([category, count]) => `${text.categories[category]} ${count}`)
-      .join(" · ")}`;
+    summary.replaceChildren(
+      ...nodes(
+        summaryParts(
+          locale,
+          results.length,
+          counts,
+          text.summary,
+          text.categoryLang ?? undefined,
+        ),
+      ),
+    );
     if (sound) playSound("success");
   }
   [names, directory].forEach((input) => {

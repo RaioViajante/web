@@ -1,0 +1,187 @@
+import type { LocaleId } from "../../../../site/locales.ts";
+import type { ExperimentSurface } from "./experiments.ts";
+
+// Per-locale prose that belongs to an experiment's surface rather than to its
+// record: the fidelity rows and the related rows. Both tables are exhaustive
+// over the surfaces and the registry locales, so a new surface or locale fails
+// type checking until it is written.
+
+export interface FidelityRow {
+  label: string;
+  value: string;
+}
+
+export interface RelatedRow {
+  /** The visible name of the destination. */
+  label: string;
+  /** Language of `label` when it differs from the page, for example an English post title. */
+  labelLanguage?: LocaleId;
+  value: string;
+  href: string;
+  /** Language of the destination page. */
+  language: LocaleId;
+}
+
+const learningNotes =
+  "https://github.com/RaioViajante/x86-os-experiment/blob/e966889b56e613d92887338a1bc979674674a115/docs/01-boot-sector.md";
+
+/** Dump posts that exist only in English, linked deliberately from either locale. */
+const dump = {
+  edgeCases: {
+    label: "Apparently Moving a File Has Edge Cases",
+    labelLanguage: "en",
+    value: "dump ↗",
+    href: "https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases",
+    language: "en",
+  },
+  toml: {
+    label: "A TOML File Changed What Sweep Was",
+    labelLanguage: "en",
+    value: "dump ↗",
+    href: "https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was",
+    language: "en",
+  },
+  execution: {
+    label: "An Execution Is More Than a Row in a Database",
+    labelLanguage: "en",
+    value: "dump ↗",
+    href: "https://dump.raioviajante.com/posts/an-execution-is-more-than-a-row-in-a-database",
+    language: "en",
+  },
+  orbit: {
+    label: "I Got Bored of CRUD, So I'm Building a Scheduler",
+    labelLanguage: "en",
+    value: "dump ↗",
+    href: "https://dump.raioviajante.com/posts/building-orbit",
+    language: "en",
+  },
+  printf: {
+    label: "There Is No printf Down Here",
+    labelLanguage: "en",
+    value: "dump ↗",
+    href: "https://dump.raioviajante.com/posts/there-is-no-printf-down-here",
+    language: "en",
+  },
+} as const satisfies Record<string, RelatedRow>;
+
+export const fidelityRows = {
+  "filename-classifier": {
+    en: [
+      { label: "classification rules", value: "as documented in docs" },
+      { label: "suffix behavior", value: "Python 3.14 Path.suffix" },
+      { label: "file system access", value: "none · nothing moves" },
+      { label: "conflict check, size", value: "not reproduced" },
+    ],
+    "pt-BR": [
+      {
+        label: "regras de classificação",
+        value: "conforme documentadas no Docs",
+      },
+      { label: "comportamento da extensão", value: "Python 3.14 Path.suffix" },
+      {
+        label: "acesso ao sistema de arquivos",
+        value: "nenhum · nada é movido",
+      },
+      {
+        label: "verificação de conflitos e tamanho",
+        value: "não reproduzidas",
+      },
+    ],
+  },
+  "execution-states": {
+    en: [
+      { label: "transition rules", value: "ported from orbit cd97666" },
+      { label: "commands, scheduler", value: "none" },
+      { label: "persistence", value: "none · reload starts over" },
+      {
+        label: "retry and timeout",
+        value: "configuration only, not exercised",
+      },
+    ],
+    "pt-BR": [
+      { label: "regras de transição", value: "reproduzidas do Orbit cd97666" },
+      { label: "comandos, agendador", value: "nenhum" },
+      {
+        label: "persistência",
+        value: "nenhuma · recarregar a página recomeça do zero",
+      },
+      {
+        label: "retry e timeout",
+        value: "apenas configuração, não exercitados",
+      },
+    ],
+  },
+  "boot-sector": {
+    en: [
+      {
+        label: "source",
+        value: "real · revision e966889 · comments omitted",
+      },
+      { label: "execution", value: "none · not booted, not emulated" },
+      { label: "result", value: "documented in project notes" },
+    ],
+    "pt-BR": [
+      {
+        label: "código-fonte",
+        value: "real · revisão e966889 · comentários omitidos",
+      },
+      { label: "execução", value: "nenhuma · sem boot e sem emulação" },
+      { label: "resultado", value: "documentado nas anotações do projeto" },
+    ],
+  },
+} as const satisfies Record<
+  ExperimentSurface,
+  Record<LocaleId, readonly FidelityRow[]>
+>;
+
+export const relatedRows = {
+  "filename-classifier": {
+    en: [
+      {
+        label: "Sweep · classification",
+        value: "docs ↗",
+        href: "https://docs.raioviajante.com/projects/sweep/#classification",
+        language: "en",
+      },
+      dump.edgeCases,
+      dump.toml,
+    ],
+    "pt-BR": [
+      {
+        label: "Sweep · classificação",
+        value: "docs ↗",
+        href: "https://docs.raioviajante.com/pt/projetos/sweep/#classificação",
+        language: "pt-BR",
+      },
+      dump.edgeCases,
+      dump.toml,
+    ],
+  },
+  "execution-states": {
+    en: [dump.execution, dump.orbit],
+    "pt-BR": [dump.execution, dump.orbit],
+  },
+  "boot-sector": {
+    en: [
+      dump.printf,
+      {
+        label: "learning notes",
+        value: "github ↗",
+        href: learningNotes,
+        language: "en",
+      },
+    ],
+    "pt-BR": [
+      dump.printf,
+      {
+        label: "anotações de aprendizado",
+        value: "github ↗",
+        href: learningNotes,
+        language: "en",
+      },
+    ],
+  },
+} as const satisfies Record<
+  ExperimentSurface,
+  Record<LocaleId, readonly RelatedRow[]>
+>;

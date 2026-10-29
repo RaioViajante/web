@@ -2,9 +2,11 @@ import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { IndexHeader, Section, LeaderRow } from "@raioviajante/design/parts";
 import { ToggleButton } from "@raioviajante/design/components";
 import { experimentsFor, experimentPath } from "../data/experiments";
-import { experimentCount } from "../lib/experiment-count";
+import { experimentCount, experimentForms } from "../lib/experiment-count";
 import { displayDate, textFor } from "../lib/copy";
 import type { LocaleId } from "../../../../site/locales";
+
+const filters = ["all", "active", "done"] as const;
 
 export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
   const experiments = experimentsFor(locale);
@@ -23,23 +25,21 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
       />
       <Section
         number="00."
-        title={text.experiments}
+        title={text.headings.experiments}
         id="experiments"
         headingExtra={
           <div
             className="lab-filters"
             role="group"
-            aria-label={
-              locale === "en" ? "Filter experiments" : "Filtrar experimentos"
-            }
+            aria-label={text.filters.aria}
           >
-            {["all", "active", "done"].map((filter) => (
+            {filters.map((filter) => (
               <ToggleButton
                 key={filter}
                 pressed={filter === "all"}
                 data-filter={filter}
               >
-                {text.filters[filter as keyof typeof text.filters]}
+                {text.filters[filter]}
               </ToggleButton>
             ))}
           </div>
@@ -47,10 +47,8 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
       >
         <div
           data-experiment-list
-          data-count-copy={JSON.stringify({
-            one: text.count(1),
-            many: text.count(2).replace(/^2 /, ""),
-          })}
+          data-locale={locale}
+          data-count-copy={JSON.stringify(experimentForms(locale))}
         >
           {experiments.map((e) => (
             <article key={e.id} className="lab-entry" data-status={e.status}>
@@ -67,7 +65,7 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
               <p>{e.description}</p>
               <div className="lab-entry__meta">
                 {e.project} · {text.fidelityLabel[e.fidelity]} ·{" "}
-                {displayDate(e)}
+                <time dateTime={e.created}>{displayDate(e)}</time>
               </div>
             </article>
           ))}
@@ -78,26 +76,21 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
           aria-live="polite"
           data-filter-result
         >
-          {locale === "en"
-            ? experimentCount(experiments.length)
-            : text.count(experiments.length)}
+          {experimentCount(locale, experiments.length)}
         </p>
       </Section>
-      <Section number="00.1" title={text.whatRuns}>
-        <LeaderRow
-          label={text.fidelityLabel["runs here"]}
-          value={text.fidelityHelp[0]}
-        />
-        <LeaderRow
-          label={text.fidelityLabel.simulated}
-          value={text.fidelityHelp[1]}
-        />
-        <LeaderRow
-          label={text.fidelityLabel["source only"]}
-          value={text.fidelityHelp[2]}
-        />
+      <Section number="00.1" title={text.headings.whatRuns}>
+        {(["runs here", "simulated", "source only"] as const).map(
+          (fidelity) => (
+            <LeaderRow
+              key={fidelity}
+              label={text.fidelityLabel[fidelity]}
+              value={text.fidelityHelp[fidelity]}
+            />
+          ),
+        )}
       </Section>
-      <Section number="00.2" title={text.notebook} id="notebook">
+      <Section number="00.2" title={text.headings.notebook} id="notebook">
         <p>{text.notebookIntro}</p>
         {experiments.map((e) => (
           <LeaderRow
@@ -105,7 +98,9 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
             href={experimentPath(e)}
             label={
               <>
-                <span className="lab-date">{displayDate(e)}</span>
+                <span className="lab-date">
+                  <time dateTime={e.created}>{displayDate(e)}</time>
+                </span>
                 {e.title} {text.published}
               </>
             }

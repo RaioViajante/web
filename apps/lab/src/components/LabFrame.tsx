@@ -1,9 +1,14 @@
 import type { ReactNode } from "react";
 import { Shell } from "@raioviajante/design/shell";
-import { DEFAULT_LOCALE, type LocaleId } from "../../../../site/locales";
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  type LocaleId,
+} from "../../../../site/locales";
 import { SearchNavItem } from "@raioviajante/design/search";
 import { experimentsFor, experimentPath } from "../data/experiments";
 import { textFor } from "../lib/copy";
+import { routePath } from "../lib/routes";
 
 export function LabFrame({
   current,
@@ -16,43 +21,30 @@ export function LabFrame({
   counterpart?: string;
   children?: ReactNode;
 }) {
+  const text = textFor(locale);
+  const home = routePath("home", locale);
+  const onSearch = current === routePath("search", locale);
+  const onExperiment = current?.startsWith(
+    `${LOCALES[locale].urlPrefix}/experiments/`,
+  );
   return (
     <Shell
       site="lab"
       locale={locale}
-      language={{
-        search: current === (locale === "en" ? "/search/" : "/pt/search/"),
-        counterpart,
-      }}
-      termsHref="/terms/"
-      privacyHref="/privacy/"
-      termsLocale="en"
-      privacyLocale="en"
+      language={{ search: onSearch, counterpart }}
+      termsHref={routePath("terms", locale)}
+      privacyHref={routePath("privacy", locale)}
       pages={[
-        {
-          label: textFor(locale).experiments.toLowerCase(),
-          href: locale === "en" ? "/" : "/pt/",
-        },
-        {
-          label: textFor(locale).notebook.toLowerCase(),
-          href: `${locale === "en" ? "/" : "/pt/"}#notebook`,
-        },
+        { label: text.nav.experiments, href: home },
+        { label: text.nav.notebook, href: `${home}#notebook` },
       ]}
-      currentPage={
-        current === (locale === "en" ? "/search/" : "/pt/search/")
-          ? undefined
-          : current?.startsWith(`${locale === "en" ? "" : "/pt"}/experiments/`)
-            ? locale === "en"
-              ? "/"
-              : "/pt/"
-            : current
-      }
+      currentPage={onSearch ? undefined : onExperiment ? home : current}
       pagesExtra={
         <SearchNavItem
           number="02."
           site="lab"
           locale={locale}
-          current={current === (locale === "en" ? "/search/" : "/pt/search/")}
+          current={onSearch}
         />
       }
       experiments={[...experimentsFor(locale)].reverse().map((e) => ({
