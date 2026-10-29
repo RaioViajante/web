@@ -1,0 +1,303 @@
+---
+contentId: "split-my-internet-into-four-different-kinds-of-place"
+locale: "pt-BR"
+originalLocale: "en"
+title: "Dividi minha internet em quatro tipos diferentes de lugar"
+description: "Fui construindo lugares para diferentes tipos de trabalho até ficar óbvio que o meu site pessoal estava tentando ser, ao mesmo tempo, página inicial, caderno, site de documentação e laboratório de experimentos."
+publishedAt: "2026-10-29"
+tags:
+  - meta
+  - dump
+  - personal
+draft: false
+---
+
+Comecei com a ideia óbvia.
+
+Fazer um site pessoal.
+
+Colocar alguns projetos nele.
+
+Adicionar alguns links.
+
+Escrever o que estou fazendo.
+
+Talvez fazer parecer que eu sei aonde tudo isso vai chegar.
+
+Essa última parte provavelmente era ambiciosa demais.
+
+A primeira versão de [raioviajante.com](https://raioviajante.com) deveria ser um lugar para a minha identidade, os meus projetos e o que estivesse com a minha atenção no momento.
+
+Funcionou por um tempo.
+
+Aí os diferentes tipos de coisa que eu estava fazendo começaram a atrapalhar uns aos outros.
+
+Um card de projeto é útil para dizer que alguma coisa existe.
+
+É um lugar péssimo para explicar como eu, sem querer, dei a um script Python permissão para reorganizar os meus arquivos.
+
+Um texto é um bom lugar para contar essa história.
+
+É um lugar pior para guardar, seis meses depois, as instruções finais de uso de um sistema.
+
+E um experimento interativo tem uma função completamente diferente das duas.
+
+Em algum momento percebi que eu não estava tentando adicionar mais páginas a um site.
+
+Eu estava tentando dar a cada tipo de trabalho um lugar apropriado para existir.
+
+## O dump veio primeiro
+
+A primeira resposta foi o dump.
+
+Eu queria um lugar para escrever sobre as coisas que construo, aprendo, uso, exploro e de vez em quando quebro.
+
+Essa era a ideia original por trás de “Talvez isso vire alguma coisa um dia”.
+
+Escrever as coisas antes que elas desapareçam.
+
+Manter os erros na história.
+
+Admitir quando ainda não entendo o que estou fazendo.
+
+Acontece que o dump foi ficando mais específico do que um blog.
+
+Não quero muito que ele seja um fluxo de anúncios polidos sobre projetos concluídos.
+
+A parte útil geralmente vem antes disso.
+
+É o momento em que mover um arquivo vira uma discussão sobre políticas de conflito.
+
+É o momento em que uma aplicação CRUD começa a precisar de uma máquina de estados de execução.
+
+É o momento em que decido projetar uma linguagem de programação antes de ter escrito um compilador.
+
+Essas coisas são histórias porque têm um antes e um depois, mesmo quando o depois é, na maior parte, outra pergunta.
+
+O Dump pode conter pensamento inacabado.
+
+Essa é uma das razões de ele existir.
+
+## A documentação começou a parecer diferente
+
+O problema é que nem tudo deveria ficar em forma de história.
+
+Existe uma diferença entre:
+
+> Descobri isto enquanto construía a coisa.
+
+e:
+
+> É assim que a coisa funciona.
+
+A primeira precisa da confusão.
+
+A segunda precisa da confusão removida.
+
+Se escrevo sobre descobrir que um sistema precisa de uma determinada fronteira, a sequência dos acontecimentos importa.
+
+Se depois documento essa fronteira, a sequência é, na maior parte, ruído.
+
+Quero conseguir explicar o resultado estável sem obrigar ninguém a atravessar toda a minha relação emocional com ele.
+
+Isso levou a [docs.raioviajante.com](https://docs.raioviajante.com).
+
+A distinção vale também dentro do repositório.
+
+A documentação interna do repositório explica como um site é desenvolvido, mantido ou organizado.
+
+A documentação pública curada explica um assunto técnico que vale a pena tornar útil e navegável para outra pessoa.
+
+As duas são parentes, mas não são a mesma coisa.
+
+O Docs deve sobreviver à história que fez a documentação existir.
+
+O Dump tem permissão para lembrar da história.
+
+## Aí aconteceu o Lab
+
+O problema seguinte foram as coisas que queriam ser tocadas.
+
+Interfaces pequenas.
+
+Demonstrações minúsculas.
+
+Coisas interativas demais para serem um parágrafo e incompletas demais para merecerem um repositório de projeto só delas.
+
+Isso virou [lab.raioviajante.com](https://lab.raioviajante.com).
+
+O primeiro design do Lab usava fixtures fictícias convincentes.
+
+Um playground de parser.
+
+Um visualizador de cron.
+
+Elas eram úteis enquanto eu descobria como o site deveria parecer.
+
+Também sugeriam, de forma discreta, que havia implementações reais de parser e de agendador por trás delas.
+
+Não havia.
+
+Isso começou a me incomodar.
+
+Não há nada de errado com uma fixture de design durante o trabalho de design.
+
+Mas, quando o Lab virou uma coleção pública, uma página interativa precisava ser honesta sobre de onde vinha o seu comportamento.
+
+Uma interface convincente não deveria insinuar em silêncio que existe código em algum lugar quando não existe.
+
+Então as fixtures fictícias foram removidas e a coleção foi reconstruída em torno de trabalho real:
+
+`001` é um classificador de nomes de arquivo baseado no Sweep.
+
+`002` é um experimento de estado de execução baseado no Orbit.
+
+`003` é um experimento de setor de boot baseado no x86-os-experiment.
+
+Os experimentos são deliberadamente limitados.
+
+O classificador de nomes de arquivo não inspeciona nem move arquivos.
+
+A página de estado de execução não roda comandos e não tem nenhum agendador por trás.
+
+A página do setor de boot apresenta assembly real e comportamento documentado, mas não dá boot nem emula nada no navegador.
+
+Isso é um pouco menos impressionante do que fingir que as páginas são versões em miniatura dos projetos.
+
+Também é muito mais interessante para mim.
+
+## Quatro lugares, uma identidade
+
+Então agora são quatro sites:
+
+[raioviajante.com](https://raioviajante.com) diz o que existe e o que está com a minha atenção no momento.
+
+[dump.raioviajante.com](https://dump.raioviajante.com) conta a história.
+
+[docs.raioviajante.com](https://docs.raioviajante.com) explica o conhecimento técnico estável.
+
+[lab.raioviajante.com](https://lab.raioviajante.com) deixa você tocar na ideia.
+
+São repositórios separados e deploys separados.
+
+Eles também foram feitos para parecer partes do mesmo lugar.
+
+Os sites compartilham uma linguagem visual, incluindo a paleta contida, a tipografia e a recusa geral a colocar cada informação dentro de um card arredondado.
+
+A IBM Plex Mono cuida do que identifica e localiza: navegação, rótulos, caminhos e metadados.
+
+A Source Serif 4 cuida do que explica: o texto, os argumentos e as descrições.
+
+Mono identifica. Serif fala.
+
+Esse princípio acabou sendo mais útil do que eu esperava.
+
+Os sites têm funções diferentes, mas não precisam de personalidades diferentes.
+
+Eles devem parecer cômodos da mesma casa.
+
+A casa pode conter um setor de boot x86, um agendador em Java em andamento, um documento de design de linguagem e um organizador de arquivos.
+
+Nunca disse que os cômodos combinariam.
+
+## Por que não manter tudo num site só?
+
+Tecnicamente, eu poderia ter feito um site só com:
+
+`/projects`
+
+`/blog`
+
+`/docs`
+
+`/lab`
+
+Esse não era bem o problema.
+
+O problema era o que cada lugar me faria esperar ao ser aberto.
+
+Quando escrevo no dump, posso contar a versão bagunçada.
+
+Posso dizer que comecei com o modelo mental errado, mostrar o teste minúsculo que o mudou e admitir que ainda não sei o que acontece depois.
+
+Quando escrevo documentação, devo me importar mais com a explicação continuar útil do que com recriar a ordem em que eu aprendi.
+
+Quando publico algo no Lab, tem que ser pequeno o bastante para tocar e honesto sobre o que está reproduzindo.
+
+Quando atualizo o root, a resposta deve ser concisa.
+
+O mesmo projeto pode aparecer em vários lugares, mas não precisa falar no mesmo registro em todos eles.
+
+O Sweep pode ser uma entrada curta no root, uma história sobre conflitos de arquivo no dump, uma futura referência útil no docs e um classificador que você pode experimentar no Lab.
+
+São quatro formas diferentes de dizer algo sobre o mesmo trabalho.
+
+## Infraestrutura para a curiosidade
+
+Fico construindo coisas que não pertencem naturalmente à mesma categoria de portfólio.
+
+Automação em Python.
+
+Java e Spring.
+
+Design de linguagem.
+
+Sistemas operacionais.
+
+Rust e ideias de sistemas que hoje existem em algum ponto entre uma especificação e uma função `main` vazia.
+
+Eu poderia forçar tudo isso num grid convencional de projetos.
+
+Provavelmente ficaria arrumado.
+
+Também esconderia o motivo de eu estar fazendo qualquer uma dessas coisas.
+
+Os projetos se ligam menos pelo que produzem do que pelo hábito por trás deles: percebo algo que não entendo, sigo mais longe do que era estritamente necessário e acabo criando um repositório.
+
+O ecossistema é a infraestrutura desse hábito.
+
+Isso soa mais grandioso do que é.
+
+Na maior parte, significa que agora tenho onde colocar a explicação quando um projeto pessoal começa a gerar mais perguntas do que código.
+
+## Isso é objetivamente demais para um site pessoal
+
+Eu queria um lugar para colocar os meus projetos.
+
+Acabei com quatro sites, quatro repositórios e quatro builds.
+
+Há documentos explicando para que serve cada site de documentos.
+
+Há notas de proveniência explicando por que uma demo no navegador pode se chamar de real.
+
+Em algum momento tive que admitir que talvez tenha construído infraestrutura em volta do ato de escrever sobre infraestrutura.
+
+Isso provavelmente é o que acontece quando me deixam sozinho com um computador e uma distinção não resolvida.
+
+A parte engraçada é que a separação fez o trabalho parecer mais simples.
+
+Não preciso decidir se uma ideia nova é importante o bastante para o site único.
+
+Posso fazer uma pergunta menor.
+
+Isto é uma atualização de identidade, uma história, conhecimento estável ou algo em que posso fazer as pessoas tocarem?
+
+## As caixas podem vazar
+
+Os quatro sites só tomaram essa forma há pouco tempo, então não espero que as fronteiras fiquem perfeitamente limpas.
+
+Alguns experimentos vão virar projetos.
+
+Algumas decisões de projeto vão virar textos.
+
+Alguns textos talvez virem documentação quando as partes incertas se acalmarem.
+
+O root vai continuar mudando porque o que está com a minha atenção no momento continua mudando.
+
+Esse movimento não é uma falha da estrutura.
+
+É a razão de a estrutura precisar ser flexível.
+
+A ideia nunca foi dar a cada ideia uma caixa perfeita.
+
+Era tornar a próxima ideia estranha um pouco mais fácil de encaixar em algum lugar.

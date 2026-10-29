@@ -1,0 +1,301 @@
+---
+contentId: "started-designing-a-language-before-i-could-compile-one"
+locale: "pt-BR"
+originalLocale: "en"
+title: "Comecei a projetar uma linguagem antes de conseguir compilar uma"
+description: "Comecei a projetar a yanawa ainda aprendendo como linguagens de programação e compiladores são construídos, e descobri que decidir o que uma linguagem deve ser é um tipo próprio de trabalho técnico."
+publishedAt: "2026-10-29"
+tags:
+  - programming-languages
+  - language-design
+  - compilers
+draft: false
+---
+
+Ultimamente tenho construído algumas coisas que me fizeram pensar com mais cuidado sobre o que eu realmente gosto em software.
+
+O Sweep está me fazendo pensar em trabalho chato e em quanta autoridade eu quero dar a um script sobre os meus arquivos.
+
+O Orbit está me fazendo pensar em estado, fronteiras e em todas as formas como uma aplicação simples pode começar a fazer perguntas difíceis.
+
+E, em algum ponto no meio disso tudo, comecei a projetar uma linguagem de programação.
+
+O que é uma coisa totalmente razoável de se fazer quando você ainda está aprendendo como linguagens de programação são construídas.
+
+A linguagem se chama [yanawa](https://github.com/yanawa/yanawa).
+
+Ela não executa.
+
+Não existe compilador.
+
+Não existe lexer, parser, verificador de tipos, interpretador, runtime, CLI nem REPL.
+
+Não existe nem um programa yanawa executável esperando em algum lugar que eu descubra o comando certo.
+
+Neste momento, a yanawa é um repositório cheio de documentos de design.
+
+E, de alguma forma, isso já começou a dar a sensação de estar construindo alguma coisa.
+
+## Eu não comecei pela sintaxe
+
+Meu primeiro instinto foi pensar nas partes divertidas.
+
+As funções deveriam usar `fn`?
+
+Os blocos deveriam usar chaves ou indentação?
+
+A linguagem deveria ter uma forma especial de declarar valores imutáveis?
+
+São o tipo de pergunta que faz uma linguagem parecer real muito rápido.
+
+Você escreve alguns exemplos, discute pontuação e de repente tem opiniões sobre ponto e vírgula.
+
+É assim que a civilização acaba.
+
+Mas, quanto mais eu anotava, mais óbvio ficava que a sintaxe não era o problema de verdade.
+
+As perguntas mais difíceis eram coisas como:
+
+Para que tipo de programa a yanawa serve?
+
+O que deve ser explícito?
+
+O que o compilador deveria poder inferir com segurança?
+
+Quando uma anotação de tipo comunica algo útil, e quando ela só repete informação?
+
+Que tipos de erro deveriam ser difíceis de expressar?
+
+Como deve ser o código de uma aplicação quando ele precisa conversar com um banco de dados, um serviço HTTP ou um sistema externo pouco confiável?
+
+Essas perguntas vêm antes de decidir se um bloco termina com `}` ou com uma mudança de indentação.
+
+Então o primeiro marco de verdade não foi um marco de compilador.
+
+Foi definir o que a yanawa está tentando se tornar.
+
+## Sintaxe familiar, menos coisas para repetir
+
+A direção atual é bem simples de descrever, pelo menos antes de os detalhes começarem a brigar entre si.
+
+A yanawa pretende ser uma linguagem orientada a aplicações, com tipagem estática forte e menos cerimônia.
+
+O objetivo não é deixar todo programa o mais curto possível.
+
+Isso geralmente vira uma competição para ver quem esconde mais informação no menor número de caracteres.
+
+Quero que o código seja conciso quando o compilador já sabe algo, mantendo visível o comportamento que importa.
+
+Por exemplo, a direção atual da sintaxe permite que o tipo seja inferido quando o valor deixa isso óbvio:
+
+```yanawa
+let name = "Morgan"
+let age = 29
+let active = true
+```
+
+A versão explícita equivalente continuaria disponível:
+
+```yanawa
+let name: str = "Morgan"
+let age: int = 29
+let active: bool = true
+```
+
+Não é uma ideia revolucionária.
+
+Também é exatamente o tipo de coisa a que eu sempre volto.
+
+A tipagem forte deveria me dar garantias úteis sem me obrigar a escrever o mesmo fato duas vezes só porque a linguagem insiste.
+
+Ao mesmo tempo, a inferência não deveria virar desculpa para o compilador tomar decisões surpreendentes em meu nome.
+
+Existe uma diferença entre deduzir um tipo e introduzir silenciosamente uma transação de banco de dados.
+
+Uma é informação que o compilador já consegue ver.
+
+A outra é comportamento com consequências.
+
+Essa distinção está virando uma das restrições de design mais importantes da yanawa.
+
+## A sintaxe ainda é uma proposta
+
+A direção atual usa blocos baseados em indentação, com dois-pontos:
+
+```yanawa
+fn greet(name: str) -> str:
+    return "Hello, {name}"
+```
+
+Para mim, isso é legível.
+
+Também é parecido o bastante com coisas que eu já entendo, então não preciso gastar meu primeiro dia aprendendo um sistema novo de pontuação antes de conseguir pensar no programa em si.
+
+Mas isso é uma proposta.
+
+Nenhum compilador aceita isso.
+
+O mesmo vale para valores anuláveis. O design hoje tende a deixar os tipos comuns não anuláveis por padrão, com a ausência tornada explícita:
+
+```yanawa
+let nickname: str? = none
+```
+
+Gosto da ideia de que `str` e `str?` signifiquem coisas diferentes.
+
+Gosto de que um valor que pode estar ausente deixe essa possibilidade visível para quem lê o código.
+
+Essas ideias me parecem mais duradouras do que a grafia exata.
+
+Talvez a sintaxe fique como `T?` e `none`.
+
+Talvez parte dela mude depois que o compilador existir e começar a encontrar buracos no meu raciocínio.
+
+Essa é a distinção que estou tentando manter clara:
+
+que a ausência seja explícita é um princípio de design.
+
+`str?` é uma proposta de sintaxe atual.
+
+Tipagem forte com inferência útil é uma direção.
+
+As regras exatas de inferência ainda são algo que preciso resolver.
+
+Estou aprendendo que dá para ter confiança sobre um problema e continuar indeciso sobre a implementação.
+
+Isso é muito inconveniente para quem gostaria de terminar uma linguagem até a próxima terça-feira.
+
+## Structs, erros e a parte voltada para aplicações
+
+Hoje a yanawa tende a blocos de construção familiares, como structs, enums e traits, preferindo composição a um design tradicional cheio de classes.
+
+O design atual tem exemplos como:
+
+```yanawa
+struct User:
+    id: int
+    name: str
+```
+
+De novo, é um exemplo de direção, não uma funcionalidade que eu possa usar.
+
+O motivo de eu voltar sempre a essas peças de aparência comum é que quero que a linguagem gaste a sua novidade com cuidado.
+
+Ela não precisa de uma forma nova de declarar cada conceito familiar só para provar que é uma linguagem nova.
+
+As perguntas mais interessantes estão nas fronteiras da aplicação.
+
+Aplicações precisam lidar com HTTP, JSON, configuração, bancos de dados e serviços externos. Também precisam lidar com entrada inválida, valores ausentes, timeouts e falhas que não ligam para o quanto o código parecia elegante no editor.
+
+O repositório explora se uma linguagem orientada a aplicações e as suas ferramentas oficiais deveriam entender mais sobre essas fronteiras do que uma linguagem de propósito geral costuma entender.
+
+Isso não quer dizer que a yanawa tenha HTTP embutido.
+
+Ela não tem suporte a JSON, camada de banco de dados nem rotas tipadas.
+
+Me interessa a pergunta em si.
+
+Se uma linguagem é projetada em torno do desenvolvimento de aplicações, a linguagem, a biblioteca padrão e as ferramentas deveriam compartilhar mais informação sobre os lugares em que o código da aplicação encontra o mundo exterior?
+
+Isso poderia eliminar parte do mapeamento mecânico entre tipos, rotas, validação, serialização e configuração de framework sem esconder o que o programa está fazendo?
+
+Ainda não sei.
+
+Mas me parece uma pergunta melhor do que adicionar mais uma anotação porque todo outro ecossistema tem uma.
+
+## Aí cheguei ao problema do compilador
+
+Em algum momento, documentos de design deixam de ser suficientes.
+
+O próximo marco é o Compiler Foundation, que é onde a yanawa começa a ter que virar software em vez de só um conjunto de intenções cuidadosamente redigidas.
+
+Isso significa um workspace, arquivos-fonte, spans de código-fonte, diagnósticos e testes.
+
+Com o tempo, significa um lexer transformando texto-fonte em tokens, um parser construindo uma árvore sintática, resolução de nomes, checagem de tipos, análise semântica e algum tipo de caminho de execução.
+
+A arquitetura atual do compilador descreve um possível pipeline:
+
+```text
+source code
+    ↓
+lexer
+    ↓
+tokens
+    ↓
+parser
+    ↓
+syntax tree
+    ↓
+type checking
+    ↓
+semantic representation
+    ↓
+target output
+```
+
+Há mais etapas na direção real do design, incluindo lowering, uma representação intermediária e geração de código.
+
+Nenhuma dessas etapas está implementada.
+
+Nem a linguagem de implementação está definida ainda.
+
+Hoje consigo desenhar um pipeline de compilador com mais confiança do que consigo escrever um.
+
+Isso parece um problema.
+
+Também parece o próximo problema útil.
+
+## Tenho opiniões sobre uma linguagem que não executa
+
+A parte desconfortável é que a yanawa não consegue executar isto:
+
+```yanawa
+fn main():
+    print("Hello, World!")
+```
+
+Ela também não consegue rejeitar.
+
+Ainda não existe lexer, então a linguagem hoje não é capaz nem de ter um token inválido.
+
+Tenho opiniões sobre tratamento de erros numa linguagem que não consegue produzir um erro.
+
+Tenho ideias sobre diagnósticos do compilador mesmo sem haver compilador para apontar um span de código-fonte.
+
+Tenho escrito sobre não anulabilidade sem possuir absolutamente nenhum mecanismo que impeça um valor anulável de ser usado do jeito errado.
+
+Isso é ou prematuro, ou exatamente o tipo de trabalho de definir restrições que deixa a implementação menos sem rumo depois.
+
+Provavelmente os dois.
+
+O importante é não fingir que um documento de design é prova de que uma funcionalidade funciona.
+
+O marco de identidade da linguagem não significa que a versão um da yanawa esteja projetada e esperando para ser baixada.
+
+Significa que o projeto tem uma ideia mais clara de quais perguntas está tentando responder.
+
+É uma conquista menor do que ter um compilador.
+
+Ainda assim, é uma conquista.
+
+## Então isso também é construir
+
+Comecei a yanawa porque queria entender melhor as linguagens de programação.
+
+Isso continua sendo verdade.
+
+Mas eu também queria ver se as coisas que me incomodam no desenvolvimento de aplicações poderiam ser descritas com precisão suficiente para projetar em torno delas.
+
+Essa parte foi mais difícil do que escolher sintaxe.
+
+É fácil dizer “menos cerimônia”.
+
+É mais difícil decidir qual cerimônia é acidental, qual comunica algo importante e qual atalho esperto vai virar a sessão de debug de outra pessoa mais tarde.
+
+Por enquanto, a yanawa é uma linguagem feita de restrições, exemplos, perguntas em aberto e uma quantidade suspeita de Markdown.
+
+O próximo passo é o Compiler Foundation.
+
+Em breve vou ter que fazer o primeiro desses exemplos significar alguma coisa para uma máquina.
+
+E então a linguagem finalmente vai poder começar a discordar de mim.

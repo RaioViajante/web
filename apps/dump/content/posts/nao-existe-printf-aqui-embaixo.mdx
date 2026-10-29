@@ -1,0 +1,433 @@
+---
+contentId: "there-is-no-printf-down-here"
+locale: "pt-BR"
+originalLocale: "en"
+title: "Não existe printf aqui embaixo"
+description: "Meus primeiros passos em assembly x86, interrupções da BIOS, setores de boot e a estranha constatação de que não existe mais um sistema operacional embaixo de mim."
+publishedAt: "2026-10-29"
+tags:
+  - osdev
+  - assembly
+  - x86
+draft: false
+---
+
+Passei a maior parte do meu tempo programando em cima de um monte de coisas que eu não sei direito como funcionam por baixo.
+
+Sistemas operacionais, runtimes, bibliotecas, frameworks.
+
+Elas simplesmente estão ali.
+
+Recentemente, decidi tentar construir um sistema operacional minúsculo em assembly x86. Estou usando a série *Building an OS*, do Nanobyte, como referência enquanto tento entender o que de fato estou digitando.
+
+Ele ainda não tem nome.
+
+E, sinceramente, ainda não entendo a maior parte disso.
+
+Mas estou ridiculamente empolgado.
+
+Então, estas são basicamente as primeiras linhas que escrevi:
+
+```asm
+org 0x7C00
+bits 16
+```
+
+`org 0x7C00` diz ao NASM para calcular rótulos e endereços de memória assumindo que nosso código será carregado no endereço `0x7C00`.
+
+Por que `0x7C00`?
+
+Porque é ali que uma BIOS tradicional carrega o setor de boot antes de passar o controle para ele.
+
+Depois temos:
+
+```asm
+bits 16
+```
+
+que diz ao NASM para gerar instruções x86 de 16 bits.
+
+Nesse ponto, o processador está rodando em modo real.
+
+Eu costumava escrever código assumindo que existia um sistema operacional inteiro embaixo de mim.
+
+Agora estou escrevendo a coisa que roda antes mesmo de o sistema operacional existir.
+
+Isso é esquisito.
+
+E extremamente legal.
+
+## Aparentemente uma quebra de linha precisa de dois números
+
+Em seguida, escrevi isto:
+
+```asm
+%define ENDL 0x0D, 0x0A
+```
+
+No começo, eu não fazia a menor ideia de por que se chamava `ENDL`.
+
+O Nanobyte chamou assim, então eu também chamei.
+
+Imagino que signifique algo como "end line".
+
+Não é uma palavra-chave especial do NASM nem nada do tipo. É só uma constante que nós mesmos definimos.
+
+`0x0D` é um carriage return e `0x0A` é um line feed.
+
+Juntos, eles formam uma nova linha.
+
+Aparentemente até apertar Enter tem lore.
+
+## Onde tudo começa
+
+Depois:
+
+```asm
+start:
+    jmp main
+```
+
+`start` é só um rótulo.
+
+A primeira coisa que o bootloader faz é pular para `main`.
+
+E `jmp` significa literalmente jump, ou seja, pular.
+
+Finalmente, uma coisa aqui é exatamente tão idiotamente simples quanto parece.
+
+## Minha primeira rotina
+
+Depois eu precisava de um jeito de imprimir uma string.
+
+Vou chamar isto de rotina porque, aparentemente, já sou baixo nível o bastante para que chamar tudo de "função" pareça suspeito.
+
+```asm
+puts:
+    push si
+    push ax
+```
+
+Esta rotina vai modificar `SI` e `AX`, então salvamos os valores atuais deles na pilha primeiro.
+
+Mais tarde vamos restaurá-los.
+
+Já com saudade das variáveis locais.
+
+Aí chegamos à parte que mais me confundiu:
+
+```asm
+.loop:
+    lodsb
+
+    or al, al
+    jz .done
+
+    mov ah, 0x0E
+    mov bh, 0x00
+    int 0x10
+
+    jmp .loop
+```
+
+Vamos tentar entender essa bagunça.
+
+`lodsb` carrega um byte do endereço apontado por `DS:SI` para o registrador `AL`.
+
+Depois, move `SI` para o próximo byte.
+
+Então, basicamente, estamos percorrendo nossa string um caractere por vez.
+
+Só que existe um pequeno detalhe.
+
+Se `lodsb` avança ou recua depende de algo chamado Direction Flag.
+
+Então, antes de usá-lo, eu limpo explicitamente essa flag mais adiante com:
+
+```asm
+cld
+```
+
+Isso garante que `SI` avance.
+
+Essa já é uma das coisas que estou começando a gostar na programação de baixo nível.
+
+Seu código pode funcionar dependendo de algum estado da CPU que você nem sabia que existia.
+
+Depois temos isto:
+
+```asm
+or al, al
+jz .done
+```
+
+Isso me pareceu completamente inútil.
+
+Estamos fazendo uma operação OR entre `AL` e ele mesmo.
+
+O valor não muda.
+
+Então... por quê?
+
+Porque as flags da CPU mudam.
+
+Se `AL` contém `0`, a Zero Flag é ativada.
+
+Então o `jz`, que significa "pular se for zero", nos manda para `.done`.
+
+E por que nos importamos com um zero?
+
+Porque a string termina com um byte nulo.
+
+Então isto:
+
+```asm
+or al, al
+jz .done
+```
+
+é basicamente a nossa versão amaldiçoada, em assembly, de:
+
+```text
+if character == 0:
+    stop
+```
+
+Aparentemente tiraram de mim as instruções `if`.
+
+Agora vem a parte que realmente imprime alguma coisa:
+
+```asm
+mov ah, 0x0E
+mov bh, 0x00
+int 0x10
+```
+
+A interrupção `0x10` da BIOS, função `0x0E`, oferece um serviço de saída teletype.
+
+O caractere que queremos imprimir já está em `AL`.
+
+Colocamos `0x0E` em `AH` para selecionar a função da BIOS e depois chamamos:
+
+```asm
+int 0x10
+```
+
+E a BIOS imprime o caractere para a gente.
+
+Sem biblioteca padrão.
+
+Sem emulador de terminal.
+
+Sem `printf`.
+
+Estou literalmente pedindo para a BIOS colocar um caractere na tela.
+
+Não sei por quê, mas essa é uma das coisas mais legais que programei em muito tempo.
+
+Depois:
+
+```asm
+jmp .loop
+```
+
+e fazemos tudo de novo.
+
+Um caractere por vez, até encontrarmos o byte nulo.
+
+## Então é isso que `ret` faz
+
+Quando terminamos:
+
+```asm
+.done:
+    pop ax
+    pop si
+    ret
+```
+
+Os `pop`s restauram os registradores que salvamos antes de entrar na rotina.
+
+Mas `ret` era outra instrução que eu tinha digitado, no começo, sem saber direito o que diabos ela estava fazendo.
+
+Começou a fazer sentido quando olhei para isto:
+
+```asm
+call puts
+```
+
+`call` não simplesmente pula para `puts`.
+
+Antes de pular, ele salva na pilha o endereço da próxima instrução.
+
+Depois, quando `puts` chega em:
+
+```asm
+ret
+```
+
+`ret` pega esse endereço de volta da pilha e a execução continua de onde a rotina foi chamada.
+
+Então `call` e `ret` juntos nos dão algo que começa a se parecer um pouco mais com as chamadas de função a que estou acostumado.
+
+A pilha já está fazendo muito mais trabalho do que eu esperava.
+
+## Por fim, `main`
+
+Agora chegamos aqui:
+
+```asm
+main:
+    mov ax, 0
+    mov ds, ax
+    mov es, ax
+```
+
+Estamos inicializando nossos registradores de segmento.
+
+Com `DS` em zero, os endereços ficam bem mais fáceis de eu raciocinar por enquanto.
+
+Depois inicializamos a pilha:
+
+```asm
+mov ss, ax
+mov sp, 0x7C00
+```
+
+O ponteiro da pilha começa em `0x7C00`.
+
+E as pilhas x86 crescem para baixo.
+
+O que é engraçado, porque o nosso próprio bootloader acabou de ser carregado em `0x7C00`.
+
+Então nosso código fica acima desse endereço, enquanto a pilha começa a crescer para dentro da memória abaixo dele.
+
+Depois adicionei:
+
+```asm
+cld
+```
+
+para garantir que instruções de string como `lodsb` avancem pela memória.
+
+Por fim:
+
+```asm
+mov si, msg_hello
+call puts
+```
+
+`SI` agora aponta para a nossa mensagem:
+
+```asm
+msg_hello: db 'Hello, World!', ENDL, 0
+```
+
+E esse `0` final é importante.
+
+É o byte nulo que o nosso loop está procurando.
+
+`puts` percorre a mensagem um byte por vez, pede para a BIOS imprimir cada caractere e para quando chega nesse zero.
+
+Depois:
+
+```asm
+hlt
+```
+
+`hlt` diz ao processador para parar de executar instruções até que uma interrupção o acorde.
+
+E logo depois disso tenho:
+
+```asm
+.halt:
+    jmp .halt
+```
+
+Assim, se a execução continuar, apenas pulamos para o mesmo lugar para sempre, em vez de deixar a CPU começar a executar, sem querer, quaisquer bytes que por acaso venham depois do nosso código.
+
+Nunca achei um loop infinito tão reconfortante.
+
+## 512 bytes
+
+E aí tem provavelmente a minha parte favorita:
+
+```asm
+times 510 - ($ - $$) db 0
+dw 0xAA55
+```
+
+Um setor de boot de BIOS tradicional ocupa exatamente 512 bytes.
+
+Isto:
+
+```asm
+times 510 - ($ - $$) db 0
+```
+
+preenche o espaço restante com zeros até o byte 510.
+
+Depois escrevemos:
+
+```asm
+dw 0xAA55
+```
+
+Como o x86 é little-endian, esses bytes aparecem no binário final como:
+
+```text
+55 AA
+```
+
+Esses são os dois últimos bytes do setor.
+
+A BIOS verifica essa assinatura para reconhecer o setor como inicializável.
+
+Então, pelo que entendo hoje, a conversa é basicamente:
+
+```text
+eu:   aqui estão 512 bytes
+BIOS: os dois últimos são 55 AA?
+eu:   sim
+BIOS: serve pra mim
+```
+
+O que parece uma quantidade absurda de confiança para depositar em alguém que aprendeu o que `ret` faz há cinco minutos.
+
+## E, de algum jeito, ele deu boot
+
+Estou escrevendo tudo isso no Vim e rodando dentro do QEMU.
+
+Montei o setor de boot, iniciei a máquina virtual e, depois de um tempo, vi:
+
+```text
+Hello, World!
+```
+
+Só isso.
+
+Treze caracteres.
+
+Provavelmente a saída menos impressionante com a qual já me empolguei tanto.
+
+Mas dessa vez não havia Node por baixo.
+
+Nem JVM.
+
+Nem libc.
+
+Nem sistema operacional.
+
+Nem `printf`.
+
+Só uma CPU acordando em modo real de 16 bits, um código que eu escrevi e uma BIOS que, aparentemente, estava disposta a confiar em mim.
+
+Ainda não entendo uma parte enorme do que está acontecendo aqui.
+
+E essa provavelmente é a melhor parte.
+
+Existe tanta coisa por baixo das abstrações que uso todo dia e em que eu nunca parei para pensar de verdade.
+
+Por enquanto, tenho 512 bytes.
+
+E, de algum jeito, eles dão boot.

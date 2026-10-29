@@ -1,0 +1,224 @@
+---
+contentId: "gave-one-operation-more-than-one-deadline"
+locale: "pt-BR"
+originalLocale: "en"
+title: "Dei mais de um deadline para uma única operação"
+description: "Achei que o jobs-mcp tinha um único deadline do chamador, mas paginação, retries, pacing e transporte tinham, cada um, adquirido a própria interpretação do tempo restante."
+publishedAt: "2026-10-29"
+tags:
+  - typescript
+  - reliability
+  - time
+  - mcp
+draft: false
+---
+
+Achei que tinha implementado um deadline.
+
+O chamador podia dizer que uma operação tinha que terminar até um determinado horário, e o `jobs-mcp` pararia quando esse horário chegasse.
+
+Razoável.
+
+Só que uma única operação não era necessariamente uma única requisição.
+
+Listar vagas de emprego podia envolver várias páginas. Uma requisição podia esperar em uma fila, ser atrasada pelo pacing, falhar e ser tentada de novo, receber um `Retry-After` e, por fim, passar algum tempo dentro da tentativa de transporte ativa.
+
+Buscar uma vaga podia passar por muitas dessas mesmas etapas.
+
+Em algum ponto do caminho, eu tinha construído vários lugares que podiam olhar o deadline de relógio de parede do chamador e decidir quanto tempo restava.
+
+Minha intenção era dar um único limite à operação.
+
+Na prática, eu tinha dado a diferentes partes dela a sua própria interpretação desse limite.
+
+## A requisição era o limite errado
+
+O primeiro modelo mental estava perto demais da requisição de rede.
+
+Algo ia fazer uma requisição, então calculava o tempo restante e providenciava para que essa requisição parasse quando a duração expirasse.
+
+Aí outra página precisava ser buscada.
+
+Esse código também podia calcular o tempo restante.
+
+Aí acontecia um retry.
+
+Ele podia fazer a mesma coisa de novo.
+
+Os cálculos individuais tentavam, todos, respeitar o mesmo deadline. Foi isso que fez o modelo parecer correto por mais tempo do que deveria.
+
+Mas o que o chamador pediu não era:
+
+```text
+fazer uma requisição HTTP
+```
+
+Era mais parecido com:
+
+```text
+concluir esta operação jobs.list antes do deadline
+```
+
+As páginas faziam parte dessa operação.
+
+Os retries também.
+
+Assim como cada momento gasto esperando permissão para fazer a próxima tentativa.
+
+O limite de tempo pertencia à operação inteira, não a qualquer requisição que estivesse ativa quando alguém olhasse o relógio.
+
+## Relógios de parede respondem a outra pergunta
+
+O deadline chegava como um timestamp de relógio de parede.
+
+Isso fazia sentido na fronteira. O chamador precisava de uma forma reconhecível de dizer:
+
+```text
+não continue depois deste timestamp
+```
+
+Meu erro foi continuar usando esse timestamp como fonte do orçamento dentro da operação.
+
+Depois que o trabalho começava, eu não precisava continuar perguntando que horas eram. Precisava medir quanto da duração original já tinha sido gasto.
+
+O relógio de parede pode se mover, porque o relógio do sistema pode ser ajustado. Na maioria das vezes eu nunca notaria. Código que mede um orçamento decorrido não pode fazer essa suposição.
+
+Se eu faço repetidamente algo conceitualmente assim:
+
+```text
+remaining = wall-clock deadline - wall-clock now
+```
+
+então cada cálculo pede ao relógio de parede que interprete o orçamento de novo.
+
+O que eu realmente precisava era de um único ponto de término monotônico. O tempo monotônico é útil aqui porque avança, para fins de medir tempo decorrido, mesmo que o relógio do sistema seja corrigido enquanto a operação está em andamento.
+
+O modelo corrigido converte o deadline de relógio de parede do chamador uma única vez, quando a operação lógica começa. Isso produz uma duração restante e um ponto de término monotônico.
+
+Depois disso, a operação para de traduzir o timestamp em novos orçamentinhos. Todas as partes dela caminham para o mesmo fim.
+
+## Tentar de novo não cria mais tempo
+
+Os retries deixaram o problema de ownership muito mais fácil de enxergar.
+
+Suponha que uma operação comece com dez segundos disponíveis.
+
+A primeira tentativa espera pelo pacing, gasta tempo na rede e falha.
+
+A próxima tentativa não tem dez segundos.
+
+Tem o que sobrou depois de tudo isso.
+
+Isso soa dolorosamente óbvio quando escrito em duas frases.
+
+Fica mais fácil de violar quando o código de retry aceita uma duração e cada tentativa cria sua própria maquinaria de timeout. Uma tentativa nova pode começar a parecer um orçamento novo, mesmo sendo só mais uma tentativa de terminar o mesmo trabalho.
+
+O mesmo vale para o `Retry-After`.
+
+Se uma resposta manda esperar mais do que a operação pode pagar, a espera não vira exceção só porque o servidor pediu. A operação não pode tomar tempo emprestado de fora do próprio deadline.
+
+Ou espera dentro do orçamento restante ou chega primeiro ao ponto de término.
+
+O deadline não é só um limite para a atividade de rede produtiva.
+
+É um limite para quanto tempo o chamador está disposto a deixar a operação inteira existir.
+
+## Esperar também faz parte da operação
+
+As camadas de fila e de pacing foram outro jeito útil de entender isso errado.
+
+É tentador pensar no timeout como algo que começa quando os bytes começam a trafegar.
+
+Mas uma operação pode passar a maior parte da vida sem trafegar para lugar nenhum.
+
+Pode esperar atrás de outro trabalho.
+
+Pode esperar um intervalo de pacing.
+
+Pode esperar antes de tentar de novo.
+
+Pode esperar porque o lado remoto pediu que ela diminuísse o ritmo.
+
+Do ponto de vista do chamador, tudo isso é tempo gasto.
+
+Se uma operação tem um segundo restante e espera dois segundos em uma fila, o resultado correto não é começar uma nova tentativa de transporte com um timeout novo. O trabalho já está atrasado.
+
+Isso mudou a pergunta que cada camada precisava fazer.
+
+Não:
+
+```text
+quanto tempo minha parte pode levar?
+```
+
+Mas:
+
+```text
+ainda há orçamento para minha parte começar ou continuar?
+```
+
+Essa é uma pergunta bem menos generosa.
+
+É também a que o chamador realmente fez.
+
+## Um canal, um orçamento
+
+A correção foi criar, uma única vez, um canal com escopo de operação para a operação lógica `jobs.list` ou `jobs.get`.
+
+O canal é dono do orçamento compartilhado e do caminho de cancelamento dessa operação.
+
+Conceitualmente, a estrutura agora é:
+
+```text
+caller wall-clock deadline
+            |
+            | convert once
+            v
+one monotonic operation endpoint
+            |
+            +-- queueing
+            +-- pacing
+            +-- page 1
+            +-- retry wait
+            +-- page 1 retry
+            +-- page 2
+            +-- active transport attempts
+```
+
+Tudo o que está abaixo do ponto de término consome o mesmo orçamento.
+
+As requisições que passam pelo canal não carregam mais estado independente de deadline ou de sinal que possa recriar em silêncio o modelo antigo. Elas participam da operação que já existe.
+
+Isso importa especialmente para a paginação.
+
+A página dois não é uma operação nova só porque é uma nova requisição HTTP. Ela existe apenas porque a operação de listagem original do chamador ainda está em andamento.
+
+Dar à página sua própria maquinaria de deadline colocaria o limite acidental de volta exatamente no lugar de onde eu tinha acabado de tirá-lo.
+
+## O bug era, em grande parte, um substantivo
+
+A correção em torno da issue `#56` foi concluída e revisada com sucesso.
+
+O código mudou, mas a mudança mais útil foi na forma como eu nomeava aquilo que estava sendo limitado.
+
+Eu vinha pensando em deadlines de requisição.
+
+O sistema precisava de um orçamento de operação.
+
+Quando essa distinção ficou explícita, várias decisões deixaram de ser independentes:
+
+- um retry consome o orçamento original;
+- uma página consome o orçamento original;
+- esperar pelo pacing consome o orçamento original;
+- esperar em uma fila consome o orçamento original;
+- uma tentativa ativa para quando o orçamento original acaba.
+
+Isto não é uma nova teoria do tempo.
+
+É um erro de modelagem em um projeto pessoal privado que me fez aprender por que código de sistemas é tão exigente com relógios e ownership.
+
+Comecei com um deadline de relógio de parede e presumi que isso significava ter um deadline.
+
+Acontece que eu só tinha um timestamp.
+
+A operação só passou a ter de fato um orçamento quando todas as partes dela foram forçadas a compartilhar o mesmo relógio e o mesmo fim.
