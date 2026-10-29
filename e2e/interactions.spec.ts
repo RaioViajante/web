@@ -282,7 +282,9 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
         innerHeight + 300,
     );
     test.skip(!far, "first article's comments are near the viewport");
-    await expect(page.getByRole("status")).toHaveText(/when you scroll/);
+    await expect(page.locator(".comments").getByRole("status")).toHaveText(
+      /when you scroll/,
+    );
     await expect(page.locator(SCRIPT)).toHaveCount(0);
     expect(external).toEqual([]);
     const axe = await new AxeBuilder({ page }).analyze();
@@ -307,7 +309,7 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
     await page.keyboard.press("Enter");
     // The script loads once; the stub finishes it and the status goes away.
     await expect(page.locator(SCRIPT)).toHaveCount(1);
-    await expect(page.getByRole("status")).toHaveCount(0);
+    await expect(page.locator(".comments").getByRole("status")).toHaveCount(0);
     expect(health, health.join("\n")).toEqual([]);
   });
 
@@ -332,19 +334,19 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
           }),
     );
     await page.getByRole("button", { name: "Load comments" }).click();
-    await expect(page.getByRole("status")).toHaveText(
+    await expect(page.locator(".comments").getByRole("status")).toHaveText(
       "Comments could not be loaded.",
     );
     const retry = page.getByRole("button", { name: "Try again" });
     expect(await retry.evaluate((el) => el.tagName)).toBe("BUTTON");
     // Focus stays on the status text (set by the click) and the retry is the next stop.
-    await expect(page.getByRole("status")).toBeFocused();
+    await expect(page.locator(".comments").getByRole("status")).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(retry).toBeFocused();
     await expectFocusRing(page, "Try again");
     await page.keyboard.press("Enter");
     await expect(page.locator(SCRIPT)).toHaveCount(1);
-    await expect(page.getByRole("status")).toHaveCount(0);
+    await expect(page.locator(".comments").getByRole("status")).toHaveCount(0);
     expect(requests).toBe(2);
     // The aborted request is the only expected console noise.
     expect(
