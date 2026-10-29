@@ -12,8 +12,13 @@ const COPIED_MS = 1500;
 /** The words of the block controls in the language the document states. */
 const words = () => catalogFor(clientLocale()).blocks;
 
-/** One polite status for assistive technology; a button's text change alone is not announced. */
-function announce(message: string) {
+/**
+ * The one polite status for assistive technology; a button's text change alone
+ * is not announced. A live region only announces changes made after it is in
+ * the document, so it is created empty up front (see `attachBlocks`), never
+ * at the moment of the first announcement.
+ */
+function statusRegion() {
   let region = document.querySelector<HTMLElement>("[data-block-status]");
   if (!region) {
     region = document.createElement("div");
@@ -23,7 +28,16 @@ function announce(message: string) {
     region.setAttribute("data-block-status", "");
     document.body.append(region);
   }
-  const live = region;
+  return region;
+}
+
+/** Creates the region as soon as the page has something to copy. */
+function prepareStatusRegion() {
+  if (document.querySelector(".block__copy")) statusRegion();
+}
+
+function announce(message: string) {
+  const live = statusRegion();
   live.textContent = "";
   // A change after the region exists is what gets announced.
   window.setTimeout(() => {
@@ -234,8 +248,12 @@ export function attachBlocks() {
     tab.tabIndex = tab.getAttribute("aria-selected") === "true" ? 0 : -1;
   });
   localizeBlocks();
+  prepareStatusRegion();
   // Client-side navigation swaps the page; reconcile whatever arrives.
-  const observer = new MutationObserver(() => localizeBlocks());
+  const observer = new MutationObserver(() => {
+    localizeBlocks();
+    prepareStatusRegion();
+  });
   observer.observe(document.body, { childList: true, subtree: true });
   document.addEventListener("click", onClick);
   document.addEventListener("keydown", onKeydown);

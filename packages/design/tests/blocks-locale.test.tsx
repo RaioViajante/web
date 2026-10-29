@@ -246,6 +246,32 @@ describe("block behavior in jsdom", () => {
     await vi.advanceTimersByTimeAsync(60);
   }
 
+  it("creates the empty polite status before any copy, and not on pages without blocks", async () => {
+    mount("<p>no blocks</p>", "pt-BR");
+    stop = attachBlocks();
+    expect(document.querySelector("[data-block-status]")).toBeNull();
+    stop();
+    mount(await render(sample, { locale: "pt-BR" }), "pt-BR");
+    stop = attachBlocks();
+    const region = document.querySelector('[role="status"][data-block-status]');
+    expect(region).not.toBeNull();
+    expect(region!.getAttribute("aria-live")).toBe("polite");
+    expect(region!.textContent).toBe("");
+    // The same node announces later: it was never replaced.
+    await copyFirst();
+    expect(document.querySelector("[data-block-status]")).toBe(region);
+    expect(region!.textContent).toBe("copiado");
+  });
+
+  it("creates the status for blocks that arrive after attach", async () => {
+    mount("", "pt-BR");
+    stop = attachBlocks();
+    document.body.insertAdjacentHTML("beforeend", await render(sample));
+    await vi.advanceTimersByTimeAsync(0);
+    await Promise.resolve();
+    expect(document.querySelector("[data-block-status]")).not.toBeNull();
+  });
+
   it("Portuguese: copy feedback is localized, announced politely and restored", async () => {
     mount(await render(sample, { locale: "pt-BR" }), "pt-BR");
     stop = attachBlocks();
