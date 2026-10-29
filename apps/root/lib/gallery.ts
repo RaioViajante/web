@@ -193,13 +193,6 @@ export const artworks: readonly Artwork[] = [
     "RaioViajante looking at a mirror that reflects him as a donkey",
   ),
   piece(
-    "candle",
-    "A Little Light in the Dark",
-    "personal",
-    gallery.candleRaincoat,
-    "RaioViajante in a yellow raincoat holding a lit candle beside a lantern in the dark",
-  ),
-  piece(
     "ferry",
     "The House of Two Cups",
     "personal",
@@ -212,6 +205,13 @@ export const artworks: readonly Artwork[] = [
     "personal",
     gallery.forestLantern,
     "RaioViajante with a lantern in a purple autumn forest, watched by a giant furry creature and small shadow creatures",
+  ),
+  piece(
+    "candle",
+    "A Little Light in the Dark",
+    "personal",
+    gallery.candleRaincoat,
+    "RaioViajante in a yellow raincoat holding a lit candle beside a lantern in the dark",
   ),
 ];
 /** Replaces `{name}` placeholders; the copy keeps whole sentences so word order can differ. */

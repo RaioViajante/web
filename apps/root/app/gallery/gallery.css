@@ -374,7 +374,7 @@
   --rotation: 2deg;
 }
 .gallery-piece--candle {
-  width: 24%;
+  width: 28%;
   margin: -2% 0 0 -1%;
   --rotation: -3deg;
 }
@@ -666,7 +666,7 @@
     width: 58%;
   }
   .gallery-piece--candle {
-    width: 36%;
+    width: 40%;
   }
   .gallery-view-stage {
     height: min(52vh, 460px);
