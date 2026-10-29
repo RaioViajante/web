@@ -4,14 +4,16 @@
  * a region role and a label; they lose them again when they fit.
  * `data-scroll-label` overrides the default label.
  */
+import { catalogFor } from "./catalog";
+import { clientLocale } from "./document-locale";
+
 const SELECTOR = ".table-block, .block pre, [data-scroll-region]";
 const MARK = "data-scroll-focus";
 
 function defaultLabel(region: HTMLElement) {
   if (region.dataset.scrollLabel) return region.dataset.scrollLabel;
-  return region.matches("pre")
-    ? "Code, scrolls sideways"
-    : "Table, scrolls sideways";
+  const { blocks } = catalogFor(clientLocale());
+  return region.matches("pre") ? blocks.scrollCode : blocks.scrollTable;
 }
 
 export function updateScrollRegion(region: HTMLElement) {

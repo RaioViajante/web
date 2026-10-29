@@ -2,12 +2,9 @@ import type { Nodes } from "hast";
 import { toJsxRuntime } from "hast-util-to-jsx-runtime";
 import { Fragment, type ReactNode } from "react";
 import { jsx, jsxs } from "react/jsx-runtime";
-import {
-  buildBlock,
-  buildCallout,
-  CALLOUT_KINDS,
-  type CalloutKind,
-} from "../blocks/build";
+import { buildBlock, buildCallout, type CalloutKind } from "../blocks/build";
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
+import { catalogFor } from "../catalog";
 import {
   createBlockModel,
   mergeIntoTabs,
@@ -31,20 +28,30 @@ export async function highlightBlock(
 }
 
 /** Code, tabs, terminal, diff, annotated code or file tree, from a model. */
-export function CodeBlock({ model }: { model: BlockModel }) {
-  return render(buildBlock(model));
+export function CodeBlock({
+  model,
+  locale = DEFAULT_LOCALE,
+}: {
+  model: BlockModel;
+  /** The page's locale: the copy, tab and expand controls are rendered in it. */
+  locale?: LocaleId;
+}) {
+  return render(buildBlock(model, locale));
 }
 
 export function Callout({
   kind = "note",
   label,
   children,
+  locale = DEFAULT_LOCALE,
 }: {
   kind?: CalloutKind;
+  /** The author's own label; without it the kind's name in `locale` is used. */
   label?: string;
   children: ReactNode;
+  locale?: LocaleId;
 }) {
-  const shell = buildCallout(kind, [], label ?? CALLOUT_KINDS[kind]);
+  const shell = buildCallout(kind, [], label, locale);
   // children are React nodes: render the frame from hast, then place them after the label
   const [labelNode] = shell.children;
   return (
@@ -83,11 +90,13 @@ export function Figure({
 
 export function Footnotes({
   items,
+  locale = DEFAULT_LOCALE,
 }: {
   items: { id: string; content: ReactNode }[];
+  locale?: LocaleId;
 }) {
   return (
-    <ol className="footnotes" aria-label="Footnotes">
+    <ol className="footnotes" aria-label={catalogFor(locale).blocks.footnotes}>
       {items.map((item, index) => (
         <li key={item.id} id={item.id}>
           <span>{index + 1}</span>

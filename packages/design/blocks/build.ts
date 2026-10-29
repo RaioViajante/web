@@ -5,6 +5,8 @@
  */
 import type { Element, ElementContent } from "hast";
 import { h } from "hastscript";
+import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
+import { catalogFor, type CalloutKindId } from "../catalog";
 import type { BlockModel, BlockPanel, BlockRow } from "./model";
 import { TREE_CLASSES } from "./model";
 import type { Line } from "./highlight";
@@ -70,7 +72,8 @@ export function blockId(model: BlockModel) {
   return `b${(hash >>> 0).toString(36)}`;
 }
 
-function metaNode(model: BlockModel): Element | null {
+function metaNode(model: BlockModel, locale: LocaleId): Element | null {
+  const { blocks } = catalogFor(locale);
   const [first] = model.panels;
   if (!first) return null;
   const tabs = model.panels.length > 1;
@@ -92,8 +95,8 @@ function metaNode(model: BlockModel): Element | null {
     if (lines.length)
       parts.push(
         lines.length > 1
-          ? `lines ${lines[0]}–${lines[lines.length - 1]}`
-          : `line ${lines[0]}`,
+          ? blocks.lines(lines[0]!, lines[lines.length - 1]!)
+          : blocks.line(lines[0]!),
       );
     if (parts.length) right.push(h("span", {}, parts.join(" · ")));
   }
@@ -104,7 +107,16 @@ function metaNode(model: BlockModel): Element | null {
   ]);
 }
 
-export function buildBlock(model: BlockModel): Element {
+/**
+ * The block's markup. Every control and label comes from the shared catalog of
+ * `locale`, which defaults to English so callers that pass nothing render
+ * exactly what they always did.
+ */
+export function buildBlock(
+  model: BlockModel,
+  locale: LocaleId = DEFAULT_LOCALE,
+): Element {
+  const { blocks } = catalogFor(locale);
   const id = blockId(model);
   const tabs = model.panels.length > 1;
   const classes = ["block"];
@@ -117,7 +129,7 @@ export function buildBlock(model: BlockModel): Element {
   const copy = h(
     "button",
     { type: "button", className: ["block__copy"] },
-    model.variant === "terminal" ? "copy commands" : "copy",
+    model.variant === "terminal" ? blocks.copyCommands : blocks.copy,
   );
   const body: ElementContent[] = [];
 
@@ -125,7 +137,11 @@ export function buildBlock(model: BlockModel): Element {
     body.push(
       h(
         "div",
-        { className: ["block__tabs"], role: "tablist", ariaLabel: "Files" },
+        {
+          className: ["block__tabs"],
+          role: "tablist",
+          ariaLabel: blocks.files,
+        },
         [
           ...model.panels.map((panel, index) =>
             h(
@@ -138,7 +154,7 @@ export function buildBlock(model: BlockModel): Element {
                 ariaControls: `${id}-p${index}`,
                 ariaSelected: String(index === 0),
               },
-              panel.file ?? `file ${index + 1}`,
+              panel.file ?? blocks.fileNumber(index + 1),
             ),
           ),
           copy,
@@ -184,19 +200,20 @@ export function buildBlock(model: BlockModel): Element {
         h(
           "button",
           { type: "button", ariaExpanded: "false" },
-          `show all ${total} lines`,
+          blocks.showAll(total),
         ),
       ]),
     );
   }
 
-  const meta = metaNode(model);
+  const meta = metaNode(model, locale);
   return h("div", { className: classes }, [
     ...(meta ? [meta] : []),
     h("div", { className: ["block__body"] }, body),
   ]);
 }
 
+/** The English callout labels, kept as the public default and the directive names. */
 export const CALLOUT_KINDS = {
   note: "Note",
   important: "Important",
@@ -204,14 +221,21 @@ export const CALLOUT_KINDS = {
   deprecated: "Deprecated",
   til: "TIL",
   careful: "Careful",
-} as const;
-export type CalloutKind = keyof typeof CALLOUT_KINDS;
+} as const satisfies Record<CalloutKindId, string>;
+export type CalloutKind = CalloutKindId;
 
+/**
+ * A callout. An explicit `label` (`:::til[Fun fact]`) is the author's own text
+ * and is never translated; without one, the label is the kind's name in
+ * `locale`.
+ */
 export function buildCallout(
   kind: CalloutKind,
   children: ElementContent[],
-  label: string = CALLOUT_KINDS[kind],
+  label?: string,
+  locale: LocaleId = DEFAULT_LOCALE,
 ): Element {
+  const text = label ?? catalogFor(locale).blocks.callouts[kind];
   return h(
     "div",
     {
@@ -219,6 +243,6 @@ export function buildCallout(
         kind === "note" ? ["callout"] : ["callout", `callout--${kind}`],
       role: "note",
     },
-    [h("span", { className: ["callout__label"] }, label), ...children],
+    [h("span", { className: ["callout__label"] }, text), ...children],
   );
 }

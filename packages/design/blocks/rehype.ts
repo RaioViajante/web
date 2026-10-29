@@ -20,6 +20,12 @@ import { toString } from "hast-util-to-string";
 import { h } from "hastscript";
 import { visit } from "unist-util-visit";
 import {
+  DEFAULT_LOCALE,
+  isLocaleId,
+  type LocaleId,
+} from "../../../site/locales";
+import { catalogFor } from "../catalog";
+import {
   buildBlock,
   buildCallout,
   CALLOUT_KINDS,
@@ -93,7 +99,29 @@ function become(node: Element, next: Element) {
   Object.assign(node, next);
 }
 
-function footnotes(section: Element): Element | null {
+/**
+ * Gives a footnote's back-reference link the locale's accessible name. The
+ * generator writes English ("Back to reference 1"); only that exact shape is
+ * rewritten, so a name an author set is left alone.
+ */
+function localizeBackrefs(nodes: ElementContent[], locale: LocaleId) {
+  const { blocks } = catalogFor(locale);
+  for (const node of nodes) {
+    if (node.type !== "element") continue;
+    const label = node.properties?.ariaLabel;
+    if (
+      node.tagName === "a" &&
+      node.properties?.dataFootnoteBackref !== undefined &&
+      typeof label === "string"
+    ) {
+      const match = /^Back to reference (\S+)$/.exec(label);
+      if (match) node.properties.ariaLabel = blocks.footnoteBack(match[1]!);
+    }
+    localizeBackrefs(node.children, locale);
+  }
+}
+
+function footnotes(section: Element, locale: LocaleId): Element | null {
   const list = section.children.find((child): child is Element =>
     isElement(child, "ol"),
   );
@@ -103,7 +131,10 @@ function footnotes(section: Element): Element | null {
   );
   return h(
     "ol",
-    { className: ["footnotes"], ariaLabel: "Footnotes" },
+    {
+      className: ["footnotes"],
+      ariaLabel: catalogFor(locale).blocks.footnotes,
+    },
     items.map((item, index) => {
       const content: ElementContent[] = [];
       for (const child of item.children) {
@@ -114,6 +145,7 @@ function footnotes(section: Element): Element | null {
           content.push(child as ElementContent);
         }
       }
+      localizeBackrefs(content, locale);
       return h("li", { id: item.properties?.id as string | undefined }, [
         h("span", {}, String(index + 1)),
         h("span", {}, content),
@@ -133,8 +165,44 @@ interface Pending {
   models: BlockModel[];
 }
 
-export function rehypeSoftBlocks() {
-  return async (tree: HastRoot) => {
+export interface SoftBlocksOptions {
+  /**
+   * The locale of the page the blocks belong to. Without it, the locale is
+   * read from the document's own `locale` frontmatter (Astro content
+   * collections, `vfile.data.matter`, or `vfile.data.locale`), and then
+   * defaults to English, so a pipeline that states nothing renders what it
+   * always did.
+   */
+  locale?: LocaleId;
+}
+
+interface DocumentFile {
+  data: { [key: string]: unknown };
+}
+
+const recordOf = (value: unknown): Record<string, unknown> | undefined =>
+  typeof value === "object" && value !== null
+    ? (value as Record<string, unknown>)
+    : undefined;
+
+/** The locale a document states, or undefined; an unsupported value is a bug and throws. */
+function statedLocale(file: DocumentFile | undefined): LocaleId | undefined {
+  const data = file?.data;
+  const value =
+    recordOf(recordOf(data?.astro)?.frontmatter)?.locale ??
+    recordOf(data?.matter)?.locale ??
+    data?.locale;
+  if (value === undefined) return undefined;
+  if (!isLocaleId(value))
+    throw new RangeError(
+      `Unsupported document locale ${JSON.stringify(value)}`,
+    );
+  return value;
+}
+
+export function rehypeSoftBlocks(options: SoftBlocksOptions = {}) {
+  return async (tree: HastRoot, file?: DocumentFile) => {
+    const locale = options.locale ?? statedLocale(file) ?? DEFAULT_LOCALE;
     const fences: { parent: Parent; index: number; pre: Element }[] = [];
 
     visit(tree, "element", (node, index, parent) => {
@@ -151,7 +219,7 @@ export function rehypeSoftBlocks() {
         node.tagName === "section" &&
         node.properties?.dataFootnotes !== undefined
       ) {
-        const list = footnotes(node);
+        const list = footnotes(node, locale);
         if (list) become(node, list);
         return "skip";
       }
@@ -168,6 +236,7 @@ export function rehypeSoftBlocks() {
             kind,
             node.children,
             typeof label === "string" ? label : undefined,
+            locale,
           ),
         );
       }
@@ -192,7 +261,7 @@ export function rehypeSoftBlocks() {
         parent: pending.parent,
         start: pending.first,
         count: pending.end - pending.first + 1,
-        node: buildBlock(model),
+        node: buildBlock(model, locale),
       });
       pending = null;
     };
