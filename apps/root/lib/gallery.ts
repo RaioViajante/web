@@ -197,7 +197,7 @@ export const artworks: readonly Artwork[] = [
     "A Little Light in the Dark",
     "personal",
     gallery.candleRaincoat,
-    "A child in a yellow raincoat holding a lit candle beside a lantern in the dark",
+    "RaioViajante in a yellow raincoat holding a lit candle beside a lantern in the dark",
   ),
   piece(
     "ferry",
