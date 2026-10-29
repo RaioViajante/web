@@ -192,6 +192,27 @@ export const artworks: readonly Artwork[] = [
     gallery.mirrorDonkey,
     "RaioViajante looking at a mirror that reflects him as a donkey",
   ),
+  piece(
+    "candle",
+    "A Little Light in the Dark",
+    "personal",
+    gallery.candleRaincoat,
+    "A child in a yellow raincoat holding a lit candle beside a lantern in the dark",
+  ),
+  piece(
+    "ferry",
+    "The House of Two Cups",
+    "personal",
+    gallery.ferrymanBoat,
+    "RaioViajante in a rowboat with a hooded ferryman, heading toward teacup houses under a full moon, in black and white",
+  ),
+  piece(
+    "forest",
+    "Where Stories Are Born",
+    "personal",
+    gallery.forestLantern,
+    "RaioViajante with a lantern in a purple autumn forest, watched by a giant furry creature and small shadow creatures",
+  ),
 ];
 /** Replaces `{name}` placeholders; the copy keeps whole sentences so word order can differ. */
 export function fill(

@@ -373,6 +373,21 @@
   margin: -3% 0 0 2%;
   --rotation: 2deg;
 }
+.gallery-piece--candle {
+  width: 24%;
+  margin: -2% 0 0 -1%;
+  --rotation: -3deg;
+}
+.gallery-piece--ferry {
+  width: 44%;
+  margin: -3% -1% 0 0;
+  --rotation: 1deg;
+}
+.gallery-piece--forest {
+  width: 48%;
+  margin: -2% 0 0 -1%;
+  --rotation: -2deg;
+}
 .gallery-dialog {
   box-sizing: border-box;
   position: fixed;
@@ -649,6 +664,9 @@
   }
   .gallery-piece--mirror {
     width: 58%;
+  }
+  .gallery-piece--candle {
+    width: 36%;
   }
   .gallery-view-stage {
     height: min(52vh, 460px);

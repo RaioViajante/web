@@ -326,6 +326,12 @@ export const ptGalleryCopy: GalleryCopy = {
     hospital:
       "RaioViajante em uma cama de hospital ao lado de um monitor que exibe código binário",
     mirror: "RaioViajante olhando para um espelho que o reflete como um burro",
+    candle:
+      "Uma criança de capa de chuva amarela segurando uma vela acesa ao lado de uma lanterna no escuro",
+    ferry:
+      "RaioViajante em um barco a remo com um barqueiro encapuzado, rumo a casas em forma de xícara sob a lua cheia, em preto e branco",
+    forest:
+      "RaioViajante com uma lanterna em uma floresta roxa de outono, observado por uma criatura peluda gigante e pequenas criaturas sombrias",
   },
   uses: {
     "gallery cover": "capa da galeria",
