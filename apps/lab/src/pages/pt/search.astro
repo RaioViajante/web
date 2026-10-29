@@ -1,23 +1,21 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { SearchPage } from "@raioviajante/design/search";
-import { portugueseExperiments } from "../../data/experiments";
-const terms = [
-  ...new Set(
-    portugueseExperiments.flatMap(({ title, project }) => [title, project]),
-  ),
-];
+import { textFor } from "../../lib/copy";
+import { routeCounterparts } from "../../lib/routes";
+import { searchSuggestions } from "../../lib/search";
+const text = textFor("pt-BR");
 ---
 
 <BaseLayout
   locale="pt-BR"
-  pageTitle="busca"
-  description="Busque experimentos do Lab e nos sites do RaioViajante."
-  counterparts={[{ locale: "en", path: "/search/" }]}
+  pageTitle={text.search.title}
+  description={text.search.description}
+  counterparts={routeCounterparts("search", "pt-BR")}
 >
   <SearchPage
     site="lab"
     locale="pt-BR"
-    suggestions={{ site: terms, everywhere: terms }}
+    suggestions={searchSuggestions["pt-BR"]}
   />
 </BaseLayout>
