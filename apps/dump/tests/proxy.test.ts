@@ -28,6 +28,31 @@ describe("dynamic route guard", () => {
     expect(isPublishedDynamicPath("/pt/tags/not-real")).toBe(false);
   });
 
+  it("knows every new Portuguese post and tag, with exact tag casing", () => {
+    for (const path of [
+      "/pt/posts/cansei-de-crud-entao-estou-construindo-um-agendador",
+      "/pt/posts/nao-existe-printf-aqui-embaixo",
+      "/pt/tags/seguranca",
+      "/pt/tags/sistemas-distribuidos",
+      "/pt/tags/linguagens-de-programacao",
+      "/posts/translating-the-site-without-pretending-everything-already-exists",
+    ])
+      expect(isPublishedDynamicPath(path)).toBe(true);
+    // Portuguese tag slugs are exact: no case folding, no English id aliases.
+    expect(isPublishedDynamicPath("/pt/tags/Seguranca")).toBe(false);
+    expect(isPublishedDynamicPath("/pt/tags/security")).toBe(false);
+    expect(isPublishedDynamicPath("/pt/tags/SEGURANCA")).toBe(false);
+    // English tag lookup stays case-insensitive.
+    expect(isPublishedDynamicPath("/tags/SECURITY")).toBe(true);
+    // A Portuguese post slug is not reachable under the English prefix, nor the reverse.
+    expect(
+      isPublishedDynamicPath("/posts/nao-existe-printf-aqui-embaixo"),
+    ).toBe(false);
+    expect(
+      isPublishedDynamicPath("/pt/posts/there-is-no-printf-down-here"),
+    ).toBe(false);
+  });
+
   it("preserves established encoded post and case-insensitive tag forms", () => {
     expect(
       isPublishedDynamicPath("/posts/%6daybe-this-can-be-something-someday"),

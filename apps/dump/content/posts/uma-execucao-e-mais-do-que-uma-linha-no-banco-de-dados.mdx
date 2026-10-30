@@ -1,0 +1,448 @@
+---
+contentId: "an-execution-is-more-than-a-row-in-a-database"
+locale: "pt-BR"
+originalLocale: "en"
+title: "Uma execução é mais do que uma linha no banco de dados"
+description: "O Orbit começou com Jobs e endpoints, mas modelar a primeira execução de verdade me obrigou a decidir quais transições de estado são válidas e quais devem falhar alto."
+publishedAt: "2026-09-13"
+tags:
+  - java
+  - spring
+  - distributed-systems
+draft: false
+---
+
+No último texto sobre o Orbit, eu estava pensando principalmente em Jobs.
+
+Criá-los.
+
+Validá-los.
+
+Colocá-los no PostgreSQL por meio de uma quantidade suspeita de código Spring.
+
+A próxima coisa óbvia era uma Execução.
+
+No começo, isso parecia fácil.
+
+Dar um id a ela.
+
+Conectá-la a um Job.
+
+Adicionar um status.
+
+Guardar alguns timestamps.
+
+Talvez deixar um código de saída por perto para depois.
+
+Mais uma entidade.
+
+Mais uma migração.
+
+Mais um lugar para eu descobrir que cinco campos, de alguma forma, exigem vinte decisões.
+
+Então comecei a perguntar quais valores realmente podiam vir um depois do outro.
+
+Foi aí que a linha parou de parecer uma linha.
+
+Começou a parecer um ciclo de vida.
+
+## Um Job não é uma Execução
+
+Um Job descreve algo que o Orbit pode vir a executar.
+
+Ele contém configuração e intenção:
+
+```text
+name
+command
+cronExpression
+maxRetries
+timeoutSeconds
+enabled
+```
+
+Uma Execução deve representar uma execução concreta desse Job.
+
+Se o mesmo comando de backup acabar rodando dez vezes, não quero dez Jobs com dez versões ligeiramente diferentes da configuração.
+
+Quero um Job e dez Execuções que me contem o que aconteceu em cada vez.
+
+Essa distinção já estava nas notas de arquitetura do Orbit.
+
+Ela ficou mais interessante quando comecei a construir o objeto.
+
+A `Execution` atual mantém a referência ao Job, mas também copia o comando, o máximo de retries e os segundos de timeout para seus próprios campos.
+
+Isso significa que uma nova Execução lembra a configuração com a qual foi criada.
+
+Se eu alterar o Job depois, a Execução existente não ganha de repente um comando diferente só porque alguém editou a definição.
+
+Não estou chamando isso de event sourcing.
+
+Já li palavras suficientes sobre sistemas distribuídos para saber que dar nome a algo cedo demais é perigoso.
+
+É simplesmente um snapshot dos valores que o modelo atual considerou relevantes quando a Execução foi criada.
+
+Isso já parece mais útil do que uma linha com uma chave estrangeira e um status vago.
+
+## `QUEUED` já é uma decisão
+
+O primeiro estado é `QUEUED`.
+
+Faz sentido para algo que pode, eventualmente, ser pego por um agendador ou por um worker.
+
+Isso também cria a primeira regra.
+
+Uma Execução não deveria virar `RUNNING` a partir de qualquer lugar.
+
+Ela deveria virar `RUNNING` quando a ação `start()` é permitida a partir de `QUEUED`.
+
+Hoje o código é assim:
+
+```java
+public void start() {
+    if (status != ExecutionStatus.QUEUED) throw new IllegalStateException("Only queued executions can be started");
+    this.status = ExecutionStatus.RUNNING;
+    this.startedAt = Instant.now();
+}
+```
+
+A parte importante não é a atribuição.
+
+É a condição antes da atribuição.
+
+Eu poderia expor um setter e deixar outra coisa escrever:
+
+```java
+execution.setStatus(RUNNING);
+```
+
+Isso responderia à pergunta:
+
+> qual valor você quer neste campo?
+
+`start()` responde a uma pergunta diferente:
+
+> iniciar esta Execução é permitido a partir de onde ela está agora?
+
+Essa diferença é pequena o bastante para caber em um método e grande o bastante para mudar como penso sobre o objeto.
+
+O objeto de domínio não fica só carregando dados enquanto a camada de serviço toma todas as decisões.
+
+Pelo menos nesta parte, ele sabe no que pode se transformar.
+
+## As transições de estado deixaram de ser setters
+
+Os estados atuais são:
+
+```text
+QUEUED
+RUNNING
+SUCCEEDED
+FAILED
+CANCELLED
+```
+
+E as transições pretendidas hoje são assim:
+
+```text
+QUEUED
+  ├─ start() ─────→ RUNNING
+  │                  ├─ succeed() ─→ SUCCEEDED
+  │                  ├─ fail() ────→ FAILED
+  │                  └─ cancel() ──→ CANCELLED
+  └─ cancel() ────→ CANCELLED
+```
+
+Não existe caminho de `SUCCEEDED` de volta para `RUNNING`.
+
+Não existe caminho de `FAILED` para `RUNNING` no modelo atual.
+
+Não existe caminho de `CANCELLED` para nenhum outro estado.
+
+Isso parece óbvio quando desenhado assim.
+
+Fica menos óbvio quando o objeto é uma entidade JPA com uma coluna de status e várias camadas da aplicação em volta.
+
+Os métodos têm nomes de ações de propósito:
+
+```java
+execution.start();
+execution.succeed(0);
+execution.fail(1, "Backup command failed");
+execution.cancel();
+```
+
+Essas chamadas descrevem um histórico.
+
+Elas não descrevem só quatro escritas sem relação em um campo do banco de dados.
+
+O histórico importa porque o mesmo método pode ser válido ou inválido dependendo do que aconteceu antes dele.
+
+Chamar `succeed(0)` em uma Execução recém-criada é rejeitado porque ela nunca esteve rodando.
+
+Chamar `start()` duas vezes é rejeitado porque ela não está mais enfileirada.
+
+Chamar `cancel()` depois do sucesso é rejeitado porque uma Execução finalizada não pode ser cancelada pela operação de domínio atual.
+
+O objeto está começando a ter memória do próprio passado.
+
+## Sucesso e falha carregam informações diferentes
+
+O status é só a parte mais visível do ciclo de vida.
+
+Quando uma Execução começa, ela registra `startedAt`.
+
+Quando tem sucesso, registra o código de saída e `finishedAt`.
+
+Quando falha, registra o código de saída, uma mensagem de erro e `finishedAt`.
+
+Quando é cancelada, registra `finishedAt`.
+
+Isso significa que o cancelamento a partir de `QUEUED` deixa `startedAt` sem valor.
+
+Ela nunca começou.
+
+Esse detalhezinho parece importante porque os timestamps também fazem parte da história que o objeto está guardando.
+
+O método de falha tem outra regra:
+
+```java
+public void fail(int exitCode, String errorMessage) {
+    if (status != ExecutionStatus.RUNNING) throw new IllegalStateException("Only running executions can fail");
+    if (errorMessage == null || errorMessage.isBlank())
+        throw new IllegalArgumentException("Error message must not be blank");
+
+    this.status = ExecutionStatus.FAILED;
+    this.exitCode = exitCode;
+    this.errorMessage = errorMessage;
+    this.finishedAt = Instant.now();
+}
+```
+
+A mensagem não pode estar em branco.
+
+Isso parece razoável.
+
+As regras do código de saída são menos opinativas por enquanto.
+
+`succeed()` não exige que o código de saída seja zero.
+
+`fail()` não exige que o código de saída seja diferente de zero.
+
+Eu poderia inventar na hora uma justificativa para as duas regras.
+
+Talvez sucesso devesse sempre significar zero.
+
+Talvez falha devesse sempre significar que algo deu errado no nível do sistema operacional.
+
+Mas essas regras não estão no modelo atual.
+
+O código aceita um inteiro e, por enquanto, deixa quem chama decidir o que esse inteiro significa.
+
+Esse é um dos pontos em que a implementação me mostra que um design pode ser incompleto sem ser acidental.
+
+Posso mudar essas regras depois.
+
+Por enquanto, preciso descrever o que o Orbit realmente diz, não o que parece arrumadinho em um diagrama.
+
+## Os testes viraram exemplos de histórico proibido
+
+Foi nos testes de Execução que o ciclo de vida ficou difícil de ignorar.
+
+Eles testam, sim, os caminhos comuns:
+
+criar uma Execução e verificar que ela começa como `QUEUED`;
+
+iniciá-la e verificar `RUNNING` e `startedAt`;
+
+marcá-la como bem-sucedida e verificar `SUCCEEDED`, o código de saída e `finishedAt`;
+
+fazê-la falhar e verificar a mensagem de erro e os timestamps;
+
+cancelá-la tanto a partir de `QUEUED` quanto de `RUNNING`.
+
+Mas os testes mais interessantes são os dos caminhos rejeitados.
+
+Os testes também fazem perguntas como:
+
+O que acontece se eu iniciar uma Execução duas vezes?
+
+O que acontece se eu marcar sucesso antes de iniciá-la?
+
+O que acontece se eu marcar falha sem mensagem de erro?
+
+O que acontece se eu cancelar uma Execução que já teve sucesso?
+
+Esses não são só testes de valores de retorno.
+
+São testes de históricos que não deveriam ser possíveis pela API do domínio.
+
+Por exemplo, espera-se que isto falhe:
+
+```java
+Execution execution = new Execution(job);
+
+execution.succeed(0);
+```
+
+A exceção é uma `IllegalStateException` com:
+
+```text
+Only running executions can succeed
+```
+
+E esta sequência também é rejeitada:
+
+```java
+execution.start();
+execution.start();
+```
+
+A segunda chamada falha com:
+
+```text
+Only queued executions can be started
+```
+
+Passei a pensar menos em se cada método funcionava isoladamente e mais em se o objeto podia entrar em um estado que nunca deveria existir.
+
+É uma pergunta muito mais interessante para fazer a um teste.
+
+Também é uma pergunta muito mais irritante quando a resposta é sim.
+
+## O banco de dados não é o modelo de domínio
+
+O Orbit tem, sim, uma tabela `executions`.
+
+Ela guarda a relação com o Job, o status, a configuração copiada e os campos do ciclo de vida.
+
+A migração também restringe a coluna de status aos cinco valores conhecidos.
+
+Isso é útil.
+
+Isso não significa que o banco de dados conhece o ciclo de vida completo.
+
+O banco pode saber que `RUNNING` é um valor válido.
+
+Ele não sabe, por si só, se esta linha específica estava antes em `QUEUED`.
+
+Ele não sabe que `SUCCEEDED` só deve vir depois de `RUNNING`.
+
+Ele não sabe que cancelar uma Execução enfileirada deve deixar `startedAt` vazio.
+
+O objeto Java atual é onde o Orbit codifica essas regras da aplicação.
+
+É um tipo de proteção diferente de uma restrição do banco de dados.
+
+Não quero fingir que isso resolve todos os problemas de consistência.
+
+Dois workers tentando pegar a mesma Execução acabariam tornando esta conversa muito mais difícil.
+
+Concorrência, locking e idempotência ainda estão em algum lugar do futuro do Orbit.
+
+O modelo atual dá ao trabalho futuro um conjunto de regras com que lidar.
+
+Ele não torna, por mágica, seguras as mudanças de estado concorrentes.
+
+## O agendador ainda não agenda nada
+
+A essa altura, o Orbit tem um Job, uma Execução e um ciclo de vida para a Execução.
+
+Tem migrações.
+
+Tem testes.
+
+Tem um conjunto de estados cuidadosamente nomeados para um trabalho que ninguém está executando no momento.
+
+O Orbit ainda não faz parse de agendamentos cron.
+
+Não executa comandos de shell.
+
+Não há workers.
+
+Não há execução distribuída.
+
+Os valores de retry e timeout são configuração armazenada, mas ainda não são aplicados por um runtime.
+
+Agora modelei o ciclo de vida de jobs que, na prática, não estão sendo executados.
+
+Isto é ou uma excelente base de trabalho ou uma forma muito organizada de evitar escrever o agendador.
+
+Provavelmente os dois.
+
+O limite importante é que o modelo de domínio é real, ainda que o comportamento em runtime não seja.
+
+`start()` altera um objeto em memória.
+
+Não inicia um processo.
+
+`succeed()` registra um resultado fornecido por quem chama.
+
+Não observa um comando terminando.
+
+`cancel()` muda o estado da Execução.
+
+Não interrompe um processo do sistema operacional, porque o Orbit ainda não tem processo para interromper.
+
+Essa distinção parece óbvia quando escrita.
+
+É exatamente o tipo de coisa que fica borrada quando um projeto tem um nome atraente e um README que diz “agendador de jobs distribuído”.
+
+## Fazer isso primeiro ainda faz sentido
+
+Antes que um loop do agendador possa criar, iniciar, tentar de novo ou cancelar Execuções, o Orbit precisa de alguma resposta para uma pergunta mais simples:
+
+No que uma Execução pode se transformar?
+
+Se essa resposta ficar inteiramente a cargo do runtime, ele vai inventar a semântica enquanto está ocupado fazendo outras coisas.
+
+Um caminho de código vai definir `RUNNING` diretamente.
+
+Outro vai atualizar os timestamps depois.
+
+Algum worker futuro vai decidir que uma Execução que falhou pode ser reiniciada.
+
+Outro worker futuro vai discordar.
+
+Agora o sistema tem uma discussão distribuída sobre um campo com cara de booleano.
+
+Manter as primeiras regras no objeto de domínio dá ao código futuro algo que faça resistência.
+
+O agendador ainda pode precisar de transições diferentes.
+
+Retries podem merecer um modelo de tentativa separado.
+
+O cancelamento pode precisar de coordenação com um worker.
+
+Pegar a mesma Execução de forma concorrente pode exigir um suporte do banco que a entidade atual não tem.
+
+Nada disso está resolvido aqui.
+
+Mas pelo menos o projeto parou de tratar toda mudança de status como uma atribuição igualmente inofensiva.
+
+## Ainda há muito espaço vazio
+
+O próximo trabalho não é um lançamento triunfal do agendador.
+
+O Orbit ainda precisa decidir como as Execuções são criadas e consultadas pelas camadas da aplicação, e como as peças de persistência se encaixam em volta do objeto de domínio.
+
+Depois disso, o projeto vai ter que lidar com agendamento, execução de comandos, retries, timeouts e workers.
+
+Cada um vai pressionar esse primeiro ciclo de vida.
+
+Provavelmente é esse o objetivo.
+
+Não quero construir um loop que invente em silêncio o que `FAILED` ou `CANCELLED` significa enquanto eu o depuro às três da manhã.
+
+Por enquanto, uma Execução é uma entidade JPA com cinco estados possíveis, algumas ações protegidas e um conjunto de testes que descrevem tanto a vida normal dela quanto os históricos que ela rejeita.
+
+Ela não é um agendador.
+
+Ela não é distribuída.
+
+Ela nem sequer está executando nada.
+
+Mas, finalmente, ela é mais do que outra linha esperando que alguém atualize uma coluna de status.
+
+A próxima pergunta é o que acontece quando duas coisas tentam alterar essa linha ao mesmo tempo.

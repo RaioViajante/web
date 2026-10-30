@@ -47,12 +47,23 @@ test("Dump keeps locale-pure navigation and document history", async ({
   await page.goto(`${base("dump")}/pt`);
   await expectLang(page, "pt-BR");
   await expect(page.locator(".rv-lang a[href='/']")).toHaveCount(1);
-  await expect(page.getByRole("link", { name: "RSS" })).toHaveCount(0);
+  // The Follow section offers the Portuguese feed, never the English one.
+  await expect(page.getByRole("link", { name: "RSS" })).toHaveAttribute(
+    "href",
+    "/pt/rss.xml",
+  );
+  await expect(page.locator("a[href='/rss.xml']")).toHaveCount(0);
+  await expect(
+    page.locator('link[rel="alternate"][type="application/rss+xml"]'),
+  ).toHaveAttribute("href", /\/pt\/rss\.xml$/);
+  // Every series part has a Portuguese version, so the section exists.
+  await expect(page.getByRole("heading", { name: /Séries/ })).toHaveCount(1);
 
-  await page.getByRole("link", { name: /arquivo/ }).click();
+  // By destination: post titles now contain "arquivo" too.
+  await page.locator("a[href='/pt/archive']").first().click();
   await expect(page).toHaveURL(`${base("dump")}/pt/archive`);
   await expectLang(page, "pt-BR");
-  await page.getByRole("link", { name: /tags/ }).click();
+  await page.locator("a[href='/pt/tags']").first().click();
   await expect(page).toHaveURL(`${base("dump")}/pt/tags`);
   await expectLang(page, "pt-BR");
 
@@ -67,10 +78,23 @@ test("Dump keeps locale-pure navigation and document history", async ({
 
   await page
     .getByRole("navigation", { name: "Informações legais" })
-    .getByRole("link", { name: "Termos de Uso (em inglês)" })
+    .getByRole("link", { name: "Termos de Uso", exact: true })
     .click();
-  await expect(page).toHaveURL(`${base("dump")}/terms`);
-  await expectLang(page, "en");
+  await expect(page).toHaveURL(`${base("dump")}/pt/terms`);
+  await expectLang(page, "pt-BR");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Termos de Uso" }),
+  ).toBeVisible();
+  await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/terms");
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]'),
+  ).toHaveAttribute("href", `${canonicalDumpOrigin}/terms`);
+  await page
+    .getByRole("navigation", { name: "Informações legais" })
+    .getByRole("link", { name: "Política de Privacidade", exact: true })
+    .click();
+  await expect(page).toHaveURL(`${base("dump")}/pt/privacy`);
+  await expectLang(page, "pt-BR");
   expect(external).toEqual([]);
 });
 
@@ -80,6 +104,8 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   const translatedPath = "/pt/posts/talvez-isso-vire-alguma-coisa-um-dia";
   const originalPath =
     "/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe";
+  const englishTranslationPath =
+    "/posts/translating-the-site-without-pretending-everything-already-exists";
 
   let response = await page.goto(`${base("dump")}/pt`);
   expect(response?.status()).toBe(200);
@@ -128,13 +154,17 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
     "href",
     `${canonicalDumpOrigin}${originalPath}`,
   );
-  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
-  await expect(page.locator(".rv-lang")).toHaveAttribute(
-    "data-lang-state",
-    "disclosure",
-  );
-  await page.locator(".rv-lang summary").click();
-  await expect(page.locator(".rv-lang details a")).toHaveAttribute("href", "/");
+  // The Portuguese original has an English translation: a complete cluster
+  // whose x-default is the English member.
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]'),
+  ).toHaveAttribute("href", `${canonicalDumpOrigin}${englishTranslationPath}`);
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="x-default"]'),
+  ).toHaveAttribute("href", `${canonicalDumpOrigin}${englishTranslationPath}`);
+  await expect(
+    page.locator(`.rv-lang a[href="${englishTranslationPath}"]`),
+  ).toHaveCount(1);
   await expect(page.getByRole("heading", { name: "Comentários" })).toHaveCount(
     1,
   );
@@ -148,7 +178,16 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   response = await page.goto(`${base("dump")}/pt/tags`);
   expect(response?.status()).toBe(200);
   await expectLang(page, "pt-BR");
-  for (const slug of ["arquitetura", "dump", "meta", "pessoal", "web"])
+  for (const slug of [
+    "arquitetura",
+    "automacao",
+    "dump",
+    "meta",
+    "pessoal",
+    "seguranca",
+    "sistemas-distribuidos",
+    "web",
+  ])
     await expect(page.locator(`a[href="/pt/tags/${slug}"]`)).toHaveCount(1);
 
   await page.goto(`${base("dump")}/pt/tags/pessoal`);
@@ -156,14 +195,11 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
     "href",
     "/tags/personal",
   );
+  // Every English tag has a Portuguese page now, so its LANG link is direct.
   await page.goto(`${base("dump")}/tags/osdev`);
-  await expect(page.locator(".rv-lang")).toHaveAttribute(
-    "data-lang-state",
-    "disclosure",
-  );
-  await expect(page.locator(".rv-lang details a")).toHaveAttribute(
+  await expect(page.locator(".rv-lang a")).toHaveAttribute(
     "href",
-    "/pt",
+    "/pt/tags/osdev",
   );
 });
 
@@ -269,7 +305,7 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
     "/search",
   );
 
-  await input.fill("Traduzir");
+  await input.fill("Traduzir o site");
   let result = page.locator("[data-search-result]");
   await expect(result).toHaveCount(1);
   await expect(result).toContainText(
@@ -277,7 +313,7 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
   );
   await expect(page.locator("a[data-lang-search]")).toHaveAttribute(
     "href",
-    "/search?q=Traduzir",
+    "/search?q=Traduzir+o+site",
   );
   // The index states canonical origins; the e2e harness maps them to the
   // local server when the client renders a result.
@@ -286,7 +322,7 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
     `${base("dump")}/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe`,
   );
 
-  await input.fill("mensagem de erro");
+  await input.fill("erro por três horas");
   result = page.locator("[data-search-result]");
   await expect(result).toHaveCount(1);
   await expect(result).toContainText("Talvez isso vire alguma coisa um dia");
@@ -295,6 +331,28 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
   await expect(page.locator("[data-search-result]")).toHaveCount(0);
   await expect(page.locator("[data-search-empty]")).toBeVisible();
 
+  // Every suggestion on an empty result leads to results in the Portuguese index.
+  const siteTerms = page.locator(
+    '[data-search-suggestions="site"] [data-search-suggestion]',
+  );
+  expect(await siteTerms.allTextContents()).toEqual([
+    "orbit",
+    "assembly",
+    "linguagem",
+    "agendador",
+  ]);
+  for (const term of await siteTerms.allTextContents()) {
+    await input.fill("nenhum resultado publicado");
+    await expect(page.locator("[data-search-empty]")).toBeVisible();
+    await page
+      .locator(
+        `[data-search-suggestions="site"] [data-search-suggestion="${term}"]`,
+      )
+      .click();
+    await expect(input).toHaveValue(term);
+    await expect(page.locator("[data-search-result]").first()).toBeVisible();
+  }
+
   await page.locator('[data-search-scope="everywhere"]').click();
   await expect(search).toHaveAttribute("data-search-state", "ready");
   expect(rootRequests).toBe(1);
@@ -302,7 +360,27 @@ test("Dump searches its local Portuguese index and federates Root, Docs and Lab"
   expect(labRequests).toBe(1);
   expect(external).toEqual([]);
 
-  await input.fill("Traduzir");
+  // The "everywhere" suggestions find an entry on another host's Portuguese index.
+  const everywhereTerms = page.locator(
+    '[data-search-suggestions="everywhere"] [data-search-suggestion]',
+  );
+  expect(await everywhereTerms.allTextContents()).toEqual([
+    "galeria",
+    "sweep",
+    "classificador",
+  ]);
+  for (const term of await everywhereTerms.allTextContents()) {
+    await input.fill("nenhum resultado publicado");
+    await expect(page.locator("[data-search-empty]")).toBeVisible();
+    await page
+      .locator(
+        `[data-search-suggestions="everywhere"] [data-search-suggestion="${term}"]`,
+      )
+      .click();
+    await expect(page.locator("[data-search-result]").first()).toBeVisible();
+  }
+
+  await input.fill("Traduzir o site");
   await expect(page.locator("[data-search-result]")).toHaveCount(1);
   await input.press("Enter");
   await expect(page).toHaveURL(
@@ -333,9 +411,10 @@ test("Dump dynamic misses use localized server-rendered 404 documents", async ({
   await expect(
     page.getByRole("heading", { name: "Procurei em todo lugar." }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: /início \(em inglês\)/ }),
-  ).toHaveAttribute("hreflang", "en");
+  await expect(page.getByRole("link", { name: /início/ })).toHaveAttribute(
+    "href",
+    "https://raioviajante.com/pt",
+  );
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
   await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
 });
@@ -422,4 +501,75 @@ test("English post comments keep the lazy Giscus boundary", async ({
   await expectLang(page, "en");
   await expect(page.getByRole("heading", { name: "Comments" })).toHaveCount(1);
   await expect(page.locator(".comments")).toHaveCount(1);
+});
+
+test("Dump marks English fragments in Portuguese posts and dates the notes it adds", async ({
+  page,
+}) => {
+  await page.goto(`${base("dump")}/pt/posts/nao-existe-printf-aqui-embaixo`);
+  await expectLang(page, "pt-BR");
+  await expect(page.locator("main [lang='en']")).toHaveText([
+    "Building an OS",
+    "end line",
+    "jump",
+  ]);
+
+  await page.goto(
+    `${base("dump")}/pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma`,
+  );
+  await expect(page.locator("main [lang='en']")).toHaveText([
+    "Compiler Foundation",
+    "Compiler Foundation",
+  ]);
+
+  // The rollout essay keeps its dated sentences in the past tense and states
+  // what is true now in a marked note, in both languages.
+  await page.goto(
+    `${base("dump")}/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe`,
+  );
+  await expect(page.getByText("Atualização", { exact: true })).toHaveCount(3);
+  await page.goto(
+    `${base("dump")}/posts/translating-the-site-without-pretending-everything-already-exists`,
+  );
+  await expect(page.getByText("Update", { exact: true })).toHaveCount(3);
+});
+
+test("Dump Portuguese posts link the Portuguese sibling sites and the Portuguese Lab page", async ({
+  page,
+}) => {
+  await page.goto(
+    `${base("dump")}/pt/posts/dividi-minha-internet-em-quatro-tipos-diferentes-de-lugar`,
+  );
+  const hrefs = await page
+    .locator("main article a[href^='https://']")
+    .evaluateAll((links) => links.map((a) => a.getAttribute("href")));
+  for (const root of [
+    "https://raioviajante.com/pt",
+    "https://dump.raioviajante.com/pt",
+    "https://docs.raioviajante.com/pt/",
+    "https://lab.raioviajante.com/pt/",
+  ])
+    expect(hrefs).toContain(root);
+  for (const english of [
+    "https://raioviajante.com",
+    "https://dump.raioviajante.com",
+    "https://docs.raioviajante.com",
+    "https://lab.raioviajante.com",
+  ])
+    expect(hrefs).not.toContain(english);
+
+  // The classifier has a Portuguese page; the other Lab targets do not yet.
+  await page.goto(
+    `${base("dump")}/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era`,
+  );
+  await expect(page.getByText("Experimente", { exact: true })).toHaveCount(1);
+  await expect(
+    page.locator(
+      "a[href='https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/']",
+    ),
+  ).toHaveCount(1);
+  await page.goto(`${base("dump")}/pt/posts/nao-existe-printf-aqui-embaixo`);
+  await expect(page.getByText("Experimente", { exact: true })).toHaveCount(0);
+  await page.goto(`${base("dump")}/posts/there-is-no-printf-down-here`);
+  await expect(page.getByText("Try it", { exact: true })).toHaveCount(1);
 });

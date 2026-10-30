@@ -9,7 +9,7 @@ import {
   type LocaleId,
 } from "../../../site/locales";
 import { DumpShell } from "@/components/DumpShell";
-import { ptCopy } from "@/lib/pt";
+import { dumpCopy } from "@/lib/copy";
 
 async function localeOfRequest(): Promise<LocaleId> {
   const stated = (await headers()).get("x-locale");
@@ -22,38 +22,21 @@ export async function generateMetadata() {
     "https://dump.raioviajante.com",
     "dump",
     locale,
-    locale === DEFAULT_LOCALE ? undefined : ptCopy.notFound.metadata,
+    dumpCopy(locale).notFound.metadata,
   );
 }
 
 export default async function NotFound() {
   const locale = await localeOfRequest();
-  const portuguese = locale === "pt-BR";
+  const copy = dumpCopy(locale).notFound;
   return (
     <DumpShell locale={locale}>
       <NotFoundPage
         site="dump"
         locale={locale}
         linkComponent={Link}
-        line={
-          portuguese
-            ? ptCopy.notFound.line
-            : "this page moved, never existed, or I haven't written it yet."
-        }
-        tryInstead={
-          portuguese
-            ? [...ptCopy.notFound.tryInstead]
-            : [
-                { label: "dump", value: "start over", href: "/" },
-                { label: "archive", value: "everything", href: "/archive" },
-                { label: "tags", value: "topics", href: "/tags" },
-                {
-                  label: "raioviajante.com",
-                  value: "home",
-                  href: "https://raioviajante.com",
-                },
-              ]
-        }
+        line={copy.line}
+        tryInstead={[...copy.tryInstead]}
       />
     </DumpShell>
   );

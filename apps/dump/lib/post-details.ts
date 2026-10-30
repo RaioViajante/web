@@ -3,7 +3,11 @@ import path from "node:path";
 import matter from "gray-matter";
 
 import { sectionNumber } from "@raioviajante/design/sections";
-import { DEFAULT_LOCALE } from "../../../site/locales";
+import {
+  labSuggestions,
+  type LabSuggestion,
+  type LabTarget,
+} from "@/lib/lab-suggestions";
 import {
   getPublishedPosts,
   sortPostsNewestFirst,
@@ -100,26 +104,28 @@ export function chronologicalNeighbours(
   };
 }
 
-/** Automatic Lab suggestions exist only when that localized counterpart exists. */
-export function labForPost(post: Post) {
+/** The Lab experiment that matches a post, by series or topic. */
+function labTargetOf(post: Post): LabTarget | null {
   const currentSeries = seriesOf(post);
-  if (post.locale !== DEFAULT_LOCALE) return null;
   return post.tags.includes("osdev")
-    ? {
-        title: "Boot sector",
-        href: "https://lab.raioviajante.com/experiments/boot-sector/",
-      }
+    ? "boot-sector"
     : currentSeries?.name === "orbit"
-      ? {
-          title: "Execution states",
-          href: "https://lab.raioviajante.com/experiments/execution-states/",
-        }
+      ? "execution-states"
       : currentSeries?.name === "sweep"
-        ? {
-            title: "Filename classifier",
-            href: "https://lab.raioviajante.com/experiments/filename-classifier/",
-          }
+        ? "filename-classifier"
         : null;
+}
+
+/**
+ * The automatic Lab suggestion for a post, in the post's own language. It
+ * exists only when that Lab page is published in that language
+ * (`lib/lab-suggestions.ts`); nothing from the other language is substituted.
+ */
+export function labForPost(post: Post): LabSuggestion | null {
+  const target = labTargetOf(post);
+  const suggestions: Partial<Record<LabTarget, LabSuggestion>> =
+    labSuggestions[post.locale];
+  return target ? (suggestions[target] ?? null) : null;
 }
 
 export function getPostDetails(post: Post) {

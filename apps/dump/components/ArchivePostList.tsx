@@ -3,16 +3,17 @@ import { LeaderRow, Section } from "@raioviajante/design/parts";
 import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 
 import { postPath } from "@/lib/inventory";
-import { ptCopy } from "@/lib/pt";
+import { dumpCopy } from "@/lib/copy";
 import { tagPresentation } from "@/lib/tags";
-import { formatPostMonth, sortPostsNewestFirst, type Post } from "@/lib/posts";
+import {
+  formatPostDate,
+  formatPostMonth,
+  sortPostsNewestFirst,
+  type Post,
+} from "@/lib/posts";
 
 type PostMonthGroup = { month: string; name: string; posts: Post[] };
 type PostYear = { year: string; months: PostMonthGroup[]; posts: Post[] };
-
-export function formatArchiveDate(date: string): string {
-  return date.slice(5);
-}
 
 export function groupPostsByYear(
   posts: readonly Post[],
@@ -47,11 +48,7 @@ export function ArchivePostList({
   locale?: LocaleId;
 }) {
   if (!posts.length)
-    return (
-      <p className="archive-empty">
-        {locale === DEFAULT_LOCALE ? "No posts yet." : ptCopy.archive.empty}
-      </p>
-    );
+    return <p className="archive-empty">{dumpCopy(locale).archive.empty}</p>;
   return (
     <>
       {groupPostsByYear(posts, locale).map(({ year, months }, index) => (
@@ -75,7 +72,7 @@ export function ArchivePostList({
                             className="archive-date"
                             dateTime={post.publishedAt}
                           >
-                            {formatArchiveDate(post.publishedAt)}
+                            {formatPostDate(post.publishedAt, locale)}
                           </time>
                           <span>{post.title}</span>
                         </span>

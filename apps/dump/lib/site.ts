@@ -3,6 +3,7 @@ import {
   localizedPath,
   type LocaleId,
 } from "../../../site/locales";
+import { dumpCopy } from "./copy";
 
 /**
  * Canonical origin (no trailing slash), resolved in priority order:
@@ -64,7 +65,7 @@ export function alternatesFor(
       "application/rss+xml": [
         {
           url: localizedPath("dump", locale, "/rss.xml"),
-          title: `${site.name} RSS`,
+          title: dumpCopy(locale).feedLinkTitle,
         },
       ],
     },

@@ -17,6 +17,7 @@ import {
 } from "@/lib/published-routes.generated";
 import { routes } from "@/lib/routes";
 import { staticMetadata } from "@/lib/seo";
+import { taxonomy } from "@/lib/tags";
 import type { DumpSearchEntry } from "@/lib/search-index";
 import { blogPostingJsonLd } from "@/lib/structured-data";
 import { checkLocaleInventory } from "../../../seo/locale";
@@ -25,19 +26,22 @@ import { participates } from "../../../site/locales";
 const TRANSLATED_SLUG = "talvez-isso-vire-alguma-coisa-um-dia";
 const PORTUGUESE_ORIGINAL_SLUG =
   "traduzir-o-site-sem-fingir-que-tudo-ja-existe";
+// A translation keeps the date of its original: the Portuguese original went
+// public on 2026-10-19, and the English post that came first on 2026-09-04.
 const PUBLICATION_DATE = "2026-10-19";
+const TRANSLATED_DATE = "2026-09-04";
 
-const PORTUGUESE_POST_PATHS = [
-  `/pt/posts/${TRANSLATED_SLUG}`,
-  `/pt/posts/${PORTUGUESE_ORIGINAL_SLUG}`,
-];
+const PORTUGUESE_POST_PATHS = getPublishedPosts("pt-BR").map(
+  (post) => `/pt/posts/${post.slug}`,
+);
+// Every tag id used by a Portuguese post has a Portuguese slug, and a
+// Portuguese tag page exists exactly when a Portuguese post carries the tag.
 const PORTUGUESE_TAG_PATHS = [
-  "/pt/tags/arquitetura",
-  "/pt/tags/dump",
-  "/pt/tags/meta",
-  "/pt/tags/pessoal",
-  "/pt/tags/web",
-];
+  ...new Set(getPublishedPosts("pt-BR").flatMap((post) => post.tags)),
+].map(
+  (id) =>
+    `/pt/tags/${encodeURIComponent(taxonomy.presentation(id, "pt-BR")!.slug)}`,
+);
 
 describe("localized published inventory", () => {
   it("passes reciprocal locale checks and participates in Portuguese", () => {
@@ -56,60 +60,35 @@ describe("localized published inventory", () => {
     }
   });
 
-  it("publishes the exact reviewed Portuguese post records", () => {
+  it("publishes the reviewed Portuguese original and the first translation unchanged", () => {
+    const records = getPublishedPosts("pt-BR");
+    expect(records.find(({ slug }) => slug === TRANSLATED_SLUG)).toMatchObject({
+      contentId: "maybe-this-can-be-something-someday",
+      locale: "pt-BR",
+      originalLocale: "en",
+      title: "Talvez isso vire alguma coisa um dia",
+      description:
+        "Por que este lugar existe, o que espero que ele se torne e por que provavelmente compliquei demais um diário.",
+      publishedAt: TRANSLATED_DATE,
+      tags: ["personal", "meta", "dump"],
+      draft: false,
+    });
     expect(
-      getPublishedPosts("pt-BR").map(
-        ({
-          slug,
-          contentId,
-          locale,
-          originalLocale,
-          title,
-          description,
-          publishedAt,
-          tags,
-          draft,
-        }) => ({
-          slug,
-          contentId,
-          locale,
-          originalLocale,
-          title,
-          description,
-          publishedAt,
-          tags,
-          draft,
-        }),
-      ),
-    ).toEqual([
-      {
-        slug: TRANSLATED_SLUG,
-        contentId: "maybe-this-can-be-something-someday",
-        locale: "pt-BR",
-        originalLocale: "en",
-        title: "Talvez isso vire alguma coisa um dia",
-        description:
-          "Por que este lugar existe, o que espero que ele se torne e por que provavelmente compliquei demais um diário.",
-        publishedAt: PUBLICATION_DATE,
-        tags: ["personal", "meta", "dump"],
-        draft: false,
-      },
-      {
-        slug: PORTUGUESE_ORIGINAL_SLUG,
-        contentId: PORTUGUESE_ORIGINAL_SLUG,
-        locale: "pt-BR",
-        originalLocale: "pt-BR",
-        title: "Traduzir o site sem fingir que tudo já existe",
-        description:
-          "Como o dump separa identidade, idioma e publicação para oferecer conteúdo parcial em português sem inventar equivalências.",
-        publishedAt: PUBLICATION_DATE,
-        tags: ["meta", "architecture", "web"],
-        draft: false,
-      },
-    ]);
+      records.find(({ slug }) => slug === PORTUGUESE_ORIGINAL_SLUG),
+    ).toMatchObject({
+      contentId: PORTUGUESE_ORIGINAL_SLUG,
+      locale: "pt-BR",
+      originalLocale: "pt-BR",
+      title: "Traduzir o site sem fingir que tudo já existe",
+      description:
+        "Como o dump separa identidade, idioma e publicação para oferecer conteúdo parcial em português sem inventar equivalências.",
+      publishedAt: PUBLICATION_DATE,
+      tags: ["meta", "architecture", "web"],
+      draft: false,
+    });
   });
 
-  it("links only the real translation and invents no English counterpart", () => {
+  it("links only real counterparts and never invents one", () => {
     const translated = getPostVersion(
       "maybe-this-can-be-something-someday",
       "pt-BR",
@@ -133,8 +112,18 @@ describe("localized published inventory", () => {
         path: "/posts/maybe-this-can-be-something-someday",
       },
     ]);
-    expect(getPostVersion(PORTUGUESE_ORIGINAL_SLUG, "en")).toBeUndefined();
-    expect(postCounterparts(portugueseOriginal!)).toEqual([]);
+    // The Portuguese original now has a real English translation.
+    expect(getPostVersion(PORTUGUESE_ORIGINAL_SLUG, "en")).toMatchObject({
+      slug: "translating-the-site-without-pretending-everything-already-exists",
+      originalLocale: "pt-BR",
+      publishedAt: PUBLICATION_DATE,
+    });
+    expect(postCounterparts(portugueseOriginal!)).toEqual([
+      {
+        locale: "en",
+        path: "/posts/translating-the-site-without-pretending-everything-already-exists",
+      },
+    ]);
   });
 
   it("publishes the exact Portuguese sitemap inventory", () => {
@@ -146,6 +135,8 @@ describe("localized published inventory", () => {
         "/pt",
         "/pt/archive",
         "/pt/tags",
+        "/pt/terms",
+        "/pt/privacy",
         ...PORTUGUESE_POST_PATHS,
         ...PORTUGUESE_TAG_PATHS,
       ]),
@@ -180,40 +171,27 @@ describe("localized published inventory", () => {
     const response = portugueseSearchIndex();
     expect(response.headers.get("content-type")).toMatch(/^application\/json/);
     const entries = (await response.json()) as DumpSearchEntry[];
+    const published = getPublishedPosts("pt-BR");
+    expect(entries.map(({ contentId }) => contentId)).toEqual(
+      published.map(({ contentId }) => contentId),
+    );
+    expect(entries.map(({ href }) => new URL(href).pathname)).toEqual(
+      PORTUGUESE_POST_PATHS,
+    );
+    expect(entries.map(({ title }) => title)).toEqual(
+      published.map(({ title }) => title),
+    );
+    expect(new Set(entries.map(({ contentId }) => contentId)).size).toBe(
+      entries.length,
+    );
     expect(
-      entries.map(
-        ({ site, locale, contentId, title, href, description, date }) => ({
-          site,
-          locale,
-          contentId,
-          title,
-          path: new URL(href).pathname,
-          description,
-          date,
-        }),
-      ),
-    ).toEqual([
-      {
-        site: "dump",
-        locale: "pt-BR",
-        contentId: "maybe-this-can-be-something-someday",
-        title: "Talvez isso vire alguma coisa um dia",
-        path: PORTUGUESE_POST_PATHS[0],
-        description:
-          "Por que este lugar existe, o que espero que ele se torne e por que provavelmente compliquei demais um diário.",
-        date: PUBLICATION_DATE,
-      },
-      {
-        site: "dump",
-        locale: "pt-BR",
-        contentId: PORTUGUESE_ORIGINAL_SLUG,
-        title: "Traduzir o site sem fingir que tudo já existe",
-        path: PORTUGUESE_POST_PATHS[1],
-        description:
-          "Como o dump separa identidade, idioma e publicação para oferecer conteúdo parcial em português sem inventar equivalências.",
-        date: PUBLICATION_DATE,
-      },
-    ]);
+      entries.find(({ contentId }) => contentId === PORTUGUESE_ORIGINAL_SLUG),
+    ).toMatchObject({
+      site: "dump",
+      locale: "pt-BR",
+      title: "Traduzir o site sem fingir que tudo já existe",
+      date: PUBLICATION_DATE,
+    });
     expect(entries.every(({ body }) => typeof body === "string")).toBe(true);
     expect(entries.every(({ locale }) => locale === "pt-BR")).toBe(true);
   });
@@ -229,18 +207,24 @@ describe("localized published inventory", () => {
       ),
     ).toEqual({ en: "/", "pt-BR": "/pt", "x-default": "/" });
     expect(metadata.alternates.types).toEqual({
-      "application/rss+xml": [{ url: "/pt/rss.xml", title: "dump RSS" }],
+      "application/rss+xml": [
+        { url: "/pt/rss.xml", title: "dump RSS (português)" },
+      ],
     });
     expect(metadata.openGraph).toMatchObject({ locale: "pt_BR" });
   });
 
   it("derives Portuguese BlogPosting data from the published records", () => {
-    const [translated, portugueseOriginal] = getPublishedPosts("pt-BR");
+    const records = getPublishedPosts("pt-BR");
+    const translated = records.find(({ slug }) => slug === TRANSLATED_SLUG);
+    const portugueseOriginal = records.find(
+      ({ slug }) => slug === PORTUGUESE_ORIGINAL_SLUG,
+    );
     expect(blogPostingJsonLd(translated!)).toMatchObject({
       "@type": "BlogPosting",
       headline: "Talvez isso vire alguma coisa um dia",
-      datePublished: PUBLICATION_DATE,
-      url: expect.stringMatching(`${PORTUGUESE_POST_PATHS[0]}$`),
+      datePublished: TRANSLATED_DATE,
+      url: expect.stringMatching(`/pt/posts/${TRANSLATED_SLUG}$`),
       mainEntityOfPage: { inLanguage: "pt-BR" },
       inLanguage: "pt-BR",
       keywords: "pessoal, meta, dump",
@@ -254,7 +238,7 @@ describe("localized published inventory", () => {
     });
   });
 
-  it("moves the reviewed manuscripts into the published collection with the approved date", () => {
+  it("moves the reviewed manuscripts into the published collection with the original's date", () => {
     const content = join(process.cwd(), "content");
     for (const slug of [TRANSLATED_SLUG, PORTUGUESE_ORIGINAL_SLUG]) {
       const published = join(content, "posts", `${slug}.mdx`);
@@ -262,7 +246,12 @@ describe("localized published inventory", () => {
       expect(existsSync(published)).toBe(true);
       expect(existsSync(draft)).toBe(false);
       const raw = readFileSync(published, "utf8");
-      expect(raw).toMatch(/^publishedAt: "2026-10-19"$/m);
+      expect(raw).toMatch(
+        new RegExp(
+          `^publishedAt: "${slug === TRANSLATED_SLUG ? TRANSLATED_DATE : PUBLICATION_DATE}"$`,
+          "m",
+        ),
+      );
       expect(raw).toMatch(/^draft: false$/m);
       expect(raw).not.toContain("OWNER MUST SET");
     }

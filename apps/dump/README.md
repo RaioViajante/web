@@ -48,7 +48,8 @@ draft: false
 
 `contentId`, `locale`, `originalLocale`, `title`, `description`, and
 `publishedAt` are required; `updatedAt`, `tags`, and `draft` are not.
-`publishedAt` belongs to this localized version. Add `updatedAt` only for a
+`publishedAt` is the work's original publication date, identical on every
+localized version (a translation copies the original's). Add `updatedAt` only for a
 later meaningful editorial or factual revision. A `draft: true` post stays out
 of every public route and inventory — listings, tags, feed, sitemap and search.
 Undated manuscripts stay under `content/drafts/<locale>/` until their actual

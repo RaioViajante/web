@@ -11,6 +11,7 @@ import {
   legacyPathnameTerm,
 } from "@/lib/comment-key";
 import { getAllPosts, getPublishedPosts } from "@/lib/posts";
+import { LEGACY_ENGLISH_CONTENT_IDS } from "@/lib/rss-identity";
 import snapshotJson from "./fixtures/giscus-discussions-snapshot.json";
 
 const snapshot = snapshotJson as DiscussionSnapshot;
@@ -40,9 +41,33 @@ describe("commentKey", () => {
     expect(commentKey.length).toBe(1);
   });
 
-  it("equals the legacy pathname term of every published English post", () => {
-    for (const post of getPublishedPosts("en"))
+  it("equals the legacy pathname term of every pre-migration English post", () => {
+    const legacy = getPublishedPosts("en").filter(({ contentId }) =>
+      LEGACY_ENGLISH_CONTENT_IDS.includes(contentId),
+    );
+    expect(legacy).toHaveLength(LEGACY_ENGLISH_CONTENT_IDS.length);
+    for (const post of legacy)
       expect(commentKey(post.contentId)).toBe(legacyPathnameTerm(post.slug));
+  });
+
+  it("shares one discussion between every version of every work", () => {
+    const posts = getPublishedPosts("en").concat(getPublishedPosts("pt-BR"));
+    const byWork = new Map<string, Set<string>>();
+    for (const post of posts)
+      byWork.set(
+        post.contentId,
+        (byWork.get(post.contentId) ?? new Set()).add(
+          commentKey(post.contentId),
+        ),
+      );
+    for (const [contentId, keys] of byWork)
+      expect([...keys]).toEqual([`posts/${contentId}`]);
+    // Every English-original work has a Portuguese version in the same
+    // discussion, and so does the English translation of a Portuguese original.
+    const withBoth = [...byWork.keys()].filter(
+      (id) => posts.filter((post) => post.contentId === id).length === 2,
+    );
+    expect(withBoth).toHaveLength(byWork.size);
   });
 });
 

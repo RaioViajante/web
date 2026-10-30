@@ -8,7 +8,7 @@ export const metadata = staticMetadata("/terms");
 
 export default function Terms() {
   return (
-    <DumpShell>
+    <DumpShell current="/terms">
       <LegalPage
         site="dump"
         title="Terms of Use"
@@ -34,10 +34,10 @@ export default function Terms() {
             title: "Text and artwork",
             body: (
               <p>
-                Posts, documentation and illustrations belong to RaioViajante
-                unless a page says otherwise. They are all rights reserved, not
-                covered by the repository&apos;s MIT license, which applies only
-                to the source code.
+                Posts and illustrations belong to RaioViajante unless a page
+                says otherwise. They are all rights reserved, not covered by the
+                repository&apos;s MIT license, which applies only to the source
+                code.
               </p>
             ),
           },

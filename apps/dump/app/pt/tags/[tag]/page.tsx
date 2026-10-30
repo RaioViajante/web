@@ -6,7 +6,7 @@ import { DumpShell } from "@/components/DumpShell";
 import { TagPostList, tagHref } from "@/components/TagViews";
 import { tagCounterparts } from "@/lib/inventory";
 import { getAllTags, getPostsByTagId } from "@/lib/posts";
-import { ptCopy } from "@/lib/pt";
+import { dumpCopy } from "@/lib/copy";
 import { metadataFor } from "@/lib/seo";
 import { tagFromSlug } from "@/lib/tags";
 
@@ -31,8 +31,8 @@ export async function generateMetadata({
     path: tagHref(found.slug, locale),
     locale,
     counterparts: tagCounterparts(locale, found.id),
-    title: `Textos com a tag "${found.label}"`,
-    description: `Textos técnicos e notas de projeto com a tag "${found.label}" no dump.`,
+    title: dumpCopy(locale).tagPageSeo.title(found.label),
+    description: dumpCopy(locale).tagPageSeo.description(found.label),
   });
 }
 
@@ -50,11 +50,11 @@ export default async function TagPagePt({ params }: PageProps) {
       locale={locale}
     >
       <PageHeader
-        label={ptCopy.tags.pageLabel}
+        label={dumpCopy(locale).tags.pageLabel}
         title={found.label}
-        line={`${posts.length} ${posts.length === 1 ? ptCopy.tags.post : ptCopy.tags.posts}`}
+        line={dumpCopy(locale).tags.posts(posts.length)}
       />
-      <TagPostList posts={posts} />
+      <TagPostList posts={posts} locale={locale} />
     </DumpShell>
   );
 }

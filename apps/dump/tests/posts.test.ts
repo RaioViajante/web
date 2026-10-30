@@ -1,6 +1,7 @@
 import path from "node:path";
 
 import { createTaxonomy, tagDefinitions } from "@/lib/tags";
+import { RECORDED_BEFORE_UPDATE, VERIFIED_UPDATES } from "./verified-updates";
 import {
   formatPostDate,
   getAllPosts,
@@ -155,21 +156,31 @@ describe("post collection", () => {
       "started-designing-a-language-before-i-could-compile-one": "2026-09-13",
       "started-writing-down-the-failures-before-the-features": "2026-09-27",
       "there-is-no-printf-down-here": "2026-09-05",
+      // The English translation of the Portuguese original keeps its date.
+      "translating-the-site-without-pretending-everything-already-exists":
+        "2026-10-19",
     });
   });
 
-  it("records only the verified historical content update", () => {
-    const posts = getPublishedPosts("en");
+  it("records an update date only for the verified material updates, on every version", () => {
+    for (const locale of ["en", "pt-BR"] as const) {
+      expect(
+        getPublishedPosts(locale)
+          .filter((post) => post.updatedAt)
+          .map(({ contentId, updatedAt }) => ({ contentId, updatedAt }))
+          .sort((a, b) => a.contentId.localeCompare(b.contentId)),
+      ).toEqual(
+        Object.entries(VERIFIED_UPDATES)
+          .map(([contentId, updatedAt]) => ({ contentId, updatedAt }))
+          .sort((a, b) => a.contentId.localeCompare(b.contentId)),
+      );
+    }
+    // The update is later than the earlier recorded one and than publication.
     expect(
-      posts
-        .filter((post) => post.updatedAt)
-        .map(({ slug, updatedAt }) => ({ slug, updatedAt })),
-    ).toEqual([
-      {
-        slug: "split-my-internet-into-four-different-kinds-of-place",
-        updatedAt: "2026-10-05",
-      },
-    ]);
+      VERIFIED_UPDATES[
+        "split-my-internet-into-four-different-kinds-of-place"
+      ]! > RECORDED_BEFORE_UPDATE,
+    ).toBe(true);
   });
 
   it("derives the slug from the filename", () => {

@@ -1,0 +1,156 @@
+---
+contentId: "started-writing-down-the-failures-before-the-features"
+locale: "pt-BR"
+originalLocale: "en"
+title: "Comecei a escrever as falhas antes das funcionalidades"
+description: "O jobs-mcp começou como uma ferramenta para fluxos de vagas de emprego e acumulou decisões sobre proveniência, segredos, recuperação e automação antes de o produto visível ter muito o que mostrar."
+publishedAt: "2026-09-27"
+tags:
+  - architecture
+  - reliability
+  - security
+  - mcp
+draft: false
+---
+
+O `jobs-mcp` começou com um propósito bem compreensível.
+
+Ajudar na descoberta de vagas de emprego e nos fluxos de candidatura.
+
+Há funcionalidades visíveis escondidas nessa frase. Encontrar coisas. Guardar coisas. Comparar coisas. Eventualmente, ajudar em ações que de outro jeito seriam repetitivas.
+
+Eu esperava passar a maior parte do tempo pensando nelas.
+
+Em vez disso, o projeto não parava de perguntar o que deveria acontecer quando a informação estivesse incompleta, duplicada, sensível, desatualizada, interrompida ou errada.
+
+O produto visível ainda tinha muito pouco para mostrar.
+
+Os modos de falha já estavam formando um comitê.
+
+## Os fatos precisavam de um passado
+
+Uma vaga de emprego parece um dado.
+
+Um título, uma empresa, uma localização, uma descrição e alguns links.
+
+Mas uma ferramenta que um dia pode ajudar a tomar decisões sobre essa vaga precisa saber mais do que os valores atuais.
+
+Eu precisava saber de onde um fato veio, se ele foi observado diretamente ou derivado, e se duas representações parecidas eram, de fato, a mesma coisa.
+
+Eu também precisava de alguma resposta para o que deve continuar verdadeiro sobre uma cópia existente depois que a fonte dela muda.
+
+Essas perguntas levaram a um trabalho de design em torno de fatos explícitos, proveniência e identidade canônica.
+
+Quase tudo isso foi trabalho de design.
+
+Escrever como a identidade deveria funcionar não é o mesmo que provar que todo caminho do programa já a segue. Decidir usar representação canônica e hashing não faz a informação duplicada ou conflitante desaparecer.
+
+O que isso faz é dar ao código futuro uma definição para implementar e, aos testes, algo preciso com que discordar.
+
+Sem essa definição, a primeira comparação de strings conveniente viraria, em silêncio, o modelo de identidade.
+
+Eu não queria que essa decisão acontecesse só porque uma comparação era a mais fácil de escrever primeiro.
+
+## Segredos deixaram o “local” menos reconfortante
+
+O `jobs-mcp` é privado e foi pensado para rodar localmente.
+
+À primeira vista, isso parece resolver boa parte da história de segurança.
+
+Não resolve.
+
+Uma ferramenta local ainda pode lidar com credenciais, gravar arquivos, chamar redes e processar informações que não deveriam acabar em um log ou em um repositório Git.
+
+Então o design foi acumulando limites.
+
+Segredos persistentes pertencem a recursos da plataforma, como o macOS Keychain ou o Secret Service, e não ao controle de versão nem a arquivos de configuração comuns.
+
+O acesso ao sistema de arquivos precisa ter um formato explícito.
+
+O acesso à rede precisa ter um formato explícito.
+
+Os logs precisam de estrutura, mas “estruturado” não pode virar uma forma sofisticada de preservar valores sensíveis para sempre.
+
+Parte disso ainda é design registrado, e não comportamento pronto. Um ADR dizendo onde os segredos devem ficar não significa que todo ciclo de vida de segredo já funcione.
+
+Mas tomar a decisão cedo evita que uma solução temporária em texto puro vire a arquitetura só porque funcionou primeiro.
+
+## A recuperação chegou antes da confiança
+
+A persistência trouxe outro conjunto de perguntas desconfortáveis.
+
+O projeto usa SQLite com tabelas estritas e migrações como parte da fundação.
+
+Isso dá aos dados um lugar para viver e ao esquema um histórico.
+
+Não responde o que acontece quando esse histórico é interrompido.
+
+Uma migração pode falhar. Pode existir um backup enquanto a restauração está quebrada. A própria recuperação pode parar no meio.
+
+O projeto também precisa decidir que evidências devem permanecer depois que uma operação muda algo importante.
+
+Isso levou a um trabalho em torno de conceitos de auditoria append-only, do design de backup e restauração e de um registro de recuperação.
+
+Parte disso ainda é design e trabalho planejado.
+
+Um documento de recuperação não é um banco de dados recuperado.
+
+Um conceito de auditoria append-only não é um sistema de auditoria completo.
+
+Um plano de backup não é confiável só porque a palavra “backup” aparece em vários títulos de issues.
+
+Essas distinções importam para mim porque este projeto é incomumente fácil de descrever no futuro. O design é detalhado o bastante para que o comportamento planejado comece a soar como implementado se eu deixar de prestar atenção nos verbos.
+
+Eu tinha escrito o que queria que a recuperação garantisse. Ainda precisava construir e testar a maior parte disso.
+
+## A automação precisava de limites antes de capacidades
+
+Aconteceu a mesma coisa com a automação.
+
+É fácil imaginar uma ferramenta de vagas de emprego ficando cada vez mais autônoma. Essa é a direção atraente se a única métrica for quantos passos manuais desaparecem.
+
+Também é assim que um assistente útil pode virar uma máquina que executa ações externas com consequências, com confiança demais.
+
+Antes de boa parte dessa automação existir, eu precisava decidir quanta autoridade ela deveria ter, o que exigiria revisão e o que nunca deveria acontecer em silêncio. Preservar de onde os fatos vieram fazia parte de tornar essas decisões compreensíveis mais tarde.
+
+Cancelamento e retries também fazem parte dessa conversa.
+
+Um retry não é automaticamente inofensivo só porque a primeira tentativa falhou. Uma operação pode ter efeitos que quem a chamou não consegue repetir com segurança. O cancelamento não é apenas um resultado de erro se o trabalho já está esperando, aguardando o intervalo de pacing ou trafegando pelo transporte.
+
+O tratamento de deadlines é um ponto em que uma restrição documentada já chegou à implementação e à revisão.
+
+Outras questões de automação e recuperação continuam como restrições documentadas ou trabalho futuro.
+
+## Eu tinha mais decisões do que produto
+
+Em algum momento, o repositório tinha acumulado ADRs, issues, marcos e notas de segurança mais rápido do que funcionalidades visíveis.
+
+Isso parecia um pouco ridículo.
+
+Eu estava construindo um projeto pessoal privado, não preparando uma nave espacial para o lançamento.
+
+Havia documentos sobre integridade de auditoria e comportamento de recuperação enquanto muitas interações comuns do produto ainda não existiam.
+
+Eu me perguntei, sim, se estava usando arquitetura como uma forma particularmente organizada de procrastinação.
+
+Essa possibilidade não foi completamente eliminada.
+
+Mas as perguntas desses documentos não foram inventadas para o repositório parecer sério.
+
+Elas vieram de decisões que o código tomaria por acidente. O primeiro loop de retry poderia decidir o que era seguro repetir. O primeiro log conveniente poderia decidir quais valores sensíveis seriam registrados. Um script de recuperação feito às pressas poderia virar a política de recuperação sem que ninguém a escolhesse de propósito.
+
+Escrever essas decisões não as resolveu.
+
+Só tornou difícil ignorá-las.
+
+## Parte disso provavelmente está errada
+
+Um ADR pode preservar o motivo pelo qual uma escolha foi feita.
+
+Ele não garante que a escolha sobreviva ao contato com a implementação.
+
+Algumas decisões já chegaram ao código. Outras ainda esperam a parte do projeto que vai pressioná-las.
+
+Espero que alguns dos ADRs se tornem constrangedores quando mais partes do sistema precisarem funcionar.
+
+Só ainda não sei quais.

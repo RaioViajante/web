@@ -2,7 +2,6 @@ import { render, screen, within } from "@testing-library/react";
 
 import {
   ArchivePostList,
-  formatArchiveDate,
   groupPostsByYear,
 } from "@/components/ArchivePostList";
 import type { Post } from "@/lib/posts";
@@ -63,12 +62,26 @@ describe("<ArchivePostList />", () => {
     );
   });
 
-  it("renders UTC-safe abbreviated dates with semantic full dates", () => {
+  it("renders UTC-safe long English dates with ISO datetime values", () => {
     render(<ArchivePostList posts={posts} />);
 
-    expect(formatArchiveDate("2026-01-01")).toBe("01-01");
     const newest = screen.getAllByRole("listitem")[0]!;
-    expect(within(newest).getByText("09-03")).toHaveAttribute(
+    expect(within(newest).getByText("September 3, 2026")).toHaveAttribute(
+      "datetime",
+      "2026-09-03",
+    );
+  });
+
+  it("renders Portuguese dates and month names in words, ISO in datetime", () => {
+    const portuguese = posts.map((post) => ({
+      ...post,
+      locale: "pt-BR" as const,
+    }));
+    render(<ArchivePostList posts={portuguese} locale="pt-BR" />);
+
+    expect(screen.getByText("setembro · 1")).toBeInTheDocument();
+    const newest = screen.getAllByRole("listitem")[0]!;
+    expect(within(newest).getByText("3 de setembro de 2026")).toHaveAttribute(
       "datetime",
       "2026-09-03",
     );
@@ -79,5 +92,13 @@ describe("<ArchivePostList />", () => {
 
     expect(screen.getByText("No posts yet.")).toBeInTheDocument();
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  it("renders the Portuguese zero-post state in Portuguese", () => {
+    render(<ArchivePostList posts={[]} locale="pt-BR" />);
+
+    expect(
+      screen.getByText("Ainda não há textos publicados em português."),
+    ).toBeInTheDocument();
   });
 });

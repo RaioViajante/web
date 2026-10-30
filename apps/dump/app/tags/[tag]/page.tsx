@@ -9,6 +9,7 @@ import { getAllTags, getPostsByTagId } from "@/lib/posts";
 import { tagFromSlug } from "@/lib/tags";
 import { metadataFor } from "@/lib/seo";
 import { tagCounterparts } from "@/lib/inventory";
+import { dumpCopy } from "@/lib/copy";
 
 export const dynamicParams = false;
 
@@ -30,8 +31,8 @@ export async function generateMetadata({
     path: tagHref(found.slug),
     locale: DEFAULT_LOCALE,
     counterparts: tagCounterparts(DEFAULT_LOCALE, found.id),
-    title: `Posts tagged "${found.label}"`,
-    description: `Technical writing and project notes tagged "${found.label}" on dump.`,
+    title: dumpCopy(DEFAULT_LOCALE).tagPageSeo.title(found.label),
+    description: dumpCopy(DEFAULT_LOCALE).tagPageSeo.description(found.label),
   });
 }
 
@@ -49,9 +50,9 @@ export default async function TagPage({ params }: PageProps) {
       counterpart={tagCounterparts(DEFAULT_LOCALE, found.id)[0]?.path}
     >
       <PageHeader
-        label="Tag"
+        label={dumpCopy(DEFAULT_LOCALE).tags.pageLabel}
         title={found.label}
-        line={`${posts.length} ${posts.length === 1 ? "post" : "posts"}`}
+        line={dumpCopy(DEFAULT_LOCALE).tags.posts(posts.length)}
       />
       <TagPostList posts={posts} />
     </DumpShell>

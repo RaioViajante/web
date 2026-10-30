@@ -10,7 +10,7 @@ import {
 
 import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 import { GISCUS, commentKey, giscusLang } from "@/lib/comment-key";
-import { ptCopy } from "@/lib/pt";
+import { commentsUiCopy } from "@/lib/comments-copy";
 
 /** Distance below the viewport at which scrolling toward the comments starts loading them. */
 const ROOT_MARGIN = "200px";
@@ -46,21 +46,6 @@ function loadGiscus(
   container.appendChild(script);
 }
 
-const ENGLISH_TEXT = {
-  waiting:
-    "Comments load from giscus (GitHub Discussions) when you scroll to this section.",
-  manual:
-    "Comments are provided by giscus (GitHub Discussions). Loading them connects to giscus.app and GitHub.",
-  loading: "Loading comments…",
-  failed: "Comments could not be loaded.",
-  load: "Load comments",
-  retry: "Try again",
-};
-
-function textFor(locale: LocaleId) {
-  return locale === DEFAULT_LOCALE ? ENGLISH_TEXT : ptCopy.post.commentsUi;
-}
-
 /**
  * Article comments, backed by giscus (GitHub Discussions). Isolated client
  * boundary: mounted only from `PostArticle`. Nothing contacts giscus.app until
@@ -77,7 +62,7 @@ export function Comments({
   contentId: string;
   locale?: LocaleId;
 }) {
-  const text = textFor(locale);
+  const text = commentsUiCopy[locale];
   const mountRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
   const started = useRef(false);

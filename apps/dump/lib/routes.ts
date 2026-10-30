@@ -13,8 +13,8 @@ export const routes: Record<RouteKey, RoutePaths> = {
   home: { en: "/", "pt-BR": "/pt" },
   archive: { en: "/archive", "pt-BR": "/pt/archive" },
   tags: { en: "/tags", "pt-BR": "/pt/tags" },
-  terms: { en: "/terms" },
-  privacy: { en: "/privacy" },
+  terms: { en: "/terms", "pt-BR": "/pt/terms" },
+  privacy: { en: "/privacy", "pt-BR": "/pt/privacy" },
   search: { en: "/search", "pt-BR": "/pt/search" },
 };
 

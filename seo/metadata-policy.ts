@@ -648,6 +648,15 @@ export interface RssItem {
   pubDate: string;
 }
 
+/** The tag GUID of an English feed item: fixed host, fixed year, `en`, a kebab contentId. */
+function tagGuidPattern(site: Site) {
+  const host = new URL(siteOrigins[site]).hostname.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&",
+  );
+  return new RegExp(`^tag:${host},2026:post/[a-z0-9]+(?:-[a-z0-9]+)*/en$`);
+}
+
 export function checkRss(
   site: Site,
   xml: string,
@@ -672,6 +681,9 @@ export function checkRss(
       };
     },
   );
+  const permalinkFlags = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(
+    (m) => /<guid\b[^>]*\bisPermaLink="([^"]*)"/.exec(m[1]!)?.[1],
+  );
   if (!/^<\?xml/.test(xml) || !/<rss\b[^>]*version="2\.0"/.test(xml))
     p.push(`${at}: not an RSS 2.0 document`);
   const channelLink = /<channel>[\s\S]*?<link>([^<]*)<\/link>/.exec(xml)?.[1];
@@ -692,8 +704,14 @@ export function checkRss(
       badHost(item.link)
     )
       p.push(`${at}: item link ${item.link} is not a production post URL`);
-    if (item.guid !== item.link)
+    // Legacy items keep their permalink GUID. A new English item uses the
+    // non-permalink tag form `tag:<production host>,2026:post/<contentId>/en`
+    // (docs/i18n.md, "GUID compatibility"); any other mismatch is a problem.
+    const tag = tagGuidPattern(site).test(item.guid);
+    if (item.guid !== item.link && !tag)
       p.push(`${at}: guid differs from link for ${item.link}`);
+    if (tag && permalinkFlags[items.indexOf(item)] !== "false")
+      p.push(`${at}: tag guid for ${item.link} must be isPermaLink="false"`);
     if (!sitemapLocs.includes(item.link))
       p.push(`${at}: ${item.link} is not in the sitemap`);
     const date = Date.parse(item.pubDate);

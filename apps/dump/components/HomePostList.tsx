@@ -2,11 +2,15 @@ import Link from "next/link";
 import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { IndexHeader, LeaderRow, Section } from "@raioviajante/design/parts";
 import { identity } from "../../../seo/structured-data";
-import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
+import {
+  DEFAULT_LOCALE,
+  localizedPath,
+  type LocaleId,
+} from "../../../site/locales";
 
 import { series } from "@/lib/post-details";
 import { postPath } from "@/lib/inventory";
-import { ptCopy } from "@/lib/pt";
+import { dumpCopy } from "@/lib/copy";
 import { tagPresentation } from "@/lib/tags";
 import {
   formatPostDate,
@@ -54,6 +58,7 @@ export function HomePostList({
   latestMinutes?: number;
   locale?: LocaleId;
 }) {
+  const copy = dumpCopy(locale);
   const sorted = sortPostsNewestFirst(posts);
   const [latest, ...older] = sorted;
   if (!latest)
@@ -61,35 +66,42 @@ export function HomePostList({
       <>
         <IndexHeader
           name="dump"
-          line={
-            locale === DEFAULT_LOCALE
-              ? "a memory dump, hopefully readable."
-              : ptCopy.home.line
+          line={copy.home.line}
+          avatar={
+            <AvatarCoin
+              label={copy.home.avatar.label}
+              reducedMotionLabel={copy.home.avatar.reduced}
+            />
           }
-          avatar={<AvatarCoin />}
         />
-        <p className="home-empty">
-          {locale === DEFAULT_LOCALE ? "No posts yet." : ptCopy.home.empty}
-        </p>
+        <p className="home-empty">{copy.home.empty}</p>
       </>
     );
   const months = groupPostsByMonth(older, locale);
-  const portuguese = locale !== DEFAULT_LOCALE;
+  // A series section lists only the parts that exist in this locale; with none
+  // it is omitted and the sections after it are numbered without a gap.
+  const seriesRows = series.flatMap((item) => {
+    const parts = item.contentIds
+      .map((contentId) => posts.find((post) => post.contentId === contentId))
+      .filter((post): post is Post => Boolean(post));
+    return parts.length > 0 ? [{ name: item.name, parts }] : [];
+  });
+  let nextSection = months.length + 1;
+  const seriesNumber = seriesRows.length > 0 ? `00.${nextSection++}` : null;
+  const followNumber = `00.${nextSection}`;
   return (
     <>
       <IndexHeader
         name="dump"
-        line={
-          portuguese ? ptCopy.home.line : "a memory dump, hopefully readable."
+        line={copy.home.line}
+        avatar={
+          <AvatarCoin
+            label={copy.home.avatar.label}
+            reducedMotionLabel={copy.home.avatar.reduced}
+          />
         }
-        avatar={<AvatarCoin />}
       />
-      <Section
-        number="00."
-        title={portuguese ? ptCopy.home.latest : "Latest"}
-        id="latest-heading"
-        index
-      >
+      <Section number="00." title={copy.home.latest} id="latest-heading" index>
         <Link
           className="featured-post"
           data-sound="nav"
@@ -100,14 +112,12 @@ export function HomePostList({
         </Link>
         <p className="post-meta">
           <time dateTime={latest.publishedAt}>
-            {portuguese
-              ? formatPostDate(latest.publishedAt, locale)
-              : latest.publishedAt}
+            {formatPostDate(latest.publishedAt, locale)}
           </time>
           <span aria-hidden="true"> · </span>
           {latestMinutes ? (
             <>
-              {latestMinutes} {portuguese ? ptCopy.post.minute : "min read"}
+              {copy.post.minutesRead(latestMinutes)}
               <span aria-hidden="true"> · </span>
             </>
           ) : null}
@@ -129,9 +139,7 @@ export function HomePostList({
                   label={post.title}
                   value={
                     <time dateTime={post.publishedAt}>
-                      {portuguese
-                        ? formatPostDate(post.publishedAt, locale)
-                        : post.publishedAt.slice(5)}
+                      {formatPostDate(post.publishedAt, locale)}
                     </time>
                   }
                   href={postPath(post)}
@@ -144,47 +152,38 @@ export function HomePostList({
           </ol>
         </Section>
       ))}
-      <Section
-        number={`00.${months.length + 1}`}
-        title={portuguese ? ptCopy.home.series : "Series"}
-        id="series-heading"
-        index
-      >
-        {series.map((item) => {
-          const parts = item.contentIds
-            .map((contentId) =>
-              posts.find((post) => post.contentId === contentId),
-            )
-            .filter((post): post is Post => Boolean(post));
-          return parts.length > 0 ? (
+      {seriesNumber ? (
+        <Section
+          number={seriesNumber}
+          title={copy.home.series}
+          id="series-heading"
+          index
+        >
+          {seriesRows.map(({ name, parts }) => (
             <LeaderRow
-              key={item.name}
-              label={item.name}
-              value={`${parts.length} ${
-                parts.length === 1
-                  ? portuguese
-                    ? ptCopy.home.part
-                    : "part"
-                  : portuguese
-                    ? ptCopy.home.parts
-                    : "parts"
-              }`}
+              key={name}
+              label={name}
+              value={copy.home.parts(parts.length)}
               href={postPath(parts[0]!)}
               linkComponent={Link}
             />
-          ) : null;
-        })}
-      </Section>
+          ))}
+        </Section>
+      ) : null}
       <Section
-        number={`00.${months.length + 2}`}
-        title={portuguese ? ptCopy.home.follow : "Follow along"}
+        number={followNumber}
+        title={copy.home.follow}
         id="follow-heading"
         index
       >
-        {!portuguese && <LeaderRow label="RSS" value="feed" href="/rss.xml" />}
+        <LeaderRow
+          label="RSS"
+          value={copy.home.feed}
+          href={localizedPath("dump", locale, "/rss.xml")}
+        />
         <LeaderRow
           label="GitHub"
-          value={portuguese ? ptCopy.home.code : "code ↗"}
+          value={copy.home.code}
           href={identity.github}
           rel="me"
         />

@@ -71,9 +71,10 @@ replace them. `publishedAt` remains the authority for ordering and RSS;
 - The filename currently determines a version's slug (and so its URL). The
   slug is route identity only; it is never used to decide that two versions are
   the same work. A translation has its own filename and slug.
-- `publishedAt`, `updatedAt` and `draft` belong to each localized version.
-  They are never copied between versions or inferred from Git, the filesystem
-  or the build. Portuguese routes exist under `/pt`; only published Portuguese
+- `updatedAt` and `draft` belong to each localized version and are never
+  copied between versions or inferred from Git, the filesystem or the build.
+  `publishedAt` is the exception: it is the original's date and identical in
+  every version of the work (see Date authority). Portuguese routes exist under `/pt`; only published Portuguese
   records enter them.
 
 ### Date authority
@@ -85,9 +86,23 @@ alternative publication date. Correct `publishedAt` only when independent
 publication evidence supports the change; otherwise preserve the recorded
 date rather than infer or redistribute dates.
 
+A translation is not a new publication. Every version of a work, in either
+language, carries the `publishedAt` of the original, also when the original is
+Portuguese and the English version came later. The original's date is the one
+already recorded in its own frontmatter.
+
 Use `updatedAt` for a later meaningful change to the article's facts or prose.
 Metadata cleanup, taxonomy changes, repository migrations, and automated
 changes do not establish a content update on their own.
+
+`updatedAt` is explicit: it is written by hand in the frontmatter and is never
+derived automatically from Git, the filesystem or the build. For a real
+material update, the date may be verified from the commit that made the update
+(its author date converted to UTC, the convention `publishedAt` follows) and
+that evidence belongs in the commit or PR that records it. Every version of a
+work that received the update carries the same date, `publishedAt` is never
+touched, and the newest update replaces an earlier `updatedAt` (there is no
+changelog). The work's versions that were not touched keep none.
 
 ### Tags
 
@@ -108,7 +123,23 @@ presentation rather than request text.
 
 Series (`lib/post-details.ts`) list `contentIds` in reading order, so every
 localized version of a part belongs to its series. Series are not derived from
-tags. The reader UI belongs to a later issue.
+tags. The home page shows only the parts that exist in the page's locale and
+omits the section when there are none.
+
+### Translations
+
+Every English-original post has a Portuguese version, and the Portuguese
+original has an English version. A new translation gets its own file, its own
+slug in its own language, the work's `contentId`, `originalLocale` unchanged,
+and `publishedAt` copied from the original: a translation is not a new
+publication, so every version of a work has the same `publishedAt` (the build
+fails otherwise), including an English translation of a Portuguese original.
+`updatedAt` stays unset unless there is an explicit material update. Tags are ids, so the translation carries the same list, and each id
+needs a presentation in the translation's locale (`content/tags.json`). The
+translation contains everything its original contains: same headings, code
+blocks, links and directives, in the same order. Code stays verbatim; natural
+language inside code comments and short quoted prose in `text` fences is
+translated. A new English item uses the non-legacy tag GUID in the feed.
 
 ### Drafts
 
@@ -129,7 +160,9 @@ established 308; a missing normalized destination then returns the localized
 An article whose truthful first-publication date is not known yet cannot be a
 post record, because `publishedAt` remains required even for a draft. Prepare
 such work in `content/drafts/<locale>/`; that directory is never loaded by the
-site. On the actual release date, add `publishedAt`, move the file into
+site. A draft translation is the exception: it takes the original's
+`publishedAt` and needs no release date. For a new original, on the actual
+release date, add `publishedAt`, move the file into
 `content/posts/`, regenerate the route manifest with `pnpm content:routes`, and
 run the full release checks before merge.
 
@@ -141,6 +174,15 @@ Fences accept the soft-block options (`title="…"`, `showLineNumbers`,
 `{8-9}`, `terminal`, `group`), and `:::note`-style callouts work; see
 [`docs/blocks.md`](../../../docs/blocks.md). Posts are plain Markdown plus
 these blocks: they are compiled without a components map.
+
+The one piece of raw markup a post may use is the inline
+`<span lang="en">…</span>`, to mark a title or phrase in English inside a
+Portuguese text so assistive technology reads it in the right language. Use it
+only in prose, never in a heading, and never around code, file names,
+identifiers, commands, project names or loanwords that read as Portuguese
+(deadline, retry, parser). A test enforces this. See
+[`docs/i18n.md`](../docs/i18n.md) for the policy and for how a sentence that
+later became false is corrected without rewriting the post.
 
 ## License
 

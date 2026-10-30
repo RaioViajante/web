@@ -1,0 +1,80 @@
+---
+contentId: "traduzir-o-site-sem-fingir-que-tudo-ja-existe"
+locale: "en"
+originalLocale: "pt-BR"
+title: "Translating the Site Without Pretending Everything Already Exists"
+description: "How dump separates identity, language and publication to offer partial content in Portuguese without inventing equivalences."
+publishedAt: "2026-10-19"
+updatedAt: "2026-10-30"
+tags:
+  - meta
+  - architecture
+  - web
+draft: false
+---
+
+Translating a site looks, at first glance, like a job of swapping texts. In this project, the most delicate part showed up before the translation: deciding what a page in another language actually means.
+
+If a text exists in English, that does not mean it already exists in Portuguese. If a route has the `/pt` prefix, it also should not carry English content just to avoid an empty spot. The site needs to be able to say “this version exists” and “this one does not exist yet” without mixing the two answers.
+
+## A work and its versions
+
+dump separates the identity of the content from the identity of the route. Each work has a stable `contentId`; each localized version has its own `locale`, slug and publication cycle.
+
+A translation can, for example, share the `maybe-this-can-be-something-someday` identifier with the original text without copying the English slug. The relationship comes from the `contentId`, not from similar titles or a naming convention.
+
+This also allows the reverse path: a text can be born in Portuguese and remain a valid work even without an English version. `originalLocale` records that origin; it does not define which language matters more.
+
+## Partial has to be a normal state
+
+The goal here is not to maintain a perfectly symmetrical table. Some pages will have versions in both languages; others may keep existing in only one of them.
+
+That is why lists of texts, the archive, tags, related texts, series and previous/next navigation are built only from records published in the current language. There is no automatic substitution by another language. When a translation does not exist, the corresponding route does not exist either.
+
+This behavior is stricter, but it keeps the answer honest. A missing page returns `404`; it does not get a Portuguese frame around an English text.
+
+## The URL chooses the language
+
+On this site, the language comes from the URL. The English routes stay unprefixed, while the Portuguese ones live under `/pt`.
+
+This avoids making the same URL change depending on the browser, a cookie or the person's location. It also keeps caches, shared links, metadata and search tools looking at the same representation.
+
+Localized slugs are independent. This choice costs a little more inventory, because every path has to be declared and validated, but it avoids turning translation into a presentation detail.
+
+## Publishing is not the same as announcing
+
+During the first stage of this rollout, the Portuguese routes could exist before the rest of the ecosystem started pointing to them. The project treats publishing and announcing as different steps.
+
+While that first stage was in validation, the pages were reached directly and checked: document language, canonical URL, metadata, search index, sitemap and `404` responses. Public participation of the language stayed turned off in that stage, so the `LANG` control and the other sites did not advertise an experience that was still in validation.
+
+Once that initial publication was verified in production, a separate stage could turn on announcing across hosts. It is a decision specific to this project, not a universal rule for multilingual sites.
+
+:::note[Update]
+That separate stage has happened: today the `LANG` control and the other sites in the ecosystem advertise the Portuguese pages.
+:::
+
+## What is left for later
+
+Not every integration arrived together with the first pages.
+
+In that initial stage, the English feed at `/rss.xml` needed to preserve URLs, GUIDs, order and dates. A Portuguese feed and its autodiscovery belonged to a separate migration; `/pt/rss.xml` was not announced while it did not exist.
+
+The English comments also stayed tied to the current path of each page. During this first publication, the Portuguese texts had no comments section; the identity of the discussions would be handled in an explicit, separate migration.
+
+:::note[Update]
+Both migrations have been done. The Portuguese feed exists at `/pt/rss.xml` and the Portuguese pages announce it. The Portuguese texts have a comments section, and each work has a single discussion, shared by its versions in both languages.
+:::
+
+Automatic links to Lab demos follow the same caution: if a real Portuguese version does not exist, the Portuguese text does not present the English destination as if it were an equivalent. An editorial link to English material can still exist, as long as it says so clearly and declares `hreflang="en"`.
+
+## Dates belong to the published version
+
+At first, the translation did not inherit the date of the original. Each version got `publishedAt` with the date of its first public publication, recorded by the project's editorial process.
+
+:::note[Update]
+That rule has changed. A translation is not a new publication: every version of a work, in any language, carries the original's `publishedAt`. The date remains an explicit editorial record; the build does not derive it from Git or from the clock.
+:::
+
+During preparation, a manuscript without a publication date stays out of the published inventory. It does not need an invented date to fit into the build, and it also does not risk showing up early on a route, in the sitemap or in search.
+
+In the end, the architecture serves a simple idea: show only what actually exists, in the language where it exists, and leave room for the rest to arrive later.
