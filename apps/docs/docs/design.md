@@ -42,7 +42,22 @@ toggle remain.
   [docs/i18n.md](../../../docs/i18n.md#404-behavior)).
 - Block controls and callout labels are localized by the shared pipeline: it
   reads each document's `locale` frontmatter, so Portuguese pages render
-  `copiar`, `Nota`, `Aviso` and the rest at build time.
+  `copiar`, `Nota`, `Aviso` and the rest at build time. The shared behavior
+  only repairs a control still in English from `<html lang>`; the common rules
+  are in [docs/blocks.md](../../../docs/blocks.md#localization).
+- Search suggestions (the "nothing found" terms) are in the same catalog, one
+  list for "this site" and one for "everywhere" per locale: English `sweep, cli,
+  tokens, commits` and `setup, assembly, classifier`; Portuguese `sweep, cli,
+  tipografia, commits` and `arquivos, classificação, bancadas`.
+  `tests/build.test.mjs` fails if one finds nothing in the built index of its
+  locale, and `e2e/docs-locale-navigation.spec.ts` clicks every Portuguese
+  suggestion in both scopes. `SearchPage` takes them as the optional
+  `suggestions` prop.
+- Dates: an explicit `lastUpdated` renders as a long date in the page's `Intl`
+  locale (UTC), such as "September 27, 2026" or "27 de setembro de 2026", with
+  the ISO value in `<time datetime>`. No page sets one today.
+- The home page omits a section that has nothing to list in the locale and
+  renumbers the rest.
 - `src/pages/[...slug].astro` renders every documentation page: breadcrumb
   label, status word and meta row, numbered sections, steps, tables, callouts,
   "last updated" and "edit this page on GitHub", and previous/next. The

@@ -54,6 +54,27 @@ endpoints. Coverage is complete today (4 of 4 documents), but nothing requires
 it: a future document may exist in one language only, and then it is absent from
 the other language's navigation and its `LANG` offers the other home.
 
+### Portuguese legal pages and cross-site links
+
+- `/pt/terms/` and `/pt/privacy/` are faithful translations of the English
+  Terms of Use and Privacy Policy (`src/components/TermsPage.tsx`,
+  `PrivacyPage.tsx`): same sections and facts, no clause added or removed, and
+  no date because the English pages show none. English remains the authoritative
+  text (stated in [docs/i18n.md](../../../docs/i18n.md#legal-pages), not on the
+  page, as for Root). The Portuguese footer links them without the "em inglês"
+  qualifier. Any change to an English legal text needs the Portuguese text
+  reviewed in the same change.
+- The Portuguese Sweep guide links Lab's Portuguese experiment
+  (`https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/`),
+  which has been published since before the Docs translation, so no merge order
+  is involved. The Portuguese Sweep guide links its two Dump posts, and the
+  Portuguese home links the Dump posts about Orbit and yanawa, in English, with
+  `hreflang="en"` and "em inglês" in the text, because their Portuguese versions
+  are not on the default branch yet (the Dump localization PR adds them). When
+  they land, point those four links at the Portuguese URLs and drop the
+  qualifier; run `pnpm links:check` afterwards, which follows links between the
+  four apps.
+
 ## Potential future information architecture
 
 Other projects may be added when they meet the publication threshold. Possible future project sections include Orbit, Hum, yanawa, or x86-related material, but none of those projects currently has a public documentation section here. Sections and pages should be created only when there is real, stable content to justify them — never as placeholders.
