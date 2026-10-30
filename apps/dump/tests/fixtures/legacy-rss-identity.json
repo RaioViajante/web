@@ -84,5 +84,11 @@
       "link": "https://dump.raioviajante.com/posts/maybe-this-can-be-something-someday",
       "pubDate": "Fri, 04 Sep 2026 00:00:00 GMT"
     }
+  ],
+  "retiredGuids": [
+    "https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was",
+    "https://dump.raioviajante.com/posts/an-execution-is-more-than-a-row-in-a-database",
+    "https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases",
+    "https://dump.raioviajante.com/posts/building-orbit"
   ]
 }

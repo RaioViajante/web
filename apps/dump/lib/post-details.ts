@@ -26,20 +26,6 @@ export const series = [
       "gave-one-operation-more-than-one-deadline",
     ],
   },
-  {
-    name: "orbit",
-    contentIds: [
-      "building-orbit",
-      "an-execution-is-more-than-a-row-in-a-database",
-    ],
-  },
-  {
-    name: "sweep",
-    contentIds: [
-      "apparently-moving-a-file-has-edge-cases",
-      "a-toml-file-changed-what-sweep-was",
-    ],
-  },
 ];
 
 /**
@@ -104,16 +90,9 @@ export function chronologicalNeighbours(
   };
 }
 
-/** The Lab experiment that matches a post, by series or topic. */
+/** The Lab experiment that matches a post, by topic. */
 function labTargetOf(post: Post): LabTarget | null {
-  const currentSeries = seriesOf(post);
-  return post.tags.includes("osdev")
-    ? "boot-sector"
-    : currentSeries?.name === "orbit"
-      ? "execution-states"
-      : currentSeries?.name === "sweep"
-        ? "filename-classifier"
-        : null;
+  return post.tags.includes("osdev") ? "boot-sector" : null;
 }
 
 /**

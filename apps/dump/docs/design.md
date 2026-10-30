@@ -18,7 +18,7 @@ narrow screens), the tag grid, the reading progress bar and the
 font binding for `next/font`.
 
 The index features the newest published post, groups older posts by month, and
-links the three editorial series (real post slugs). Archive groups posts by
+links the editorial series (real post slugs; today only jobs-mcp). Archive groups posts by
 year and month. Tags split into recurring and once-so-far. Search is the shared
 search page; `/` and ⌘K open it. Articles show reading time, a progress bar
 (`data-reading-progress`), "on this page" in the sidebar with the current

@@ -77,6 +77,12 @@ describe("current English content", () => {
     expect(published.map((p) => `/posts/${p.slug}`)).toEqual(contract.postUrls);
   });
 
+  it("lists no retired post among the recorded ones", () => {
+    expect(contract.retired).toHaveLength(4);
+    for (const slug of contract.retired)
+      expect(contract.posts.map((p) => p.slug)).not.toContain(slug);
+  });
+
   it("keeps tag counts, order and URLs", () => {
     // Counted over the recorded posts: the added translation only adds to
     // the counts of its own tags.

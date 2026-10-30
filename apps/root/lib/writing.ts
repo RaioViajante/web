@@ -16,9 +16,9 @@ export interface RecentPost {
 
 const fallbackPosts: RecentPost[] = [
   {
-    title: "A TOML File Changed What Sweep Was",
-    url: `${DUMP_ORIGIN}/posts/a-toml-file-changed-what-sweep-was`,
-    date: "2026-09-27",
+    title: "Translating the Site Without Pretending Everything Already Exists",
+    url: `${DUMP_ORIGIN}/posts/translating-the-site-without-pretending-everything-already-exists`,
+    date: "2026-10-19",
   },
   {
     title: "I Gave One Operation More Than One Deadline",

@@ -73,17 +73,20 @@ describe("<HomePostList />", () => {
   it("localizes Portuguese series counts without changing their identity", () => {
     const portuguesePart: Post = {
       ...posts[0]!,
-      slug: "construindo-orbit",
-      contentId: "building-orbit",
+      slug: "comecei-a-escrever-as-falhas-antes-das-funcionalidades",
+      contentId: "started-writing-down-the-failures-before-the-features",
       locale: "pt-BR",
       originalLocale: "en",
-      title: "Construindo Orbit",
+      title: "Comecei a escrever as falhas antes das funcionalidades",
     };
     render(<HomePostList posts={[portuguesePart]} locale="pt-BR" />);
 
     expect(
-      screen.getByRole("link", { name: /orbit.*1 parte/i }),
-    ).toHaveAttribute("href", "/pt/posts/construindo-orbit");
+      screen.getByRole("link", { name: /jobs-mcp.*1 parte/i }),
+    ).toHaveAttribute(
+      "href",
+      "/pt/posts/comecei-a-escrever-as-falhas-antes-das-funcionalidades",
+    );
     expect(screen.queryByText(/1 part$/)).not.toBeInTheDocument();
   });
 

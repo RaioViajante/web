@@ -9,8 +9,13 @@ import fixture from "./fixtures/legacy-rss-identity.json";
 // localized-RSS migration (issue #48), captured from the live /rss.xml.
 // Feed readers key items by GUID, so every recorded item must keep its GUID,
 // link, pubDate and isPermaLink for as long as its post is published. An
-// editorial removal must edit the fixture on purpose, in the same change.
+// editorial removal must edit the fixture on purpose, in the same change: the
+// raw capture stays untouched, and the removed GUIDs are listed in
+// \`retiredGuids\` so they are expected to be absent instead.
 const PRODUCTION_ORIGIN = "https://dump.raioviajante.com";
+
+const retired = new Set(fixture.retiredGuids);
+const live = fixture.items.filter((item) => !retired.has(item.guid));
 
 interface FeedItem {
   guid: string;
@@ -65,8 +70,16 @@ describe("English /rss.xml against the production snapshot", () => {
 
   it("serves every recorded item with identical GUID, isPermaLink, link and pubDate", () => {
     const byGuid = new Map(rendered().map((item) => [item.guid, item]));
-    for (const recorded of fixture.items) {
+    for (const recorded of live) {
       expect(byGuid.get(recorded.guid)).toEqual(recorded);
+    }
+  });
+
+  it("no longer serves a retired item, under its permalink GUID or any other", () => {
+    expect(retired.size).toBe(4);
+    for (const item of fixture.items.filter((i) => retired.has(i.guid))) {
+      expect(feed).not.toContain(item.guid);
+      expect(feed).not.toContain(item.link);
     }
   });
 
@@ -100,18 +113,17 @@ describe("English /rss.xml against the production snapshot", () => {
     );
     const published = getPublishedPosts("en").length;
     expect(extended).toHaveLength(published + 1);
-    expect(published).toBeGreaterThanOrEqual(fixture.items.length);
+    expect(published).toBeGreaterThanOrEqual(live.length);
     expect(extended[0]).toMatchObject({
       guid: "tag:dump.raioviajante.com,2026:post/brand-new/en",
       isPermaLink: "false",
     });
-    for (const recorded of fixture.items)
-      expect(extended).toContainEqual(recorded);
+    for (const recorded of live) expect(extended).toContainEqual(recorded);
   });
 
   it("gives the English translation of a Portuguese original the non-legacy tag GUID", () => {
     const added = rendered().filter(
-      (item) => !fixture.items.some((recorded) => recorded.guid === item.guid),
+      (item) => !live.some((recorded) => recorded.guid === item.guid),
     );
     expect(added).toEqual([
       {

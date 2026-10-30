@@ -60,7 +60,6 @@ const copy = {
 				orbit: {
 					status: "not documented yet",
 					summary: "self-hosted job scheduler",
-					note: "read about it on dump ↗",
 				},
 				yanawa: {
 					status: "not documented yet",
@@ -100,7 +99,6 @@ const copy = {
 				orbit: {
 					status: "ainda não documentado",
 					summary: "agendador de tarefas auto-hospedado",
-					note: "leia sobre ele no dump ↗",
 				},
 				yanawa: {
 					status: "ainda não documentado",

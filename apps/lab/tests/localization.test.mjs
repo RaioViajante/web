@@ -98,7 +98,7 @@ test("fidelity rows and related rows exist for every surface in both locales", (
   for (const experiment of experiments) {
     assert.ok(fidelityRows[experiment.surface].en.length >= 3);
     assert.ok(fidelityRows[experiment.surface]["pt-BR"].length >= 3);
-    assert.ok(relatedRows[experiment.surface].en.length >= 2);
+    assert.ok(relatedRows[experiment.surface].en.length >= 1);
   }
 });
 

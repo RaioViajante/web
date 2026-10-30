@@ -559,15 +559,6 @@ test("Dump Portuguese posts link the Portuguese sibling sites and the Portuguese
     expect(hrefs).not.toContain(english);
 
   // Every Lab target has a Portuguese page, so a Portuguese post links it.
-  await page.goto(
-    `${base("dump")}/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era`,
-  );
-  await expect(page.getByText("Experimente", { exact: true })).toHaveCount(1);
-  await expect(
-    page.locator(
-      "a[href='https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/']",
-    ),
-  ).toHaveCount(1);
   await page.goto(`${base("dump")}/pt/posts/nao-existe-printf-aqui-embaixo`);
   await expect(page.getByText("Experimente", { exact: true })).toHaveCount(1);
   await expect(

@@ -157,6 +157,20 @@ normalizes repeated separators and one trailing slash before the proxy with its
 established 308; a missing normalized destination then returns the localized
 404. No alias or new canonical is introduced.
 
+### Retiring a work
+
+A work is retired by deleting every localized `.mdx` file of its `contentId` in
+one commit, regenerating the route manifest with `pnpm content:routes`, and
+removing the work from series, links and fixtures that name it. Git history
+keeps the text. Its old URLs get the existing localized 404: Next.js static
+output and the request proxy do not serve a `410 Gone`, and there is no
+redirect to an unrelated page. Its `contentId` stays in
+`LEGACY_ENGLISH_CONTENT_IDS` (`lib/rss-identity.ts`) so the feed GUID is never
+reassigned; `tests/retired-content.test.ts` lists the retired works and checks
+that none of them reappears in a collection, feed, sitemap or search index.
+Tags that only a retired work used stop appearing in tag indexes but stay in
+`tags.json`.
+
 An article whose truthful first-publication date is not known yet cannot be a
 post record, because `publishedAt` remains required even for a draft. Prepare
 such work in `content/drafts/<locale>/`; that directory is never loaded by the

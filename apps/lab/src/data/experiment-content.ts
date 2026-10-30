@@ -30,38 +30,9 @@ const learningNotes =
 
 /**
  * Dump posts linked from either locale. The Portuguese printf row uses the
- * Portuguese post (`printfPt`); the other rows deliberately keep linking the
- * English posts and name them as English.
+ * Portuguese post (`printfPt`); the English row names the English post.
  */
 const dump = {
-  edgeCases: {
-    label: "Apparently Moving a File Has Edge Cases",
-    labelLanguage: "en",
-    value: "dump ↗",
-    href: "https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases",
-    language: "en",
-  },
-  toml: {
-    label: "A TOML File Changed What Sweep Was",
-    labelLanguage: "en",
-    value: "dump ↗",
-    href: "https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was",
-    language: "en",
-  },
-  execution: {
-    label: "An Execution Is More Than a Row in a Database",
-    labelLanguage: "en",
-    value: "dump ↗",
-    href: "https://dump.raioviajante.com/posts/an-execution-is-more-than-a-row-in-a-database",
-    language: "en",
-  },
-  orbit: {
-    label: "I Got Bored of CRUD, So I'm Building a Scheduler",
-    labelLanguage: "en",
-    value: "dump ↗",
-    href: "https://dump.raioviajante.com/posts/building-orbit",
-    language: "en",
-  },
   printf: {
     label: "There Is No printf Down Here",
     labelLanguage: "en",
@@ -157,8 +128,11 @@ export const relatedRows = {
         href: "https://docs.raioviajante.com/projects/sweep/#classification",
         language: "en",
       },
-      dump.edgeCases,
-      dump.toml,
+      {
+        label: "Sweep source code",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/sweep",
+      },
     ],
     "pt-BR": [
       {
@@ -176,8 +150,20 @@ export const relatedRows = {
     ],
   },
   "execution-states": {
-    en: [dump.execution, dump.orbit],
-    "pt-BR": [dump.execution, dump.orbit],
+    en: [
+      {
+        label: "Orbit source code",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit",
+      },
+    ],
+    "pt-BR": [
+      {
+        label: "código-fonte do Orbit",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit",
+      },
+    ],
   },
   "boot-sector": {
     en: [

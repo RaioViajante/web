@@ -112,6 +112,4 @@ The target directory is supplied by the user. Downloads is only an example; it i
 ## Try it and read more
 
 - [001 filename classifier](https://lab.raioviajante.com/experiments/filename-classifier/): classify names in your browser (lab)
-- [Apparently Moving a File Has Edge Cases](https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases) (dump)
-- [A TOML File Changed What Sweep Was](https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was) (dump)
 - [Source repository](https://github.com/RaioViajante/sweep)

@@ -1,19 +1,6 @@
 {
   "posts": [
     {
-      "slug": "a-toml-file-changed-what-sweep-was",
-      "title": "A TOML File Changed What Sweep Was",
-      "publishedAt": "2026-09-27",
-      "updatedAt": null,
-      "tags": [
-        "python",
-        "toml",
-        "cli",
-        "sweep"
-      ],
-      "bodyLength": 5154
-    },
-    {
       "slug": "gave-one-operation-more-than-one-deadline",
       "title": "I Gave One Operation More Than One Deadline",
       "publishedAt": "2026-09-27",
@@ -66,18 +53,6 @@
       "bodyLength": 3813
     },
     {
-      "slug": "an-execution-is-more-than-a-row-in-a-database",
-      "title": "An Execution Is More Than a Row in a Database",
-      "publishedAt": "2026-09-13",
-      "updatedAt": null,
-      "tags": [
-        "java",
-        "spring",
-        "distributed-systems"
-      ],
-      "bodyLength": 12481
-    },
-    {
       "slug": "split-my-internet-into-four-different-kinds-of-place",
       "title": "I Split My Internet Into Four Different Kinds of Place",
       "publishedAt": "2026-09-13",
@@ -100,31 +75,6 @@
         "compilers"
       ],
       "bodyLength": 9878
-    },
-    {
-      "slug": "apparently-moving-a-file-has-edge-cases",
-      "title": "Apparently Moving a File Has Edge Cases",
-      "publishedAt": "2026-09-12",
-      "updatedAt": null,
-      "tags": [
-        "python",
-        "pytest",
-        "automation",
-        "sweep"
-      ],
-      "bodyLength": 8388
-    },
-    {
-      "slug": "building-orbit",
-      "title": "I Got Bored of CRUD, So I'm Building a Scheduler",
-      "publishedAt": "2026-09-07",
-      "updatedAt": null,
-      "tags": [
-        "java",
-        "spring",
-        "distributed-systems"
-      ],
-      "bodyLength": 16409
     },
     {
       "slug": "there-is-no-printf-down-here",
@@ -161,15 +111,7 @@
       "count": 4
     },
     {
-      "tag": "distributed-systems",
-      "count": 2
-    },
-    {
       "tag": "dump",
-      "count": 2
-    },
-    {
-      "tag": "java",
       "count": 2
     },
     {
@@ -177,19 +119,7 @@
       "count": 2
     },
     {
-      "tag": "python",
-      "count": 2
-    },
-    {
       "tag": "reliability",
-      "count": 2
-    },
-    {
-      "tag": "spring",
-      "count": 2
-    },
-    {
-      "tag": "sweep",
       "count": 2
     },
     {
@@ -198,14 +128,6 @@
     },
     {
       "tag": "assembly",
-      "count": 1
-    },
-    {
-      "tag": "automation",
-      "count": 1
-    },
-    {
-      "tag": "cli",
       "count": 1
     },
     {
@@ -229,19 +151,11 @@
       "count": 1
     },
     {
-      "tag": "pytest",
-      "count": 1
-    },
-    {
       "tag": "security",
       "count": 1
     },
     {
       "tag": "time",
-      "count": 1
-    },
-    {
-      "tag": "toml",
       "count": 1
     },
     {
@@ -268,27 +182,18 @@
   "tagUrls": [
     "/tags/meta",
     "/tags/personal",
-    "/tags/distributed-systems",
     "/tags/dump",
-    "/tags/java",
     "/tags/mcp",
-    "/tags/python",
     "/tags/reliability",
-    "/tags/spring",
-    "/tags/sweep",
     "/tags/architecture",
     "/tags/assembly",
-    "/tags/automation",
-    "/tags/cli",
     "/tags/compilers",
     "/tags/language-design",
     "/tags/osdev",
     "/tags/programming-languages",
     "/tags/projects",
-    "/tags/pytest",
     "/tags/security",
     "/tags/time",
-    "/tags/toml",
     "/tags/typescript",
     "/tags/web",
     "/tags/workflow",
@@ -296,16 +201,12 @@
     "/tags/x86"
   ],
   "postUrls": [
-    "/posts/a-toml-file-changed-what-sweep-was",
     "/posts/gave-one-operation-more-than-one-deadline",
     "/posts/kept-building-and-stopped-writing-it-down",
     "/posts/started-writing-down-the-failures-before-the-features",
     "/posts/my-project-cards-were-getting-ahead-of-my-projects",
-    "/posts/an-execution-is-more-than-a-row-in-a-database",
     "/posts/split-my-internet-into-four-different-kinds-of-place",
     "/posts/started-designing-a-language-before-i-could-compile-one",
-    "/posts/apparently-moving-a-file-has-edge-cases",
-    "/posts/building-orbit",
     "/posts/there-is-no-printf-down-here",
     "/posts/maybe-this-can-be-something-someday"
   ],
@@ -316,20 +217,12 @@
         "started-writing-down-the-failures-before-the-features",
         "gave-one-operation-more-than-one-deadline"
       ]
-    },
-    {
-      "name": "orbit",
-      "slugs": [
-        "building-orbit",
-        "an-execution-is-more-than-a-row-in-a-database"
-      ]
-    },
-    {
-      "name": "sweep",
-      "slugs": [
-        "apparently-moving-a-file-has-edge-cases",
-        "a-toml-file-changed-what-sweep-was"
-      ]
     }
+  ],
+  "retired": [
+    "a-toml-file-changed-what-sweep-was",
+    "an-execution-is-more-than-a-row-in-a-database",
+    "apparently-moving-a-file-has-edge-cases",
+    "building-orbit"
   ]
 }

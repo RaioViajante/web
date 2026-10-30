@@ -56,29 +56,15 @@ describe("automatic Lab links", () => {
       locale,
       originalLocale: locale,
     });
-    // The Sweep series reaches the classifier, whose Portuguese page exists.
-    expect(
-      labForPost(make([], "pt-BR", "a-toml-file-changed-what-sweep-was")),
-    ).toEqual({
-      title: "Classificador de arquivos",
-      href: "https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/",
-    });
-    expect(
-      labForPost(make([], "en", "a-toml-file-changed-what-sweep-was")),
-    ).toEqual({
-      title: "Filename classifier",
-      href: "https://lab.raioviajante.com/experiments/filename-classifier/",
-    });
-    // Orbit and boot-sector reach their own Portuguese pages.
-    expect(labForPost(make([], "pt-BR", "building-orbit"))?.href).toBe(
-      "https://lab.raioviajante.com/pt/experiments/estados-de-execucao/",
-    );
+    // Boot-sector reaches its own Portuguese page.
     expect(labForPost(make(["osdev"], "pt-BR", "boot"))?.href).toBe(
       "https://lab.raioviajante.com/pt/experiments/setor-de-boot/",
     );
-    expect(labForPost(make([], "en", "building-orbit"))?.href).toBe(
-      "https://lab.raioviajante.com/experiments/execution-states/",
-    );
+    // Retired Orbit and Sweep articles no longer map to any Lab page.
+    expect(labForPost(make([], "en", "building-orbit"))).toBeNull();
+    expect(
+      labForPost(make([], "pt-BR", "a-toml-file-changed-what-sweep-was")),
+    ).toBeNull();
   });
 
   it("never points a Portuguese suggestion at an English page", () => {
