@@ -76,20 +76,11 @@ the other language's navigation and its `LANG` offers the other home.
 - The Portuguese Sweep guide links Lab's Portuguese experiment
   (`https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/`),
   which is published on the default branch, so no merge order is involved.
-- **Merge order: Dump first.** Four Portuguese links point to the Portuguese
-  Dump posts that the Dump localization PR (#99) adds: in the Sweep guide
-  `/pt/posts/aparentemente-mover-um-arquivo-tem-casos-de-borda` and
-  `/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era`, and in the home notes
-  `/pt/posts/cansei-de-crud-entao-estou-construindo-um-agendador` (Orbit) and
-  `/pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma`
-  (yanawa). They are valid only once #99 is merged: merge Dump #99 first, or
-  accept a temporary 404 on those four links. `pnpm links:check` follows links
-  between the four apps against the local builds, so it would fail on them;
-  `pendingRoutes` in `links/check.mjs` lists exactly those four paths, allows
-  only HTTP 404 for them, prints them on every run, and reports a route that
-  exists so its entry gets removed (delete the entries when #99 is on `main`).
-  Re-check the slugs against `apps/dump/content/posts` if the Dump PR renames
-  one.
+- **Dump links.** The Portuguese pages link Dump's Portuguese posts, now
+  published (the Dump localization landed in #99). `pnpm links:check` follows
+  them against the local builds. `pendingRoutes` in `links/check.mjs` is empty;
+  add an entry there only for a route that another open pull request creates.
+  Re-check the slugs against `apps/dump/content/posts` if a post is renamed.
 
 ### Proposed legal amendments (require owner/legal approval; not published)
 
