@@ -14,7 +14,7 @@ import {
   type TextPart,
 } from "../../lib/classifier-view";
 import { foreignLang } from "../../lib/copy";
-import type { LocaleId } from "../../../../../site/locales";
+import { LOCALES, type LocaleId } from "../../../../../site/locales";
 import { Rich } from "../Rich";
 
 export const initialNames = [
@@ -53,6 +53,7 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
       data-classifier
       data-locale={locale}
       data-copy={JSON.stringify({
+        intlLocale: LOCALES[locale].intlLocale,
         none: text.none,
         categoryGloss: text.categoryGloss,
         categoryLang: categoryLang ?? null,
@@ -148,7 +149,7 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
           >
             <Parts
               parts={summaryParts(
-                locale,
+                LOCALES[locale].intlLocale,
                 rows.length,
                 counts,
                 text.summary,

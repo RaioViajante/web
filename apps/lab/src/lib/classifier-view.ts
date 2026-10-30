@@ -1,6 +1,5 @@
-import type { LocaleId } from "../../../../site/locales.ts";
 import type { ClassifierCategory } from "./bench-copy.ts";
-import { counted, type PluralForms } from "./plural.ts";
+import { countedFor, type PluralForms } from "./plural-core.ts";
 
 /** A run of text, optionally in another language than the page. */
 export interface TextPart {
@@ -26,13 +25,13 @@ export function emptyCounts(): Record<ClassifierCategory, number> {
  * this one result.
  */
 export function summaryParts(
-  locale: LocaleId,
+  intlLocale: string,
   total: number,
   counts: Record<ClassifierCategory, number>,
   forms: PluralForms,
   categoryLang?: string,
 ): TextPart[] {
-  const parts: TextPart[] = [{ text: counted(locale, total, forms) }];
+  const parts: TextPart[] = [{ text: countedFor(intlLocale, total, forms) }];
   for (const category of classifierCategories)
     parts.push(
       { text: " · " },

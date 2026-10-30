@@ -53,7 +53,7 @@ zero wording where CLDR would say "one"; see [i18n.md](i18n.md)), and dates use
 `src/lib/date.ts` (`Intl` with the registry locale, UTC, ISO in
 `<time datetime>`). Each bench renders its locale's strings into the page at
 build time (a `data-copy` attribute plus `data-locale`); the plain TypeScript
-scripts only fill `{placeholders}` and pick a plural form, and never consult
+scripts only fill `{placeholders}` (the classifier also gets its `Intl` locale string; the index filter gets its result sentences, one per filter, already worded), and never consult
 the browser's language or storage. `src/lib/routes.ts` is the route registry for
 home, search, Terms and Privacy; the experiments are content records.
 Portuguese search has its own static index (`src/lib/search.ts` builds both

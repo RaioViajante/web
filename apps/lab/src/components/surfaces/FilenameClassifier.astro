@@ -17,13 +17,12 @@ const { locale } = Astro.props;
     type TextPart,
   } from "../../lib/classifier-view";
   import type { ClassifierCategory } from "../../lib/bench-copy";
-  import type { PluralForms } from "../../lib/plural";
-  import type { LocaleId } from "../../../../../site/locales";
+  import type { PluralForms } from "../../lib/plural-core";
   import { playSound } from "@raioviajante/design/sound";
   const container = document.querySelector<HTMLElement>("[data-classifier]")!;
   // Rendered into the page at build time; never read from the browser.
-  const locale = container.dataset.locale as LocaleId;
   const text = JSON.parse(container.dataset.copy!) as {
+    intlLocale: string;
     none: string;
     categoryGloss: Record<ClassifierCategory, string | null>;
     categoryLang: string | null;
@@ -77,7 +76,7 @@ const { locale } = Astro.props;
     summary.replaceChildren(
       ...nodes(
         summaryParts(
-          locale,
+          text.intlLocale,
           results.length,
           counts,
           text.summary,

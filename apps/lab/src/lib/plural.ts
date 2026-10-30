@@ -1,5 +1,10 @@
 import { LOCALES, type LocaleId } from "../../../../site/locales.ts";
-import { fill } from "./template.ts";
+import {
+  categoryOf,
+  countedFor,
+  formFor,
+  type PluralForms,
+} from "./plural-core.ts";
 
 // Count-aware wording. The grammatical category comes from the platform's CLDR
 // data (`Intl.PluralRules`) for the registry's `intlLocale`, so no locale's rule
@@ -16,27 +21,19 @@ import { fill } from "./template.ts";
 //
 // Counts here are whole numbers (items on a page, lines in a table); a
 // fraction or a negative number is a bug and throws.
+//
+// This module is the registry-aware API for the server and the tests. The
+// browser scripts use `plural-core.ts` with an `Intl` locale string rendered
+// into the page, so no locale registry ships to the client.
 
-/**
- * The wording of one counted phrase. Each form is a complete sentence fragment
- * with a `{count}` placeholder, because the number's position and the noun's
- * agreement are the locale's business, not the caller's.
- */
-export interface PluralForms {
-  /** Exactly the "one" category; the first two forms of a locale that has them. */
-  one: string;
-  /** Every other category the locale has (CLDR "many", "few", ... are not used). */
-  other: string;
-  /** Zero, when it needs its own wording; see above. */
-  none?: string;
-}
+export type { PluralForms };
 
 /** The CLDR plural category of `count` in `locale`. */
 export function pluralCategory(
   locale: LocaleId,
   count: number,
 ): Intl.LDMLPluralRule {
-  return new Intl.PluralRules(LOCALES[locale].intlLocale).select(count);
+  return categoryOf(LOCALES[locale].intlLocale, count);
 }
 
 /** Which of `forms` applies to `count` in `locale`. */
@@ -45,10 +42,7 @@ export function pluralForm(
   count: number,
   forms: PluralForms,
 ): string {
-  if (!Number.isInteger(count) || count < 0)
-    throw new RangeError(`Counts are whole numbers, got ${count}`);
-  if (count === 0 && forms.none !== undefined) return forms.none;
-  return pluralCategory(locale, count) === "one" ? forms.one : forms.other;
+  return formFor(LOCALES[locale].intlLocale, count, forms);
 }
 
 /** `3 experiments`, `1 experimento`, `nenhum experimento`: the matching form, filled. */
@@ -57,7 +51,7 @@ export function counted(
   count: number,
   forms: PluralForms,
 ): string {
-  return fill(pluralForm(locale, count, forms), { count });
+  return countedFor(LOCALES[locale].intlLocale, count, forms);
 }
 
 /** Whether `locale`'s CLDR rule files zero under "one", so wording must supply `none`. */

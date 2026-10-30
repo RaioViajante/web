@@ -2,7 +2,7 @@ import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { IndexHeader, Section, LeaderRow } from "@raioviajante/design/parts";
 import { ToggleButton } from "@raioviajante/design/components";
 import { experimentsFor, experimentPath } from "../data/experiments";
-import { experimentCount, experimentForms } from "../lib/experiment-count";
+import { experimentCount } from "../lib/experiment-count";
 import { displayDate, textFor } from "../lib/copy";
 import type { LocaleId } from "../../../../site/locales";
 
@@ -11,6 +11,17 @@ const filters = ["all", "active", "done"] as const;
 export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
   const experiments = experimentsFor(locale);
   const text = textFor(locale);
+  // The live result of each filter, worded for this locale at build time.
+  const filterResults = Object.fromEntries(
+    filters.map((filter) => [
+      filter,
+      experimentCount(
+        locale,
+        experiments.filter((e) => filter === "all" || e.status === filter)
+          .length,
+      ),
+    ]),
+  );
   return (
     <>
       <IndexHeader
@@ -47,8 +58,7 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
       >
         <div
           data-experiment-list
-          data-locale={locale}
-          data-count-copy={JSON.stringify(experimentForms(locale))}
+          data-filter-results={JSON.stringify(filterResults)}
         >
           {experiments.map((e) => (
             <article key={e.id} className="lab-entry" data-status={e.status}>
