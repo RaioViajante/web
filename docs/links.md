@@ -13,6 +13,17 @@ any of the four production hosts are mapped to the matching local server, so
 `https://docs.raioviajante.com/...` is checked against the local docs build. The
 404 pages are not crawl targets.
 
+## One commit, no deployed content
+
+Root renders Dump's latest posts from Dump's RSS at request time. The local
+servers (`security/local-servers.mjs`, shared by every runtime check) start Root
+with `DUMP_FEED_ORIGIN` set to the local Dump, so Root links what this commit's
+Dump publishes rather than what production still serves. Without that, removing
+a post fails the crawl until the removal is deployed. Root honours only a
+loopback `http` origin (`feedSourceOrigin` in `apps/root/lib/writing.ts`);
+production never sets it and keeps reading the deployed feed. No link is
+exempted: a link to a missing page still fails.
+
 ## Internal links
 
 Each distinct destination must answer 200. Fails: a 404, a malformed URL, a

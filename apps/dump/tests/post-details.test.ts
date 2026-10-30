@@ -1,6 +1,7 @@
 import { labSuggestions } from "@/lib/lab-suggestions";
 import { headingSlug, headingText, labForPost } from "@/lib/post-details";
 import type { Post } from "@/lib/posts";
+import { RETIRED_CONTENT_IDS } from "./retired-content-ids";
 
 // The "on this page" links must equal the ids rehype-slug gives the rendered
 // headings (github-slugger rules). A literal underscore is text, not emphasis.
@@ -60,11 +61,14 @@ describe("automatic Lab links", () => {
     expect(labForPost(make(["osdev"], "pt-BR", "boot"))?.href).toBe(
       "https://lab.raioviajante.com/pt/experiments/setor-de-boot/",
     );
-    // Retired Orbit and Sweep articles no longer map to any Lab page.
-    expect(labForPost(make([], "en", "building-orbit"))).toBeNull();
-    expect(
-      labForPost(make([], "pt-BR", "a-toml-file-changed-what-sweep-was")),
-    ).toBeNull();
+    // Only a tagged topic reaches a Lab page: a post with no matching tag gets
+    // none, whatever its contentId, and a retired work's id grants nothing.
+    for (const contentId of [
+      "kept-building-and-stopped-writing-it-down",
+      ...RETIRED_CONTENT_IDS,
+    ])
+      for (const locale of ["en", "pt-BR"] as const)
+        expect(labForPost(make(["meta"], locale, contentId))).toBeNull();
   });
 
   it("never points a Portuguese suggestion at an English page", () => {

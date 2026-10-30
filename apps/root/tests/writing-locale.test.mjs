@@ -15,8 +15,13 @@ registerHooks({
 });
 
 const { localeParticipation } = await import("../../../site/locales.ts");
-const { feedUrl, getLatestWriting, parseRecentPosts } =
-  await import("../lib/writing.ts");
+const {
+  feedSourceOrigin,
+  feedUrl,
+  getLatestWriting,
+  getRecentPosts,
+  parseRecentPosts,
+} = await import("../lib/writing.ts");
 
 const ptPost = "https://dump.raioviajante.com/pt/posts/um-texto";
 const enPost = "https://dump.raioviajante.com/posts/an-english-post";
@@ -74,4 +79,68 @@ test("Root reads only the active Portuguese Dump feed and never substitutes Engl
     throw new Error("inactive feed was fetched");
   };
   assert.deepEqual(await getLatestWriting("pt-BR"), { state: "unavailable" });
+});
+
+test("the feed source is production unless a loopback origin is configured", () => {
+  const production = "https://dump.raioviajante.com";
+  assert.equal(feedSourceOrigin(undefined), production);
+  assert.equal(feedSourceOrigin(""), production);
+  assert.equal(
+    feedSourceOrigin("http://127.0.0.1:3001"),
+    "http://127.0.0.1:3001",
+  );
+  assert.equal(
+    feedSourceOrigin("http://localhost:3001"),
+    "http://localhost:3001",
+  );
+  // Anything that is not a loopback http origin is ignored, never followed.
+  for (const other of [
+    "https://127.0.0.1:3001",
+    "http://example.com",
+    "http://10.0.0.5:3001",
+    "https://dump.raioviajante.com",
+    "not a url",
+  ])
+    assert.equal(feedSourceOrigin(other), production, other);
+  // The public feed URL is never rewritten.
+  assert.equal(feedUrl("en"), `${production}/rss.xml`);
+});
+
+test("a configured local Dump, not the deployed feed, decides the latest posts", async (t) => {
+  const previousFetch = globalThis.fetch;
+  const previousEnv = process.env.DUMP_FEED_ORIGIN;
+  t.after(() => {
+    globalThis.fetch = previousFetch;
+    if (previousEnv === undefined) delete process.env.DUMP_FEED_ORIGIN;
+    else process.env.DUMP_FEED_ORIGIN = previousEnv;
+  });
+  const stale = "https://dump.raioviajante.com/posts/retired-in-this-commit";
+  const current = "https://dump.raioviajante.com/posts/kept-in-this-commit";
+  const served = {
+    "https://dump.raioviajante.com/rss.xml": feed([["Stale", stale]]),
+    "http://127.0.0.1:3001/rss.xml": feed([["Current", current]]),
+  };
+  const requests = [];
+  globalThis.fetch = async (url) => {
+    requests.push(url);
+    return { ok: true, text: async () => served[url] };
+  };
+
+  process.env.DUMP_FEED_ORIGIN = "http://127.0.0.1:3001";
+  const local = await getRecentPosts();
+  assert.deepEqual(
+    local.map((post) => post.url),
+    [current],
+  );
+
+  delete process.env.DUMP_FEED_ORIGIN;
+  const production = await getRecentPosts();
+  assert.deepEqual(
+    production.map((post) => post.url),
+    [stale],
+  );
+  assert.deepEqual(requests, [
+    "http://127.0.0.1:3001/rss.xml",
+    "https://dump.raioviajante.com/rss.xml",
+  ]);
 });

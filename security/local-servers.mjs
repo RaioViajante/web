@@ -47,6 +47,12 @@ export async function startServers(sites = Object.keys(ports)) {
     started.push(
       spawn("pnpm", ["exec", ...commands[site]], {
         cwd: new URL(`../apps/${site}/`, import.meta.url),
+        // Root reads Dump's feed at request time; read the local Dump, not the
+        // deployed one, so every check validates one commit (apps/root/lib/writing.ts).
+        env: {
+          ...process.env,
+          DUMP_FEED_ORIGIN: `http://127.0.0.1:${ports.dump}`,
+        },
         stdio: "ignore",
         detached: true,
       }),
