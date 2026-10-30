@@ -70,7 +70,7 @@ the other language's navigation and its `LANG` offers the other home.
   sources identify no data controller beyond the operator and CNPJ, state no
   legal basis for processing, no data-subject rights (LGPD), no international
   transfer statement (the host is Vercel) and no last-updated date. Wording to
-  read: "operado por … CNPJ", "a fonte definitiva", "o provedor de hospedagem
+  read: "operado por … CNPJ", "a fonte de referência", "o provedor de hospedagem
   (Vercel)", "endereço IP, navegador e a página solicitada", the cookie clause,
   and the `starlight-theme` leftover.
 - The Portuguese Sweep guide links Lab's Portuguese experiment
@@ -90,6 +90,36 @@ the other language's navigation and its `LANG` offers the other home.
   exists so its entry gets removed (delete the entries when #99 is on `main`).
   Re-check the slugs against `apps/dump/content/posts` if the Dump PR renames
   one.
+
+### Proposed legal amendments (require owner/legal approval; not published)
+
+Found by the independent legal-content audit of the Terms and Privacy pages
+(English and Portuguese). None is on any page: they would add a statement,
+duty or right, which only the owner can decide with legal advice. Placeholders
+are `[owner must supply]`; nothing below is an invented fact.
+
+| Topic | Gap in the current English source (both languages) | Evidence |
+| --- | --- | --- |
+| Controller identification | Only "run by RaioViajante, CNPJ …" is stated; no operator legal name, no contact for data requests | `TermsPage.tsx` section "Who runs this"; legal name `[owner must supply]` |
+| Legal basis | None stated for the cookie or the host's request data | `PrivacyPage.tsx` |
+| Data-subject rights (LGPD art. 18) | No rights or request procedure | `PrivacyPage.tsx`; procedure `[owner must supply]` |
+| International transfers | None stated; the host is Vercel | `PrivacyPage.tsx` section "On the way to the page" |
+| Retention | Only the cookie's one-year life; nothing for the host's request data | `PrivacyPage.tsx` |
+| Data protection officer, children | Not mentioned | `[owner must supply]` |
+| Which text controls | No clause; `docs/i18n.md` policy conflict, see the PR body | `docs/i18n.md` "Legal pages" |
+| Last-updated date | The English pages show none | `TermsPage.tsx`, `PrivacyPage.tsx` |
+| Warranty | The summary row says "warranty: none — things may break" but no section carries a warranty clause | `TermsPage.tsx` `inShort` vs `sections` |
+| Content licence | Docs content is CC BY 4.0 (`src/content/docs/LICENSE`) while the Terms say only "Code shown here follows the license of the repository it comes from" | `apps/docs/src/content/docs/LICENSE` |
+| Operator wording | "operado por" in Portuguese can be misread against the LGPD term "operador" (a processor) | `TermsPage.tsx` |
+| Legacy storage | The `starlight-theme` leftover is disclosed; no other legacy key is | `PrivacyPage.tsx` |
+
+Wording fixed in the Portuguese text without changing its meaning (round 4):
+"a fonte definitiva" is now "a fonte de referência" for "the authority" (it
+keeps "the source repository decides" without the stronger "definitive"), and
+the Search sentence of the Privacy Policy no longer claims that nothing you type
+goes anywhere ("what you type is not sent to those sites" / "o que você digita
+não é enviado a esses sites"), because the shared `LANG` link can carry `?q=`
+to the site's own host.
 
 ## Potential future information architecture
 

@@ -142,6 +142,13 @@ test("a cold-cache production build keeps semantic headings in the search index"
 	for (const slug of ptDumpPosts) assert.ok(linkedDump.includes(`/pt/posts/${slug}`), `a Portuguese page links /pt/posts/${slug}`);
 	assert.ok(!linkedDump.some((path) => path.startsWith("/posts/")), "no Portuguese page links an English Dump post");
 	assert.doesNotMatch(read("pt/index.html"), /dump, em inglês/);
+	// Privacy, Search: the site's own host may receive `q` through the LANG link, so
+	// the sentence says only that nothing is sent to the other sites.
+	assert.match(read("privacy/index.html"), /what you type is not sent to those sites/);
+	assert.match(read("pt/privacy/index.html"), /o que você digita não é enviado a esses sites/);
+	for (const path of ["privacy/index.html", "pt/privacy/index.html"])
+		assert.doesNotMatch(read(path), /sent anywhere|lugar nenhum/, path);
+	assert.match(read("pt/terms/index.html"), /é a fonte de referência/);
 	// English blocks keep their English words.
 	assert.match(en, /<button type="button" class="block__copy">copy<\/button>/);
 

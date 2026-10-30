@@ -50,7 +50,7 @@ const text = {
 				body: (
 					<p>
 						Search runs in your browser over a static index. The “everywhere” scope also reads the search indexes of the other
-						RaioViajante sites; nothing you type is sent anywhere.
+						RaioViajante sites; what you type is not sent to those sites.
 					</p>
 				),
 			},
@@ -93,7 +93,7 @@ const text = {
 				body: (
 					<p>
 						A busca funciona no seu navegador, sobre um índice estático. O escopo “todos os sites” também lê os índices de busca dos
-						outros sites do RaioViajante; nada do que você digita é enviado a lugar nenhum.
+						outros sites do RaioViajante; o que você digita não é enviado a esses sites.
 					</p>
 				),
 			},
