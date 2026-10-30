@@ -33,6 +33,11 @@ export const pages = [
     name: "filename-classifier",
     path: "/experiments/filename-classifier/",
   },
+  {
+    app: "lab",
+    name: "image-compression-lab",
+    path: "/experiments/image-compression-lab/",
+  },
   { app: "lab", name: "search", path: "/search/" },
 ];
 export const profiles = ["mobile", "desktop"];

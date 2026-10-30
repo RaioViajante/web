@@ -114,6 +114,38 @@ export const fidelityRows = {
       { label: "resultado", value: "documentado nas anotações do projeto" },
     ],
   },
+  "image-compression-lab": {
+    en: [
+      {
+        label: "encoding",
+        value: "your browser’s own encoders · real, measured bytes",
+      },
+      {
+        label: "mochifile",
+        value: "inspiration only · its engine is not used",
+      },
+      { label: "upload, storage", value: "none · the image stays in this tab" },
+      { label: "target sizes", value: "not offered · not guaranteeable" },
+    ],
+    "pt-BR": [
+      {
+        label: "codificação",
+        value: "codificadores do seu navegador · bytes reais e medidos",
+      },
+      {
+        label: "mochifile",
+        value: "apenas inspiração · o motor dele não é usado",
+      },
+      {
+        label: "envio, armazenamento",
+        value: "nenhum · a imagem fica nesta aba",
+      },
+      {
+        label: "tamanhos-alvo",
+        value: "não oferecidos · não podem ser garantidos",
+      },
+    ],
+  },
 } as const satisfies Record<
   ExperimentSurface,
   Record<LocaleId, readonly FidelityRow[]>
@@ -182,6 +214,46 @@ export const relatedRows = {
         value: "github ↗",
         href: learningNotes,
         language: "en",
+      },
+    ],
+  },
+  "image-compression-lab": {
+    en: [
+      {
+        label: "Mochifile · image engine notes",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile/blob/f674bf16f7ffee4ad8094bf079567ccf1bc001c2/docs/adr/0016-image-engine-jsquash-with-native-decoding.md",
+        language: "en",
+      },
+      {
+        label: "Mochifile · size-targeting notes",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile/blob/f674bf16f7ffee4ad8094bf079567ccf1bc001c2/docs/adr/0017-size-targeting-algorithm.md",
+        language: "en",
+      },
+      {
+        label: "Mochifile source code",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile",
+      },
+    ],
+    "pt-BR": [
+      {
+        label: "Mochifile · notas do motor de imagens",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile/blob/f674bf16f7ffee4ad8094bf079567ccf1bc001c2/docs/adr/0016-image-engine-jsquash-with-native-decoding.md",
+        language: "en",
+      },
+      {
+        label: "Mochifile · notas sobre tamanho-alvo",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile/blob/f674bf16f7ffee4ad8094bf079567ccf1bc001c2/docs/adr/0017-size-targeting-algorithm.md",
+        language: "en",
+      },
+      {
+        label: "código-fonte do Mochifile",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile",
       },
     ],
   },
