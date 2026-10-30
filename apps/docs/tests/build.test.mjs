@@ -118,6 +118,18 @@ test("a cold-cache production build keeps semantic headings in the search index"
 		const html = read(join(path, "index.html"));
 		assert.match(html, /<button type="button" class="block__copy">copiar<\/button>/, path);
 	}
+	// A Portuguese page that sends the reader to English content says so in
+	// words and carries hreflang (docs/i18n.md, "Cross-language related links").
+	const siblingAnchor = /<a\b([^>]*?)href="https:\/\/(?:dump|lab)\.raioviajante\.com(\/[^"]*)"([^>]*)>/g;
+	for (const [path, html] of ptPages)
+		for (const match of html.matchAll(siblingAnchor)) {
+			const [, before, target, after] = match;
+			if (/^\/pt(\/|$)/.test(target)) continue;
+			assert.match(`${before}${after}`, /hreflang="en"/i, `${path}: ${target} is English and needs hreflang`);
+			// The words "em inglês" sit in the link or in the row/item note that follows it.
+			const item = html.slice(match.index).split(/<\/(?:div|li)>/)[0];
+			assert.match(item, /em inglês/, `${path}: ${target} says it is in English`);
+		}
 	// English blocks keep their English words.
 	assert.match(en, /<button type="button" class="block__copy">copy<\/button>/);
 

@@ -70,7 +70,7 @@ const text = {
 				body: (
 					<p>
 						Estas páginas descrevem projetos e sistemas criados sob o RaioViajante, como funcionam hoje. Uma página pode estar
-						desatualizada; o repositório de código-fonte de cada projeto é a autoridade.
+						desatualizada; o repositório de código-fonte de cada projeto é a fonte definitiva.
 					</p>
 				),
 			},

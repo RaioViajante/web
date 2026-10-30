@@ -44,7 +44,7 @@ function shape(body) {
 		paragraphs: prose
 			.split(/\n{2,}/)
 			.filter((block) => block.trim() && !/^(#|\||:::|\s*(?:[-*]|\d+\.) )/.test(block.trim())).length,
-		links: [...prose.matchAll(/\]\((https?:[^)\s]+)\)/g)].map(([, url]) => url),
+		links: [...prose.matchAll(/\]\((https?:[^)\s]+)\)|href="(https?:[^"\s]+)"/g)].map(([, md, html]) => md ?? html),
 	};
 }
 
