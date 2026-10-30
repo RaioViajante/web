@@ -237,6 +237,24 @@
         "requests": 10
       }
     },
+    "lab/scheduler-simulator": {
+      "baseline": {
+        "total": 81961,
+        "script": 20632,
+        "stylesheet": 10045,
+        "font": 33315,
+        "image": 10066,
+        "requests": 9
+},
+      "max": {
+        "total": 98304,
+        "script": 22528,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 11
+      }
+    },
     "lab/search": {
       "baseline": {
         "total": 102471,

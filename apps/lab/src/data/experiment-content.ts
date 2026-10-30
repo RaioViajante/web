@@ -114,6 +114,29 @@ export const fidelityRows = {
       { label: "resultado", value: "documentado nas anotações do projeto" },
     ],
   },
+  "scheduler-simulator": {
+    en: [
+      { label: "model", value: "teaching simulation · integer clock" },
+      { label: "orbit", value: "job settings only · no scheduler exists yet" },
+      {
+        label: "background work, persistence",
+        value: "none · reload starts over",
+      },
+      { label: "randomness", value: "none · every run repeats" },
+    ],
+    "pt-BR": [
+      { label: "modelo", value: "simulação didática · relógio de inteiros" },
+      {
+        label: "orbit",
+        value: "apenas as configurações de job · ainda não há agendador",
+      },
+      {
+        label: "trabalho em segundo plano, persistência",
+        value: "nenhum · recarregar a página recomeça do zero",
+      },
+      { label: "aleatoriedade", value: "nenhuma · toda execução se repete" },
+    ],
+  },
 } as const satisfies Record<
   ExperimentSurface,
   Record<LocaleId, readonly FidelityRow[]>
@@ -182,6 +205,44 @@ export const relatedRows = {
         value: "github ↗",
         href: learningNotes,
         language: "en",
+      },
+    ],
+  },
+  "scheduler-simulator": {
+    en: [
+      {
+        label: "execution states",
+        value: "lab · 002",
+        href: "/experiments/execution-states/",
+      },
+      {
+        label: "Orbit architecture notes",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit/blob/2967494085ec5f66085e09ee9cc15c9d5be368e0/docs/architecture.md",
+        language: "en",
+      },
+      {
+        label: "Orbit source code",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit",
+      },
+    ],
+    "pt-BR": [
+      {
+        label: "estados de execução",
+        value: "lab · 002",
+        href: "/pt/experiments/estados-de-execucao/",
+      },
+      {
+        label: "notas de arquitetura do Orbit",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit/blob/2967494085ec5f66085e09ee9cc15c9d5be368e0/docs/architecture.md",
+        language: "en",
+      },
+      {
+        label: "código-fonte do Orbit",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit",
       },
     ],
   },

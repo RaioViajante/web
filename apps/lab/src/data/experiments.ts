@@ -9,7 +9,10 @@ export type ExperimentStatus = "active" | "done" | "archived";
  * just without this section.
  */
 export type ExperimentSurface =
-  "filename-classifier" | "execution-states" | "boot-sector";
+  | "filename-classifier"
+  | "execution-states"
+  | "boot-sector"
+  | "scheduler-simulator";
 
 export interface Experiment {
   id: string;
@@ -37,6 +40,25 @@ export interface Experiment {
 
 /** Real experiments, ordered by descending publication number. */
 export const experiments: Experiment[] = [
+  {
+    id: "004",
+    contentId: "004",
+    locale: "en",
+    originalLocale: "en",
+    slug: "scheduler-simulator",
+    surface: "scheduler-simulator",
+    title: "scheduler simulator",
+    description: "queues, slots, retries and timeouts on a deterministic clock",
+    status: "active",
+    project: "orbit",
+    revision: "2967494",
+    fidelity: "simulated",
+    created: "2026-10-30",
+    source: "https://github.com/RaioViajante/orbit",
+    what: "What happens to a job when slots are limited, an attempt fails, or a timeout fires? A teaching model of a job scheduler: change durations, retries, backoff and failures, then step through the queue one tick at a time. It illustrates the idea behind Orbit’s job settings; Orbit has no scheduler yet, and this page does not run it.",
+    notes:
+      "Inspired by the job settings in Orbit revision 2967494 (maximum retries and execution timeout). Orbit’s architecture notes put retries and workers outside its initial scope, so no Orbit behavior is reproduced. Time is an integer clock, nothing runs in the background, and nothing is stored.",
+  },
   {
     id: "003",
     contentId: "003",
@@ -114,6 +136,17 @@ function original(id: string): Experiment {
  * inherited from the English original; only authored text differs.
  */
 export const portugueseExperiments: Experiment[] = [
+  {
+    ...original("004"),
+    locale: "pt-BR",
+    slug: "simulador-de-agendamento",
+    title: "simulador de agendamento",
+    description:
+      "filas, vagas, retries e timeouts em um relógio determinístico",
+    what: "O que acontece com um job quando as vagas são limitadas, uma tentativa falha ou um timeout dispara? Um modelo didático de agendador de jobs: mude durações, retries, backoff e falhas e avance pela fila um tick por vez. Ele ilustra a ideia por trás das configurações de job do Orbit; o Orbit ainda não tem agendador, e esta página não o executa.",
+    notes:
+      "Inspirado nas configurações de job da revisão 2967494 do Orbit (máximo de retries e timeout de execução). As notas de arquitetura do Orbit deixam retries e workers fora do escopo inicial, então nenhum comportamento do Orbit é reproduzido. O tempo é um relógio de números inteiros, nada roda em segundo plano e nada é guardado.",
+  },
   {
     ...original("003"),
     locale: "pt-BR",
