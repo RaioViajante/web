@@ -29,6 +29,11 @@ export default function Privacy() {
                   tracking.
                 </p>
                 <p>
+                  Older versions of the site kept the same sound choice in your
+                  browser&apos;s local storage. The site only reads that old
+                  value until you next switch sound, which removes it.
+                </p>
+                <p>
                   If you sign in with GitHub to comment, the giscus script that
                   runs on this page keeps a sign-in value in your browser&apos;s
                   local storage for dump.raioviajante.com, under the name
@@ -55,7 +60,8 @@ export default function Privacy() {
               <p>
                 Comments go through giscus to GitHub Discussions. They load when
                 the comments section comes near the screen as you scroll (on a
-                short article, that can be as soon as the page opens), or when
+                short article, that can be as soon as the page opens), when you
+                come back to an article after signing in with GitHub, or when
                 you press Load comments in a browser that cannot detect
                 scrolling. Before then this page does not contact giscus or
                 GitHub. Once they load, your browser connects to giscus.app and
@@ -63,6 +69,16 @@ export default function Privacy() {
                 GitHub&apos;s privacy policy; dump never sees your password. The
                 RSS feed is a plain file — feed readers request it like any
                 page.
+              </p>
+            ),
+          },
+          {
+            title: "Search",
+            body: (
+              <p>
+                Search runs in your browser. The “everywhere” scope also reads
+                the search indexes of the other RaioViajante sites; what you
+                type is not sent to those sites.
               </p>
             ),
           },

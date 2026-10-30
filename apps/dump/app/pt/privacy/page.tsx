@@ -38,6 +38,12 @@ export default function PrivacyPt() {
                   para rastreamento.
                 </p>
                 <p>
+                  Versões anteriores do site guardavam essa mesma escolha de som
+                  no armazenamento local do seu navegador. O site apenas lê esse
+                  valor antigo até você alternar o som novamente, o que o
+                  remove.
+                </p>
+                <p>
                   Se você entrar com o GitHub para comentar, o script do giscus
                   que roda nesta página guarda um valor de login no
                   armazenamento local do seu navegador para
@@ -49,7 +55,7 @@ export default function PrivacyPt() {
             ),
           },
           {
-            title: "A caminho da página",
+            title: "No caminho até a página",
             body: (
               <p>
                 Como qualquer site, o provedor de hospedagem (Vercel) recebe
@@ -65,14 +71,24 @@ export default function PrivacyPt() {
                 Os comentários passam pelo giscus até o GitHub Discussions. Eles
                 carregam quando a seção de comentários chega perto da tela
                 enquanto você rola (em um texto curto, isso pode acontecer assim
-                que a página abre), ou quando você aperta Carregar comentários
-                em um navegador que não detecta a rolagem. Antes disso, esta
-                página não contata o giscus nem o GitHub. Depois que eles
-                carregam, seu navegador se conecta ao giscus.app e ao GitHub.
-                Entrar e publicar acontecem no GitHub, sob a política de
-                privacidade do GitHub; o dump nunca vê sua senha. O feed RSS é
-                um arquivo simples — os leitores de feed o solicitam como
-                qualquer página.
+                que a página abre), quando você volta ao texto depois de entrar
+                com o GitHub, ou quando você clica em Carregar comentários em um
+                navegador que não detecta a rolagem. Antes disso, esta página
+                não contata o giscus nem o GitHub. Depois que eles carregam, seu
+                navegador se conecta ao giscus.app e ao GitHub. Entrar e
+                publicar acontecem no GitHub, sob a política de privacidade do
+                GitHub; o dump nunca vê sua senha. O feed RSS é um arquivo
+                simples — os leitores de feed o solicitam como qualquer página.
+              </p>
+            ),
+          },
+          {
+            title: "Busca",
+            body: (
+              <p>
+                A busca funciona no seu navegador. O escopo “todos os sites”
+                também lê os índices de busca dos outros sites do RaioViajante;
+                o que você digita não é enviado a esses sites.
               </p>
             ),
           },

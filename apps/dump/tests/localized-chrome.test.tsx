@@ -127,3 +127,50 @@ describe("locale branching", () => {
     }
   });
 });
+
+describe("legal wording grounded in the implementation", () => {
+  const text = (element: React.ReactElement) => {
+    const view = render(element);
+    const body = view.container.textContent!.replace(/\s+/g, " ");
+    view.unmount();
+    return body;
+  };
+
+  it("claims all rights reserved for posts and illustrations only; documentation is licensed separately", () => {
+    expect(text(<Terms />)).toContain(
+      "Posts and illustrations belong to RaioViajante unless a page says otherwise.",
+    );
+    expect(text(<Terms />)).not.toMatch(/documentation/i);
+    expect(text(<TermsPt />)).toContain(
+      "Textos e ilustrações pertencem a RaioViajante, salvo indicação em contrário em alguma página. Todos os direitos estão reservados e esses conteúdos não são cobertos pela licença MIT do repositório, que se aplica apenas ao código-fonte.",
+    );
+    expect(text(<TermsPt />)).not.toMatch(/documentação/i);
+  });
+
+  it("describes search, the old sound value and the sign-in return like the code does", () => {
+    const en = text(<Privacy />);
+    const pt = text(<PrivacyPt />);
+    // Search runs locally; the cross-site scope reads other indexes only.
+    expect(en).toContain(
+      "Search runs in your browser. The “everywhere” scope also reads the search indexes of the other RaioViajante sites; what you type is not sent to those sites.",
+    );
+    expect(pt).toContain(
+      "A busca funciona no seu navegador. O escopo “todos os sites” também lê os índices de busca dos outros sites do RaioViajante; o que você digita não é enviado a esses sites.",
+    );
+    // The legacy local-storage sound value, worded as on Root.
+    expect(en).toContain(
+      "Older versions of the site kept the same sound choice in your browser's local storage. The site only reads that old value until you next switch sound, which removes it.",
+    );
+    expect(pt).toContain(
+      "Versões anteriores do site guardavam essa mesma escolha de som no armazenamento local do seu navegador. O site apenas lê esse valor antigo até você alternar o som novamente, o que o remove.",
+    );
+    // Comments load at once when returning from GitHub sign-in (Comments.tsx).
+    expect(en).toContain(
+      "when you come back to an article after signing in with GitHub",
+    );
+    expect(pt).toContain(
+      "quando você volta ao texto depois de entrar com o GitHub, ou quando você clica em Carregar comentários",
+    );
+    expect(pt).toContain("No caminho até a página");
+  });
+});

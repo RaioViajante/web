@@ -44,10 +44,10 @@ export default function TermsPt() {
             title: "Textos e arte",
             body: (
               <p>
-                Textos, documentação e ilustrações pertencem a RaioViajante,
-                salvo indicação em contrário em alguma página. Estão com todos
-                os direitos reservados e não são cobertos pela licença MIT do
-                repositório, que se aplica apenas ao código-fonte.
+                Textos e ilustrações pertencem a RaioViajante, salvo indicação
+                em contrário em alguma página. Todos os direitos estão
+                reservados e esses conteúdos não são cobertos pela licença MIT
+                do repositório, que se aplica apenas ao código-fonte.
               </p>
             ),
           },
