@@ -12,6 +12,13 @@ import { RECORDED_BEFORE_UPDATE, VERIFIED_UPDATES } from "./verified-updates";
 // frozen pre-migration set; everything else below must stay untouched.
 const ADDED_ENGLISH = [
   {
+    slug: "for-those-who-never-quite-belonged",
+    contentId: "for-those-who-never-quite-belonged",
+    originalLocale: "en",
+    publishedAt: "2026-10-30",
+    tags: ["personal", "writing"],
+  },
+  {
     slug: "translating-the-site-without-pretending-everything-already-exists",
     contentId: "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
     originalLocale: "pt-BR",
