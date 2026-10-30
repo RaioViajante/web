@@ -164,6 +164,15 @@ Fences accept the soft-block options (`title="…"`, `showLineNumbers`,
 [`docs/blocks.md`](../../../docs/blocks.md). Posts are plain Markdown plus
 these blocks: they are compiled without a components map.
 
+The one piece of raw markup a post may use is the inline
+`<span lang="en">…</span>`, to mark a title or phrase in English inside a
+Portuguese text so assistive technology reads it in the right language. Use it
+only in prose, never in a heading, and never around code, file names,
+identifiers, commands, project names or loanwords that read as Portuguese
+(deadline, retry, parser). A test enforces this. See
+[`docs/i18n.md`](../docs/i18n.md) for the policy and for how a sentence that
+later became false is corrected without rewriting the post.
+
 ## License
 
 Articles here are Copyright RaioViajante, all rights reserved — not covered
