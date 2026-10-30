@@ -18,6 +18,8 @@ export const LIMITS = {
   maxDepth: 24,
   maxIndentLevels: 12,
   maxDiagnostics: 12,
+  /** Diagnostics listed in all, lexer and parser together. */
+  maxReported: 50,
   /** Evaluated nodes in one run. */
   maxSteps: 20000,
   maxCallDepth: 30,
@@ -535,8 +537,11 @@ class Parser {
   }
   private enter(): void {
     this.depth += 1;
-    if (this.depth > LIMITS.maxDepth)
+    if (this.depth > LIMITS.maxDepth) {
+      // The caller's `finally` has not been set up yet, so undo the count here.
+      this.depth -= 1;
       this.fail("nesting-too-deep", { max: LIMITS.maxDepth });
+    }
   }
   private leave(): void {
     this.depth -= 1;
@@ -974,9 +979,9 @@ export function analyze(source: string): Analysis {
       diagnostics: lexed.diagnostics,
     };
   const parsed = parse(lexed.tokens);
-  const diagnostics = [...lexed.diagnostics, ...parsed.diagnostics].sort(
-    (a, b) => a.line - b.line || a.column - b.column,
-  );
+  const diagnostics = [...lexed.diagnostics, ...parsed.diagnostics]
+    .sort((a, b) => a.line - b.line || a.column - b.column)
+    .slice(0, LIMITS.maxReported);
   return { tokens: lexed.tokens, program: parsed.program, diagnostics };
 }
 
@@ -1162,8 +1167,9 @@ class Interpreter {
     return this.scopes[this.scopes.length - 1]!;
   }
   private find(name: string): Slot | undefined {
-    // The innermost scope of this call outwards, then the program's own scopes.
-    for (const list of [this.scopes, this.frames[0]!])
+    // The innermost scope of this call outwards, then the program's root scope
+    // (never the caller's open blocks, which would be dynamic scoping).
+    for (const list of [this.scopes, [this.frames[0]![0]!]])
       for (let i = list.length - 1; i >= 0; i -= 1) {
         const slot = list[i]!.get(name);
         if (slot) return slot;

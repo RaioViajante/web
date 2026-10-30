@@ -25,7 +25,7 @@ truncates, spaces only (tabs are a diagnostic).
 1. `tokenize`: line by line; indentation levels become `indent`/`dedent` tokens.
 2. `parse`: recursive descent. An error is recorded and the parser skips the
    broken line and the block indented under it, then continues, so later errors
-   and later good lines are still reported. At most 12 diagnostics.
+   and later good lines are still reported. At most 12 parser errors and 50 diagnostics in all.
 3. `execute`: a tree-walking interpreter over the AST. Values are JavaScript
    numbers, strings and booleans held in `Map` scopes (so names such as
    `constructor` or `__proto__` are ordinary undefined names). The source is
@@ -34,7 +34,7 @@ truncates, spaces only (tabs are a diagnostic).
 
 ## Limits (`LIMITS`)
 
-4,000 characters and 200 lines of source; 3,000 tokens; nesting depth 24; 12
+4,000 characters and 200 lines of source; 3,000 tokens; nesting depth 24 (blocks and expressions counted together); 12
 indentation levels; 20,000 evaluation steps; 30 nested calls; 100 output lines
 and 4,000 output characters; strings up to 1,000 characters; integers within
 the safe range; a trace of the first 200 events. Hitting a limit is a

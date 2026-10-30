@@ -145,9 +145,9 @@ const text = tinyLanguageCopy[locale];
           : "");
       const scroll = document.createElement("div");
       scroll.className = "tiny-scroll";
-      scroll.tabIndex = 0;
-      scroll.setAttribute("role", "region");
-      scroll.setAttribute("aria-label", text.panels.tokens);
+      // The shared scroll-region behavior adds the tab stop only if it overflows.
+      scroll.dataset.scrollRegion = "";
+      scroll.dataset.scrollLabel = text.panels.tokens;
       scroll.append(table);
       holder.replaceChildren(summary, scroll);
     }
@@ -207,11 +207,8 @@ const text = tinyLanguageCopy[locale];
       });
       const scroll = document.createElement("div");
       scroll.className = "tiny-scroll";
-      if (events.length > 0) {
-        scroll.tabIndex = 0;
-        scroll.setAttribute("role", "region");
-        scroll.setAttribute("aria-label", text.traceLabel);
-      }
+      scroll.dataset.scrollRegion = "";
+      scroll.dataset.scrollLabel = text.traceLabel;
       if (shown > 0) scroll.append(table);
       traceEl.replaceChildren(scroll);
     }
@@ -255,6 +252,7 @@ const text = tinyLanguageCopy[locale];
     }
 
     function refresh(announce: boolean) {
+      debounce = undefined;
       result = null;
       shown = 0;
       analysis = analyze(source.value);
@@ -263,6 +261,12 @@ const text = tinyLanguageCopy[locale];
     }
 
     function prepareRun() {
+      // Run what is on screen, not the analysis from before the last keystrokes.
+      if (debounce !== undefined) {
+        window.clearTimeout(debounce);
+        debounce = undefined;
+        refresh(false);
+      }
       if (analysis.diagnostics.length > 0 || !analysis.program) {
         say(text.runBlocked);
         playSound("reject");

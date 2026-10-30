@@ -130,8 +130,8 @@ export function TinyLanguageBench({ locale }: { locale: LocaleId }) {
             <pre
               className="tiny-output"
               data-output
-              tabIndex={0}
-              aria-label={text.outputLabel}
+              data-scroll-region
+              data-scroll-label={text.outputLabel}
             />
             <h3 className="rv-label tiny-label">{text.traceLabel}</h3>
             <div className="tiny-scroll" data-trace />

@@ -442,3 +442,29 @@ test("analysis and execution are repeatable", () => {
   const ok = "print(1 + 1)\n";
   assert.deepEqual(execute(analyze(ok).program), execute(analyze(ok).program));
 });
+
+test("functions see the program's root scope, never the caller's open blocks", () => {
+  const leak = run(
+    "fn f() -> int:\n    return i\nfor i in 0..2:\n    print(f())\n",
+  );
+  assert.deepEqual(codes(leak.diagnostics), ["undefined-variable"]);
+  const hidden = run(
+    "fn g() -> int:\n    return hidden\nif true:\n    let hidden = 7\n    print(g())\n",
+  );
+  assert.deepEqual(codes(hidden.diagnostics), ["undefined-variable"]);
+  assert.deepEqual(
+    run("let root = 5\nfn h() -> int:\n    return root\nprint(h())\n").output,
+    ["5"],
+  );
+});
+
+test("a nesting error does not shrink the depth left for later lines", () => {
+  const deep = `let a = ${"(".repeat(30)}1${")".repeat(30)}\n`;
+  const columns = analyze(deep.repeat(5)).diagnostics.map((d) => d.column);
+  assert.equal(new Set(columns).size, 1, "every copy fails at the same column");
+});
+
+test("the number of lexer diagnostics is capped", () => {
+  const { diagnostics } = analyze("$".repeat(3000));
+  assert.ok(diagnostics.length <= LIMITS.maxReported);
+});
