@@ -151,7 +151,9 @@ established 308; a missing normalized destination then returns the localized
 An article whose truthful first-publication date is not known yet cannot be a
 post record, because `publishedAt` remains required even for a draft. Prepare
 such work in `content/drafts/<locale>/`; that directory is never loaded by the
-site. On the actual release date, add `publishedAt`, move the file into
+site. A draft translation is the exception: it takes the original's
+`publishedAt` and needs no release date. For a new original, on the actual
+release date, add `publishedAt`, move the file into
 `content/posts/`, regenerate the route manifest with `pnpm content:routes`, and
 run the full release checks before merge.
 
