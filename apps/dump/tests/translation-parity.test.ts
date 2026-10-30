@@ -83,6 +83,18 @@ const pairs = [...new Set(posts.map((post) => post.contentId))].flatMap(
   },
 );
 
+// The four sibling sites' roots. A Portuguese post links the Portuguese root
+// where one is published (verified on main), an English post the English one;
+// the author's text and link order are otherwise identical.
+const SIBLING_ROOTS: Record<string, string> = {
+  "https://raioviajante.com": "https://raioviajante.com/pt",
+  "https://dump.raioviajante.com": "https://dump.raioviajante.com/pt",
+  "https://docs.raioviajante.com": "https://docs.raioviajante.com/pt/",
+  "https://lab.raioviajante.com": "https://lab.raioviajante.com/pt/",
+};
+const toEnglishRoot = (link: string) =>
+  Object.entries(SIBLING_ROOTS).find(([, pt]) => pt === link)?.[0] ?? link;
+
 describe("translation parity", () => {
   it("compares every translated work with its original", () => {
     // 11 English originals translated to Portuguese, the English original
@@ -98,7 +110,7 @@ describe("translation parity", () => {
       expect(b.headings).toEqual(a.headings);
       expect(b.blocks).toBe(a.blocks);
       expect(b.inlineCode).toEqual(a.inlineCode);
-      expect(b.links).toEqual(a.links);
+      expect(b.links.map(toEnglishRoot)).toEqual(a.links.map(toEnglishRoot));
       expect(b.images).toEqual(a.images);
       expect(b.directives).toBe(a.directives);
       expect(b.lists).toBe(a.lists);
@@ -115,6 +127,21 @@ describe("translation parity", () => {
       });
       expect(translation.tags).toEqual(original.tags);
       expect(translation.originalLocale).toBe(original.originalLocale);
+    },
+  );
+});
+
+describe("links from posts to the sibling sites", () => {
+  it.each(pairs.map((pair) => [pair.contentId, pair] as const))(
+    "%s links the root of the sibling sites in its own language",
+    (_contentId, { translation }) => {
+      const links = structureOf(translation.slug).links;
+      const english = Object.keys(SIBLING_ROOTS);
+      const portuguese = Object.values(SIBLING_ROOTS);
+      for (const link of links) {
+        if (translation.locale === "pt-BR") expect(english).not.toContain(link);
+        else expect(portuguese).not.toContain(link);
+      }
     },
   );
 });
