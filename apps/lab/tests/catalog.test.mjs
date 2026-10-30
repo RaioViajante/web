@@ -130,7 +130,7 @@ test("boot sections share one source and keep their technical tokens exact", () 
   assert.ok(checked >= 20);
 });
 
-test("related rows point to the same destinations in both locales, except the localized docs page", () => {
+test("related rows point to the same destinations in both locales, except the localized docs page and the Portuguese printf post", () => {
   for (const [surface, byLocale] of Object.entries(relatedRows)) {
     if (surface === "filename-classifier") continue; // pinned in localization.test.mjs
     const hosts = (rows) => rows.map((row) => new URL(row.href).hostname);

@@ -29,9 +29,9 @@ const learningNotes =
   "https://github.com/RaioViajante/x86-os-experiment/blob/e966889b56e613d92887338a1bc979674674a115/docs/01-boot-sector.md";
 
 /**
- * Dump posts linked from either locale. Where the Portuguese post exists and is
- * the one to keep, the Portuguese rows use it (`printfPt`); the rest are
- * English posts, linked deliberately and named as such.
+ * Dump posts linked from either locale. The Portuguese printf row uses the
+ * Portuguese post (`printfPt`); the other rows deliberately keep linking the
+ * English posts and name them as English.
  */
 const dump = {
   edgeCases: {

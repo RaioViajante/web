@@ -33,12 +33,12 @@ for (const r of await dumpConfig.redirects())
     permanent: r.permanent,
   });
 
-// Cross-site routes that another open pull request creates (none today). A link to one of
-// them is allowed to answer 404 until that pull request is merged, and nothing
-// else is: every entry is printed on each run, a route that exists is reported
+// Cross-site routes that another open pull request creates (none now). A link
+// to one of them is allowed to answer 404 until that pull request is merged,
+// and nothing else is: every entry is printed on each run, a route that exists is reported
 // so its entry gets removed, and an entry never excuses any other status.
 // Keys are "<app> <path>"; the value names what publishes the route.
-const pendingRoutes = new Map([]);
+const pendingRoutes = new Map();
 const pendingNotes = [];
 
 const { stop } = await startServers();
