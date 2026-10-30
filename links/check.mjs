@@ -33,6 +33,31 @@ for (const r of await dumpConfig.redirects())
     permanent: r.permanent,
   });
 
+// Cross-site routes that another open pull request creates. A link to one of
+// them is allowed to answer 404 until that pull request is merged, and nothing
+// else is: every entry is printed on each run, a route that exists is reported
+// so its entry gets removed, and an entry never excuses any other status.
+// Keys are "<app> <path>"; the value names what publishes the route.
+const pendingRoutes = new Map([
+  [
+    "dump /pt/posts/aparentemente-mover-um-arquivo-tem-casos-de-borda",
+    "RaioViajante/web#99 (Dump Portuguese posts)",
+  ],
+  [
+    "dump /pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era",
+    "RaioViajante/web#99 (Dump Portuguese posts)",
+  ],
+  [
+    "dump /pt/posts/cansei-de-crud-entao-estou-construindo-um-agendador",
+    "RaioViajante/web#99 (Dump Portuguese posts)",
+  ],
+  [
+    "dump /pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma",
+    "RaioViajante/web#99 (Dump Portuguese posts)",
+  ],
+]);
+const pendingNotes = [];
+
 const { stop } = await startServers();
 process.on("exit", stop);
 
@@ -168,6 +193,17 @@ async function resolve(entry) {
     }
     return void (await response.arrayBuffer());
   }
+  const pending = pendingRoutes.get(`${app} ${path}`);
+  if (pending && response.status === 404) {
+    await response.arrayBuffer();
+    return void pendingNotes.push(
+      `${app} ${path} answers 404 until ${pending} is merged (linked from ${where})`,
+    );
+  }
+  if (pending && response.status === 200)
+    pendingNotes.push(
+      `${app} ${path} now exists: remove it from pendingRoutes in links/check.mjs`,
+    );
   if (response.status !== 200) {
     await response.arrayBuffer();
     return note(`${path}: HTTP ${response.status}`, where);
@@ -293,6 +329,13 @@ if (process.argv.includes("--external")) {
 }
 
 stop();
+if (pendingNotes.length)
+  console.log(
+    `\nPending cross-site routes (${pendingNotes.length}), not counted as broken:\n${pendingNotes
+      .sort()
+      .map((n) => `  ${n}`)
+      .join("\n")}\n`,
+  );
 console.log(
   `${stats.pages} pages, ${stats.links} links (${stats.internal} internal, ${stats.external.size} distinct external, ${stats.mailto} mailto), ${stats.fragments} fragment checks, ${targets.size + cssTargets.size} distinct internal targets and first-party resources (${stats.resources} references), ${redirects.size} known redirects.`,
 );

@@ -112,6 +112,6 @@ O diretório alvo é informado pelo usuário. Downloads é apenas um exemplo; el
 ## Experimente e leia mais
 
 - [001 classificador de arquivos](https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/): classifique nomes no seu navegador (lab)
-- <a href="https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases" hreflang="en"><span lang="en">Apparently Moving a File Has Edge Cases</span> — em inglês</a> (dump)
-- <a href="https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was" hreflang="en"><span lang="en">A TOML File Changed What Sweep Was</span> — em inglês</a> (dump)
+- [Aparentemente mover um arquivo tem casos de borda](https://dump.raioviajante.com/pt/posts/aparentemente-mover-um-arquivo-tem-casos-de-borda) (dump)
+- [Um arquivo TOML mudou o que o Sweep era](https://dump.raioviajante.com/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era) (dump)
 - [Repositório de código-fonte](https://github.com/RaioViajante/sweep)

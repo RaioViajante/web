@@ -100,12 +100,12 @@ const copy = {
 				orbit: {
 					status: "ainda não documentado",
 					summary: "agendador de tarefas auto-hospedado",
-					note: "leia sobre ele no dump, em inglês ↗",
+					note: "leia sobre ele no dump ↗",
 				},
 				yanawa: {
 					status: "ainda não documentado",
 					summary: "linguagem de programação em fase de projeto",
-					note: "leia sobre ela no dump, em inglês ↗",
+					note: "leia sobre ela no dump ↗",
 				},
 			},
 		},

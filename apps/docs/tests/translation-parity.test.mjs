@@ -51,6 +51,8 @@ function shape(body) {
 /** Links that deliberately point at the other language's own page. */
 const localizedLinks = new Map([
 	["https://lab.raioviajante.com/experiments/filename-classifier/", "https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/"],
+	["https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases", "https://dump.raioviajante.com/pt/posts/aparentemente-mover-um-arquivo-tem-casos-de-borda"],
+	["https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was", "https://dump.raioviajante.com/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era"],
 ]);
 
 test("every English document has a Portuguese translation sharing its identity", () => {

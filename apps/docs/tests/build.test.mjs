@@ -130,6 +130,18 @@ test("a cold-cache production build keeps semantic headings in the search index"
 			const item = html.slice(match.index).split(/<\/(?:div|li)>/)[0];
 			assert.match(item, /em inglês/, `${path}: ${target} says it is in English`);
 		}
+	// The Dump posts a Portuguese page links are the Portuguese versions: the
+	// Sweep guide and the home notes for Orbit and yanawa.
+	const ptDumpPosts = [
+		"aparentemente-mover-um-arquivo-tem-casos-de-borda",
+		"um-arquivo-toml-mudou-o-que-o-sweep-era",
+		"cansei-de-crud-entao-estou-construindo-um-agendador",
+		"comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma",
+	];
+	const linkedDump = ptPages.flatMap(([, html]) => [...html.matchAll(/href="https:\/\/dump\.raioviajante\.com(\/[^"]*)"/g)].map(([, path]) => path));
+	for (const slug of ptDumpPosts) assert.ok(linkedDump.includes(`/pt/posts/${slug}`), `a Portuguese page links /pt/posts/${slug}`);
+	assert.ok(!linkedDump.some((path) => path.startsWith("/posts/")), "no Portuguese page links an English Dump post");
+	assert.doesNotMatch(read("pt/index.html"), /dump, em inglês/);
 	// English blocks keep their English words.
 	assert.match(en, /<button type="button" class="block__copy">copy<\/button>/);
 
