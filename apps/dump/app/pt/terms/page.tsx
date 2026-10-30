@@ -28,10 +28,10 @@ export default function TermsPt() {
         ]}
         sections={[
           {
-            title: "Quem mantém isto",
+            title: "Quem opera este site",
             body: (
               <p>
-                dump.raioviajante.com é mantido por RaioViajante, CNPJ
+                dump.raioviajante.com é operado por RaioViajante, CNPJ
                 53.021.377/0001-93, como parte de raioviajante.com. Dúvidas
                 podem ser enviadas para{" "}
                 <a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a>
@@ -44,8 +44,8 @@ export default function TermsPt() {
             body: (
               <p>
                 Textos, documentação e ilustrações pertencem a RaioViajante,
-                salvo indicação em contrário em alguma página. Todos os direitos
-                são reservados e não são cobertos pela licença MIT do
+                salvo indicação em contrário em alguma página. Estão com todos
+                os direitos reservados e não são cobertos pela licença MIT do
                 repositório, que se aplica apenas ao código-fonte.
               </p>
             ),
