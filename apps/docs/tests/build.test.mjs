@@ -131,17 +131,15 @@ test("a cold-cache production build keeps semantic headings in the search index"
 			assert.match(item, /em inglês/, `${path}: ${target} says it is in English`);
 		}
 	// The Dump posts a Portuguese page links are the Portuguese versions: the
-	// Sweep guide and the home notes for Orbit and yanawa.
-	const ptDumpPosts = [
-		"aparentemente-mover-um-arquivo-tem-casos-de-borda",
-		"um-arquivo-toml-mudou-o-que-o-sweep-era",
-		"cansei-de-crud-entao-estou-construindo-um-agendador",
-		"comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma",
-	];
+	// home note for yanawa.
+	const ptDumpPosts = ["comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma"];
 	const linkedDump = ptPages.flatMap(([, html]) => [...html.matchAll(/href="https:\/\/dump\.raioviajante\.com(\/[^"]*)"/g)].map(([, path]) => path));
 	for (const slug of ptDumpPosts) assert.ok(linkedDump.includes(`/pt/posts/${slug}`), `a Portuguese page links /pt/posts/${slug}`);
 	assert.ok(!linkedDump.some((path) => path.startsWith("/posts/")), "no Portuguese page links an English Dump post");
 	assert.doesNotMatch(read("pt/index.html"), /dump, em inglês/);
+	// Four retired Dump articles are linked from no page, in either language.
+	const retiredDump = /building-orbit|cansei-de-crud|apparently-moving-a-file|aparentemente-mover|an-execution-is-more-than|uma-execucao-e-mais|a-toml-file-changed|um-arquivo-toml/;
+	for (const [path, html] of [...ptPages, ...pairs.map(([enPath]) => [enPath, read(join(enPath, "index.html"))])]) assert.doesNotMatch(html, retiredDump, `${path} links no retired Dump article`);
 	// Privacy, Search: the site's own host may receive `q` through the LANG link, so
 	// the sentence says only that nothing is sent to the other sites.
 	assert.match(read("privacy/index.html"), /what you type is not sent to those sites/);

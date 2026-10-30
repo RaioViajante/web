@@ -1,6 +1,7 @@
 import { labSuggestions } from "@/lib/lab-suggestions";
 import { headingSlug, headingText, labForPost } from "@/lib/post-details";
 import type { Post } from "@/lib/posts";
+import { RETIRED_CONTENT_IDS } from "./retired-content-ids";
 
 // The "on this page" links must equal the ids rehype-slug gives the rendered
 // headings (github-slugger rules). A literal underscore is text, not emphasis.
@@ -56,29 +57,18 @@ describe("automatic Lab links", () => {
       locale,
       originalLocale: locale,
     });
-    // The Sweep series reaches the classifier, whose Portuguese page exists.
-    expect(
-      labForPost(make([], "pt-BR", "a-toml-file-changed-what-sweep-was")),
-    ).toEqual({
-      title: "Classificador de arquivos",
-      href: "https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/",
-    });
-    expect(
-      labForPost(make([], "en", "a-toml-file-changed-what-sweep-was")),
-    ).toEqual({
-      title: "Filename classifier",
-      href: "https://lab.raioviajante.com/experiments/filename-classifier/",
-    });
-    // Orbit and boot-sector reach their own Portuguese pages.
-    expect(labForPost(make([], "pt-BR", "building-orbit"))?.href).toBe(
-      "https://lab.raioviajante.com/pt/experiments/estados-de-execucao/",
-    );
+    // Boot-sector reaches its own Portuguese page.
     expect(labForPost(make(["osdev"], "pt-BR", "boot"))?.href).toBe(
       "https://lab.raioviajante.com/pt/experiments/setor-de-boot/",
     );
-    expect(labForPost(make([], "en", "building-orbit"))?.href).toBe(
-      "https://lab.raioviajante.com/experiments/execution-states/",
-    );
+    // Only a tagged topic reaches a Lab page: a post with no matching tag gets
+    // none, whatever its contentId, and a retired work's id grants nothing.
+    for (const contentId of [
+      "kept-building-and-stopped-writing-it-down",
+      ...RETIRED_CONTENT_IDS,
+    ])
+      for (const locale of ["en", "pt-BR"] as const)
+        expect(labForPost(make(["meta"], locale, contentId))).toBeNull();
   });
 
   it("never points a Portuguese suggestion at an English page", () => {

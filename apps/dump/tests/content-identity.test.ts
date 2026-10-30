@@ -404,18 +404,19 @@ describe("tags: id, label and slug are separate", () => {
 
 describe("series are keyed by contentId", () => {
   it("covers a translated part through its work, not its slug or tags", () => {
-    const en = post({ slug: "building-orbit", contentId: "building-orbit" });
+    const id = "started-writing-down-the-failures-before-the-features";
+    const en = post({ slug: id, contentId: id });
     const pt = post({
-      slug: "construindo-orbit",
-      contentId: "building-orbit",
+      slug: "comecei-a-escrever-as-falhas-antes-das-funcionalidades",
+      contentId: id,
       locale: "pt-BR",
     });
-    expect(seriesOf(en)?.name).toBe("orbit");
-    expect(seriesOf(pt)?.name).toBe("orbit");
+    expect(seriesOf(en)?.name).toBe("jobs-mcp");
+    expect(seriesOf(pt)?.name).toBe("jobs-mcp");
     expect(
       seriesOf(
         post({
-          slug: "building-orbit",
+          slug: id,
           contentId: "unrelated",
           tags: ["osdev"],
         }),
@@ -423,24 +424,13 @@ describe("series are keyed by contentId", () => {
     ).toBeUndefined();
   });
 
-  it("keeps today's three series and their order, every part a real work", () => {
+  it("keeps today's only series and their order, every part a real work", () => {
     expect(series.map((s) => [s.name, s.contentIds])).toEqual([
       [
         "jobs-mcp",
         [
           "started-writing-down-the-failures-before-the-features",
           "gave-one-operation-more-than-one-deadline",
-        ],
-      ],
-      [
-        "orbit",
-        ["building-orbit", "an-execution-is-more-than-a-row-in-a-database"],
-      ],
-      [
-        "sweep",
-        [
-          "apparently-moving-a-file-has-edge-cases",
-          "a-toml-file-changed-what-sweep-was",
         ],
       ],
     ]);

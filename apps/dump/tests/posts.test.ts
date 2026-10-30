@@ -144,10 +144,6 @@ describe("post collection", () => {
         getPublishedPosts("en").map((post) => [post.slug, post.publishedAt]),
       ),
     ).toEqual({
-      "a-toml-file-changed-what-sweep-was": "2026-09-27",
-      "an-execution-is-more-than-a-row-in-a-database": "2026-09-13",
-      "apparently-moving-a-file-has-edge-cases": "2026-09-12",
-      "building-orbit": "2026-09-07",
       "gave-one-operation-more-than-one-deadline": "2026-09-27",
       "kept-building-and-stopped-writing-it-down": "2026-09-27",
       "maybe-this-can-be-something-someday": "2026-09-04",

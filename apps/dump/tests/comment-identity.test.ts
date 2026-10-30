@@ -12,6 +12,7 @@ import {
 } from "@/lib/comment-key";
 import { getAllPosts, getPublishedPosts } from "@/lib/posts";
 import { LEGACY_ENGLISH_CONTENT_IDS } from "@/lib/rss-identity";
+import { stillPublishedLegacyIds } from "./retired-content-ids";
 import snapshotJson from "./fixtures/giscus-discussions-snapshot.json";
 
 const snapshot = snapshotJson as DiscussionSnapshot;
@@ -45,7 +46,9 @@ describe("commentKey", () => {
     const legacy = getPublishedPosts("en").filter(({ contentId }) =>
       LEGACY_ENGLISH_CONTENT_IDS.includes(contentId),
     );
-    expect(legacy).toHaveLength(LEGACY_ENGLISH_CONTENT_IDS.length);
+    expect(legacy).toHaveLength(
+      stillPublishedLegacyIds(LEGACY_ENGLISH_CONTENT_IDS).length,
+    );
     for (const post of legacy)
       expect(commentKey(post.contentId)).toBe(legacyPathnameTerm(post.slug));
   });

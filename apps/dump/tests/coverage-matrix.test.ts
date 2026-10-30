@@ -23,10 +23,6 @@ const works = (() => {
 })();
 
 const ENGLISH_ORIGINALS = [
-  "a-toml-file-changed-what-sweep-was",
-  "an-execution-is-more-than-a-row-in-a-database",
-  "apparently-moving-a-file-has-edge-cases",
-  "building-orbit",
   "gave-one-operation-more-than-one-deadline",
   "kept-building-and-stopped-writing-it-down",
   "maybe-this-can-be-something-someday",
@@ -41,10 +37,6 @@ const PORTUGUESE_ORIGINALS = ["traduzir-o-site-sem-fingir-que-tudo-ja-existe"];
 // When each work's original first went public (UTC), from the original's
 // frontmatter, which matches the date of the Git commit that published it.
 const ORIGINAL_DATES: Record<string, string> = {
-  "a-toml-file-changed-what-sweep-was": "2026-09-27",
-  "an-execution-is-more-than-a-row-in-a-database": "2026-09-13",
-  "apparently-moving-a-file-has-edge-cases": "2026-09-12",
-  "building-orbit": "2026-09-07",
   "gave-one-operation-more-than-one-deadline": "2026-09-27",
   "kept-building-and-stopped-writing-it-down": "2026-09-27",
   "maybe-this-can-be-something-someday": "2026-09-04",
@@ -57,7 +49,7 @@ const ORIGINAL_DATES: Record<string, string> = {
 };
 
 describe("works x locale coverage", () => {
-  it("covers all thirteen published works", () => {
+  it("covers all nine published works", () => {
     expect([...works.keys()].sort()).toEqual(
       [...ENGLISH_ORIGINALS, ...PORTUGUESE_ORIGINALS].sort(),
     );

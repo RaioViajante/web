@@ -180,15 +180,17 @@ test("Dump publishes the reviewed Portuguese inventory without English fallback"
   await expectLang(page, "pt-BR");
   for (const slug of [
     "arquitetura",
-    "automacao",
+    "confiabilidade",
     "dump",
     "meta",
     "pessoal",
     "seguranca",
-    "sistemas-distribuidos",
     "web",
   ])
     await expect(page.locator(`a[href="/pt/tags/${slug}"]`)).toHaveCount(1);
+  // Tags only the retired articles used are no longer listed.
+  for (const slug of ["automacao", "sistemas-distribuidos"])
+    await expect(page.locator(`a[href="/pt/tags/${slug}"]`)).toHaveCount(0);
 
   await page.goto(`${base("dump")}/pt/tags/pessoal`);
   await expect(page.locator(".rv-lang a")).toHaveAttribute(
@@ -558,16 +560,7 @@ test("Dump Portuguese posts link the Portuguese sibling sites and the Portuguese
   ])
     expect(hrefs).not.toContain(english);
 
-  // Every Lab target has a Portuguese page, so a Portuguese post links it.
-  await page.goto(
-    `${base("dump")}/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era`,
-  );
-  await expect(page.getByText("Experimente", { exact: true })).toHaveCount(1);
-  await expect(
-    page.locator(
-      "a[href='https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/']",
-    ),
-  ).toHaveCount(1);
+  // The Lab target has a Portuguese page, so a Portuguese post links it.
   await page.goto(`${base("dump")}/pt/posts/nao-existe-printf-aqui-embaixo`);
   await expect(page.getByText("Experimente", { exact: true })).toHaveCount(1);
   await expect(

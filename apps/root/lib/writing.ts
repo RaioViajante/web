@@ -6,7 +6,28 @@ import {
 } from "../../../site/locales";
 import { siteOrigins } from "../../../site/sites";
 const DUMP_ORIGIN = siteOrigins.dump;
-const FEED_URL = `${DUMP_ORIGIN}/rss.xml`;
+
+/**
+ * Where Root reads Dump's feed from. Production reads `DUMP_ORIGIN`. The local
+ * verifiers (`security/local-servers.mjs`) set `DUMP_FEED_ORIGIN` to the Dump
+ * they started from the same commit, so a check never depends on what the
+ * deployed Dump publishes. Only a loopback `http` origin is honoured; anything
+ * else is ignored. Item links keep the production origin either way.
+ */
+export function feedSourceOrigin(
+  override: string | undefined = process.env.DUMP_FEED_ORIGIN,
+): string {
+  if (!override) return DUMP_ORIGIN;
+  try {
+    const url = new URL(override);
+    if (
+      url.protocol === "http:" &&
+      (url.hostname === "127.0.0.1" || url.hostname === "localhost")
+    )
+      return url.origin;
+  } catch {}
+  return DUMP_ORIGIN;
+}
 
 export interface RecentPost {
   title: string;
@@ -16,9 +37,9 @@ export interface RecentPost {
 
 const fallbackPosts: RecentPost[] = [
   {
-    title: "A TOML File Changed What Sweep Was",
-    url: `${DUMP_ORIGIN}/posts/a-toml-file-changed-what-sweep-was`,
-    date: "2026-09-27",
+    title: "Translating the Site Without Pretending Everything Already Exists",
+    url: `${DUMP_ORIGIN}/posts/translating-the-site-without-pretending-everything-already-exists`,
+    date: "2026-10-19",
   },
   {
     title: "I Gave One Operation More Than One Deadline",
@@ -100,7 +121,7 @@ export function parseRecentPosts(
 
 export async function getRecentPosts(): Promise<RecentPost[]> {
   try {
-    const response = await fetch(FEED_URL, {
+    const response = await fetch(feedUrl("en", feedSourceOrigin()), {
       next: { revalidate: 60 },
       signal: AbortSignal.timeout(5000),
     });
@@ -113,8 +134,8 @@ export async function getRecentPosts(): Promise<RecentPost[]> {
 }
 
 /** Dump's feed in a locale, built from the shared registry and origins. */
-export const feedUrl = (locale: LocaleId) =>
-  `${DUMP_ORIGIN}${localizedPath("dump", locale, "/rss.xml")}`;
+export const feedUrl = (locale: LocaleId, origin: string = DUMP_ORIGIN) =>
+  `${origin}${localizedPath("dump", locale, "/rss.xml")}`;
 
 export type LatestWriting =
   | { state: "ready"; posts: RecentPost[] }
@@ -134,7 +155,7 @@ export async function getLatestWriting(
     return { state: "ready", posts: await getRecentPosts() };
   if (!participates("dump", locale)) return { state: "unavailable" };
   try {
-    const response = await fetch(feedUrl(locale), {
+    const response = await fetch(feedUrl(locale, feedSourceOrigin()), {
       next: { revalidate: 60 },
       signal: AbortSignal.timeout(5000),
     });

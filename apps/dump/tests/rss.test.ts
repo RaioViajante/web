@@ -14,6 +14,7 @@ import {
 } from "@/lib/rss-identity";
 import { alternatesFor, site } from "@/lib/site";
 import { tagPresentation } from "@/lib/tags";
+import { stillPublishedLegacyIds } from "./retired-content-ids";
 
 function post(overrides: Partial<Post> = {}): Post {
   return {
@@ -168,7 +169,7 @@ describe("GUID policy", () => {
     const english = getPublishedPosts("en");
     const legacy = english.filter((p) => !rssGuid(p).startsWith("tag:"));
     expect(legacy.map((p) => p.contentId).sort()).toEqual(
-      [...LEGACY_ENGLISH_CONTENT_IDS].sort(),
+      stillPublishedLegacyIds(LEGACY_ENGLISH_CONTENT_IDS).sort(),
     );
   });
 });

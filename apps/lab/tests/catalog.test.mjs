@@ -44,7 +44,7 @@ test("every catalog declares every locale with exactly the same keys", () => {
     for (const [surface, byLocale] of Object.entries(table)) {
       assert.deepEqual(Object.keys(byLocale).sort(), [...LOCALE_IDS].sort());
       // The published Portuguese 001 keeps the two Related rows it has always
-      // had (the English page lists the two Dump posts as well).
+      // had; its pinned list lives in localization.test.mjs.
       if (table === relatedRows && surface === "filename-classifier") continue;
       assert.equal(
         byLocale.en.length,
@@ -147,4 +147,12 @@ test("related rows point to the same destinations in both locales, except the lo
       else assert.equal(pt.href, row.href);
     });
   }
+});
+
+test("no related row links a retired Dump article", () => {
+  const retired =
+    /building-orbit|cansei-de-crud|apparently-moving-a-file|aparentemente-mover|an-execution-is-more-than|uma-execucao-e-mais|a-toml-file-changed|um-arquivo-toml/;
+  for (const byLocale of Object.values(relatedRows))
+    for (const rows of Object.values(byLocale))
+      for (const row of rows) assert.doesNotMatch(row.href, retired);
 });

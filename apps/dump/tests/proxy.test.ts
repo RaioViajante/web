@@ -30,10 +30,10 @@ describe("dynamic route guard", () => {
 
   it("knows every new Portuguese post and tag, with exact tag casing", () => {
     for (const path of [
-      "/pt/posts/cansei-de-crud-entao-estou-construindo-um-agendador",
+      "/pt/posts/comecei-a-escrever-as-falhas-antes-das-funcionalidades",
       "/pt/posts/nao-existe-printf-aqui-embaixo",
       "/pt/tags/seguranca",
-      "/pt/tags/sistemas-distribuidos",
+      "/pt/tags/confiabilidade",
       "/pt/tags/linguagens-de-programacao",
       "/posts/translating-the-site-without-pretending-everything-already-exists",
     ])
