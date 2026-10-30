@@ -31,6 +31,17 @@ const RETIRED = {
     "pt-BR": "um-arquivo-toml-mudou-o-que-o-sweep-era",
   },
 } as const;
+const RETAINED = [
+  "gave-one-operation-more-than-one-deadline",
+  "kept-building-and-stopped-writing-it-down",
+  "maybe-this-can-be-something-someday",
+  "my-project-cards-were-getting-ahead-of-my-projects",
+  "split-my-internet-into-four-different-kinds-of-place",
+  "started-designing-a-language-before-i-could-compile-one",
+  "started-writing-down-the-failures-before-the-features",
+  "there-is-no-printf-down-here",
+  "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+] as const;
 const IDS = Object.keys(RETIRED);
 
 const SLUGS = Object.values(RETIRED).flatMap((s) => Object.values(s));
@@ -47,9 +58,11 @@ describe("retired works", () => {
     expect(new Set(SLUGS).size).toBe(8);
   });
 
-  it("leaves nine published works, nine per language", () => {
-    for (const locale of ["en", "pt-BR"] as const)
-      expect(getPublishedPosts(locale)).toHaveLength(9);
+  it("keeps the nine retained works, in both languages", () => {
+    for (const locale of ["en", "pt-BR"] as const) {
+      const ids = getPublishedPosts(locale).map((post) => post.contentId);
+      for (const id of RETAINED) expect(ids).toContain(id);
+    }
   });
 
   it("has no source file, record or draft for any retired contentId or slug", () => {
@@ -89,14 +102,16 @@ describe("retired works", () => {
     const urls = sitemap().map((entry) => new URL(entry.url).pathname);
     const entries = (await searchIndex().json()) as Array<{ href: string }>;
     const ptEntries = (await searchIndexPt().json()) as Array<{ href: string }>;
-    expect(entries).toHaveLength(9);
-    expect(ptEntries).toHaveLength(9);
+    expect(entries).toHaveLength(getPublishedPosts("en").length);
+    expect(ptEntries).toHaveLength(getPublishedPosts("pt-BR").length);
     const hrefs = [...entries, ...ptEntries].map(
       (entry) => new URL(entry.href).pathname,
     );
     for (const locale of ["en", "pt-BR"] as const) {
       const feed = renderRssFeed(getPublishedPosts(locale), locale);
-      expect(feed.match(/<item>/g)).toHaveLength(9);
+      expect(feed.match(/<item>/g)).toHaveLength(
+        getPublishedPosts(locale).length,
+      );
       for (const slug of SLUGS) expect(feed).not.toContain(slug);
     }
     for (const retired of PATHS) {

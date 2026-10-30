@@ -127,6 +127,12 @@ describe("English /rss.xml against the production snapshot", () => {
     );
     expect(added).toEqual([
       {
+        guid: "tag:dump.raioviajante.com,2026:post/algumas-coisas-nao-sabem-como-terminar/en",
+        isPermaLink: "false",
+        link: `${PRODUCTION_ORIGIN}/posts/some-things-dont-know-how-to-end`,
+        pubDate: "Fri, 30 Oct 2026 00:00:00 GMT",
+      },
+      {
         guid: "tag:dump.raioviajante.com,2026:post/traduzir-o-site-sem-fingir-que-tudo-ja-existe/en",
         isPermaLink: "false",
         link: `${PRODUCTION_ORIGIN}/posts/translating-the-site-without-pretending-everything-already-exists`,

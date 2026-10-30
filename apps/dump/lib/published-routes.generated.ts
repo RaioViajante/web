@@ -5,6 +5,7 @@ export const publishedPostPaths = {
     "/posts/kept-building-and-stopped-writing-it-down",
     "/posts/maybe-this-can-be-something-someday",
     "/posts/my-project-cards-were-getting-ahead-of-my-projects",
+    "/posts/some-things-dont-know-how-to-end",
     "/posts/split-my-internet-into-four-different-kinds-of-place",
     "/posts/started-designing-a-language-before-i-could-compile-one",
     "/posts/started-writing-down-the-failures-before-the-features",
@@ -12,6 +13,7 @@ export const publishedPostPaths = {
     "/posts/translating-the-site-without-pretending-everything-already-exists",
   ],
   "pt-BR": [
+    "/pt/posts/algumas-coisas-nao-sabem-como-terminar",
     "/pt/posts/comecei-a-escrever-as-falhas-antes-das-funcionalidades",
     "/pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma",
     "/pt/posts/continuei-construindo-e-parei-de-escrever",
