@@ -28,7 +28,11 @@ export interface RelatedRow {
 const learningNotes =
   "https://github.com/RaioViajante/x86-os-experiment/blob/e966889b56e613d92887338a1bc979674674a115/docs/01-boot-sector.md";
 
-/** Dump posts that exist only in English, linked deliberately from either locale. */
+/**
+ * Dump posts linked from either locale. Where the Portuguese post exists and is
+ * the one to keep, the Portuguese rows use it (`printfPt`); the rest are
+ * English posts, linked deliberately and named as such.
+ */
 const dump = {
   edgeCases: {
     label: "Apparently Moving a File Has Edge Cases",
@@ -66,6 +70,13 @@ const dump = {
     language: "en",
   },
 } as const satisfies Record<string, RelatedRow>;
+
+const printfPt = {
+  label: "Não existe printf aqui embaixo",
+  value: "dump ↗",
+  href: "https://dump.raioviajante.com/pt/posts/nao-existe-printf-aqui-embaixo",
+  language: "pt-BR",
+} as const satisfies RelatedRow;
 
 export const fidelityRows = {
   "filename-classifier": {
@@ -179,7 +190,7 @@ export const relatedRows = {
       },
     ],
     "pt-BR": [
-      dump.printf,
+      printfPt,
       {
         label: "anotações de aprendizado",
         value: "github ↗",

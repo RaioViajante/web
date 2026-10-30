@@ -32,7 +32,8 @@ through the locale catalog (`src/lib/copy.ts`), `created` renders as a long
 date in the page locale with the ISO value in `<time datetime>`, and the
 fidelity and related rows of each surface live in
 `src/data/experiment-content.ts`. Related rows that point to English-only
-material (the Dump posts, the learning notes) say so in words ("em inglês"),
+material (the learning notes and Dump posts without a Portuguese counterpart to
+keep) say so in words ("em inglês"),
 carry `hreflang="en"` and mark the English title with `lang="en"`.
 
 Technical identifiers stay exact in both languages: Orbit's status values

@@ -139,6 +139,11 @@ test("related rows point to the same destinations in both locales, except the lo
       const pt = byLocale["pt-BR"][index];
       if (new URL(row.href).hostname === "docs.raioviajante.com")
         assert.ok(pt.href.includes("/pt/"));
+      else if (row.href.endsWith("/posts/there-is-no-printf-down-here"))
+        assert.equal(
+          pt.href,
+          "https://dump.raioviajante.com/pt/posts/nao-existe-printf-aqui-embaixo",
+        );
       else assert.equal(pt.href, row.href);
     });
   }
