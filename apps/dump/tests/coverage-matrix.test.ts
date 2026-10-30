@@ -33,7 +33,10 @@ const ENGLISH_ORIGINALS = [
   "started-writing-down-the-failures-before-the-features",
   "there-is-no-printf-down-here",
 ];
-const PORTUGUESE_ORIGINALS = ["traduzir-o-site-sem-fingir-que-tudo-ja-existe"];
+const PORTUGUESE_ORIGINALS = [
+  "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+  "algumas-coisas-nao-sabem-como-terminar",
+];
 
 // When each work's original first went public (UTC), from the original's
 // frontmatter, which matches the date of the Git commit that published it.
@@ -48,10 +51,11 @@ const ORIGINAL_DATES: Record<string, string> = {
   "there-is-no-printf-down-here": "2026-09-05",
   "traduzir-o-site-sem-fingir-que-tudo-ja-existe": "2026-10-19",
   "for-those-who-never-quite-belonged": "2026-10-30",
+  "algumas-coisas-nao-sabem-como-terminar": "2026-10-30",
 };
 
 describe("works x locale coverage", () => {
-  it("covers all ten published works", () => {
+  it("covers all eleven published works", () => {
     expect([...works.keys()].sort()).toEqual(
       [...ENGLISH_ORIGINALS, ...PORTUGUESE_ORIGINALS].sort(),
     );
