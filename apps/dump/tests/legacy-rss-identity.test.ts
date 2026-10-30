@@ -127,6 +127,12 @@ describe("English /rss.xml against the production snapshot", () => {
     );
     expect(added).toEqual([
       {
+        guid: "tag:dump.raioviajante.com,2026:post/for-those-who-never-quite-belonged/en",
+        isPermaLink: "false",
+        link: `${PRODUCTION_ORIGIN}/posts/for-those-who-never-quite-belonged`,
+        pubDate: "Fri, 30 Oct 2026 00:00:00 GMT",
+      },
+      {
         guid: "tag:dump.raioviajante.com,2026:post/algumas-coisas-nao-sabem-como-terminar/en",
         isPermaLink: "false",
         link: `${PRODUCTION_ORIGIN}/posts/some-things-dont-know-how-to-end`,
