@@ -42,26 +42,38 @@ Slugs localizados são independentes. Essa escolha custa um pouco mais de invent
 
 ## Publicar não é o mesmo que anunciar
 
-Durante a primeira etapa deste rollout, as rotas portuguesas podem existir antes de o restante do ecossistema começar a apontar para elas. O projeto trata publicação e divulgação como etapas diferentes.
+Durante a primeira etapa deste rollout, as rotas portuguesas podiam existir antes de o restante do ecossistema começar a apontar para elas. O projeto trata publicação e divulgação como etapas diferentes.
 
-Enquanto essa primeira etapa estiver em validação, as páginas são acessadas diretamente e verificadas: idioma do documento, URL canônica, metadados, índice de busca, mapa do site e respostas `404`. A participação pública do idioma permanece desativada nessa etapa, então o controle `LANG` e os outros sites não anunciam uma experiência que ainda está em validação.
+Enquanto essa primeira etapa esteve em validação, as páginas eram acessadas diretamente e verificadas: idioma do documento, URL canônica, metadados, índice de busca, mapa do site e respostas `404`. A participação pública do idioma ficou desativada nessa etapa, então o controle `LANG` e os outros sites não anunciavam uma experiência que ainda estava em validação.
 
-Depois que essa publicação inicial for verificada em produção, uma etapa separada poderá ativar a divulgação entre hosts. É uma decisão específica deste projeto, não uma regra universal para sites multilíngues.
+Depois que essa publicação inicial fosse verificada em produção, uma etapa separada poderia ativar a divulgação entre hosts. É uma decisão específica deste projeto, não uma regra universal para sites multilíngues.
+
+:::note[Atualização]
+Essa etapa separada já aconteceu: hoje o controle `LANG` e os outros sites do ecossistema anunciam as páginas em português.
+:::
 
 ## O que continua para depois
 
-Nem toda integração entra junto com as primeiras páginas.
+Nem toda integração entrou junto com as primeiras páginas.
 
-Nesta etapa inicial, o feed inglês em `/rss.xml` precisa preservar URLs, GUIDs, ordem e datas. Um feed em português e sua autodetecção pertencem a uma migração separada; `/pt/rss.xml` não é anunciado enquanto não existe.
+Nessa etapa inicial, o feed inglês em `/rss.xml` precisava preservar URLs, GUIDs, ordem e datas. Um feed em português e sua autodetecção pertenciam a uma migração separada; `/pt/rss.xml` não era anunciado enquanto não existia.
 
-Os comentários em inglês também continuam associados ao caminho atual de cada página. Durante essa primeira publicação, textos em português ficam sem a seção de comentários; a identidade das discussões será tratada em uma migração explícita e separada.
+Os comentários em inglês também continuavam associados ao caminho atual de cada página. Durante essa primeira publicação, os textos em português ficaram sem a seção de comentários; a identidade das discussões seria tratada em uma migração explícita e separada.
+
+:::note[Atualização]
+As duas migrações já foram feitas. O feed em português existe em `/pt/rss.xml` e é anunciado pelas páginas em português. Os textos em português têm seção de comentários, e cada obra tem uma única discussão, compartilhada pelas versões nos dois idiomas.
+:::
 
 Links automáticos para demonstrações do Lab seguem a mesma cautela: se não existe uma versão portuguesa real, o texto em português não apresenta o destino inglês como se fosse equivalente. Um link editorial para material em inglês ainda pode existir, desde que diga isso claramente e declare `hreflang="en"`.
 
 ## Datas pertencem à versão publicada
 
-A tradução não herda a data do original. Cada versão recebe `publishedAt` com a data de sua primeira publicação pública, registrada pelo processo editorial do projeto.
+No começo, a tradução não herdava a data do original. Cada versão recebia `publishedAt` com a data de sua primeira publicação pública, registrada pelo processo editorial do projeto.
 
-Durante a preparação, um manuscrito sem essa data permanece fora do inventário publicado. Ele não precisa de uma data inventada para caber no build, e também não corre o risco de aparecer antes da hora em uma rota, no mapa do site ou na busca.
+:::note[Atualização]
+Essa regra mudou. Uma tradução não é uma nova publicação: toda versão de uma obra, em qualquer idioma, carrega o `publishedAt` do original. A data continua sendo um registro editorial explícito; o build não a deriva do Git nem do relógio.
+:::
+
+Durante a preparação, um manuscrito sem data de publicação permanece fora do inventário publicado. Ele não precisa de uma data inventada para caber no build, e também não corre o risco de aparecer antes da hora em uma rota, no mapa do site ou na busca.
 
 No fim, a arquitetura serve a uma ideia simples: mostrar apenas o que de fato existe, no idioma em que existe, e deixar espaço para o restante chegar depois.
