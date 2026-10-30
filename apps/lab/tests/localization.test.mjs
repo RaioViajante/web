@@ -82,7 +82,14 @@ test("revisions and technical names survive translation verbatim", () => {
   for (const english of experiments) {
     const portuguese = byId(portugueseExperiments, english.id);
     // An experiment with no source project has no revision or project to keep.
-    if (!english.revision) continue;
+    if (!english.revision) {
+      assert.equal(
+        english.source,
+        undefined,
+        `${english.id} has no revision and no source`,
+      );
+      continue;
+    }
     assert.ok(
       portuguese.notes.includes(english.revision),
       `${english.id} notes keep revision ${english.revision}`,

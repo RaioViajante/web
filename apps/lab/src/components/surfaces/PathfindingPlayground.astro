@@ -196,7 +196,11 @@ const text = pathfindingCopy[locale];
     }
 
     /** Applies the selected tool; returns the message for the live region, or null when nothing changed. */
-    function apply(i: number): { message: string; ok: boolean } {
+    function apply(i: number): {
+      message: string;
+      ok: boolean;
+      quiet?: boolean;
+    } {
       const before = grid;
       const row = rowOf(grid, i) + 1;
       const column = columnOf(grid, i) + 1;
@@ -222,14 +226,18 @@ const text = pathfindingCopy[locale];
         const weight: Weight =
           tool === "wall" ? WALL : tool === "mud" ? MUD : GROUND;
         grid = paint(grid, i, weight);
-        if (grid === before)
+        if (grid === before) {
+          if (tool === "wall" && (i === grid.start || i === grid.goal))
+            return { ok: false, message: text.messages.rejectedWall };
+          // Already in that state: nothing was refused, so no rejection sound.
           return {
-            ok: false,
-            message:
-              tool === "wall" && (i === grid.start || i === grid.goal)
-                ? text.messages.rejectedWall
-                : text.messages.rejectedOther,
+            ok: true,
+            quiet: true,
+            message: fill(text.messages.unchanged, {
+              kind: text.kinds[kindOf(grid, i)],
+            }),
           };
+        }
       }
       const reset = resetSearch();
       const base =
@@ -243,7 +251,9 @@ const text = pathfindingCopy[locale];
               column,
             })
           : fill(text.messages.painted, {
-              kind: text.tools[tool].split(" · ")[0]!,
+              kind: text.kinds[
+                tool === "wall" ? "wall" : tool === "mud" ? "mud" : "ground"
+              ],
               row,
               column,
             });
@@ -253,10 +263,14 @@ const text = pathfindingCopy[locale];
       };
     }
 
-    function finishEdit(result: { message: string; ok: boolean }) {
+    function finishEdit(result: {
+      message: string;
+      ok: boolean;
+      quiet?: boolean;
+    }) {
       render();
       say(result.message);
-      playSound(result.ok ? "success" : "reject");
+      if (!result.quiet) playSound(result.ok ? "success" : "reject");
     }
 
     // Pointer: mouse and pen drag to draw; touch taps, so dragging still scrolls.
@@ -290,7 +304,8 @@ const text = pathfindingCopy[locale];
       painting = false;
     });
     gridEl.addEventListener("click", (event) => {
-      if (lastPointer !== "touch") return;
+      // Touch taps, and clicks with no pointer behind them (assistive technology).
+      if (lastPointer !== "touch" && event.detail !== 0) return;
       const cell = (event.target as HTMLElement).closest<HTMLElement>(
         "[data-cell]",
       );
@@ -485,15 +500,15 @@ const text = pathfindingCopy[locale];
         const found = row.status === "found";
         const yes = text.compareYes;
         const no = text.compareNo;
-        const optimal = !found
-          ? text.compareNa
-          : [row.fewestSteps ? yes : no, row.lowestCost ? yes : no].join(" / ");
+        const optimal = (flag: boolean) =>
+          !found ? text.compareNa : flag ? yes : no;
         for (const value of [
           text.statusNames[row.status],
           String(row.explored),
           found ? String(row.pathSteps) : text.none,
           found ? String(row.pathCost) : text.none,
-          optimal,
+          optimal(row.fewestSteps),
+          optimal(row.lowestCost),
         ])
           tr.insertCell().textContent = value;
       }

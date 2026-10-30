@@ -38,7 +38,6 @@ export interface PathfindingCopy {
   };
   keyboardHelp: string;
   touchHelp: string;
-  legendBand: string;
   marks: Record<CellKind | "frontier" | "expanded" | "path", string>;
   legend: Record<CellKind | "frontier" | "expanded" | "path", string>;
   controlsBand: string;
@@ -92,14 +91,22 @@ export interface PathfindingCopy {
     rejectedSame: string;
     rejectedOther: string;
     finished: string;
-    noGoalReached: string;
+    unchanged: string;
     editResets: string;
     running: string;
     paused: string;
   };
   compareBand: string;
   compareCaption: string;
-  compareHeaders: readonly [string, string, string, string, string, string];
+  compareHeaders: readonly [
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+    string,
+  ];
   compareYes: string;
   compareNo: string;
   compareNa: string;
@@ -162,7 +169,6 @@ export const pathfindingCopy = {
       "Keyboard: arrow keys move between cells, Home and End jump along the row, Enter or Space applies the selected tool.",
     touchHelp:
       "Touch: tap a cell to apply the tool. Dragging scrolls the page, so draw lines with a mouse or the keyboard.",
-    legendBand: "Legend",
     marks: {
       ground: "",
       wall: "#",
@@ -239,7 +245,7 @@ export const pathfindingCopy = {
       rejectedSame: "The start and the goal need different cells.",
       rejectedOther: "That cell cannot be changed.",
       finished: "The search is over. Reset it to run again.",
-      noGoalReached: "The search ended without reaching the goal.",
+      unchanged: "Nothing changed: that cell already is {kind}.",
       editResets: "Editing the grid reset the search.",
       running: "Running.",
       paused: "Paused.",
@@ -252,13 +258,14 @@ export const pathfindingCopy = {
       "explored",
       "moves",
       "weight",
-      "optimal for",
+      "fewest moves",
+      "lowest weight",
     ],
     compareYes: "yes",
     compareNo: "no",
     compareNa: "—",
     compareNote:
-      "Optimal for moves means no path has fewer moves. Optimal for weight means no path costs less. Without mud they are the same thing. Explored counts cells, not time.",
+      "Fewest moves: no path has fewer moves. Lowest weight: no path costs less. Without mud they are the same thing. Explored counts cells, not time.",
     conceptsHeading: "What to watch",
     concepts: [
       {
@@ -293,8 +300,8 @@ export const pathfindingCopy = {
     limitsHeading: "Limits",
     limits: [
       "Movement is up, right, down and left only. There are no diagonals.",
-      "Mud is the only weight, fixed at 5. Costs are charged for entering a cell.",
-      "Grids hold at most 30 × 16 cells, and the search and the comparison finish in well under a frame on them.",
+      "Mud is the only weight, fixed at 5. Entering a cell costs its weight; the start cell is never charged.",
+      "Grids hold at most 30 × 16 cells, and a search or a comparison finishes quickly on them.",
       "Explored counts are not timings. Real performance depends on the data structures, which this page keeps deliberately simple.",
       "Generated grids are repeatable by seed but are not guaranteed to have a path.",
     ],
@@ -350,7 +357,6 @@ export const pathfindingCopy = {
       "Teclado: as setas movem entre as células, Home e End vão ao início e ao fim da linha, Enter ou Espaço aplica a ferramenta escolhida.",
     touchHelp:
       "Toque: toque numa célula para aplicar a ferramenta. Arrastar rola a página, então trace linhas com o mouse ou o teclado.",
-    legendBand: "Legenda",
     marks: {
       ground: "",
       wall: "#",
@@ -432,7 +438,7 @@ export const pathfindingCopy = {
       rejectedSame: "O início e o destino precisam de células diferentes.",
       rejectedOther: "Essa célula não pode ser alterada.",
       finished: "A busca terminou. Reinicie-a para executar de novo.",
-      noGoalReached: "A busca terminou sem chegar ao destino.",
+      unchanged: "Nada mudou: essa célula já é {kind}.",
       editResets: "Editar a grade reiniciou a busca.",
       running: "Executando.",
       paused: "Pausado.",
@@ -445,13 +451,14 @@ export const pathfindingCopy = {
       "exploradas",
       "passos",
       "peso",
-      "ótimo em",
+      "menos passos",
+      "menor peso",
     ],
     compareYes: "sim",
     compareNo: "não",
     compareNa: "—",
     compareNote:
-      "Ótimo em passos significa que nenhum caminho tem menos passos. Ótimo em peso significa que nenhum caminho custa menos. Sem lama, é a mesma coisa. Exploradas conta células, não tempo.",
+      "Menos passos: nenhum caminho tem menos passos. Menor peso: nenhum caminho custa menos. Sem lama, é a mesma coisa. Exploradas conta células, não tempo.",
     conceptsHeading: "O que observar",
     concepts: [
       {
@@ -486,8 +493,8 @@ export const pathfindingCopy = {
     limitsHeading: "Limites",
     limits: [
       "O movimento é só para cima, direita, baixo e esquerda. Não há diagonais.",
-      "A lama é o único peso, fixo em 5. O custo é cobrado ao entrar na célula.",
-      "As grades têm no máximo 30 × 16 células, e a busca e a comparação terminam em bem menos de um quadro nelas.",
+      "A lama é o único peso, fixo em 5. Entrar numa célula custa o peso dela; a célula de início nunca é cobrada.",
+      "As grades têm no máximo 30 × 16 células, e uma busca ou uma comparação termina rápido nelas.",
       "Células exploradas não são tempo de execução. O desempenho real depende das estruturas de dados, que esta página mantém propositalmente simples.",
       "As grades geradas se repetem pela semente, mas não há garantia de que tenham caminho.",
     ],

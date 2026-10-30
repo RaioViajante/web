@@ -51,3 +51,11 @@ compares it with `countedFor` for every count up to 480.
 against references, weighted versus unweighted, DFS not shortest, termination
 and repeatability over 120 generated grids) and `tests/pathfinding-copy.test.mjs`
 (EN/PT parity, plurals, labels).
+
+## Accessibility notes
+
+Grid cells are 24, 28 or 34 px, smaller than the 44 px rule for standalone
+controls. They are cells of one grid (one tab stop with arrow-key movement), the
+selected tool and every action button keep the 44 px size, and the keyboard
+route covers every edit. Touch drawing is tap-by-tap on purpose so the page can
+still scroll.
