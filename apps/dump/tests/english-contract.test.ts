@@ -5,6 +5,7 @@ import { renderRssFeed } from "@/lib/rss";
 import { getAllPosts, getAllTags, getPublishedPosts } from "@/lib/posts";
 import { LEGACY_ENGLISH_CONTENT_IDS } from "@/lib/rss-identity";
 import contract from "./fixtures/english-contract.json";
+import { RECORDED_BEFORE_UPDATE, VERIFIED_UPDATES } from "./verified-updates";
 
 // English posts added after the contract was recorded. They are new English
 // items (here, the translation of a Portuguese original), not part of the
@@ -57,8 +58,22 @@ describe("current English content", () => {
         tags: p.tags,
       })),
     ).toEqual(
-      contract.posts.map(({ bodyLength, ...rest }) => (void bodyLength, rest)),
+      contract.posts.map(
+        ({ bodyLength, ...rest }) => (
+          void bodyLength,
+          {
+            ...rest,
+            // The recorded production update date is replaced only by a verified,
+            // later material update (tests/verified-updates.ts).
+            updatedAt: VERIFIED_UPDATES[rest.slug] ?? rest.updatedAt,
+          }
+        ),
+      ),
     );
+    const recordedUpdate = contract.posts.find(
+      (p) => p.slug === "split-my-internet-into-four-different-kinds-of-place",
+    );
+    expect(recordedUpdate?.updatedAt).toBe(RECORDED_BEFORE_UPDATE);
     expect(published.map((p) => `/posts/${p.slug}`)).toEqual(contract.postUrls);
   });
 

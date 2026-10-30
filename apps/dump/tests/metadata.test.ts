@@ -237,7 +237,7 @@ describe("dynamic route pages keep canonical and RSS together", () => {
 
     expect(metadata.openGraph).toMatchObject({
       publishedTime: "2026-09-13T00:00:00.000Z",
-      modifiedTime: "2026-10-05T00:00:00.000Z",
+      modifiedTime: "2026-10-30T00:00:00.000Z",
     });
     expect(metadata.alternates).toMatchObject({ canonical: `/posts/${slug}` });
   });

@@ -3,6 +3,7 @@ import { LOCALE_IDS } from "../../../site/locales";
 import { getAllTags, getPublishedPosts, type Post } from "@/lib/posts";
 import { series } from "@/lib/post-details";
 import { taxonomy } from "@/lib/tags";
+import { VERIFIED_UPDATES } from "./verified-updates";
 
 // The localization coverage of the published works: every work written in one
 // language has a published version in the other, and each translation carries
@@ -96,9 +97,13 @@ describe("works x locale coverage", () => {
         ORIGINAL_DATES[id],
         ORIGINAL_DATES[id],
       ]);
-      // A translation never gets an update date just for existing.
-      const translation = en!.originalLocale === "en" ? pt! : en!;
-      expect(translation.updatedAt).toBeUndefined();
+      // A translation never gets an update date just for existing: both
+      // versions share the date of a verified update, or have none.
+      expect([id, en!.updatedAt, pt!.updatedAt]).toEqual([
+        id,
+        VERIFIED_UPDATES[id],
+        VERIFIED_UPDATES[id],
+      ]);
     }
   });
 

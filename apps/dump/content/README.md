@@ -95,6 +95,15 @@ Use `updatedAt` for a later meaningful change to the article's facts or prose.
 Metadata cleanup, taxonomy changes, repository migrations, and automated
 changes do not establish a content update on their own.
 
+`updatedAt` is explicit: it is written by hand in the frontmatter and is never
+derived automatically from Git, the filesystem or the build. For a real
+material update, the date may be verified from the commit that made the update
+(its author date converted to UTC, the convention `publishedAt` follows) and
+that evidence belongs in the commit or PR that records it. Every version of a
+work that received the update carries the same date, `publishedAt` is never
+touched, and the newest update replaces an earlier `updatedAt` (there is no
+changelog). The work's versions that were not touched keep none.
+
 ### Tags
 
 Frontmatter `tags` are stable tag ids defined in `content/tags.json` and read

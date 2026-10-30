@@ -1,4 +1,5 @@
 import type { Post } from "@/lib/posts";
+import { VERIFIED_UPDATES } from "./verified-updates";
 
 // `lib/site.ts` resolves the canonical origin once, at module load, so every
 // test here needs a fresh module instance after changing `process.env`.
@@ -65,13 +66,22 @@ describe("metadata, RSS, and sitemap under the canonical production origin", () 
     for (const entry of urls) {
       expect(entry.url.startsWith(`${PRODUCTION_ORIGIN}/`)).toBe(true);
     }
+    // lastmod comes only from an explicit `updatedAt`, on every version of
+    // the verified updates (tests/verified-updates.ts).
+    const withLastmod = urls
+      .filter((entry) => "lastModified" in entry)
+      .map((entry) => [entry.url, entry.lastModified]);
+    expect(withLastmod).toHaveLength(Object.keys(VERIFIED_UPDATES).length * 2);
+    for (const [, lastModified] of withLastmod)
+      expect(lastModified).toBe("2026-10-30");
     expect(
-      urls.find((entry) =>
-        entry.url.endsWith(
-          "/posts/split-my-internet-into-four-different-kinds-of-place",
-        ),
-      ),
-    ).toMatchObject({ lastModified: "2026-10-05" });
+      withLastmod.map(([url]) => String(url).split("/").pop()).sort(),
+    ).toEqual([
+      "dividi-minha-internet-em-quatro-tipos-diferentes-de-lugar",
+      "split-my-internet-into-four-different-kinds-of-place",
+      "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
+      "translating-the-site-without-pretending-everything-already-exists",
+    ]);
     expect(
       urls.find((entry) =>
         entry.url.endsWith("/posts/there-is-no-printf-down-here"),
