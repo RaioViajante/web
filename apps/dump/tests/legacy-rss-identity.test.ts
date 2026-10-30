@@ -11,7 +11,7 @@ import fixture from "./fixtures/legacy-rss-identity.json";
 // link, pubDate and isPermaLink for as long as its post is published. An
 // editorial removal must edit the fixture on purpose, in the same change: the
 // raw capture stays untouched, and the removed GUIDs are listed in
-// \`retiredGuids\` so they are expected to be absent instead.
+// `retiredGuids` so they are expected to be absent instead.
 const PRODUCTION_ORIGIN = "https://dump.raioviajante.com";
 
 const retired = new Set(fixture.retiredGuids);

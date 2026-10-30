@@ -560,7 +560,7 @@ test("Dump Portuguese posts link the Portuguese sibling sites and the Portuguese
   ])
     expect(hrefs).not.toContain(english);
 
-  // Every Lab target has a Portuguese page, so a Portuguese post links it.
+  // The Lab target has a Portuguese page, so a Portuguese post links it.
   await page.goto(`${base("dump")}/pt/posts/nao-existe-printf-aqui-embaixo`);
   await expect(page.getByText("Experimente", { exact: true })).toHaveCount(1);
   await expect(
