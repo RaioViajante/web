@@ -44,7 +44,7 @@ describe("automatic Lab links", () => {
     );
   });
 
-  it("offers the Portuguese Lab page only where it is published", () => {
+  it("offers each Lab page in the post's own language", () => {
     const make = (
       tags: string[],
       locale: "en" | "pt-BR",
@@ -69,10 +69,13 @@ describe("automatic Lab links", () => {
       title: "Filename classifier",
       href: "https://lab.raioviajante.com/experiments/filename-classifier/",
     });
-    // Orbit and boot-sector Portuguese pages are not published yet: no
-    // suggestion, and never the English page in their place.
-    expect(labForPost(make([], "pt-BR", "building-orbit"))).toBeNull();
-    expect(labForPost(make(["osdev"], "pt-BR", "boot"))).toBeNull();
+    // Orbit and boot-sector reach their own Portuguese pages.
+    expect(labForPost(make([], "pt-BR", "building-orbit"))?.href).toBe(
+      "https://lab.raioviajante.com/pt/experiments/estados-de-execucao/",
+    );
+    expect(labForPost(make(["osdev"], "pt-BR", "boot"))?.href).toBe(
+      "https://lab.raioviajante.com/pt/experiments/setor-de-boot/",
+    );
     expect(labForPost(make([], "en", "building-orbit"))?.href).toBe(
       "https://lab.raioviajante.com/experiments/execution-states/",
     );

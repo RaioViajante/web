@@ -558,7 +558,7 @@ test("Dump Portuguese posts link the Portuguese sibling sites and the Portuguese
   ])
     expect(hrefs).not.toContain(english);
 
-  // The classifier has a Portuguese page; the other Lab targets do not yet.
+  // Every Lab target has a Portuguese page, so a Portuguese post links it.
   await page.goto(
     `${base("dump")}/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era`,
   );
@@ -569,7 +569,28 @@ test("Dump Portuguese posts link the Portuguese sibling sites and the Portuguese
     ),
   ).toHaveCount(1);
   await page.goto(`${base("dump")}/pt/posts/nao-existe-printf-aqui-embaixo`);
-  await expect(page.getByText("Experimente", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Experimente", { exact: true })).toHaveCount(1);
+  await expect(
+    page.locator(
+      "a[href='https://lab.raioviajante.com/pt/experiments/setor-de-boot/']",
+    ),
+  ).toHaveCount(1);
   await page.goto(`${base("dump")}/posts/there-is-no-printf-down-here`);
   await expect(page.getByText("Try it", { exact: true })).toHaveCount(1);
+});
+
+test("Dump code blocks speak the post's language", async ({ page }) => {
+  await isolate(page, []);
+  for (const [path, control, lang] of [
+    ["/posts/there-is-no-printf-down-here", "copy", "en"],
+    ["/pt/posts/nao-existe-printf-aqui-embaixo", "copiar", "pt-BR"],
+  ] as const) {
+    await page.goto(base("dump") + path);
+    await expectLang(page, lang);
+    await expect(page.locator(".block__copy").first()).toHaveText(control);
+    // No control word of the other language is left on the page.
+    await expect(
+      page.getByRole("button", { name: lang === "en" ? /^copiar/ : /^copy/i }),
+    ).toHaveCount(0);
+  }
 });

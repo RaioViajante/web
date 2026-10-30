@@ -38,8 +38,9 @@ test`, Node's built-in runner) checks that every declared path is a built page
   and every built page is declared, plus the shared inventory rules.
 - **Copy.** Portuguese editorial copy is Root's own, in `lib/pt.ts`. Shared UI
   strings come from the `packages/design` catalog. English-only destinations are
-  named as such in words and carry `hreflang="en"`; Terms and Privacy stay
-  English-only.
+  named as such in words and carry `hreflang="en"`. Terms and Privacy exist in
+  Portuguese as translations of the English pages, with the unresolved legal
+  reservations recorded in `docs/i18n.md` ("Legal pages").
 - **Locale.** The proxy sets `x-locale` from the URL (overwriting any client
   value). The one root layout renders `<html lang>` from it, and
   `app/not-found.tsx` renders the English or Portuguese 404 from it. Misses are

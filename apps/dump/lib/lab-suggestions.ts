@@ -28,11 +28,16 @@ export const labSuggestions = {
       href: "https://lab.raioviajante.com/experiments/filename-classifier/",
     },
   },
-  // Lab's Portuguese experiment pages published on main: only the classifier
-  // (`classificador-de-arquivos`). `estados-de-execucao` and `setor-de-boot`
-  // are added when they are published (Lab PR); until then the posts that
-  // point to them show no suggestion in Portuguese.
+  // Lab's Portuguese experiment pages, all three published.
   "pt-BR": {
+    "boot-sector": {
+      title: "Setor de boot",
+      href: "https://lab.raioviajante.com/pt/experiments/setor-de-boot/",
+    },
+    "execution-states": {
+      title: "Estados de execução",
+      href: "https://lab.raioviajante.com/pt/experiments/estados-de-execucao/",
+    },
     "filename-classifier": {
       title: "Classificador de arquivos",
       href: "https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/",
