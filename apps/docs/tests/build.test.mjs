@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { copyFor } from "../src/lib/copy.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 
@@ -34,15 +35,25 @@ test("a cold-cache production build keeps semantic headings in the search index"
     assert.ok(entries.every(({ locale }) => locale === "en"), "every entry states the English locale id");
 	const ptEntries = JSON.parse(readFileSync(join(outDir, "pt/search-index.json"), "utf8"));
 	assert.ok(ptEntries.length > 1);
-	assert.ok(ptEntries.every(({ locale, href, contentId }) => locale === "pt-BR" && href.startsWith("https://docs.raioviajante.com/pt/projetos/sweep/") && contentId === "projects/sweep"));
+	const ptHome = "https://docs.raioviajante.com/pt/";
+	assert.ok(ptEntries.every(({ locale, href }) => locale === "pt-BR" && href.startsWith(ptHome)));
+	assert.deepEqual(
+		[...new Set(ptEntries.map(({ contentId }) => contentId))].sort(),
+		["projects/sweep", "projects/sweep/cli", "raioviajante/design-language", "raioviajante/repository-conventions"],
+		"every English document is searchable in Portuguese",
+	);
 	assert.ok(entries.some(({ href }) => href.endsWith("/projects/sweep/cli/")));
-	assert.ok(!ptEntries.some(({ href }) => href.includes("/cli/")));
-	const en = readFileSync(join(outDir, "projects/sweep/index.html"), "utf8");
-	const enHome = readFileSync(join(outDir, "index.html"), "utf8");
-	const untranslated = readFileSync(join(outDir, "projects/sweep/cli/index.html"), "utf8");
-	const pt = readFileSync(join(outDir, "pt/projetos/sweep/index.html"), "utf8");
-	const home = readFileSync(join(outDir, "pt/index.html"), "utf8");
-	const missing = readFileSync(join(outDir, "404.html"), "utf8");
+	assert.ok(ptEntries.some(({ href }) => href.endsWith("/pt/projetos/sweep/cli/")));
+	const pageFiles = (directory, prefix = "") => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+		const relative = prefix + entry.name;
+		return entry.isDirectory() ? pageFiles(join(directory, entry.name), `${relative}/`) : entry.name === "index.html" ? [relative] : [];
+	});
+	const read = (path) => readFileSync(join(outDir, path), "utf8");
+	const en = read("projects/sweep/index.html");
+	const enHome = read("index.html");
+	const pt = read("pt/projetos/sweep/index.html");
+	const home = read("pt/index.html");
+	const missing = read("404.html");
 	assert.match(en, /<html lang="en">/);
 	assert.doesNotMatch(enHome, /<a href="\/pt\/projetos\/sweep\/"/);
 	assert.match(pt, /<html lang="pt-BR">/);
@@ -52,37 +63,184 @@ test("a cold-cache production build keeps semantic headings in the search index"
 	assert.match(pt, /"inLanguage":"pt-BR"/);
 	assert.match(pt, /"@type":"BreadcrumbList"/);
 	assert.match(pt, /"name":"docs","item":"https:\/\/docs\.raioviajante\.com\/pt\/"/);
-	assert.doesNotMatch(pt, /"dateModified"|"datePublished"|href="\/projects\/sweep\/cli\/"/);
-	assert.doesNotMatch(pt, /<a[^>]*href="\/pt\/projects\/sweep\/cli\/"/);
-	assert.match(home, /href="\/pt\/projetos\/sweep\/"/);
-	assert.doesNotMatch(home, /href="\/projects\/sweep\/cli\/"/);
+	assert.doesNotMatch(pt, /"dateModified"|"datePublished"/);
 	assert.match(home, /data-lang-state="link"/);
 	assert.match(home, /<span class="rv-utility__label">LANG<\/span>(?:<!-- -->)? <span class="rv-utility__value" lang="pt-BR">PT<\/span>/);
-	assert.match(home, /<a href="\/" hrefLang="en" aria-label="Idioma: Português \(Brasil\)\. Mudar para inglês\."/);
-	assert.match(enHome, /<a href="\/pt\/" hrefLang="pt-BR" aria-label="Language: English\. Switch to Portuguese\."/);
+	// The accessible name begins with the visible text (WCAG 2.5.3).
+	assert.match(home, /<a href="\/" hrefLang="en" aria-label="LANG PT — Idioma: Português \(Brasil\)\. Mudar para inglês\."/);
+	assert.match(enHome, /<a href="\/pt\/" hrefLang="pt-BR" aria-label="LANG EN — Language: English\. Switch to Portuguese\."/);
 	assert.match(en, /<a href="\/pt\/projetos\/sweep\/" hrefLang="pt-BR"/);
-	assert.match(untranslated, /data-lang-state="disclosure"/);
-	assert.match(untranslated, /href="\/pt\/" hrefLang="pt-BR"/);
-	assert.doesNotMatch(untranslated, /href="\/pt\/projects\/sweep\/cli\/"|hreflang="pt-BR"/);
 	assert.match(missing, /<html lang="en">/);
 	assert.match(missing, /name="robots" content="noindex, follow"/);
 	assert.doesNotMatch(missing, /rel="canonical"|rel="alternate"/);
-	const sitemap = readFileSync(join(outDir, "sitemap.xml"), "utf8");
-	for (const path of ["/", "/projects/sweep/", "/projects/sweep/cli/", "/raioviajante/design-language/", "/raioviajante/repository-conventions/", "/pt/", "/pt/projetos/sweep/"]) {
+
+	// Every English document has a Portuguese counterpart at its declared path,
+	// and each pair links to the other through hreflang and LANG.
+	const pairs = [
+		["projects/sweep", "pt/projetos/sweep"],
+		["projects/sweep/cli", "pt/projetos/sweep/cli"],
+		["raioviajante/design-language", "pt/raioviajante/linguagem-de-design"],
+		["raioviajante/repository-conventions", "pt/raioviajante/convencoes-de-repositorio"],
+		["terms", "pt/terms"],
+		["privacy", "pt/privacy"],
+		["", "pt"],
+		["search", "pt/search"],
+	];
+	for (const [enPath, ptPath] of pairs) {
+		const enHtml = read(join(enPath, "index.html"));
+		const ptHtml = read(join(ptPath, "index.html"));
+		const enUrl = `https://docs.raioviajante.com/${enPath ? `${enPath}/` : ""}`;
+		const ptUrl = `https://docs.raioviajante.com/${ptPath}/`;
+		assert.match(enHtml, /<html lang="en">/, enPath);
+		assert.match(ptHtml, /<html lang="pt-BR">/, ptPath);
+		for (const html of [enHtml, ptHtml]) {
+			assert.ok(html.includes(`<link rel="alternate" hreflang="en" href="${enUrl}">`), `${ptPath} hreflang en`);
+			assert.ok(html.includes(`<link rel="alternate" hreflang="pt-BR" href="${ptUrl}">`), `${ptPath} hreflang pt-BR`);
+			assert.ok(html.includes(`<link rel="alternate" hreflang="x-default" href="${enUrl}">`), `${ptPath} x-default`);
+		}
+		assert.ok(ptHtml.includes(`<link rel="canonical" href="${ptUrl}">`), `${ptPath} canonical`);
+		assert.match(ptHtml, /data-lang-state="link"/, ptPath);
+		assert.match(enHtml, /data-lang-state="link"/, enPath);
+		assert.match(ptHtml, /property="og:locale" content="pt_BR"/, ptPath);
+		assert.ok(existsSync(join(outDir, "og", `${ptPath}.png`)), `${ptPath} social card was built`);
+		assert.ok(ptHtml.includes(`<meta property="og:image" content="https://docs.raioviajante.com/og/${ptPath}.png">`), `${ptPath} og:image is its own card`);
+	}
+
+	// No English control, label or footer qualifier on a Portuguese page.
+	const ptPages = pairs.map(([, ptPath]) => [ptPath, read(join(ptPath, "index.html"))]);
+	for (const [path, html] of ptPages) {
+		assert.doesNotMatch(html, />copy<|>copy commands<|aria-label="Files"|show all \d+ lines|aria-label="Footnotes"|>(?:Note|Important|Warning|Deprecated|Careful)</, `${path}: English block UI`);
+		assert.doesNotMatch(html, /\(em inglês\)|\(in English\)/, `${path}: legal links need no qualifier`);
+		assert.match(html, /href="\/pt\/terms\/"[^>]*>Termos de Uso</, `${path}: Portuguese Terms in the footer`);
+		assert.match(html, /href="\/pt\/privacy\/"[^>]*>Política de Privacidade</, `${path}: Portuguese Privacy in the footer`);
+	}
+	for (const path of ["pt/projetos/sweep", "pt/projetos/sweep/cli", "pt/raioviajante/linguagem-de-design"]) {
+		const html = read(join(path, "index.html"));
+		assert.match(html, /<button type="button" class="block__copy">copiar<\/button>/, path);
+	}
+	// A Portuguese page that sends the reader to English content says so in
+	// words and carries hreflang (docs/i18n.md, "Cross-language related links").
+	const siblingAnchor = /<a\b([^>]*?)href="https:\/\/(?:dump|lab)\.raioviajante\.com(\/[^"]*)"([^>]*)>/g;
+	for (const [path, html] of ptPages)
+		for (const match of html.matchAll(siblingAnchor)) {
+			const [, before, target, after] = match;
+			if (/^\/pt(\/|$)/.test(target)) continue;
+			assert.match(`${before}${after}`, /hreflang="en"/i, `${path}: ${target} is English and needs hreflang`);
+			// The words "em inglês" sit in the link or in the row/item note that follows it.
+			const item = html.slice(match.index).split(/<\/(?:div|li)>/)[0];
+			assert.match(item, /em inglês/, `${path}: ${target} says it is in English`);
+		}
+	// The Dump posts a Portuguese page links are the Portuguese versions: the
+	// Sweep guide and the home notes for Orbit and yanawa.
+	const ptDumpPosts = [
+		"aparentemente-mover-um-arquivo-tem-casos-de-borda",
+		"um-arquivo-toml-mudou-o-que-o-sweep-era",
+		"cansei-de-crud-entao-estou-construindo-um-agendador",
+		"comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma",
+	];
+	const linkedDump = ptPages.flatMap(([, html]) => [...html.matchAll(/href="https:\/\/dump\.raioviajante\.com(\/[^"]*)"/g)].map(([, path]) => path));
+	for (const slug of ptDumpPosts) assert.ok(linkedDump.includes(`/pt/posts/${slug}`), `a Portuguese page links /pt/posts/${slug}`);
+	assert.ok(!linkedDump.some((path) => path.startsWith("/posts/")), "no Portuguese page links an English Dump post");
+	assert.doesNotMatch(read("pt/index.html"), /dump, em inglês/);
+	// Privacy, Search: the site's own host may receive `q` through the LANG link, so
+	// the sentence says only that nothing is sent to the other sites.
+	assert.match(read("privacy/index.html"), /what you type is not sent to those sites/);
+	assert.match(read("pt/privacy/index.html"), /o que você digita não é enviado a esses sites/);
+	for (const path of ["privacy/index.html", "pt/privacy/index.html"])
+		assert.doesNotMatch(read(path), /sent anywhere|lugar nenhum/, path);
+	assert.match(read("pt/terms/index.html"), /é a fonte de referência/);
+	// English blocks keep their English words.
+	assert.match(en, /<button type="button" class="block__copy">copy<\/button>/);
+
+	// Portuguese navigation omits nothing that exists: the home lists every
+	// document and every project, the sidebar numbers them like English.
+	for (const href of ["/pt/projetos/sweep/", "/pt/raioviajante/linguagem-de-design/", "/pt/raioviajante/convencoes-de-repositorio/"]) {
+		assert.ok(home.includes(`href="${href}"`), `Portuguese home lists ${href}`);
+	}
+	assert.match(home, /guia · referência da cli/);
+	for (const row of ["hum", "orbit", "yanawa"]) assert.match(home, new RegExp(`<span>${row}</span>`), row);
+	assert.equal((home.match(/ainda não documentado/g) ?? []).length, 2);
+	assert.ok(home.includes('<h2><span class="rv-num" aria-hidden="true">01.</span>projetos/</h2>'), "projects section is 01.");
+	assert.ok(home.includes('<h2><span class="rv-num" aria-hidden="true">02.</span>raioviajante/</h2>'), "raioviajante section is 02.");
+	const homeEn = enHome;
+	assert.equal(
+		(home.match(/class="docs-entry"/g) ?? []).length,
+		(homeEn.match(/class="docs-entry"/g) ?? []).length,
+		"the Portuguese home lists as many entries as the English one",
+	);
+	const sidebar = (html) => [...html.matchAll(/<a href="([^"]+)"[^>]*><span class="rv-nav__num">([^<]+)<\/span>/g)].map(([, href, number]) => [href, number]);
+	assert.deepEqual(sidebar(home).map(([, number]) => number), ["00.", "01.", "01.1", "02.", "03."]);
+	assert.deepEqual(sidebar(home).map(([, number]) => number), sidebar(homeEn).map(([, number]) => number));
+	assert.ok(home.includes('<span class="rv-search__num">04.</span><span>busca</span>'), "search follows the last page");
+	const cli = read("pt/projetos/sweep/cli/index.html");
+	assert.match(cli, /<span aria-current="page">referência da cli<\/span>/);
+	assert.match(cli, /<a href="\/pt\/projetos\/sweep\/">sweep<\/a>/);
+	assert.match(cli, /rel="prev"[^>]*>(?:<span class="rv-label">← Anterior<\/span>)<span>sweep<\/span>/);
+	assert.match(cli, /rel="next"[^>]*>(?:<span class="rv-label">Próximo →<\/span>)<span>linguagem de design<\/span>/);
+
+	// Dates are formatted in the page's locale, never printed raw.
+	assert.doesNotMatch(read("pt/projetos/sweep/index.html"), /\d{4}-\d{2}-\d{2}(?!T)/);
+
+	const sitemap = read("sitemap.xml");
+	for (const path of [
+		"/",
+		"/projects/sweep/",
+		"/projects/sweep/cli/",
+		"/raioviajante/design-language/",
+		"/raioviajante/repository-conventions/",
+		"/terms/",
+		"/privacy/",
+		"/pt/",
+		"/pt/projetos/sweep/",
+		"/pt/projetos/sweep/cli/",
+		"/pt/raioviajante/linguagem-de-design/",
+		"/pt/raioviajante/convencoes-de-repositorio/",
+		"/pt/terms/",
+		"/pt/privacy/",
+	]) {
 		assert.ok(sitemap.includes(`<loc>https://docs.raioviajante.com${path}</loc>`), path);
 	}
-	assert.doesNotMatch(sitemap, /<lastmod>|\/search\/|\/404\/|\/pt\/projects\/sweep\/cli\//);
-	for (const path of ["index.html", "search/index.html", "search-index.json", "projetos/sweep/index.html"]) {
+	assert.doesNotMatch(sitemap, /<lastmod>|\/search\/|\/404\/|\/pt\/projects\//);
+	assert.deepEqual(
+		pageFiles(join(outDir, "pt")).sort(),
+		[
+			"index.html",
+			"privacy/index.html",
+			"projetos/sweep/cli/index.html",
+			"projetos/sweep/index.html",
+			"raioviajante/convencoes-de-repositorio/index.html",
+			"raioviajante/linguagem-de-design/index.html",
+			"search/index.html",
+			"terms/index.html",
+		],
+	);
+	for (const path of ["index.html", "search/index.html", "search-index.json"]) {
 		assert.ok(existsSync(join(outDir, "pt", path)), `declared Portuguese route ${path} was built`);
 	}
-	for (const path of ["projects/sweep/cli/index.html", "raioviajante/design-language/index.html"]) {
-		assert.ok(!existsSync(join(outDir, "pt", path)), `untranslated English route ${path} was not built`);
+	assert.ok(!existsSync(join(outDir, "pt", "projects")), "no English-structured path under /pt");
+
+	// Every search suggestion must lead somewhere: it finds at least one entry
+	// of the built index of its own locale (the shared engine's matching rule:
+	// lower-cased with the locale, accents folded, every word present).
+	const normalize = (text, intl) => text.toLocaleLowerCase(intl).normalize("NFD").replace(/\p{M}/gu, "");
+	const finds = (index, term, intl) => {
+		const words = normalize(term.trim(), intl).split(/\s+/).filter(Boolean);
+		return index.filter((entry) => {
+			const text = normalize(`${entry.title} ${entry.description} ${entry.body ?? ""}`, intl);
+			return words.every((word) => text.includes(word));
+		});
+	};
+	for (const [locale, index, intl] of [["en", entries, "en-US"], ["pt-BR", ptEntries, "pt-BR"]]) {
+		const { site, everywhere } = copyFor(locale).search.suggestions;
+		assert.ok(site.length >= 3 && new Set(site).size === site.length, `${locale}: distinct site suggestions`);
+		for (const term of site)
+			assert.ok(finds(index, term, intl).length > 0, `${locale}: site suggestion "${term}" has no hit in its built index`);
+		// "Everywhere" also searches the other hosts, so only the Portuguese list is
+		// expected to be answerable from this host alone; it is kept that way.
+		if (locale === "pt-BR")
+			for (const term of everywhere)
+				assert.ok(finds(index, term, intl).length > 0, `${locale}: everywhere suggestion "${term}" has no hit in the Docs index`);
 	}
-	const pageFiles = (directory, prefix = "") => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-		const relative = prefix + entry.name;
-		return entry.isDirectory() ? pageFiles(join(directory, entry.name), `${relative}/`) : entry.name === "index.html" ? [relative] : [];
-	});
-	assert.deepEqual(pageFiles(join(outDir, "pt")).sort(), ["index.html", "projetos/sweep/index.html", "search/index.html"]);
   } finally {
     rmSync(outDir, { recursive: true, force: true });
   }

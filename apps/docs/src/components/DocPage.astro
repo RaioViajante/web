@@ -5,6 +5,7 @@ import { getSectionHeadings } from "@raioviajante/design/sections";
 import { DocHeader } from "./DocHeader";
 import DocsShell from "../layouts/DocsShell.astro";
 import { pageJsonLd } from "../lib/structured-data";
+import { formatDocDate } from "../lib/date";
 import { counterpartOf, editUrl, getPages, homePath, labelOf, lastUpdated, navPages, pathOf, type DocEntry } from "../lib/docs";
 import { breadcrumb } from "../lib/nav";
 import { copyFor } from "../lib/copy";
@@ -26,8 +27,9 @@ const toc = headings
 		number: heading.number,
 	}));
 
-const crumbs = breadcrumb(await navPages(locale), index, data.group === "projects" ? copy.projects : "raioviajante");
-const updated = lastUpdated(entry);
+const crumbs = breadcrumb(await navPages(locale), index, copy.groupLabels[data.group]);
+const updatedIso = lastUpdated(entry);
+const updated = updatedIso ? { iso: updatedIso, text: formatDocDate(updatedIso, locale) } : undefined;
 const jsonLd = await pageJsonLd(entry);
 const counterpart = await counterpartOf(entry);
 
@@ -44,14 +46,15 @@ const next = neighbor(pages[index + 1], copy.next);
 		title={data.title}
 		line={data.tagline ?? data.description}
 		status={data.status}
-		meta={[...data.meta, ...(updated ? [`${copy.updated} ${updated}`] : [])]}
+		meta={data.meta}
+		updated={updated}
 		source={data.source}
 	/>
 
 	<Prose><Content /></Prose>
 
 	<div class="page-foot">
-		{updated && <span>{copy.lastUpdated} {updated}</span>}
+		{updated && <span>{copy.lastUpdated} <time datetime={updated.iso}>{updated.text}</time></span>}
 		<a href={editUrl(entry)}>{copy.edit} ↗</a>
 	</div>
 	<Pager locale={locale} prev={previous} next={next} />

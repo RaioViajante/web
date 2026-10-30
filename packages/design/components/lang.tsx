@@ -16,6 +16,14 @@ import { searchLocaleHref } from "../search/locale";
  */
 const LANG_TOKEN = "LANG";
 
+/**
+ * The accessible name starts with the visible face (WCAG 2.5.3, Label in
+ * Name), so speech input that says what it sees ("LANG PT") reaches the
+ * control, then continues with the explanation in the page's language.
+ */
+const nameWith = (face: string, explanation: string) =>
+  `${face} — ${explanation}`;
+
 export interface LanguageControlProps {
   site: SiteId;
   /** The rendered locale; the route states it. */
@@ -49,6 +57,7 @@ export function LanguageControl({
   const catalog = catalogFor(locale);
   const current = LOCALES[locale];
   const target = LOCALE_IDS.find((id) => id !== locale);
+  const face = `${LANG_TOKEN} ${current.label}`;
   const compact = (
     <span>
       <span className="rv-utility__label">{LANG_TOKEN}</span>{" "}
@@ -66,7 +75,7 @@ export function LanguageControl({
       <div className="rv-lang" data-lang-state="status">
         <span aria-hidden="true">{compact}</span>
         <span className="rv-sr-only">
-          {catalog.lang.statusAria(current.name)}
+          {nameWith(face, catalog.lang.statusAria(current.name))}
         </span>
       </div>
     );
@@ -86,7 +95,10 @@ export function LanguageControl({
         <a
           href={href}
           hrefLang={other.hreflang}
-          aria-label={catalog.lang.switchAria(current.name, targetWord)}
+          aria-label={nameWith(
+            face,
+            catalog.lang.switchAria(current.name, targetWord),
+          )}
           data-sound="nav"
           {...(search ? { "data-lang-search": "" } : {})}
         >
@@ -95,7 +107,10 @@ export function LanguageControl({
       ) : (
         <details className="rv-lang__details">
           <summary
-            aria-label={catalog.lang.availabilityAria(current.name, targetWord)}
+            aria-label={nameWith(
+              face,
+              catalog.lang.availabilityAria(current.name, targetWord),
+            )}
           >
             {compact}
           </summary>

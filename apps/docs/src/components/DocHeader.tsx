@@ -11,8 +11,9 @@ export function DocHeader({
 	line,
 	status,
 	meta,
+	updated,
 	source,
-    locale = "en",
+	locale,
 }: {
 	/** Breadcrumb after "docs"; the last one is the current page. */
 	crumbs: Crumb[];
@@ -20,8 +21,10 @@ export function DocHeader({
 	line: string;
 	status: string;
 	meta: string[];
+	/** The page's explicit update date, already formatted for the locale. */
+	updated?: { iso: string; text: string };
 	source?: string;
-    locale?: LocaleId;
+	locale: LocaleId;
 }) {
 	return (
 		<PageHeader
@@ -47,6 +50,13 @@ export function DocHeader({
 			meta={[
 				status,
 				...meta,
+				...(updated
+					? [
+							<span key="updated">
+								{copyFor(locale).updated} <time dateTime={updated.iso}>{updated.text}</time>
+							</span>,
+						]
+					: []),
 				...(source ? [<a key="source" href={source}>{copyFor(locale).source} ↗</a>] : []),
 			]}
 		/>

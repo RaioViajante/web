@@ -1,7 +1,12 @@
 ---
 import { SearchPage } from "@raioviajante/design/search";
+import { copyFor } from "../../lib/copy";
+import { searchPagePath } from "../../lib/docs";
 import DocsShell from "../../layouts/DocsShell.astro";
+
+const copy = copyFor("pt-BR");
 ---
-<DocsShell title="Busca" description="Busque na documentação e nos sites do RaioViajante." current="/pt/search/" locale="pt-BR" counterparts={[{ locale: "en", path: "/search/" }]}>
-	<SearchPage site="docs" locale="pt-BR" />
+
+<DocsShell title={copy.search.title} description={copy.search.description} current={searchPagePath("pt-BR")} locale="pt-BR" counterparts={[{ locale: "en", path: searchPagePath("en") }]}>
+	<SearchPage site="docs" locale="pt-BR" suggestions={copy.search.suggestions} />
 </DocsShell>

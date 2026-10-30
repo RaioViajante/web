@@ -17,49 +17,101 @@ summary: organização de arquivos em um diretório escolhido
 
 ## Visão geral
 
-Sweep é uma ferramenta de linha de comando em Python que organiza arquivos em um diretório escolhido. Ela examina os arquivos diretamente nesse diretório, classifica cada um pela extensão final e calcula um destino por categoria. `preview` mostra os destinos sem mover os arquivos; `run` efetua os movimentos.
+Sweep é uma pequena ferramenta de linha de comando em Python que organiza arquivos em um diretório escolhido. Ela examina os arquivos que estão diretamente nesse diretório, classifica cada um pela extensão final e calcula um destino por categoria. `preview` mostra esses destinos sem mover os arquivos; `run` efetua os movimentos.
 
-## Como funciona
+## O que o Sweep faz hoje
 
-Para o diretório informado, Sweep expande `~`, verifica se o caminho existe e se é um diretório, e examina somente os arquivos diretamente nele. Subdiretórios são ignorados. O destino calculado tem este formato:
+Para um diretório escolhido, o Sweep:
 
-```text
-<diretório>/<categoria>/<nome do arquivo>
-```
+1. expande a notação de diretório pessoal, como `~`;
+2. verifica se o caminho existe e se é um diretório;
+3. examina os arquivos que estão diretamente no diretório;
+4. ignora subdiretórios;
+5. classifica cada arquivo pelo sufixo final, em minúsculas;
+6. calcula um destino neste formato:
 
-O comando mostra nome, categoria, extensão, tamanho e destino de cada arquivo, além de totais e contagens por categoria. `run` também informa quantos arquivos foram movidos ou ignorados.
+   ```text
+   <diretório>/<categoria>/<nome do arquivo>
+   ```
+
+Com `preview`, o Sweep mostra a classificação e o destino calculado. Com `run`, ele move cada arquivo para esse destino. O diretório de destino é criado quando um movimento precisa dele.
+
+O comando imprime informações de cada arquivo, incluindo nome, categoria, sufixo, tamanho e destino. Também imprime totais e contagens por categoria. `run` informa ainda quantos arquivos foram movidos e quantos foram ignorados.
 
 ## Classificação
 
-A classificação usa a extensão final em minúsculas (`Path.suffix`):
+A classificação usa o valor final de `Path.suffix`, em minúsculas. As categorias atuais são:
 
 | Categoria | Extensões |
 | --- | --- |
 | Images | `.jpg`, `.png`, `.jpeg`, `.gif`, `.webp` |
 | Documents | `.docx`, `.pdf`, `.md`, `.txt` |
 | Archives | `.zip`, `.rar`, `.7z`, `.tar`, `.gz` |
-| Other | Qualquer outra extensão final, inclusive nenhuma |
+| Other | Qualquer outro sufixo final, inclusive nenhum |
 
-Esses nomes de categoria são os valores usados pelo programa. Por exemplo, `REPORT.PDF` vai para `Documents`; `archive.tar.gz` vai para `Archives` porque `.gz` é a extensão final; `README` e `.hidden` vão para `Other`.
+Por exemplo:
 
-## Experimentar sem mover arquivos
+```text
+photo.png     → Images
+REPORT.PDF    → Documents
+archive.tar.gz → Archives
+README        → Other
+.hidden       → Other
+```
+
+:::note
+`archive.tar.gz` é classificado em `Archives` porque `.gz` é o seu sufixo final. `.hidden` não tem sufixo, segundo o comportamento de `Path.suffix` do Python.
+:::
+
+## Preview e run
+
+### Preview
 
 ```bash
 sweep preview ~/Downloads
 ```
 
-`preview` calcula e mostra a organização planejada, mas não move arquivos. Ele não faz a verificação de conflito que ocorre durante o movimento.
+`preview` examina e classifica os arquivos, calcula seus destinos e mostra a organização planejada. Ele não move arquivos.
 
-Para efetuar a organização:
+:::important
+O preview não faz a verificação de conflito de destino que acontece no momento do movimento.
+:::
+
+### Run
 
 ```bash
 sweep run ~/Downloads
 ```
 
-`run` cria os diretórios de categoria quando necessários e move os arquivos. Se já houver um arquivo no destino, o movimento é ignorado e o arquivo de origem permanece no lugar. Não há renomeação automática, sobrescrita ou rollback.
+`run` executa a organização. Ele cria os diretórios de categoria quando necessário e move os arquivos para os destinos calculados.
 
-## Limitações
+## Comportamento em conflitos
 
-Sweep não examina subdiretórios recursivamente, não monitora arquivos, não agenda execuções e não oferece regras de classificação configuráveis. O diretório é informado pelo usuário; `Downloads` é apenas um exemplo.
+O Sweep não sobrescreve um arquivo que já exista no destino. Quando o destino já existe, o movimento é ignorado e o arquivo de origem permanece onde está.
 
-[Repositório do Sweep](https://github.com/RaioViajante/sweep)
+:::warning
+Não há renomeação automática, opção de sobrescrita, estratégia de resolução de conflitos, transação nem rollback.
+:::
+
+## Limitações atuais
+
+A implementação atual não oferece:
+
+- varredura recursiva;
+- monitoramento de arquivos ou automação em segundo plano;
+- agendamento;
+- regras de classificação configuráveis;
+- detecção de arquivos pelo conteúdo;
+- renomeação automática em conflitos;
+- tratamento de sobrescrita;
+- rollback;
+- organização ampla de todo o sistema de arquivos.
+
+O diretório alvo é informado pelo usuário. Downloads é apenas um exemplo; ele não está fixo no código.
+
+## Experimente e leia mais
+
+- [001 classificador de arquivos](https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/): classifique nomes no seu navegador (lab)
+- [Aparentemente mover um arquivo tem casos de borda](https://dump.raioviajante.com/pt/posts/aparentemente-mover-um-arquivo-tem-casos-de-borda) (dump)
+- [Um arquivo TOML mudou o que o Sweep era](https://dump.raioviajante.com/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era) (dump)
+- [Repositório de código-fonte](https://github.com/RaioViajante/sweep)

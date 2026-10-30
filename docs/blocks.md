@@ -48,6 +48,33 @@ Every source line is one `<span class="line">` inside `<pre><code>`, with **no n
 
 Syntax tokens use `.tok-keyword .tok-type .tok-function .tok-string .tok-number .tok-comment .tok-punct` (colors in `blocks.css`).
 
+## Localization
+
+The words of the controls and labels come from the `blocks` section of the
+shared catalog (`packages/design/catalog.ts`), one complete set per registry
+locale: `copy`, `copy commands`, `copied`, `show all N lines`, `show less`, the
+`Files` tab list name, `file N` tab labels, the highlighted-line meta
+(`lines 2–3`), the callout labels (Note, Important, Warning, Deprecated, TIL,
+Careful), the footnote list and back-reference names, and the names of
+sideways-scrolling regions. Nothing is hard-coded in the markup builders.
+
+- `buildBlock(model, locale?)`, `buildCallout(kind, children, label?, locale?)`
+  and the React `CodeBlock`, `Callout` and `Footnotes` take an optional
+  `locale`. Without one they render English, exactly as before.
+- `rehypeSoftBlocks({ locale })` builds the markup for that locale. Without the
+  option it uses the `locale` of the document's frontmatter when the pipeline
+  exposes it (`vfile.data.astro.frontmatter.locale` in Astro content
+  collections, `vfile.data.matter.locale`, `vfile.data.locale`), then English.
+  An unsupported value throws; nothing falls back silently.
+- An explicit callout label (`:::til[Fun fact]`) is the author's text and is not
+  translated.
+- `attachBlocks` repaints any control still in the default language from the
+  catalog selected by `<html lang>`, so a page built without a locale is right
+  in the browser too. It only rewrites the default locale's own words as built;
+  it never touches author text. After copying it shows "copied" in the page's
+  language, announces it through a polite `role="status"` region, and restores
+  the label from the catalog.
+
 ## Markdown and MDX
 
 Use `remark-directive`, then `remarkSoftCallouts` and `rehypeSoftBlocks` from

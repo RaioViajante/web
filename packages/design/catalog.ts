@@ -9,6 +9,10 @@ import type { SiteId } from "../../site/sites";
 // `packages/design` itself renders live here. Page prose, taglines, project and
 // experiment text, legal bodies and app-specific voice stay in the apps.
 
+/** The callout kinds of the soft blocks; `blocks/build.ts` derives its type from this list. */
+export type CalloutKindId =
+  "note" | "important" | "warning" | "deprecated" | "til" | "careful";
+
 export interface SharedCatalog {
   shell: {
     skip: string;
@@ -90,6 +94,36 @@ export interface SharedCatalog {
     aria: string;
     previous: string;
     next: string;
+  };
+  /**
+   * Controls and labels of the soft blocks (docs/blocks.md): rendered into the
+   * markup at build time for the page's locale, and repainted by the block
+   * behavior from the catalog selected by `<html lang>` when a page was built
+   * without a locale.
+   */
+  blocks: {
+    copy: string;
+    copyCommands: string;
+    /** Feedback shown on the copy button for a moment after copying. */
+    copied: string;
+    /** Accessible name of the file tab list of a tabbed block. */
+    files: string;
+    /** Tab label for a panel without a file name. */
+    fileNumber: (index: number) => string;
+    /** Label of the control that expands a collapsed block. */
+    showAll: (lines: number) => string;
+    showLess: string;
+    /** The highlighted lines of the meta row, a single line or a range. */
+    line: (line: number) => string;
+    lines: (from: number, to: number) => string;
+    callouts: Record<CalloutKindId, string>;
+    /** Accessible name of the footnote list. */
+    footnotes: string;
+    /** Accessible name of a footnote's link back to its reference (`1`, `1-2`). */
+    footnoteBack: (reference: string) => string;
+    /** Accessible names of keyboard-scrollable regions (wide code and tables). */
+    scrollCode: string;
+    scrollTable: string;
   };
   notFound: {
     label: string;
@@ -182,6 +216,29 @@ export const catalogs = {
       previous: "← Previous",
       next: "Next →",
     },
+    blocks: {
+      copy: "copy",
+      copyCommands: "copy commands",
+      copied: "copied",
+      files: "Files",
+      fileNumber: (index) => `file ${index}`,
+      showAll: (lines) => `show all ${lines} lines`,
+      showLess: "show less",
+      line: (line) => `line ${line}`,
+      lines: (from, to) => `lines ${from}–${to}`,
+      callouts: {
+        note: "Note",
+        important: "Important",
+        warning: "Warning",
+        deprecated: "Deprecated",
+        til: "TIL",
+        careful: "Careful",
+      },
+      footnotes: "Footnotes",
+      footnoteBack: (reference) => `Back to reference ${reference}`,
+      scrollCode: "Code, scrolls sideways",
+      scrollTable: "Table, scrolls sideways",
+    },
     notFound: {
       label: "404 · NOT FOUND",
       title: "I looked everywhere.",
@@ -272,6 +329,30 @@ export const catalogs = {
       aria: "Anterior e próximo",
       previous: "← Anterior",
       next: "Próximo →",
+    },
+    blocks: {
+      copy: "copiar",
+      copyCommands: "copiar comandos",
+      copied: "copiado",
+      files: "Arquivos",
+      fileNumber: (index) => `arquivo ${index}`,
+      showAll: (lines) =>
+        lines === 1 ? "mostrar a linha" : `mostrar as ${lines} linhas`,
+      showLess: "mostrar menos",
+      line: (line) => `linha ${line}`,
+      lines: (from, to) => `linhas ${from}–${to}`,
+      callouts: {
+        note: "Nota",
+        important: "Importante",
+        warning: "Aviso",
+        deprecated: "Obsoleto",
+        til: "Aprendi hoje",
+        careful: "Cuidado",
+      },
+      footnotes: "Notas de rodapé",
+      footnoteBack: (reference) => `Voltar para a referência ${reference}`,
+      scrollCode: "Código, rola para o lado",
+      scrollTable: "Tabela, rola para o lado",
     },
     notFound: {
       label: "404 · NÃO ENCONTRADO",

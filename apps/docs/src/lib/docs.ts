@@ -46,6 +46,15 @@ export function homePath(locale: LocaleId) {
 	return localizedPath("docs", locale, "/");
 }
 
+export function searchPagePath(locale: LocaleId) {
+	return localizedPath("docs", locale, "/search/");
+}
+
+/** A static application page (`terms`, `privacy`) in a locale; the path mirrors English under `/pt`. */
+export function legalPath(locale: LocaleId, page: "terms" | "privacy") {
+	return localizedPath("docs", locale, `/${page}/`);
+}
+
 /** A page's own nav label, lowercase. */
 export function labelOf(entry: DocEntry) {
 	return entry.data.label ?? entry.data.title.toLowerCase();

@@ -1,22 +1,35 @@
-import { LegalPage } from "@raioviajante/design/templates";
+import { LegalPage, type LegalSection } from "@raioviajante/design/templates";
+import { CONTACT } from "../../../../site/sites";
+import type { LocaleId } from "../../../../site/locales";
 
-export function TermsPage() {
-	return (
-<LegalPage
-		site="docs"
-		title="Terms of Use"
-		inShort={[
+interface TermsText {
+	title: string;
+	inShort: { label: string; value: string }[];
+	sections: LegalSection[];
+}
+
+const mail = <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>;
+
+/**
+ * The Terms of Use, one complete text per locale. The Portuguese one is a
+ * translation of the English one that adds and removes no clause; it needs the
+ * owner's and legal review before publication (apps/docs/docs/content.md).
+ */
+const text = {
+	en: {
+		title: "Terms of Use",
+		inShort: [
 			{ label: "reading", value: "free" },
 			{ label: "accounts", value: "none" },
 			{ label: "warranty", value: "none — things may break" },
-		]}
-		sections={[
+		],
+		sections: [
 			{
 				title: "Who runs this",
 				body: (
 					<p>
-						docs.raioviajante.com is run by RaioViajante, CNPJ 53.021.377/0001-93, as part of raioviajante.com. Questions go to{" "}
-						<a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a>.
+						{`docs.raioviajante.com is run by RaioViajante, CNPJ ${CONTACT.cnpj}, as part of raioviajante.com. Questions go to`}{" "}
+						{mail}.
 					</p>
 				),
 			},
@@ -33,7 +46,43 @@ export function TermsPage() {
 				title: "Code",
 				body: <p>Code shown here follows the license of the repository it comes from.</p>,
 			},
-		]}
-	/>
-	);
+		],
+	},
+	"pt-BR": {
+		title: "Termos de Uso",
+		inShort: [
+			{ label: "leitura", value: "gratuita" },
+			{ label: "contas", value: "nenhuma" },
+			{ label: "garantia", value: "nenhuma — as coisas podem quebrar" },
+		],
+		sections: [
+			{
+				title: "Quem opera este site",
+				body: (
+					<p>
+						{`docs.raioviajante.com é operado por RaioViajante, CNPJ ${CONTACT.cnpj}, como parte de raioviajante.com. Dúvidas podem ser enviadas para`}{" "}
+						{mail}.
+					</p>
+				),
+			},
+			{
+				title: "O que é a documentação",
+				body: (
+					<p>
+						Estas páginas descrevem projetos e sistemas criados sob o RaioViajante, como funcionam hoje. Uma página pode estar
+						desatualizada; o repositório de código-fonte de cada projeto é a fonte de referência.
+					</p>
+				),
+			},
+			{
+				title: "Código",
+				body: <p>O código mostrado aqui segue a licença do repositório de onde ele vem.</p>,
+			},
+		],
+	},
+} satisfies Record<LocaleId, TermsText>;
+
+export function TermsPage({ locale }: { locale: LocaleId }) {
+	const { title, inShort, sections } = text[locale];
+	return <LegalPage site="docs" locale={locale} title={title} inShort={inShort} sections={sections} />;
 }

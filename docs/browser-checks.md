@@ -12,7 +12,8 @@ and local sockets. It runs nothing against public hosts.
   root 9, dump 45, docs 7 and lab 6 sitemap pages, 79 documents in all.
 - **Two viewports each**, 1440 and 390 CSS pixels (height 900 and 844), asserted
   from `window.innerWidth`: 158 page audits.
-- **Per page:** an axe scan with the default rule set (zero violations
+- **Per page:** an axe scan with the default rule set plus the experimental
+  `label-content-name-mismatch` rule (WCAG 2.5.3, Label in Name; zero violations
   required; nothing is suppressed); exactly one `h1` and one `main`; no
   horizontal document overflow and nothing outside the viewport unless a
   scrollable container clips it (code blocks); no broken images after scrolling;

@@ -4,6 +4,15 @@
  * list (marks the link of the section being read with `.is-current`).
  */
 
+import { LOCALE_IDS } from "../../site/locales";
+import { catalogFor } from "./catalog";
+
+/** "On this page" is named in the page's language: match the name of every locale. */
+const TOC_LINKS = LOCALE_IDS.map(
+  (locale) =>
+    `nav[aria-label="${catalogFor(locale).shell.onThisPageAria}"] a[href^="#"]`,
+).join(", ");
+
 function updateProgress() {
   const bar = document.querySelector<HTMLElement>("[data-reading-progress]");
   if (!bar) return;
@@ -13,11 +22,7 @@ function updateProgress() {
 }
 
 function updateToc() {
-  const links = [
-    ...document.querySelectorAll<HTMLAnchorElement>(
-      'nav[aria-label="on this page"] a[href^="#"]',
-    ),
-  ];
+  const links = [...document.querySelectorAll<HTMLAnchorElement>(TOC_LINKS)];
   let current: HTMLAnchorElement | undefined;
   for (const link of links) {
     const target = document.getElementById(

@@ -99,7 +99,7 @@ describe("LANG: participation first", () => {
   it("the status has an accessible name and no fake disabled link", () => {
     const body = render({ site: "lab", isParticipating: only("en") });
     expect(body.querySelector(".rv-sr-only")?.textContent).toBe(
-      "Language: English",
+      "LANG EN — Language: English",
     );
     expect(body.querySelector("[aria-disabled]")).toBeNull();
   });
@@ -114,7 +114,7 @@ describe("LANG: both locales participate", () => {
     expect(link.getAttribute("hreflang")).toBe("pt-BR");
     expect(link.textContent).toBe("LANG EN");
     expect(link.getAttribute("aria-label")).toBe(
-      "Language: English. Switch to Portuguese.",
+      "LANG EN — Language: English. Switch to Portuguese.",
     );
     expect(body.querySelector("details")).toBeNull();
   });
@@ -130,7 +130,7 @@ describe("LANG: both locales participate", () => {
     expect(link.getAttribute("hreflang")).toBe("en");
     expect(link.textContent).toBe("LANG PT");
     expect(link.getAttribute("aria-label")).toBe(
-      "Idioma: Português (Brasil). Mudar para inglês.",
+      "LANG PT — Idioma: Português (Brasil). Mudar para inglês.",
     );
     expect(body.querySelector("nav")!.getAttribute("aria-label")).toBe(
       "Idioma. Atual: Português (Brasil)",
@@ -143,7 +143,7 @@ describe("LANG: both locales participate", () => {
     const summary = body.querySelector("summary")!;
     expect(summary.textContent).toBe("LANG EN");
     expect(summary.getAttribute("aria-label")).toBe(
-      "Language: English. Check Portuguese availability.",
+      "LANG EN — Language: English. Check Portuguese availability.",
     );
     expect(body.querySelector("p")?.textContent).toBe(
       "This page is not available in Portuguese.",
@@ -169,7 +169,7 @@ describe("LANG: both locales participate", () => {
     expect(home.textContent).toBe("Ir para a página inicial em inglês →");
     expect(body.querySelector("summary")?.textContent).toBe("LANG PT");
     expect(body.querySelector("summary")?.getAttribute("aria-label")).toBe(
-      "Idioma: Português (Brasil). Verificar disponibilidade em inglês.",
+      "LANG PT — Idioma: Português (Brasil). Verificar disponibilidade em inglês.",
     );
   });
 
@@ -220,4 +220,33 @@ describe("LANG: both locales participate", () => {
     expect(html).toContain("<details");
     expect(html).not.toMatch(/<script|onclick|aria-expanded/);
   });
+});
+
+describe("LANG: the accessible name contains the visible label (WCAG 2.5.3)", () => {
+  const states = [
+    ["EN link", { counterpart: "/pt/about/" }],
+    ["EN disclosure", {}],
+    ["EN status", { isParticipating: only("en") }],
+    ["PT link", { locale: "pt-BR", counterpart: "/about/" }],
+    ["PT disclosure", { locale: "pt-BR" }],
+    ["PT status", { locale: "pt-BR", isParticipating: only("pt-BR") }],
+  ] as const;
+
+  for (const [name, props] of states) {
+    it(`${name}: the name starts with the visible text`, () => {
+      const body = render({ isParticipating: both, ...props } as never);
+      const control = body.querySelector<HTMLElement>(
+        "a[aria-label], summary[aria-label], .rv-sr-only",
+      )!;
+      const visible = (
+        control.closest(".rv-lang")!.querySelector(".rv-utility__label")!
+          .parentElement!.textContent ?? ""
+      ).replace(/\s+/g, " ");
+      expect(visible).toMatch(/^LANG (EN|PT)$/);
+      const accessible =
+        control.getAttribute("aria-label") ?? control.textContent!;
+      expect(accessible.startsWith(`${visible} — `)).toBe(true);
+      expect(accessible.length).toBeGreaterThan(visible.length + 3);
+    });
+  }
 });

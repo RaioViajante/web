@@ -33,6 +33,31 @@ toggle remain.
   before it in `order` and numbered `01.1`, `01.2`, … (`src/lib/nav.ts`). Its
   breadcrumb is the folder, that page as a link, then its own sidebar label, and
   the home page notes the pages listed under each project guide.
+- Interface text is in `src/lib/copy.ts`, a typed `Record<LocaleId, DocsCopy>`
+  (home titles and rows, folder names, search titles and suggestions, update
+  labels). Components read it by locale; nothing branches on a locale inline.
+  The home page of both locales is `src/components/HomePage.astro`, and Terms
+  and Privacy keep one complete text per locale in their components. Dates go
+  through `src/lib/date.ts`. The Docs 404 stays English (see
+  [docs/i18n.md](../../../docs/i18n.md#404-behavior)).
+- Block controls and callout labels are localized by the shared pipeline: it
+  reads each document's `locale` frontmatter, so Portuguese pages render
+  `copiar`, `Nota`, `Aviso` and the rest at build time. The shared behavior
+  only repairs a control still in English from `<html lang>`; the common rules
+  are in [docs/blocks.md](../../../docs/blocks.md#localization).
+- Search suggestions (the "nothing found" terms) are in the same catalog, one
+  list for "this site" and one for "everywhere" per locale: English `sweep, cli,
+  tokens, commits` and `setup, assembly, classifier`; Portuguese `sweep, cli,
+  tipografia, commits` and `arquivos, classificação, bancadas`.
+  `tests/build.test.mjs` fails if one finds nothing in the built index of its
+  locale, and `e2e/docs-locale-navigation.spec.ts` clicks every Portuguese
+  suggestion in both scopes. `SearchPage` takes them as the optional
+  `suggestions` prop.
+- Dates: an explicit `lastUpdated` renders as a long date in the page's `Intl`
+  locale (UTC), such as "September 27, 2026" or "27 de setembro de 2026", with
+  the ISO value in `<time datetime>`. No page sets one today.
+- The home page omits a section that has nothing to list in the locale and
+  renumbers the rest.
 - `src/pages/[...slug].astro` renders every documentation page: breadcrumb
   label, status word and meta row, numbered sections, steps, tables, callouts,
   "last updated" and "edit this page on GitHub", and previous/next. The

@@ -23,10 +23,10 @@ export function DocsFrame({
 }) {
 	return (
 		<Shell
-			termsHref="/terms/"
-			privacyHref="/privacy/"
-			termsLocale={DEFAULT_LOCALE}
-			privacyLocale={DEFAULT_LOCALE}
+			termsHref={localizedPath("docs", locale, "/terms/")}
+			privacyHref={localizedPath("docs", locale, "/privacy/")}
+			termsLocale={locale}
+			privacyLocale={locale}
 			site="docs"
 			locale={locale}
 			language={{ search: current === localizedPath("docs", locale, "/search/"), counterpart }}
