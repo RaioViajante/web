@@ -41,13 +41,11 @@ There is no endpoint to delete a job or to change an execution's state. Validati
 
 The create and update bodies share the same fields.
 
-| Field | Type | Rule |
-| --- | --- | --- |
-| `name` | string | required, at most 120 characters |
-| `command` | string | required |
-| `cronExpression` | string | optional, not blank, at most 100 characters; stored without interpretation |
-| `maxRetries` | integer | required, zero or more; stored without effect |
-| `timeoutSeconds` | integer | required, greater than zero; stored without effect |
+- `name` (string): required, at most 120 characters.
+- `command` (string): required.
+- `cronExpression` (string): optional, not blank, at most 100 characters; stored without interpretation.
+- `maxRetries` (integer): required, zero or more; stored without effect.
+- `timeoutSeconds` (integer): required, greater than zero; stored without effect.
 
 ```shell title="create a job"
 curl -X POST http://localhost:8080/jobs \

@@ -41,13 +41,11 @@ Não há endpoint para excluir um job nem para mudar o estado de uma execução.
 
 Os corpos de criação e de atualização compartilham os mesmos campos.
 
-| Campo | Tipo | Regra |
-| --- | --- | --- |
-| `name` | string | obrigatório, no máximo 120 caracteres |
-| `command` | string | obrigatório |
-| `cronExpression` | string | opcional, não pode estar em branco, no máximo 100 caracteres; guardado sem interpretação |
-| `maxRetries` | inteiro | obrigatório, zero ou mais; guardado sem efeito |
-| `timeoutSeconds` | inteiro | obrigatório, maior que zero; guardado sem efeito |
+- `name` (string): obrigatório, no máximo 120 caracteres.
+- `command` (string): obrigatório.
+- `cronExpression` (string): opcional, não pode estar em branco, no máximo 100 caracteres; guardado sem interpretação.
+- `maxRetries` (inteiro): obrigatório, zero ou mais; guardado sem efeito.
+- `timeoutSeconds` (inteiro): obrigatório, maior que zero; guardado sem efeito.
 
 ```shell title="criar um job"
 curl -X POST http://localhost:8080/jobs \
