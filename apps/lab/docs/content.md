@@ -6,21 +6,23 @@ Every experiment must be grounded in actual project code, tests, artifacts, or e
 
 The initial collection was published in Lab on 2026-09-13:
 
-| ID  | Experiment          | Status | Provenance                                                              |
-| --- | ------------------- | ------ | ----------------------------------------------------------------------- |
-| 003 | boot sector         | done   | x86-os-experiment `e966889`: actual assembly and documented BIOS output |
-| 002 | execution states    | active | Orbit `cd97666`: Execution lifecycle rules and domain tests             |
-| 001 | filename classifier | active | Sweep `3544d36`: final-extension classifier and tests                   |
+| ID  | Experiment             | Status | Provenance                                                                         |
+| --- | ---------------------- | ------ | ---------------------------------------------------------------------------------- |
+| 005 | pathfinding playground | active | none: a teaching implementation written for the Lab; no source project or revision |
+| 003 | boot sector            | done   | x86-os-experiment `e966889`: actual assembly and documented BIOS output            |
+| 002 | execution states       | active | Orbit `cd97666`: Execution lifecycle rules and domain tests                        |
+| 001 | filename classifier    | active | Sweep `3544d36`: final-extension classifier and tests                              |
 
 Every experiment has an English and a Brazilian Portuguese version. The
 Portuguese versions are authored by hand, keep the English `contentId` (the
 experiment `id`) and `originalLocale: en`, and live at independent slugs:
 
-| ID  | English slug          | Portuguese slug             |
-| --- | --------------------- | --------------------------- |
-| 003 | `boot-sector`         | `setor-de-boot`             |
-| 002 | `execution-states`    | `estados-de-execucao`       |
-| 001 | `filename-classifier` | `classificador-de-arquivos` |
+| ID  | English slug             | Portuguese slug             |
+| --- | ------------------------ | --------------------------- |
+| 005 | `pathfinding-playground` | `busca-de-caminhos`         |
+| 003 | `boot-sector`            | `setor-de-boot`             |
+| 002 | `execution-states`       | `estados-de-execucao`       |
+| 001 | `filename-classifier`    | `classificador-de-arquivos` |
 
 Stable facts (`id`, `project`, `revision`, `created`, `source`, `status`,
 `fidelity`, `surface`) are inherited from the English record and checked by

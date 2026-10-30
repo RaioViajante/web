@@ -19,15 +19,16 @@ const byId = (list, id) => list.find((experiment) => experiment.id === id);
 test("stable identities, shared provenance and real reciprocal counterparts", () => {
   assert.deepEqual(
     experiments.map(({ id }) => id),
-    ["003", "002", "001"],
+    ["005", "003", "002", "001"],
   );
   assert.deepEqual(
     portugueseExperiments.map(({ contentId }) => contentId),
-    ["003", "002", "001"],
+    ["005", "003", "002", "001"],
   );
   assert.deepEqual(
     portugueseExperiments.map((experiment) => experimentPath(experiment)),
     [
+      "/pt/experiments/busca-de-caminhos/",
       "/pt/experiments/setor-de-boot/",
       "/pt/experiments/estados-de-execucao/",
       "/pt/experiments/classificador-de-arquivos/",
@@ -55,9 +56,9 @@ test("stable identities, shared provenance and real reciprocal counterparts", ()
     ])
       assert.equal(portuguese[key], english[key], `${english.id} ${key}`);
   }
-  assert.deepEqual(experimentsFor("en").length, 3);
-  assert.deepEqual(experimentsFor("pt-BR").length, 3);
-  assert.deepEqual(publishedExperiments.length, 6);
+  assert.deepEqual(experimentsFor("en").length, 4);
+  assert.deepEqual(experimentsFor("pt-BR").length, 4);
+  assert.deepEqual(publishedExperiments.length, 8);
 });
 
 test("every experiment is fully authored in Portuguese, not copied from English", () => {
@@ -80,6 +81,8 @@ test("every experiment is fully authored in Portuguese, not copied from English"
 test("revisions and technical names survive translation verbatim", () => {
   for (const english of experiments) {
     const portuguese = byId(portugueseExperiments, english.id);
+    // An experiment with no source project has no revision or project to keep.
+    if (!english.revision) continue;
     assert.ok(
       portuguese.notes.includes(english.revision),
       `${english.id} notes keep revision ${english.revision}`,
