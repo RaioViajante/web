@@ -17,7 +17,7 @@ Convenções que valem para os repositórios do RaioViajante, incluindo este sit
 
 ## Commits
 
-Toda unidade de trabalho relevante resulta em um commit próprio, escrito em inglês seguindo o [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`, ...). Uma mudança coerente por commit — trabalho não relacionado nunca é misturado no mesmo commit, e mensagens de commit nunca são vagas. O diff é revisado antes de ser commitado.
+Toda unidade de trabalho relevante resulta em um commit próprio, escrito em inglês seguindo o [Conventional Commits](https://www.conventionalcommits.org/pt-br/v1.0.0/) (`feat:`, `fix:`, `docs:`, `chore:`, ...). Uma mudança coerente por commit — trabalho não relacionado nunca é misturado no mesmo commit, e mensagens de commit nunca são vagas. O diff é revisado antes de ser commitado.
 
 ## Publicando mudanças
 

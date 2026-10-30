@@ -87,7 +87,7 @@ const copy = {
 		lastUpdated: "última atualização",
 		edit: "editar esta página no GitHub",
 		source: "código-fonte",
-		avatar: "Girar o avatar do RaioViajante",
+		avatar: "Virar o avatar do RaioViajante",
 		reducedAvatar: "Personagem ilustrado do RaioViajante",
 		description: "Documentação técnica pública de projetos e sistemas do RaioViajante.",
 		home: {

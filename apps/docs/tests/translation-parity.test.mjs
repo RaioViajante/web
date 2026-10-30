@@ -51,6 +51,7 @@ function shape(body) {
 /** Links that deliberately point at the other language's own page. */
 const localizedLinks = new Map([
 	["https://lab.raioviajante.com/experiments/filename-classifier/", "https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/"],
+	["https://www.conventionalcommits.org/", "https://www.conventionalcommits.org/pt-br/v1.0.0/"],
 	["https://dump.raioviajante.com/posts/apparently-moving-a-file-has-edge-cases", "https://dump.raioviajante.com/pt/posts/aparentemente-mover-um-arquivo-tem-casos-de-borda"],
 	["https://dump.raioviajante.com/posts/a-toml-file-changed-what-sweep-was", "https://dump.raioviajante.com/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era"],
 ]);
@@ -119,7 +120,7 @@ test("a translation keeps every inline command, path, token and figure of its or
 		// The figures of the prose (sizes, weights, counts) are the same numbers
 		// whatever the decimal mark.
 		const figures = (text) =>
-			[...text.replace(/`[^`\n]*`/g, "").matchAll(/\d+(?:[.,]\d+)?/g)].map(([figure]) => figure.replace(",", ".")).sort();
+			[...text.replace(/`[^`\n]*`|\]\([^)]*\)/g, "").matchAll(/\d+(?:[.,]\d+)?/g)].map(([figure]) => figure.replace(",", ".")).sort();
 		assert.deepEqual(figures(b), figures(a), `${translation.path}: figures`);
 	}
 });
@@ -140,6 +141,9 @@ test("the Docs catalog is complete in both locales", () => {
 	assert.deepEqual(keys(pt).sort(), keys(en).sort());
 	for (const id of ["hum", "orbit", "yanawa"]) assert.ok(pt.home.external[id].summary && pt.home.external[id].status, id);
 	assert.notEqual(pt.home.external.orbit.status, en.home.external.orbit.status);
+	// The avatar control uses Root's Portuguese wording for the same action.
+	assert.equal(pt.avatar, "Virar o avatar do RaioViajante");
+	assert.equal(pt.reducedAvatar, "Personagem ilustrado do RaioViajante");
 });
 
 test("dates read in the page's locale, in the same calendar day everywhere", () => {
