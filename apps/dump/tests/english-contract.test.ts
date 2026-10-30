@@ -14,7 +14,7 @@ const ADDED_ENGLISH = [
     slug: "translating-the-site-without-pretending-everything-already-exists",
     contentId: "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
     originalLocale: "pt-BR",
-    publishedAt: "2026-10-29",
+    publishedAt: "2026-10-19",
     tags: ["meta", "architecture", "web"],
   },
 ];

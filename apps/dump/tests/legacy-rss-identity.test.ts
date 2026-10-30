@@ -118,7 +118,7 @@ describe("English /rss.xml against the production snapshot", () => {
         guid: "tag:dump.raioviajante.com,2026:post/traduzir-o-site-sem-fingir-que-tudo-ja-existe/en",
         isPermaLink: "false",
         link: `${PRODUCTION_ORIGIN}/posts/translating-the-site-without-pretending-everything-already-exists`,
-        pubDate: "Thu, 29 Oct 2026 00:00:00 GMT",
+        pubDate: "Mon, 19 Oct 2026 00:00:00 GMT",
       },
     ]);
   });

@@ -155,10 +155,9 @@ describe("post collection", () => {
       "started-designing-a-language-before-i-could-compile-one": "2026-09-13",
       "started-writing-down-the-failures-before-the-features": "2026-09-27",
       "there-is-no-printf-down-here": "2026-09-05",
-      // The English translation of the Portuguese original, first public on
-      // the day it was added.
+      // The English translation of the Portuguese original keeps its date.
       "translating-the-site-without-pretending-everything-already-exists":
-        "2026-10-29",
+        "2026-10-19",
     });
   });
 

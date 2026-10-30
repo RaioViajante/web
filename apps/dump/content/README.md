@@ -71,9 +71,10 @@ replace them. `publishedAt` remains the authority for ordering and RSS;
 - The filename currently determines a version's slug (and so its URL). The
   slug is route identity only; it is never used to decide that two versions are
   the same work. A translation has its own filename and slug.
-- `publishedAt`, `updatedAt` and `draft` belong to each localized version.
-  They are never copied between versions or inferred from Git, the filesystem
-  or the build. Portuguese routes exist under `/pt`; only published Portuguese
+- `updatedAt` and `draft` belong to each localized version and are never
+  copied between versions or inferred from Git, the filesystem or the build.
+  `publishedAt` is the exception: it is the original's date and identical in
+  every version of the work (see Date authority). Portuguese routes exist under `/pt`; only published Portuguese
   records enter them.
 
 ### Date authority
@@ -84,6 +85,11 @@ activity, which may happen before or after publication, so it is not an
 alternative publication date. Correct `publishedAt` only when independent
 publication evidence supports the change; otherwise preserve the recorded
 date rather than infer or redistribute dates.
+
+A translation is not a new publication. Every version of a work, in either
+language, carries the `publishedAt` of the original, also when the original is
+Portuguese and the English version came later. The original's date is the one
+already recorded in its own frontmatter.
 
 Use `updatedAt` for a later meaningful change to the article's facts or prose.
 Metadata cleanup, taxonomy changes, repository migrations, and automated
@@ -116,9 +122,10 @@ omits the section when there are none.
 Every English-original post has a Portuguese version, and the Portuguese
 original has an English version. A new translation gets its own file, its own
 slug in its own language, the work's `contentId`, `originalLocale` unchanged,
-and `publishedAt` set to the day that translation first went public (never the
-original's date); `updatedAt` stays unset unless there is an explicit material
-update. Tags are ids, so the translation carries the same list, and each id
+and `publishedAt` copied from the original: a translation is not a new
+publication, so every version of a work has the same `publishedAt` (the build
+fails otherwise), including an English translation of a Portuguese original.
+`updatedAt` stays unset unless there is an explicit material update. Tags are ids, so the translation carries the same list, and each id
 needs a presentation in the translation's locale (`content/tags.json`). The
 translation contains everything its original contains: same headings, code
 blocks, links and directives, in the same order. Code stays verbatim; natural

@@ -106,14 +106,14 @@ describe("one work, several localized versions", () => {
     expect(pt.locale).toBe(pt.originalLocale);
   });
 
-  it("K/14: each version keeps its own dates", () => {
+  it("K/14: a translation keeps its original's publication date and its own update", () => {
     const en = getPostVersion("same-work", "en", DIR, TAXONOMY)!;
     const pt = getPostVersion("same-work", "pt-BR", DIR, TAXONOMY)!;
     expect([en.publishedAt, en.updatedAt]).toEqual([
       "2026-02-01",
       "2026-02-10",
     ]);
-    expect([pt.publishedAt, pt.updatedAt]).toEqual(["2026-03-05", undefined]);
+    expect([pt.publishedAt, pt.updatedAt]).toEqual(["2026-02-01", undefined]);
   });
 
   it("13/I: drafts are per version", () => {
@@ -160,6 +160,34 @@ describe("collection validation", () => {
       post({ slug: "b", locale: "pt-BR", originalLocale: "pt-BR" }),
     ]);
     expect(message).toMatch(/disagree on originalLocale/);
+  });
+
+  it("rejects versions of one work that disagree on publishedAt", () => {
+    const message = problems([
+      post({ slug: "a", publishedAt: "2026-02-01" }),
+      post({
+        slug: "b",
+        locale: "pt-BR",
+        publishedAt: "2026-03-05",
+      }),
+    ]);
+    expect(message).toMatch(
+      /contentId "work" versions disagree on publishedAt: "a" says 2026-02-01, "b" says 2026-03-05/,
+    );
+  });
+
+  it("accepts a draft translation that shares its original's date", () => {
+    expect(
+      problems([
+        post({ slug: "a", publishedAt: "2026-02-01" }),
+        post({
+          slug: "b",
+          locale: "pt-BR",
+          publishedAt: "2026-02-01",
+          draft: true,
+        }),
+      ]),
+    ).toBe("");
   });
 
   it("H: rejects a claimed original with no provenance record, never inferring it", () => {

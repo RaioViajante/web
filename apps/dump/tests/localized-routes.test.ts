@@ -26,8 +26,10 @@ import { participates } from "../../../site/locales";
 const TRANSLATED_SLUG = "talvez-isso-vire-alguma-coisa-um-dia";
 const PORTUGUESE_ORIGINAL_SLUG =
   "traduzir-o-site-sem-fingir-que-tudo-ja-existe";
+// A translation keeps the date of its original: the Portuguese original went
+// public on 2026-10-19, and the English post that came first on 2026-09-04.
 const PUBLICATION_DATE = "2026-10-19";
-const TRANSLATION_DATE = "2026-10-29";
+const TRANSLATED_DATE = "2026-09-04";
 
 const PORTUGUESE_POST_PATHS = getPublishedPosts("pt-BR").map(
   (post) => `/pt/posts/${post.slug}`,
@@ -67,7 +69,7 @@ describe("localized published inventory", () => {
       title: "Talvez isso vire alguma coisa um dia",
       description:
         "Por que este lugar existe, o que espero que ele se torne e por que provavelmente compliquei demais um diário.",
-      publishedAt: PUBLICATION_DATE,
+      publishedAt: TRANSLATED_DATE,
       tags: ["personal", "meta", "dump"],
       draft: false,
     });
@@ -114,7 +116,7 @@ describe("localized published inventory", () => {
     expect(getPostVersion(PORTUGUESE_ORIGINAL_SLUG, "en")).toMatchObject({
       slug: "translating-the-site-without-pretending-everything-already-exists",
       originalLocale: "pt-BR",
-      publishedAt: TRANSLATION_DATE,
+      publishedAt: PUBLICATION_DATE,
     });
     expect(postCounterparts(portugueseOriginal!)).toEqual([
       {
@@ -221,7 +223,7 @@ describe("localized published inventory", () => {
     expect(blogPostingJsonLd(translated!)).toMatchObject({
       "@type": "BlogPosting",
       headline: "Talvez isso vire alguma coisa um dia",
-      datePublished: PUBLICATION_DATE,
+      datePublished: TRANSLATED_DATE,
       url: expect.stringMatching(`/pt/posts/${TRANSLATED_SLUG}$`),
       mainEntityOfPage: { inLanguage: "pt-BR" },
       inLanguage: "pt-BR",
@@ -236,7 +238,7 @@ describe("localized published inventory", () => {
     });
   });
 
-  it("moves the reviewed manuscripts into the published collection with the approved date", () => {
+  it("moves the reviewed manuscripts into the published collection with the original's date", () => {
     const content = join(process.cwd(), "content");
     for (const slug of [TRANSLATED_SLUG, PORTUGUESE_ORIGINAL_SLUG]) {
       const published = join(content, "posts", `${slug}.mdx`);
@@ -244,7 +246,12 @@ describe("localized published inventory", () => {
       expect(existsSync(published)).toBe(true);
       expect(existsSync(draft)).toBe(false);
       const raw = readFileSync(published, "utf8");
-      expect(raw).toMatch(/^publishedAt: "2026-10-19"$/m);
+      expect(raw).toMatch(
+        new RegExp(
+          `^publishedAt: "${slug === TRANSLATED_SLUG ? TRANSLATED_DATE : PUBLICATION_DATE}"$`,
+          "m",
+        ),
+      );
       expect(raw).toMatch(/^draft: false$/m);
       expect(raw).not.toContain("OWNER MUST SET");
     }

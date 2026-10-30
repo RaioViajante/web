@@ -6,7 +6,7 @@ import { taxonomy } from "@/lib/tags";
 
 // The localization coverage of the published works: every work written in one
 // language has a published version in the other, and each translation carries
-// its own publication date.
+// the publication date of its original (a translation is not a new publication).
 const works = (() => {
   const byWork = new Map<
     string,
@@ -37,6 +37,24 @@ const ENGLISH_ORIGINALS = [
 ];
 const PORTUGUESE_ORIGINALS = ["traduzir-o-site-sem-fingir-que-tudo-ja-existe"];
 
+// When each work's original first went public (UTC), from the original's
+// frontmatter, which matches the date of the Git commit that published it.
+const ORIGINAL_DATES: Record<string, string> = {
+  "a-toml-file-changed-what-sweep-was": "2026-09-27",
+  "an-execution-is-more-than-a-row-in-a-database": "2026-09-13",
+  "apparently-moving-a-file-has-edge-cases": "2026-09-12",
+  "building-orbit": "2026-09-07",
+  "gave-one-operation-more-than-one-deadline": "2026-09-27",
+  "kept-building-and-stopped-writing-it-down": "2026-09-27",
+  "maybe-this-can-be-something-someday": "2026-09-04",
+  "my-project-cards-were-getting-ahead-of-my-projects": "2026-09-27",
+  "split-my-internet-into-four-different-kinds-of-place": "2026-09-13",
+  "started-designing-a-language-before-i-could-compile-one": "2026-09-13",
+  "started-writing-down-the-failures-before-the-features": "2026-09-27",
+  "there-is-no-printf-down-here": "2026-09-05",
+  "traduzir-o-site-sem-fingir-que-tudo-ja-existe": "2026-10-19",
+};
+
 describe("works x locale coverage", () => {
   it("covers all thirteen published works", () => {
     expect([...works.keys()].sort()).toEqual(
@@ -62,23 +80,24 @@ describe("works x locale coverage", () => {
       expect(en).toMatchObject({
         locale: "en",
         originalLocale: "pt-BR",
-        publishedAt: "2026-10-29",
+        publishedAt: ORIGINAL_DATES[id],
       });
       expect(en!.title).not.toBe(pt!.title);
     }
   });
 
-  it("dates each new translation with its own first publication", () => {
-    for (const { en, "pt-BR": pt } of works.values()) {
+  it("gives every version the publication date of its original", () => {
+    expect([...works.keys()].sort()).toEqual(
+      Object.keys(ORIGINAL_DATES).sort(),
+    );
+    for (const [id, { en, "pt-BR": pt }] of works) {
+      expect([id, en!.publishedAt, pt!.publishedAt]).toEqual([
+        id,
+        ORIGINAL_DATES[id],
+        ORIGINAL_DATES[id],
+      ]);
+      // A translation never gets an update date just for existing.
       const translation = en!.originalLocale === "en" ? pt! : en!;
-      const original = en!.originalLocale === "en" ? en! : pt!;
-      if (original.contentId === "maybe-this-can-be-something-someday") {
-        // Translated before this change; its recorded date stays.
-        expect(translation.publishedAt).toBe("2026-10-19");
-      } else if (original.originalLocale === "en") {
-        expect(translation.publishedAt).toBe("2026-10-29");
-      }
-      // An original's own date and any update are never touched by a translation.
       expect(translation.updatedAt).toBeUndefined();
     }
   });

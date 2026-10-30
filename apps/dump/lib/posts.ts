@@ -40,8 +40,9 @@ const KEBAB_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /**
  * The collection-level identity rules. For every work (`contentId`): one
- * version per locale, every version agreeing on `originalLocale`, and a
- * provenance record in that locale (which may be a draft). Missing
+ * version per locale, every version agreeing on `originalLocale` and on
+ * `publishedAt` (the original's first publication), and a provenance record
+ * in that locale (which may be a draft). Missing
  * translations are fine. Every tag a post uses must exist and have a
  * presentation in the post's own locale. Throws one error naming every
  * conflict; nothing is inferred or repaired.
@@ -88,6 +89,15 @@ export function validatePostCollection(
         );
       seen.set(version.locale, version);
     }
+    // A translation is not a new publication: every version of a work carries
+    // the date the original first went public.
+    const dates = new Set(versions.map((version) => version.publishedAt));
+    if (dates.size > 1)
+      problems.push(
+        `contentId "${contentId}" versions disagree on publishedAt: ${versions
+          .map((version) => `"${version.slug}" says ${version.publishedAt}`)
+          .join(", ")}`,
+      );
     const originals = new Set(
       versions.map((version) => version.originalLocale),
     );

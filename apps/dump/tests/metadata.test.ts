@@ -261,7 +261,7 @@ describe("dynamic route pages keep canonical and RSS together", () => {
       type: "article",
       locale: "en_US",
       alternateLocale: ["pt_BR"],
-      publishedTime: "2026-10-29T00:00:00.000Z",
+      publishedTime: "2026-10-19T00:00:00.000Z",
     });
   });
 
@@ -285,7 +285,7 @@ describe("dynamic route pages keep canonical and RSS together", () => {
       locale: "pt_BR",
       alternateLocale: ["en_US"],
       url: `${PRODUCTION_ORIGIN}/pt/posts/${slug}`,
-      publishedTime: "2026-10-19T00:00:00.000Z",
+      publishedTime: "2026-09-04T00:00:00.000Z",
       images: [
         expect.objectContaining({
           url: `${PRODUCTION_ORIGIN}/og/pt/posts/${slug}.png`,
