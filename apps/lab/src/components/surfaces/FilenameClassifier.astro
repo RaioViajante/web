@@ -17,6 +17,7 @@ const { locale } = Astro.props;
     type TextPart,
   } from "../../lib/classifier-view";
   import type { ClassifierCategory } from "../../lib/bench-copy";
+  import type { PluralForms } from "../../lib/plural";
   import type { LocaleId } from "../../../../../site/locales";
   import { playSound } from "@raioviajante/design/sound";
   const container = document.querySelector<HTMLElement>("[data-classifier]")!;
@@ -26,7 +27,7 @@ const { locale } = Astro.props;
     none: string;
     categoryGloss: Record<ClassifierCategory, string | null>;
     categoryLang: string | null;
-    summary: { one: string; other: string };
+    summary: PluralForms;
   };
   const names = container.querySelector<HTMLTextAreaElement>("#filenames")!;
   const directory = container.querySelector<HTMLInputElement>("#directory")!;

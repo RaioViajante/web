@@ -13,6 +13,13 @@ import { placeholders } from "../src/lib/template.ts";
 
 const catalogs = { copy, classifierCopy, executionCopy, bootCopy, bootText };
 
+/**
+ * `none` is the optional zero wording of a counted phrase: Portuguese needs it
+ * (CLDR files zero under "one"), English does not. plural.test.mjs enforces
+ * exactly when it is required, so key parity skips it.
+ */
+const optionalZero = /(^|\.)summary\.none$/;
+
 /** Every leaf of a catalog as `[path, value]`; functions and strings are leaves. */
 function leaves(value, path = "") {
   if (typeof value === "string" || typeof value === "function")
@@ -27,7 +34,9 @@ test("every catalog declares every locale with exactly the same keys", () => {
   for (const [name, catalog] of Object.entries(catalogs)) {
     assert.deepEqual(Object.keys(catalog).sort(), [...LOCALE_IDS].sort(), name);
     const [first, ...rest] = LOCALE_IDS.map((id) =>
-      leaves(catalog[id]).map(([path]) => path),
+      leaves(catalog[id])
+        .map(([path]) => path)
+        .filter((path) => !optionalZero.test(path)),
     );
     for (const other of rest) assert.deepEqual(other, first, name);
   }
@@ -44,7 +53,9 @@ test("every catalog declares every locale with exactly the same keys", () => {
 
 test("templates keep the same placeholders in every locale", () => {
   for (const name of ["executionCopy", "bootCopy", "classifierCopy"]) {
-    const [en, pt] = LOCALE_IDS.map((id) => leaves(catalogs[name][id]));
+    const [en, pt] = LOCALE_IDS.map((id) =>
+      leaves(catalogs[name][id]).filter(([path]) => !optionalZero.test(path)),
+    );
     en.forEach(([path, value], index) => {
       if (typeof value !== "string") return;
       assert.deepEqual(
@@ -62,7 +73,9 @@ const sameInBothLanguages = ["bootCopy.assemblyLink", "bootCopy.progress"];
 test("Portuguese strings are translated, not copied from English", () => {
   const identical = [];
   for (const [name, catalog] of Object.entries(catalogs)) {
-    const [en, pt] = LOCALE_IDS.map((id) => leaves(catalog[id]));
+    const [en, pt] = LOCALE_IDS.map((id) =>
+      leaves(catalog[id]).filter(([path]) => !optionalZero.test(path)),
+    );
     en.forEach(([path, value], index) => {
       // `{ code }` spans quote identifiers and are shared by design.
       if (typeof value !== "string" || path.endsWith(".code")) return;

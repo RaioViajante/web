@@ -28,7 +28,7 @@ export interface ClassifierCopy {
    * itself is Sweep's, is never translated, and is what the destination uses.
    */
   categoryGloss: Record<ClassifierCategory, string | null>;
-  /** "{count} files classified"; the summary lists real category values after it. */
+  /** "{count} files classified"; the summary lists real category values after it. Zero reads "nenhum arquivo classificado" in Portuguese. */
   summary: PluralForms;
   why: string;
   explanation: RichText;
@@ -144,6 +144,7 @@ export const classifierCopy = {
     summary: {
       one: "{count} arquivo classificado",
       other: "{count} arquivos classificados",
+      none: "nenhum arquivo classificado",
     },
     why: 'Por que .hidden é "Other"',
     explanation: [

@@ -7,7 +7,7 @@ test("the filter result counts experiments in words, singular and plural, in bot
   assert.equal(experimentCount("en", 0), "0 experiments");
   assert.equal(experimentCount("en", 1), "1 experiment");
   assert.equal(experimentCount("en", 2), "2 experiments");
-  assert.equal(experimentCount("pt-BR", 0), "0 experimentos");
+  assert.equal(experimentCount("pt-BR", 0), "nenhum experimento");
   assert.equal(experimentCount("pt-BR", 1), "1 experimento");
   assert.equal(experimentCount("pt-BR", 2), "2 experimentos");
   assert.equal(textFor("pt-BR").count(3), "3 experimentos");
