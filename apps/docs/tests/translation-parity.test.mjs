@@ -97,6 +97,31 @@ test("a Portuguese document contains everything its original does", () => {
 	}
 });
 
+/** Inline code that is an illustration with words in it, translated on purpose. */
+const translatedCode = new Map([["name ····· value", "nome ····· valor"]]);
+
+test("a translation keeps every inline command, path, token and figure of its original", () => {
+	const count = (items) => items.reduce((map, item) => map.set(item, (map.get(item) ?? 0) + 1), new Map());
+	for (const translation of byLocale("pt-BR")) {
+		const original = byLocale("en").find(({ data }) => data.contentId === translation.data.contentId);
+		const strip = (body) => body.replace(/^([ \t]*)```[\s\S]*?\n\1```/gm, "");
+		const [a, b] = [strip(original.body), strip(translation.body)];
+		// Inline code is never translated; a translation may add some (a category
+		// name it explains) but may not drop or alter one.
+		const spans = (text) => count([...text.matchAll(/`([^`\n]+)`/g)].map(([, code]) => code));
+		const [from, to] = [spans(a), spans(b)];
+		for (const [code, times] of from) {
+			const kept = translatedCode.get(code) ?? code;
+			assert.ok((to.get(kept) ?? 0) >= times, `${translation.path}: inline code \`${code}\` x${times} is kept`);
+		}
+		// The figures of the prose (sizes, weights, counts) are the same numbers
+		// whatever the decimal mark.
+		const figures = (text) =>
+			[...text.replace(/`[^`\n]*`/g, "").matchAll(/\d+(?:[.,]\d+)?/g)].map(([figure]) => figure.replace(",", ".")).sort();
+		assert.deepEqual(figures(b), figures(a), `${translation.path}: figures`);
+	}
+});
+
 test("Portuguese is not English left in place", () => {
 	for (const translation of byLocale("pt-BR")) {
 		const prose = translation.body.replace(/```[\s\S]*?```/g, "").replace(/`[^`]*`/g, "");
