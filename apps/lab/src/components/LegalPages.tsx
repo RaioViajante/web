@@ -6,10 +6,11 @@ import { Pager } from "@raioviajante/design/parts";
 import { textFor } from "../lib/copy";
 import { routePath } from "../lib/routes";
 
-// Terms and Privacy, one authored version per locale. The English text is
-// authoritative; the Portuguese text is a faithful translation of it with the
-// same sections, facts and (absent) update date. It adds and removes no clause.
-// Legal facts come from `site/` in both languages.
+// Terms and Privacy, one authored version per locale. The Portuguese text is a
+// translation of the English one with the same sections, facts and (absent)
+// update date. It adds and removes no clause. Which text controls is not
+// decided here (see apps/lab/docs/i18n.md, "Legal pages"). Legal facts come
+// from `site/` in both languages.
 
 interface LegalContent {
   inShort: { label: string; value: string }[];

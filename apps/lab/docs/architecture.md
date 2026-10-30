@@ -58,8 +58,9 @@ the browser's language or storage. `src/lib/routes.ts` is the route registry for
 home, search, Terms and Privacy; the experiments are content records.
 Portuguese search has its own static index (`src/lib/search.ts` builds both
 indexes) and explicit suggestions, each of which finds a published Portuguese
-experiment (tested). The Portuguese Terms and Privacy pages are faithful
-translations of the English text, which stays authoritative. Lab participation
+experiment (tested). The Portuguese Terms and Privacy pages are
+translations of the English texts, pending owner and legal review (see
+[i18n.md](i18n.md)). Lab participation
 is declared in `site/locales.ts`.
 
 The dynamic routes statically render each surface.

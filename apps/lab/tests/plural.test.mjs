@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { LOCALE_IDS } from "../../../site/locales.ts";
+import { LOCALES, LOCALE_IDS } from "../../../site/locales.ts";
 import { counted, pluralCategory, zeroReadsAsOne } from "../src/lib/plural.ts";
 import {
   experimentCount,
@@ -11,7 +11,7 @@ import {
   classifierCategories,
   emptyCounts,
   summaryParts,
-  categoryParts,
+  destinationParts,
 } from "../src/lib/classifier-view.ts";
 import { fill, placeholders } from "../src/lib/template.ts";
 
@@ -144,7 +144,13 @@ test("counts must be whole, non-negative numbers", () => {
 });
 
 const sentence = (locale, total, counts = emptyCounts()) =>
-  summaryParts(locale, total, counts, classifierCopy[locale].summary)
+  summaryParts(
+    LOCALES[locale].intlLocale,
+    total,
+    counts,
+    classifierCopy[locale].summary,
+    classifierCopy[locale].categoryLabel,
+  )
     .map(({ text }) => text)
     .join("");
 
@@ -163,39 +169,40 @@ test("the classifier summary agrees with the count in both locales", () => {
   );
   assert.equal(
     sentence("pt-BR", 0),
-    "nenhum arquivo classificado · Images 0 · Documents 0 · Archives 0 · Other 0",
+    "nenhum arquivo classificado · Imagens 0 · Documentos 0 · Arquivos compactados 0 · Outros 0",
   );
   assert.equal(
     sentence("pt-BR", 1, { ...emptyCounts(), Images: 1 }),
-    "1 arquivo classificado · Images 1 · Documents 0 · Archives 0 · Other 0",
+    "1 arquivo classificado · Imagens 1 · Documentos 0 · Arquivos compactados 0 · Outros 0",
   );
   assert.equal(
     sentence("pt-BR", 5, { Images: 1, Documents: 1, Archives: 1, Other: 2 }),
-    "5 arquivos classificados · Images 1 · Documents 1 · Archives 1 · Other 2",
+    "5 arquivos classificados · Imagens 1 · Documentos 1 · Arquivos compactados 1 · Outros 2",
   );
 });
 
-test("the real category values stay visible, flagged as English in Portuguese only", () => {
-  const pt = summaryParts(
-    "pt-BR",
-    2,
-    emptyCounts(),
-    classifierCopy["pt-BR"].summary,
-    "en",
-  );
+test("category names are translated for display while the folder stays Sweep's identifier", () => {
+  // The names the Portuguese page has always shown (origin/main fe68b49).
+  assert.deepEqual(classifierCopy["pt-BR"].categoryLabel, {
+    Images: "Imagens",
+    Documents: "Documentos",
+    Archives: "Arquivos compactados",
+    Other: "Outros",
+  });
   assert.deepEqual(
-    pt.filter((part) => part.lang).map((part) => part.text),
-    [...classifierCategories],
+    classifierCopy.en.categoryLabel,
+    Object.fromEntries(classifierCategories.map((name) => [name, name])),
   );
-  const plain = summaryParts("en", 2, emptyCounts(), classifierCopy.en.summary);
-  assert.ok(plain.every((part) => part.lang === undefined));
-  // The cell shows the program's value first; the gloss is clearly secondary.
-  assert.deepEqual(
-    categoryParts("Images", classifierCopy["pt-BR"].categoryGloss.Images, "en"),
-    [{ text: "Images", lang: "en" }, { text: " (imagens)" }],
-  );
-  assert.deepEqual(categoryParts("Images", null), [
-    { text: "Images", lang: undefined },
+  // The destination keeps the real directory name, flagged English in Portuguese only.
+  assert.deepEqual(destinationParts("~/Downloads", "Images", "a.png", "en"), [
+    { text: "~/Downloads/" },
+    { text: "Images", lang: "en" },
+    { text: "/a.png" },
+  ]);
+  assert.deepEqual(destinationParts("~/Docs", "Other", "README"), [
+    { text: "~/Docs/" },
+    { text: "Other", lang: undefined },
+    { text: "/README" },
   ]);
 });
 

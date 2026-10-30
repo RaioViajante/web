@@ -8,7 +8,7 @@ import {
 import { classifyFilename } from "../../lib/filename-classifier";
 import { classifierCopy, type ClassifierCategory } from "../../lib/bench-copy";
 import {
-  categoryParts,
+  destinationParts,
   emptyCounts,
   summaryParts,
   type TextPart,
@@ -43,8 +43,8 @@ function Parts({ parts }: { parts: TextPart[] }) {
 
 export function ClassifierBench({ locale }: { locale: LocaleId }) {
   const text = classifierCopy[locale];
-  // Sweep's category values are English identifiers on every page.
-  const categoryLang = foreignLang(locale, "en");
+  // Sweep's category folders are English identifiers on every page.
+  const folderLang = foreignLang(locale, "en");
   const rows = initialNames.map(classifyFilename);
   const counts = emptyCounts();
   for (const row of rows) counts[row.category as ClassifierCategory]++;
@@ -55,8 +55,8 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
       data-copy={JSON.stringify({
         intlLocale: LOCALES[locale].intlLocale,
         none: text.none,
-        categoryGloss: text.categoryGloss,
-        categoryLang: categoryLang ?? null,
+        categoryLabel: text.categoryLabel,
+        folderLang: folderLang ?? null,
         summary: text.summary,
       })}
     >
@@ -124,17 +124,18 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
                     </th>
                     <td className="tok-number">{row.suffix || text.none}</td>
                     <td className="tok-type">
+                      {text.categoryLabel[row.category as ClassifierCategory]}
+                    </td>
+                    <td>
                       <Parts
-                        parts={categoryParts(
+                        parts={destinationParts(
+                          "~/Downloads",
                           row.category as ClassifierCategory,
-                          text.categoryGloss[
-                            row.category as ClassifierCategory
-                          ],
-                          categoryLang,
+                          row.filename,
+                          folderLang,
                         )}
                       />
                     </td>
-                    <td>{`~/Downloads/${row.category}/${row.filename}`}</td>
                   </tr>
                 ))}
               </tbody>
@@ -153,7 +154,7 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
                 rows.length,
                 counts,
                 text.summary,
-                categoryLang,
+                text.categoryLabel,
               )}
             />
           </p>

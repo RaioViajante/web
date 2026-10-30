@@ -18,8 +18,11 @@ export interface RelatedRow {
   labelLanguage?: LocaleId;
   value: string;
   href: string;
-  /** Language of the destination page. */
-  language: LocaleId;
+  /**
+   * Language of the destination page when it should be declared and said in
+   * words; leave it out where the page never marked it (a source repository).
+   */
+  language?: LocaleId;
 }
 
 const learningNotes =
@@ -153,8 +156,12 @@ export const relatedRows = {
         href: "https://docs.raioviajante.com/pt/projetos/sweep/#classificação",
         language: "pt-BR",
       },
-      dump.edgeCases,
-      dump.toml,
+      // Both rows are the ones the published page has always listed.
+      {
+        label: "código-fonte do Sweep",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/sweep",
+      },
     ],
   },
   "execution-states": {

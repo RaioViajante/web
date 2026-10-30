@@ -171,8 +171,7 @@ export const copy = {
     },
     published: (titlePlural) => (titlePlural ? "registrados" : "registrado"),
     all: "Todos os experimentos",
-    notebookIntro:
-      "Registros curtos e datados: o que mudou, o que quebrou, o que foi respondido.",
+    notebookIntro: "Registros dos experimentos e de seus limites.",
     inLanguage: (language) => `em ${language}`,
     languageNames: { en: "inglês", "pt-BR": "português" },
     search: {

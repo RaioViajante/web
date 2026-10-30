@@ -23,11 +23,11 @@ export interface ClassifierCopy {
   headers: readonly [string, string, string, string];
   none: string;
   /**
-   * A descriptive label shown beside each category in the table, or null when
-   * the category value already reads in this language. The category value
-   * itself is Sweep's, is never translated, and is what the destination uses.
+   * The display name of each category in the table and the live summary. The
+   * category value itself is Sweep's identifier: the logic and the destination
+   * folder always use it, never this name.
    */
-  categoryGloss: Record<ClassifierCategory, string | null>;
+  categoryLabel: Record<ClassifierCategory, string>;
   /** "{count} files classified"; the summary lists real category values after it. Zero reads "nenhum arquivo classificado" in Portuguese. */
   summary: PluralForms;
   why: string;
@@ -67,8 +67,12 @@ export interface ExecutionCopy {
   rules: {
     caption: string;
     headers: readonly [string, string, string, string];
-    /** The `sets` cell of the failure rule. */
-    failSets: string;
+    /**
+     * Words around the identifiers in the `sets` cell of the failure rule:
+     * `finishedAt, exitCode, <before>errorMessage<after>`. The identifiers
+     * themselves are Orbit's and are not translated.
+     */
+    failSets: { before: string; after: string };
   };
   noscript: string;
 }
@@ -100,11 +104,11 @@ export const classifierCopy = {
     try: "try",
     headers: ["file", "suffix", "category", "destination"],
     none: "(none)",
-    categoryGloss: {
-      Images: null,
-      Documents: null,
-      Archives: null,
-      Other: null,
+    categoryLabel: {
+      Images: "Images",
+      Documents: "Documents",
+      Archives: "Archives",
+      Other: "Other",
     },
     summary: {
       one: "{count} file classified",
@@ -135,18 +139,18 @@ export const classifierCopy = {
     try: "testar",
     headers: ["arquivo", "extensão", "categoria", "destino"],
     none: "(nenhuma)",
-    categoryGloss: {
-      Images: "imagens",
-      Documents: "documentos",
-      Archives: "arquivos compactados",
-      Other: "outros",
+    categoryLabel: {
+      Images: "Imagens",
+      Documents: "Documentos",
+      Archives: "Arquivos compactados",
+      Other: "Outros",
     },
     summary: {
       one: "{count} arquivo classificado",
       other: "{count} arquivos classificados",
       none: "nenhum arquivo classificado",
     },
-    why: 'Por que .hidden é "Other"',
+    why: 'Por que .hidden é "Outros"',
     explanation: [
       "Em Python 3.14, ",
       { code: "Path.suffix" },
@@ -158,7 +162,7 @@ export const classifierCopy = {
       { code: "." },
       ", então ",
       { code: "image." },
-      " fica em Other. Os espaços nos nomes são preservados. Os destinos são apenas prévias; nenhum arquivo é movido. Os nomes de categoria (Images, Documents, Archives e Other) são os valores usados pelo Sweep e por isso aparecem em inglês; a tradução entre parênteses é só uma ajuda de leitura.",
+      " fica em Outros. Os espaços nos nomes são preservados. Os destinos são apenas prévias e mantêm os nomes de categoria usados pelo Sweep; nenhum arquivo é movido.",
     ],
     noscript:
       "Os exemplos já estão calculados. Ative o JavaScript para testar outros nomes de arquivo.",
@@ -214,7 +218,7 @@ export const executionCopy = {
     rules: {
       caption: "Transition rules · Orbit cd97666",
       headers: ["action", "from", "to", "sets"],
-      failSets: "finishedAt, exitCode, nonblank errorMessage",
+      failSets: { before: "nonblank ", after: "" },
     },
     noscript: "Enable JavaScript to try the lifecycle operations.",
   },
@@ -269,7 +273,7 @@ export const executionCopy = {
     rules: {
       caption: "Regras de transição · Orbit cd97666",
       headers: ["ação", "de", "para", "define"],
-      failSets: "finishedAt, exitCode, errorMessage não vazia",
+      failSets: { before: "", after: " não vazia" },
     },
     noscript: "Ative o JavaScript para testar as operações do ciclo de vida.",
   },

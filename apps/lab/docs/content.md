@@ -38,11 +38,12 @@ carry `hreflang="en"` and mark the English title with `lang="en"`.
 Technical identifiers stay exact in both languages: Orbit's status values
 (`QUEUED`, `RUNNING`, ...) and field names, Sweep's category values (`Images`,
 `Documents`, `Archives`, `Other`), assembly, registers, hex values and
-revisions. The Portuguese classifier shows the program's category value in the
-table and in the live summary, flagged `lang="en"`, with a descriptive
-translation in parentheses only beside the table cell (`Images (imagens)`), so
-the destination path (`~/Downloads/Images/...`) and the category column always
-agree. Operation names (`start`, `succeed`, `fail`, `cancel`) are Orbit's
+revisions. The Portuguese classifier shows translated display names for the
+categories in the table and in the live summary (`Imagens`, `Documentos`,
+`Arquivos compactados`, `Outros`, the names the published page has always
+used), while the destination preview keeps Sweep's real folder name
+(`~/Downloads/Images/...`), with that folder segment marked `lang="en"`. The
+classification logic only ever sees the identifiers. Operation names (`start`, `succeed`, `fail`, `cancel`) are Orbit's
 method names: Portuguese buttons and messages use verbs ("iniciar",
 "concluir com sucesso", "falhar", "cancelar") and the transition table shows
 the identifier next to the verb.

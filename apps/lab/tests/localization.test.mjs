@@ -138,9 +138,9 @@ test("Portuguese labels are localized while classification keys remain stable", 
   const pt = textFor("pt-BR");
   assert.equal(pt.status.active, "ativo");
   assert.equal(pt.fidelityLabel["runs here"], "executa aqui");
-  // Sweep's category values are not translated; the gloss is only a reading aid.
-  assert.equal(classifierCopy["pt-BR"].categoryGloss.Other, "outros");
-  assert.equal(classifierCopy.en.categoryGloss.Other, null);
+  // Category names are translated for display; Sweep's folder names are not.
+  assert.equal(classifierCopy["pt-BR"].categoryLabel.Other, "Outros");
+  assert.equal(classifierCopy.en.categoryLabel.Other, "Other");
 });
 
 test("no Portuguese page renders a raw status or fidelity key", () => {
@@ -203,6 +203,37 @@ test("the already-published Portuguese experiment 001 keeps its original public 
   );
   const pt = textFor("pt-BR");
   assert.equal(pt.headings.whatRuns, "O que funciona aqui");
+  assert.equal(
+    pt.notebookIntro,
+    "Registros dos experimentos e de seus limites.",
+  );
+  assert.equal(pt.search.title, "busca");
+  assert.deepEqual(classifierCopy["pt-BR"].headers, [
+    "arquivo",
+    "extensão",
+    "categoria",
+    "destino",
+  ]);
+  assert.equal(classifierCopy["pt-BR"].why, 'Por que .hidden é "Outros"');
+  assert.deepEqual(
+    relatedRows["filename-classifier"]["pt-BR"].map((row) => [
+      row.label,
+      row.value,
+      row.href,
+    ]),
+    [
+      [
+        "Sweep · classificação",
+        "docs ↗",
+        "https://docs.raioviajante.com/pt/projetos/sweep/#classificação",
+      ],
+      [
+        "código-fonte do Sweep",
+        "github ↗",
+        "https://github.com/RaioViajante/sweep",
+      ],
+    ],
+  );
   assert.equal(pt.published(false), "registrado");
   assert.equal(pt.tagline, "experimentos podem falhar.");
   assert.deepEqual(

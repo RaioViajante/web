@@ -66,7 +66,9 @@ export function ExperimentRelated({
           const labelLang = row.labelLanguage
             ? foreignLang(e.locale, row.labelLanguage)
             : undefined;
-          const destination = foreignLang(e.locale, row.language);
+          const destination = row.language
+            ? foreignLang(e.locale, row.language)
+            : undefined;
           return (
             <LeaderRow
               key={row.href}
@@ -79,7 +81,7 @@ export function ExperimentRelated({
                   ) : (
                     row.label
                   )}
-                  {destination
+                  {destination && row.language
                     ? ` — ${text.inLanguage(text.languageNames[row.language])}`
                     : null}
                 </>

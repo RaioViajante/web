@@ -19,36 +19,37 @@ export function emptyCounts(): Record<ClassifierCategory, number> {
 }
 
 /**
- * The bench's live summary: the localized, count-aware sentence, then each real
- * category value (Sweep's own, in `categoryLang` when that differs from the
- * page) with its count. The browser script and the static markup both render
- * this one result.
+ * The bench's live summary: the localized, count-aware sentence, then each
+ * category's display name with its count. The browser script and the static
+ * markup both render this one result.
  */
 export function summaryParts(
   intlLocale: string,
   total: number,
   counts: Record<ClassifierCategory, number>,
   forms: PluralForms,
-  categoryLang?: string,
+  labels: Record<ClassifierCategory, string>,
 ): TextPart[] {
   const parts: TextPart[] = [{ text: countedFor(intlLocale, total, forms) }];
   for (const category of classifierCategories)
-    parts.push(
-      { text: " · " },
-      { text: category, lang: categoryLang },
-      { text: ` ${counts[category]}` },
-    );
+    parts.push({ text: ` · ${labels[category]} ${counts[category]}` });
   return parts;
 }
 
-/** A category cell: the real value, then an optional descriptive gloss. */
-export function categoryParts(
+/**
+ * A destination preview. The category folder is Sweep's real directory name
+ * (`Images`, `Documents`, ...), an identifier, so it keeps its own language
+ * (`folderLang`) wherever the page's language differs.
+ */
+export function destinationParts(
+  directory: string,
   category: ClassifierCategory,
-  gloss: string | null,
-  categoryLang?: string,
+  filename: string,
+  folderLang?: string,
 ): TextPart[] {
   return [
-    { text: category, lang: categoryLang },
-    ...(gloss ? [{ text: ` (${gloss})` }] : []),
+    { text: `${directory}/` },
+    { text: category, lang: folderLang },
+    { text: `/${filename}` },
   ];
 }

@@ -11,7 +11,7 @@ const { locale } = Astro.props;
 <script>
   import { classifyFilename } from "../../lib/filename-classifier";
   import {
-    categoryParts,
+    destinationParts,
     emptyCounts,
     summaryParts,
     type TextPart,
@@ -24,8 +24,8 @@ const { locale } = Astro.props;
   const text = JSON.parse(container.dataset.copy!) as {
     intlLocale: string;
     none: string;
-    categoryGloss: Record<ClassifierCategory, string | null>;
-    categoryLang: string | null;
+    categoryLabel: Record<ClassifierCategory, string>;
+    folderLang: string | null;
     summary: PluralForms;
   };
   const names = container.querySelector<HTMLTextAreaElement>("#filenames")!;
@@ -57,12 +57,13 @@ const { locale } = Astro.props;
         [
           [{ text: row.filename }],
           [{ text: row.suffix || text.none }],
-          categoryParts(
+          [{ text: text.categoryLabel[category] }],
+          destinationParts(
+            dir,
             category,
-            text.categoryGloss[category],
-            text.categoryLang ?? undefined,
+            row.filename,
+            text.folderLang ?? undefined,
           ),
-          [{ text: `${dir}/${row.category}/${row.filename}` }],
         ].forEach((parts, index) => {
           const cell = document.createElement(index === 0 ? "th" : "td");
           if (index === 0) cell.setAttribute("scope", "row");
@@ -80,7 +81,7 @@ const { locale } = Astro.props;
           results.length,
           counts,
           text.summary,
-          text.categoryLang ?? undefined,
+          text.categoryLabel,
         ),
       ),
     );

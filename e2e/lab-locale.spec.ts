@@ -65,27 +65,33 @@ test("Portuguese classifier translates live output, preserves actual destination
   await page.goto(`${base("lab")}/pt/experiments/classificador-de-arquivos/`);
   await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
   await expect(page.locator("main")).toContainText("executa aqui");
-  await expect(page.locator("[data-summary]")).toContainText("Images 1");
+  await expect(page.locator("[data-summary]")).toContainText("Imagens 1");
   await page.locator("#filenames").fill("photo.png\nREADME");
   await page.locator("[data-classify]").focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("[data-summary]")).toHaveText(
-    "2 arquivos classificados · Images 1 · Documents 0 · Archives 0 · Other 1",
+    "2 arquivos classificados · Imagens 1 · Documentos 0 · Arquivos compactados 0 · Outros 1",
   );
   await expect(
     page.locator("tbody tr").first().locator("td").nth(1),
-  ).toHaveText("Images (imagens)");
+  ).toHaveText("Imagens");
   await page.locator("#filenames").fill("");
   await expect(page.locator("[data-summary]")).toHaveText(
-    "nenhum arquivo classificado · Images 0 · Documents 0 · Archives 0 · Other 0",
+    "nenhum arquivo classificado · Imagens 0 · Documentos 0 · Arquivos compactados 0 · Outros 0",
   );
   await page.locator("#filenames").fill("photo.png");
   await expect(page.locator("[data-summary]")).toHaveText(
-    "1 arquivo classificado · Images 1 · Documents 0 · Archives 0 · Other 0",
+    "1 arquivo classificado · Imagens 1 · Documentos 0 · Arquivos compactados 0 · Outros 0",
   );
   await expect(page.locator("tbody")).toContainText(
     "~/Downloads/Images/photo.png",
   );
+  await expect(page.locator("tbody tr td").last().locator("[lang]")).toHaveText(
+    "Images",
+  );
+  await expect(
+    page.locator("tbody tr td").last().locator("[lang]"),
+  ).toHaveAttribute("lang", "en");
   await expect(
     page.locator('link[rel="alternate"][hreflang="en"]'),
   ).toHaveAttribute(

@@ -43,6 +43,9 @@ test("every catalog declares every locale with exactly the same keys", () => {
   for (const table of [fidelityRows, relatedRows])
     for (const [surface, byLocale] of Object.entries(table)) {
       assert.deepEqual(Object.keys(byLocale).sort(), [...LOCALE_IDS].sort());
+      // The published Portuguese 001 keeps the two Related rows it has always
+      // had (the English page lists the two Dump posts as well).
+      if (table === relatedRows && surface === "filename-classifier") continue;
       assert.equal(
         byLocale.en.length,
         byLocale["pt-BR"].length,
@@ -129,6 +132,7 @@ test("boot sections share one source and keep their technical tokens exact", () 
 
 test("related rows point to the same destinations in both locales, except the localized docs page", () => {
   for (const [surface, byLocale] of Object.entries(relatedRows)) {
+    if (surface === "filename-classifier") continue; // pinned in localization.test.mjs
     const hosts = (rows) => rows.map((row) => new URL(row.href).hostname);
     assert.deepEqual(hosts(byLocale["pt-BR"]), hosts(byLocale.en), surface);
     byLocale.en.forEach((row, index) => {

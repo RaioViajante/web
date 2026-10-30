@@ -148,11 +148,32 @@ export function ExecutionBench({ locale }: { locale: LocaleId }) {
           </thead>
           <tbody>
             {operations.map((operation) => {
+              const id = (name: string) =>
+                identifierLang ? (
+                  <span lang={identifierLang}>{name}</span>
+                ) : (
+                  name
+                );
               const rule = {
-                start: ["QUEUED", "RUNNING", "startedAt"],
-                succeed: ["RUNNING", "SUCCEEDED", "finishedAt, exitCode"],
-                fail: ["RUNNING", "FAILED", text.rules.failSets],
-                cancel: ["QUEUED · RUNNING", "CANCELLED", "finishedAt"],
+                start: ["QUEUED", "RUNNING", id("startedAt")],
+                succeed: [
+                  "RUNNING",
+                  "SUCCEEDED",
+                  <>
+                    {id("finishedAt")}, {id("exitCode")}
+                  </>,
+                ],
+                fail: [
+                  "RUNNING",
+                  "FAILED",
+                  <>
+                    {id("finishedAt")}, {id("exitCode")},{" "}
+                    {text.rules.failSets.before}
+                    {id("errorMessage")}
+                    {text.rules.failSets.after}
+                  </>,
+                ],
+                cancel: ["QUEUED · RUNNING", "CANCELLED", id("finishedAt")],
               }[operation];
               const label = text.operations[operation];
               return (
