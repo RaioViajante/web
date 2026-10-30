@@ -10,9 +10,10 @@ const path = routes.terms[locale]!;
 
 export const metadata = staticMetadata(path);
 
-// Portuguese rendering of app/terms/page.tsx: same sections, same facts. It
-// adds and removes no clause and is not a new revision; the English text stays
-// authoritative.
+// Portuguese translation of app/terms/page.tsx: same sections, same facts. It
+// adds and removes no clause and is not a new revision. It has not had a legal
+// review, and which text controls is an open question for the owner
+// (apps/dump/docs/i18n.md, "Legal pages").
 export default function TermsPt() {
   return (
     <DumpShell current={path} locale={locale}>

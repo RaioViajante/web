@@ -9,9 +9,10 @@ const path = routes.privacy[locale]!;
 
 export const metadata = staticMetadata(path);
 
-// Portuguese rendering of app/privacy/page.tsx: same sections, same facts. It
-// adds and removes no practice or clause and is not a new revision; the
-// English text stays authoritative.
+// Portuguese translation of app/privacy/page.tsx: same sections, same facts. It
+// adds and removes no practice or clause and is not a new revision. It has not
+// had a legal review, and which text controls is an open question for the
+// owner (apps/dump/docs/i18n.md, "Legal pages").
 export default function PrivacyPt() {
   return (
     <DumpShell current={path} locale={locale}>
@@ -51,9 +52,9 @@ export default function PrivacyPt() {
             title: "A caminho da página",
             body: (
               <p>
-                Como qualquer site, a hospedagem (Vercel) recebe dados padrão da
-                requisição — endereço IP, navegador e a página solicitada — para
-                entregá-la.
+                Como qualquer site, o provedor de hospedagem (Vercel) recebe
+                dados padrão da requisição — endereço IP, navegador e a página
+                solicitada — para entregá-la.
               </p>
             ),
           },

@@ -89,7 +89,7 @@ describe("Portuguese legal pages", () => {
     }
   });
 
-  it("states the entity and contact unchanged and keeps English authoritative text out of the page", () => {
+  it("states the entity and contact unchanged and keeps the English source headings out of the page", () => {
     render(<TermsPt />);
     expect(
       screen.getByRole("heading", { level: 1, name: "Termos de Uso" }),

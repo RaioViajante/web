@@ -73,6 +73,7 @@ post frontmatter. Reading times use a 220 words per minute estimate, excluding
 fenced code. Related posts are selected by shared tags, not hand-authored
 links. The Terms and Privacy pages use the shared legal template; sentences that
 needed an unconfirmed fact (a license, a retention period, a date) are left out
-rather than shown as placeholders. `/pt/terms` and `/pt/privacy` are faithful
-Portuguese renderings of the English pages: same sections, same facts, no added
-or removed clause, not a new revision. The English text stays authoritative.
+rather than shown as placeholders. `/pt/terms` and `/pt/privacy` are
+translations of the English pages: same sections, same facts, no added or
+removed clause, not a new revision. They need an owner and legal review before
+they are published (see `i18n.md`, "Legal pages").
