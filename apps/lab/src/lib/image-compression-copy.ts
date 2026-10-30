@@ -142,7 +142,7 @@ export const imageCompressionCopy = {
       file: "File size",
       dimensions: "Dimensions",
       saved: "Compared with the original",
-      factor: "Pixels per encoded byte",
+      factor: "Uncompressed size per encoded byte",
       raw: "Uncompressed pixels",
     },
     measured: "measured",
@@ -170,7 +170,7 @@ export const imageCompressionCopy = {
     sweepCaption:
       "Measured file size at each quality with the current format and size",
     sweepNote:
-      "Each row is a real encode in this browser. The curve is steep at the top: the last quality points cost the most bytes.",
+      "Each row is a real encode in this browser. On photos the curve is steep at the top: the last quality points cost the most bytes.",
     sweepLossless: "PNG has no quality to sweep. Choose JPEG or WebP.",
     messages: {
       ready:
@@ -215,7 +215,7 @@ export const imageCompressionCopy = {
       },
       {
         term: "resizing",
-        text: "Fewer pixels shrink the file whatever the format, and the loss is blurriness, not blocks. Resize only and quality are two different dials; compare the “small preview” and “resize only” presets.",
+        text: "Fewer pixels usually shrink the file whatever the format, and the loss is blurriness, not blocks. Resize only and quality are two different dials; compare the “small preview” and “resize only” presets.",
       },
       {
         term: "artifacts",
@@ -231,7 +231,8 @@ export const imageCompressionCopy = {
       "This is a teaching experiment, not a compression tool. It does not try to hit a size and does not produce a download.",
       "It uses your browser’s own encoders (canvas). Mochifile’s engine uses its own codecs so results match across browsers; the numbers here will not match it.",
       "WebP encoding is missing in some browsers; the page detects it and says so instead of showing a PNG as WebP. AVIF and GIF are readable but not offered as outputs.",
-      "Images are decoded in memory, so very large ones are refused. Metadata such as EXIF is dropped by re-encoding.",
+      "The pixel size is read from the file header and anything over 36 megapixels (or whose header cannot be read) is refused before decoding. AVIF is not accepted because its size cannot be checked that way. Animated GIFs use their first frame. EXIF orientation is applied; other metadata and color profiles are not kept.",
+      "Some browsers (notably Safari) limit canvas size, so a very large image may fail to encode at full size, and browsers that protect against fingerprinting add noise to canvas readback, which would show up in the difference view. Zoom magnifies the centre only.",
       "Everything stays in this tab: no upload, no storage, no download. Previews are drawn on canvases and the decoded image is released when you pick another one or leave the page.",
     ],
     noscript:
@@ -289,7 +290,7 @@ export const imageCompressionCopy = {
       file: "Tamanho do arquivo",
       dimensions: "Dimensões",
       saved: "Em relação ao original",
-      factor: "Pixels por byte codificado",
+      factor: "Tamanho sem compressão por byte codificado",
       raw: "Pixels sem compressão",
     },
     measured: "medido",
@@ -321,7 +322,7 @@ export const imageCompressionCopy = {
     sweepCaption:
       "Tamanho de arquivo medido em cada qualidade, com o formato e o tamanho atuais",
     sweepNote:
-      "Cada linha é uma codificação real neste navegador. A curva é íngreme no topo: os últimos pontos de qualidade custam mais bytes.",
+      "Cada linha é uma codificação real neste navegador. Em fotos a curva é íngreme no topo: os últimos pontos de qualidade custam mais bytes.",
     sweepLossless: "O PNG não tem qualidade para varrer. Escolha JPEG ou WebP.",
     messages: {
       ready:
@@ -366,7 +367,7 @@ export const imageCompressionCopy = {
       },
       {
         term: "redimensionar",
-        text: "Menos pixels diminuem o arquivo em qualquer formato, e a perda é desfoque, não blocos. Só redimensionar e qualidade são dois ajustes diferentes; compare as predefinições “prévia pequena” e “só redimensionar”.",
+        text: "Menos pixels em geral diminuem o arquivo em qualquer formato, e a perda é desfoque, não blocos. Só redimensionar e qualidade são dois ajustes diferentes; compare as predefinições “prévia pequena” e “só redimensionar”.",
       },
       {
         term: "artefatos",
@@ -382,7 +383,8 @@ export const imageCompressionCopy = {
       "Este é um experimento didático, não uma ferramenta de compressão. Ele não tenta atingir um tamanho e não gera download.",
       "Usa os codificadores do próprio navegador (canvas). O motor do Mochifile usa codecs próprios para que os resultados sejam iguais entre navegadores; os números daqui não vão coincidir com os dele.",
       "A codificação em WebP falta em alguns navegadores; a página detecta isso e avisa em vez de mostrar um PNG como se fosse WebP. AVIF e GIF podem ser lidos, mas não são oferecidos como saída.",
-      "As imagens são decodificadas na memória, então as muito grandes são recusadas. Metadados como EXIF se perdem na recodificação.",
+      "O tamanho em pixels é lido do cabeçalho do arquivo, e o que passa de 36 megapixels (ou tem cabeçalho ilegível) é recusado antes de decodificar. O AVIF não é aceito porque o tamanho dele não pode ser verificado assim. GIFs animados usam o primeiro quadro. A orientação EXIF é aplicada; os outros metadados e os perfis de cor não são mantidos.",
+      "Alguns navegadores (principalmente o Safari) limitam o tamanho do canvas, então uma imagem muito grande pode falhar ao codificar no tamanho total, e navegadores que protegem contra rastreamento acrescentam ruído à leitura do canvas, o que apareceria na visão de diferença. O zoom amplia apenas o centro.",
       "Tudo fica nesta aba: sem envio, sem armazenamento, sem download. As prévias são desenhadas em canvas, e a imagem decodificada é liberada quando você escolhe outra ou sai da página.",
     ],
     noscript:

@@ -4,7 +4,7 @@ import type {
   Encoder,
   OutputFormat,
 } from "./image-compression.ts";
-import { mimeOf } from "./image-compression.ts";
+import { HEAD_BYTES, mimeOf, readDimensions } from "./image-compression.ts";
 
 // The browser side of the `Encoder` the session drives: decoding with
 // `createImageBitmap` and encoding with a canvas. This module is imported by the
@@ -64,6 +64,11 @@ export interface BitmapDecoded extends Decoded {
 }
 
 export const browserEncoder: Encoder = {
+  async probe(file: Blob): Promise<Dimensions | null> {
+    return readDimensions(
+      new Uint8Array(await file.slice(0, HEAD_BYTES).arrayBuffer()),
+    );
+  },
   async decode(file: Blob): Promise<BitmapDecoded> {
     const bitmap = await createImageBitmap(file, {
       imageOrientation: "from-image",
@@ -101,10 +106,15 @@ export function drawOn(
   target: HTMLCanvasElement,
   bitmap: ImageBitmap,
   size: Dimensions,
+  onWhite = false,
 ): void {
   target.width = size.width;
   target.height = size.height;
   const context = target.getContext("2d")!;
+  if (onWhite) {
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, size.width, size.height);
+  }
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
   context.drawImage(bitmap, 0, 0, size.width, size.height);

@@ -171,13 +171,19 @@ const text = imageCompressionCopy[locale];
     /** Draws both pictures at one preview size, so what is compared is on the same pixel grid. */
     async function drawPreviews() {
       const decoded = session.decoded as BitmapDecoded | null;
-      if (!decoded || !last) return;
+      const mine = last;
+      if (!decoded || !mine) return;
       // Bounded: a 36-megapixel image is shown at 2000 px on its long side.
-      const size = fitWithin(last.measurement.output, 2000);
-      drawOn(original, decoded.bitmap, size);
-      const bitmap = await createImageBitmap(last.blob).catch(() => null);
-      if (!bitmap || !last) return;
-      drawOn(result, bitmap, size);
+      const size = fitWithin(mine.measurement.output, 2000);
+      const bitmap = await createImageBitmap(mine.blob).catch(() => null);
+      // A newer encoding or image may have arrived while this one decoded.
+      if (!bitmap || last !== mine || session.decoded !== decoded) {
+        bitmap?.close();
+        return;
+      }
+      // JPEG output sits on white, so the original is shown on white too.
+      drawOn(original, decoded.bitmap, size, formatSelect.value === "jpeg");
+      drawOn(result, bitmap, size, false);
       bitmap.close();
       await updateDifference();
     }
@@ -197,7 +203,7 @@ const text = imageCompressionCopy[locale];
       diffCanvas.hidden = false;
     }
 
-    async function encode() {
+    async function encode(announce = true) {
       if (!session.hasImage) {
         say(text.messages.noImage);
         return;
@@ -208,9 +214,9 @@ const text = imageCompressionCopy[locale];
         if (outcome.reason === "failed") say(text.messages.encodeFailed);
         return;
       }
-      last = outcome;
-      renderMeasurement(outcome.measurement);
       if (outcome.support === "fallback") {
+        // The browser answered with a different format: show no numbers for it.
+        last = null;
         say(
           fill(text.messages.unsupported, {
             format: text.formatNames[spec.format].split(" ")[0]!,
@@ -218,30 +224,35 @@ const text = imageCompressionCopy[locale];
         );
         return;
       }
+      last = outcome;
+      renderMeasurement(outcome.measurement);
       const m = outcome.measurement;
-      say(
-        m.saved >= 0
-          ? fill(text.messages.smaller, {
-              size: bytes(m.outputBytes),
-              saved: fill(text.savedValue, { value: percentOf(m.saved) }),
-            })
-          : fill(text.messages.larger, {
-              size: bytes(m.outputBytes),
-              larger: fill(text.largerValue, { value: percentOf(-m.saved) }),
-            }),
-      );
+      if (announce)
+        say(
+          m.saved >= 0
+            ? fill(text.messages.smaller, {
+                size: bytes(m.outputBytes),
+                saved: fill(text.savedValue, { value: percentOf(m.saved) }),
+              })
+            : fill(text.messages.larger, {
+                size: bytes(m.outputBytes),
+                larger: fill(text.largerValue, { value: percentOf(-m.saved) }),
+              }),
+        );
       void drawPreviews();
     }
 
-    function scheduleEncode() {
+    function scheduleEncode(announce = true) {
       window.clearTimeout(debounce);
-      debounce = window.setTimeout(() => void encode(), 150);
+      debounce = window.setTimeout(() => void encode(announce), 150);
     }
 
     async function afterLoad(
       loaded: LoadResult,
       describe: (l: Extract<LoadResult, { ok: true }>) => string,
     ) {
+      // A newer choice already took over; saying anything here would be noise.
+      if (!loaded.ok && loaded.reason === "stale") return;
       if (!loaded.ok) {
         say(text.messages.problems[loaded.reason]);
         playSound("reject");
@@ -262,6 +273,7 @@ const text = imageCompressionCopy[locale];
       if (!file) return;
       say(text.messages.loading);
       const loaded = await session.load(file);
+      fileInput.value = ""; // choosing the same file again must fire `change`
       await afterLoad(loaded, (l) =>
         fill(text.messages.loaded, {
           name: file.name,
@@ -299,7 +311,11 @@ const text = imageCompressionCopy[locale];
         say(text.messages.encodeFailed);
         return;
       }
-      const bitmap = await createImageBitmap(blob);
+      const bitmap = await createImageBitmap(blob).catch(() => null);
+      if (!bitmap) {
+        say(text.messages.encodeFailed);
+        return;
+      }
       const decoded: BitmapDecoded = {
         bitmap,
         width,
@@ -347,7 +363,12 @@ const text = imageCompressionCopy[locale];
           .querySelectorAll("[data-preset]")
           .forEach((button) => button.setAttribute("aria-pressed", "false"));
         renderSettings();
-        if (session.hasImage) scheduleEncode();
+        // While a slider moves the numbers update silently; release announces once.
+        if (session.hasImage) scheduleEncode(false);
+      });
+    for (const control of [formatSelect, quality, scale])
+      control.addEventListener("change", () => {
+        if (session.hasImage) scheduleEncode(true);
       });
 
     split.addEventListener("input", setSplit);
@@ -382,7 +403,10 @@ const text = imageCompressionCopy[locale];
         return;
       }
       say(text.messages.sweepBusy);
-      const rows = await session.sweep(format, percent);
+      sweepButton.disabled = true;
+      const rows = await session.sweep(format, percent).finally(() => {
+        sweepButton.disabled = false;
+      });
       if (!rows) {
         say(text.messages.sweepSkipped);
         return;

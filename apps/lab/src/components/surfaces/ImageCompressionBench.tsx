@@ -82,30 +82,40 @@ export function ImageCompressionBench({ locale }: { locale: LocaleId }) {
                 ))}
               </select>
             </label>
-            <label>
-              <span className="rv-label">{text.qualityLabel}</span>
-              <input
-                type="range"
-                data-quality
-                min={1}
-                max={100}
-                step={1}
-                defaultValue={80}
+            <div>
+              <label>
+                <span className="rv-label">{text.qualityLabel}</span>
+                <input
+                  type="range"
+                  data-quality
+                  aria-describedby="ic-quality-value"
+                  min={1}
+                  max={100}
+                  step={1}
+                  defaultValue={80}
+                />
+              </label>
+              <span
+                className="ic-value"
+                id="ic-quality-value"
+                data-quality-text
               />
-              <span className="ic-value" data-quality-text />
-            </label>
-            <label>
-              <span className="rv-label">{text.scaleLabel}</span>
-              <input
-                type="range"
-                data-scale
-                min={10}
-                max={100}
-                step={5}
-                defaultValue={100}
-              />
-              <span className="ic-value" data-scale-text />
-            </label>
+            </div>
+            <div>
+              <label>
+                <span className="rv-label">{text.scaleLabel}</span>
+                <input
+                  type="range"
+                  data-scale
+                  aria-describedby="ic-scale-value"
+                  min={10}
+                  max={100}
+                  step={5}
+                  defaultValue={100}
+                />
+              </label>
+              <span className="ic-value" id="ic-scale-value" data-scale-text />
+            </div>
           </div>
           <p className="bench-help" data-quality-note hidden>
             {text.qualityLossless}

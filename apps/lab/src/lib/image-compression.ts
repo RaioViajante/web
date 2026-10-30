@@ -26,7 +26,6 @@ export const acceptedTypes: readonly string[] = [
   "image/png",
   "image/webp",
   "image/gif",
-  "image/avif",
   "image/bmp",
 ];
 
@@ -255,7 +254,98 @@ export interface Decoded extends Dimensions {
   close(): void;
 }
 
+/** Bytes of the file's start that `readDimensions` needs; a JPEG's frame header can follow a large EXIF block. */
+export const HEAD_BYTES = 262_144;
+
+const u16be = (b: Uint8Array, i: number) => (b[i]! << 8) | b[i + 1]!;
+const u16le = (b: Uint8Array, i: number) => b[i]! | (b[i + 1]! << 8);
+const u24le = (b: Uint8Array, i: number) =>
+  b[i]! | (b[i + 1]! << 8) | (b[i + 2]! << 16);
+const u32be = (b: Uint8Array, i: number) =>
+  ((b[i]! << 24) | (b[i + 1]! << 16) | (b[i + 2]! << 8) | b[i + 3]!) >>> 0;
+const u32le = (b: Uint8Array, i: number) =>
+  (b[i]! | (b[i + 1]! << 8) | (b[i + 2]! << 16) | (b[i + 3]! << 24)) >>> 0;
+const ascii = (b: Uint8Array, i: number, n: number) =>
+  String.fromCharCode(...b.slice(i, i + n));
+
+/**
+ * Reads the pixel size from a file's first bytes, without decoding it, so an
+ * image that declares a huge size is refused before the browser allocates it.
+ * Understands PNG, GIF, BMP, JPEG and WebP; returns `null` for anything else
+ * or for a truncated header, which callers treat as a refusal.
+ */
+export function readDimensions(b: Uint8Array): Dimensions | null {
+  const done = (width: number, height: number) =>
+    width > 0 && height > 0 ? { width, height } : null;
+  if (
+    b.length >= 24 &&
+    b[0] === 0x89 &&
+    ascii(b, 1, 3) === "PNG" &&
+    ascii(b, 12, 4) === "IHDR"
+  )
+    return done(u32be(b, 16), u32be(b, 20));
+  if (
+    b.length >= 10 &&
+    (ascii(b, 0, 6) === "GIF87a" || ascii(b, 0, 6) === "GIF89a")
+  )
+    return done(u16le(b, 6), u16le(b, 8));
+  if (b.length >= 26 && ascii(b, 0, 2) === "BM") {
+    const header = u32le(b, 14);
+    // OS/2 headers store 16-bit sizes; Windows ones 32-bit, with a negative height meaning top-down.
+    if (header === 12) return done(u16le(b, 18), u16le(b, 20));
+    return done(u32le(b, 18), Math.abs(u32le(b, 22) | 0));
+  }
+  if (b.length >= 4 && b[0] === 0xff && b[1] === 0xd8) {
+    let at = 2;
+    while (at + 9 < b.length) {
+      if (b[at] !== 0xff) {
+        at += 1;
+        continue;
+      }
+      const marker = b[at + 1]!;
+      if (marker === 0xff) {
+        at += 1;
+        continue;
+      }
+      // Start-of-frame markers (not DHT, JPG, DAC) carry the size.
+      if (
+        marker >= 0xc0 &&
+        marker <= 0xcf &&
+        marker !== 0xc4 &&
+        marker !== 0xc8 &&
+        marker !== 0xcc
+      )
+        return done(u16be(b, at + 7), u16be(b, at + 5));
+      if (
+        marker === 0xd8 ||
+        marker === 0x01 ||
+        (marker >= 0xd0 && marker <= 0xd7)
+      )
+        at += 2;
+      else at += 2 + u16be(b, at + 2);
+    }
+    return null;
+  }
+  if (
+    b.length >= 30 &&
+    ascii(b, 0, 4) === "RIFF" &&
+    ascii(b, 8, 4) === "WEBP"
+  ) {
+    const kind = ascii(b, 12, 4);
+    if (kind === "VP8X") return done(u24le(b, 24) + 1, u24le(b, 27) + 1);
+    if (kind === "VP8L" && b[20] === 0x2f) {
+      const bits = u32le(b, 21);
+      return done((bits & 0x3fff) + 1, ((bits >>> 14) & 0x3fff) + 1);
+    }
+    if (kind === "VP8 " && b[23] === 0x9d && b[24] === 0x01 && b[25] === 0x2a)
+      return done(u16le(b, 26) & 0x3fff, u16le(b, 28) & 0x3fff);
+  }
+  return null;
+}
+
 export interface Encoder {
+  /** The file's pixel size read from its header, or `null` when it cannot be read. Never decodes. */
+  probe(file: Blob): Promise<Dimensions | null>;
   /** Decodes a file; rejects when the browser cannot. */
   decode(file: Blob): Promise<Decoded>;
   /** Draws `source` at `size` and encodes it. */
@@ -306,7 +396,10 @@ export class CompressionSession {
   private readonly encoder: Encoder;
   private source: Decoded | null = null;
   private file: { size: number } | null = null;
-  private generation = 0;
+  /** Bumped by every load, adoption and dispose. */
+  private loadGeneration = 0;
+  /** Bumped by every encode, load, adoption and dispose. */
+  private encodeGeneration = 0;
 
   constructor(encoder: Encoder) {
     this.encoder = encoder;
@@ -328,14 +421,27 @@ export class CompressionSession {
       size: file.size,
     });
     if (problem) return { ok: false, reason: problem };
-    const generation = ++this.generation;
+    const generation = ++this.loadGeneration;
+    // The size comes from the header: a tiny file can declare a gigantic image,
+    // so the pixel limit must hold before the browser allocates anything.
+    let declared: Dimensions | null;
+    try {
+      declared = await this.encoder.probe(file);
+    } catch {
+      declared = null;
+    }
+    if (generation !== this.loadGeneration)
+      return { ok: false, reason: "stale" };
+    if (!declared) return { ok: false, reason: "decode-failed" };
+    if (declared.width * declared.height > LIMITS.maxPixels)
+      return { ok: false, reason: "too-many-pixels" };
     let decoded: Decoded;
     try {
       decoded = await this.encoder.decode(file);
     } catch {
       return { ok: false, reason: "decode-failed" };
     }
-    if (generation !== this.generation) {
+    if (generation !== this.loadGeneration) {
       decoded.close();
       return { ok: false, reason: "stale" };
     }
@@ -343,6 +449,7 @@ export class CompressionSession {
       decoded.close();
       return { ok: false, reason: "too-many-pixels" };
     }
+    this.encodeGeneration += 1;
     this.clear();
     this.source = decoded;
     this.file = { size: file.size };
@@ -355,7 +462,8 @@ export class CompressionSession {
 
   /** Loads a decoded picture that did not come from a file (the built-in sample). */
   adopt(decoded: Decoded, blob: Blob): LoadResult {
-    this.generation += 1;
+    this.loadGeneration += 1;
+    this.encodeGeneration += 1;
     this.clear();
     this.source = decoded;
     this.file = { size: blob.size };
@@ -370,10 +478,11 @@ export class CompressionSession {
     const source = this.source;
     const file = this.file;
     if (!source || !file) return { ok: false, reason: "no-image" };
-    const generation = ++this.generation;
-    const size = scaled(source, spec.scale);
+    const generation = ++this.encodeGeneration;
     let blob: Blob;
+    let size: Dimensions;
     try {
+      size = scaled(source, spec.scale);
       blob = await this.encoder.encode(
         source,
         size,
@@ -383,15 +492,20 @@ export class CompressionSession {
     } catch {
       return { ok: false, reason: "failed" };
     }
-    if (generation !== this.generation || this.source !== source)
+    if (generation !== this.encodeGeneration || this.source !== source)
       return { ok: false, reason: "stale" };
-    return {
-      ok: true,
-      measurement: measure(file.size, source, blob.size, size),
-      support: classifyEncoded(spec.format, blob.type),
-      blob,
-      type: blob.type,
-    };
+    try {
+      return {
+        ok: true,
+        measurement: measure(file.size, source, blob.size, size),
+        support: classifyEncoded(spec.format, blob.type),
+        blob,
+        type: blob.type,
+      };
+    } catch {
+      // An empty blob cannot be measured.
+      return { ok: false, reason: "failed" };
+    }
   }
 
   /** Sizes of the same picture at several qualities; stops early if the session moves on. */
@@ -401,7 +515,7 @@ export class CompressionSession {
   ): Promise<{ quality: number; bytes: number }[] | null> {
     const source = this.source;
     if (!source || !isLossy(format)) return null;
-    const generation = this.generation;
+    const generation = this.encodeGeneration;
     const size = scaled(source, scale);
     const rows: { quality: number; bytes: number }[] = [];
     for (const quality of sweepQualities) {
@@ -411,7 +525,8 @@ export class CompressionSession {
       } catch {
         return null;
       }
-      if (generation !== this.generation || this.source !== source) return null;
+      if (generation !== this.encodeGeneration || this.source !== source)
+        return null;
       if (classifyEncoded(format, blob.type) === "fallback") return null;
       rows.push({ quality, bytes: blob.size });
     }
@@ -426,7 +541,8 @@ export class CompressionSession {
 
   /** Frees the decoded image. Safe to call twice. */
   dispose(): void {
-    this.generation += 1;
+    this.loadGeneration += 1;
+    this.encodeGeneration += 1;
     this.clear();
   }
 }

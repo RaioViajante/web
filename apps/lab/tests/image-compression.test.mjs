@@ -18,6 +18,7 @@ import {
   measure,
   megapixels,
   presets,
+  readDimensions,
   qualityOption,
   rawBytes,
   samplePixels,
@@ -42,6 +43,7 @@ function fakeEncoder({
     closed,
     calls,
     pending,
+    probe: async () => ({ width, height }),
     decode: async () => {
       if (failDecode) throw new Error("cannot decode");
       return { width, height, close: () => closed.push(1) };
@@ -255,7 +257,11 @@ test("an image that cannot be decoded or has too many pixels is refused and free
   const huge = instant({ width: 7000, height: 6000 });
   const session = new CompressionSession(huge);
   assert.equal((await session.load(file())).reason, "too-many-pixels");
-  assert.equal(huge.closed.length, 1, "the oversized bitmap is released");
+  assert.equal(
+    huge.closed.length,
+    0,
+    "an oversized image is refused from its header and never decoded",
+  );
   assert.equal(session.hasImage, false);
   const edge = instant({ width: 6000, height: 6000 });
   assert.equal((await new CompressionSession(edge).load(file())).ok, true);
@@ -482,4 +488,156 @@ test("previews fit inside a limit without enlarging", () => {
     width: 750,
     height: 1000,
   });
+});
+
+// A minimal file header for each supported format.
+const bytes = (...parts) => Uint8Array.from(parts.flat());
+const be32 = (n) => [
+  (n >>> 24) & 255,
+  (n >>> 16) & 255,
+  (n >>> 8) & 255,
+  n & 255,
+];
+const le16 = (n) => [n & 255, (n >> 8) & 255];
+const le32 = (n) => [
+  n & 255,
+  (n >>> 8) & 255,
+  (n >>> 16) & 255,
+  (n >>> 24) & 255,
+];
+const text = (s) => [...s].map((c) => c.charCodeAt(0));
+
+test("dimensions are read from the file header, without decoding", () => {
+  const png = bytes(
+    [0x89],
+    text("PNG\r\n"),
+    [0x1a, 0x0a],
+    be32(13),
+    text("IHDR"),
+    be32(30000),
+    be32(20000),
+    new Array(8).fill(0),
+  );
+  assert.deepEqual(readDimensions(png), { width: 30000, height: 20000 });
+  assert.deepEqual(
+    readDimensions(bytes(text("GIF89a"), le16(640), le16(480), [0, 0, 0])),
+    { width: 640, height: 480 },
+  );
+  const bmp = bytes(
+    text("BM"),
+    new Array(12).fill(0),
+    le32(40),
+    le32(800),
+    le32(-600),
+    new Array(8).fill(0),
+  );
+  assert.deepEqual(readDimensions(bmp), { width: 800, height: 600 });
+  // JPEG: skip an APP0 segment, then read the SOF0 frame header (height first, then width).
+  const jpeg = bytes(
+    [0xff, 0xd8],
+    [0xff, 0xe0, 0, 6, 1, 2, 3, 4],
+    [0xff, 0xc0, 0, 11, 8],
+    [0x0b, 0xb8],
+    [0x0f, 0xa0],
+    [3, 0, 0, 0, 0, 0, 0, 0, 0],
+  );
+  assert.deepEqual(readDimensions(jpeg), { width: 4000, height: 3000 });
+  const vp8x = bytes(
+    text("RIFF"),
+    le32(30),
+    text("WEBPVP8X"),
+    le32(10),
+    [0, 0, 0, 0],
+    [0x0f, 0x27, 0],
+    [0xc7, 0x1d, 0],
+    new Array(4).fill(0),
+  );
+  assert.deepEqual(readDimensions(vp8x), { width: 10000, height: 7624 });
+  const vp8 = bytes(
+    text("RIFF"),
+    le32(30),
+    text("WEBPVP8 "),
+    le32(10),
+    [0, 0, 0],
+    [0x9d, 0x01, 0x2a],
+    le16(1024),
+    le16(768),
+    new Array(4).fill(0),
+  );
+  assert.deepEqual(readDimensions(vp8), { width: 1024, height: 768 });
+});
+
+test("headers that cannot be read give no size", () => {
+  assert.equal(readDimensions(new Uint8Array(0)), null);
+  assert.equal(
+    readDimensions(bytes(text("not an image at all, just text........."))),
+    null,
+  );
+  assert.equal(
+    readDimensions(bytes([0xff, 0xd8], [0xff, 0xe0, 0, 4, 0, 0])),
+    null,
+    "a JPEG with no frame header",
+  );
+  assert.equal(
+    readDimensions(bytes([0x89], text("PNG"), new Array(10).fill(0))),
+    null,
+    "a truncated PNG",
+  );
+  assert.equal(
+    readDimensions(bytes(text("<svg xmlns='http://www.w3.org/2000/svg'/>"))),
+    null,
+  );
+});
+
+test("a file that declares a huge size is refused before anything is decoded", async () => {
+  const encoder = instant({ width: 30000, height: 20000 });
+  let decodes = 0;
+  const decode = encoder.decode;
+  encoder.decode = async (f) => {
+    decodes += 1;
+    return decode(f);
+  };
+  const session = new CompressionSession(encoder);
+  assert.equal(
+    (await session.load(file({ size: 4000 }))).reason,
+    "too-many-pixels",
+  );
+  assert.equal(decodes, 0, "the decoder never saw it");
+  encoder.probe = async () => null;
+  assert.equal(
+    (await session.load(file())).reason,
+    "decode-failed",
+    "an unreadable header is refused too",
+  );
+  assert.equal(decodes, 0);
+});
+
+test("moving a slider while a file is still loading does not discard the file", async () => {
+  const encoder = instant({ width: 100, height: 80 });
+  const session = new CompressionSession(encoder);
+  await session.load(file());
+  let release;
+  const slow = new Promise((resolve) => (release = resolve));
+  const decode = encoder.decode;
+  encoder.decode = async (f) => {
+    await slow;
+    return decode(f);
+  };
+  const loading = session.load(file({ name: "big.jpg" }));
+  await session.encode({ format: "jpeg", quality: 50, scale: 100 });
+  release();
+  assert.equal(
+    (await loading).ok,
+    true,
+    "an encode in between does not stale a load",
+  );
+  // A second load, in contrast, does take over.
+  encoder.decode = async (f) => {
+    await new Promise((r) => setTimeout(r, 5));
+    return decode(f);
+  };
+  const first = session.load(file({ name: "a.jpg" }));
+  const second = session.load(file({ name: "b.jpg" }));
+  assert.equal((await first).reason, "stale");
+  assert.equal((await second).ok, true);
 });

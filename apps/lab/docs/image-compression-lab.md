@@ -41,7 +41,7 @@ drawn on white because JPEG has no alpha. Resizing uses the canvas' high-quality
 smoothing at a percentage of the original width and height.
 
 Labeled **measured**: file sizes and the saved fraction. Labeled **theoretical**:
-the uncompressed RGBA size of the pixels and the pixels-per-byte factor. The
+the uncompressed RGBA size of the pixels and the factor of uncompressed bytes per encoded byte. The
 quality sweep is ten real encodes at 10..100 for the current format and size,
 abandoned if the image or settings change. The difference view compares both
 pictures at one preview size, amplified 8 times.
