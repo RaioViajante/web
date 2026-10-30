@@ -32,7 +32,7 @@ const text = textFor(experiment.locale);
   </Section>
   <Section number="03." title={text.headings.fidelity}>
     <Fidelity experiment={experiment} />
-    {text.showNotes && experiment.notes && <p>{experiment.notes}</p>}
+    {experiment.notes && <p>{experiment.notes}</p>}
   </Section>
   <Section number="04." title={text.headings.related}>
     <ExperimentRelated experiment={experiment} />

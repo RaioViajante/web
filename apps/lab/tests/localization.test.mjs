@@ -182,3 +182,65 @@ test("fixture: Portuguese-only work and withdrawn English original retain truthf
     /provenance/,
   );
 });
+
+test("the already-published Portuguese experiment 001 keeps its original public text", () => {
+  // These strings were live before the full localization (main at fe68b49).
+  // Changing one is an editorial decision for the owner, not a side effect.
+  const sweep = byId(portugueseExperiments, "001");
+  assert.equal(sweep.slug, "classificador-de-arquivos");
+  assert.equal(sweep.title, "classificador de arquivos");
+  assert.equal(
+    sweep.description,
+    "descubra como o Sweep classifica um nome de arquivo",
+  );
+  assert.equal(
+    sweep.what,
+    "Com apenas um nome de arquivo, qual categoria o Sweep escolhe e qual seria o destino? O Sweep classifica pela última extensão antes de decidir onde o arquivo pertence. Esta página reproduz essa pequena parte do comportamento no navegador; o Sweep não está em execução aqui.",
+  );
+  assert.equal(
+    sweep.notes,
+    "Baseado na revisão 3544d36 do Sweep. Apenas as extensões dos nomes são consideradas. Nenhum arquivo é enviado, inspecionado ou movido.",
+  );
+  const pt = textFor("pt-BR");
+  assert.equal(pt.headings.whatRuns, "O que funciona aqui");
+  assert.equal(pt.published(false), "registrado");
+  assert.equal(pt.tagline, "experimentos podem falhar.");
+  assert.deepEqual(
+    fidelityRows["filename-classifier"]["pt-BR"].map((row) => row.label),
+    [
+      "regras de classificação",
+      "comportamento da extensão",
+      "acesso ao sistema de arquivos",
+      "verificação de conflitos e tamanho",
+    ],
+  );
+});
+
+test("a notebook entry's participle agrees with its title's number", () => {
+  const pt = textFor("pt-BR");
+  for (const experiment of portugueseExperiments) {
+    const entry = `${experiment.title} ${pt.published(experiment.titlePlural === true)}`;
+    assert.equal(
+      entry.endsWith("registrados"),
+      experiment.title === "estados de execução",
+      entry,
+    );
+  }
+  assert.equal(textFor("en").published(true), "published");
+  // Only a plural title declares it, and only translations carry the flag.
+  assert.deepEqual(
+    experiments.filter((experiment) => experiment.titlePlural),
+    [],
+  );
+  assert.deepEqual(
+    portugueseExperiments
+      .filter((experiment) => experiment.titlePlural)
+      .map(({ id }) => id),
+    ["002"],
+  );
+});
+
+test("every experiment in every locale carries its notes, which both layouts render", () => {
+  for (const experiment of publishedExperiments)
+    assert.ok(experiment.notes, `${experiment.locale} ${experiment.id} notes`);
+});

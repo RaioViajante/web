@@ -101,7 +101,7 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
                 <span className="lab-date">
                   <time dateTime={e.created}>{displayDate(e)}</time>
                 </span>
-                {e.title} {text.published}
+                {e.title} {text.published(e.titlePlural === true)}
               </>
             }
             value={e.id}

@@ -47,8 +47,10 @@ method names: Portuguese buttons and messages use verbs ("iniciar",
 "concluir com sucesso", "falhar", "cancelar") and the transition table shows
 the identifier next to the verb.
 
-The English pages do not render an experiment's `notes`; the Portuguese pages
-always have (`showNotes` in the catalog keeps that difference explicit).
+Both languages render an experiment's `notes` (provenance: the pinned revision
+and the limits of the page) under Fidelity. The English pages did not between
+the shared-design migration and this localization, although the notes were
+always in the record; see [i18n.md](i18n.md).
 
 The classifier reproduces Python 3.14 POSIX suffix behavior, lowercases the suffix, and applies Sweep's category sets. It does not inspect files. Execution states reproduces the domain guards, including cancellation from queued/running, nonblank failure messages, and no success/failure restriction on integer exit-code values. Its timestamps are browser samples; no commands run or state persists. The boot page uses real assembly excerpts with comments omitted and attributes its result to the learning notes. It contains no generated machine bytes or emulator.
 

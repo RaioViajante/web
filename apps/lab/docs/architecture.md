@@ -48,8 +48,8 @@ catalogs: `Record<LocaleId, ...>` with `satisfies`, so a missing locale or key
 fails type checking and nothing falls back to English. Code that depends on the
 locale reads its strings from them (or from the registry); there are no
 `locale === ...` ternaries over user-facing text. Counts use
-`src/lib/plural.ts` (`pluralCategory`, exhaustive over the registry; zero takes
-the plural in both languages, so "0 arquivos classificados"), and dates use
+`src/lib/plural.ts` (CLDR categories from `Intl.PluralRules`, plus an explicit
+zero wording where CLDR would say "one"; see [i18n.md](i18n.md)), and dates use
 `src/lib/date.ts` (`Intl` with the registry locale, UTC, ISO in
 `<time datetime>`). Each bench renders its locale's strings into the page at
 build time (a `data-copy` attribute plus `data-locale`); the plain TypeScript

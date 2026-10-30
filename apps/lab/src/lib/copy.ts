@@ -39,17 +39,15 @@ export interface LabCopy {
     created: string;
     source: string;
   };
-  /** Notebook entry suffix: "boot sector published". */
-  published: string;
+  /**
+   * Notebook entry suffix: "boot sector published". Takes whether the title is
+   * a plural noun phrase so a participle can agree ("estados de execução
+   * registrados").
+   */
+  published: (titlePlural: boolean) => string;
   /** "All experiments", the pager's way back to the index. */
   all: string;
   notebookIntro: string;
-  /**
-   * Whether an experiment's `notes` paragraph renders under Fidelity. The
-   * Portuguese pages have always shown it and the English pages never have;
-   * the flag keeps that difference explicit instead of hidden in a branch.
-   */
-  showNotes: boolean;
   /** Qualifier of a link whose destination is in another language. */
   inLanguage: (language: string) => string;
   /** Language names as written in this catalog's language, by locale. */
@@ -105,11 +103,10 @@ export const copy = {
       created: "created",
       source: "source ↗",
     },
-    published: "published",
+    published: () => "published",
     all: "All experiments",
     notebookIntro:
       "Short dated entries: what changed, what broke, what got answered.",
-    showNotes: false,
     inLanguage: (language) => `in ${language}`,
     languageNames: { en: "English", "pt-BR": "Portuguese" },
     search: {
@@ -141,7 +138,7 @@ export const copy = {
     nav: { experiments: "experimentos", notebook: "caderno" },
     headings: {
       experiments: "Experimentos",
-      whatRuns: "O que executa aqui",
+      whatRuns: "O que funciona aqui",
       notebook: "Caderno",
       question: "Pergunta",
       bench: "Bancada",
@@ -172,11 +169,10 @@ export const copy = {
       created: "criado em",
       source: "código-fonte ↗",
     },
-    published: "publicado",
+    published: (titlePlural) => (titlePlural ? "registrados" : "registrado"),
     all: "Todos os experimentos",
     notebookIntro:
       "Registros curtos e datados: o que mudou, o que quebrou, o que foi respondido.",
-    showNotes: true,
     inLanguage: (language) => `em ${language}`,
     languageNames: { en: "inglês", "pt-BR": "português" },
     search: {

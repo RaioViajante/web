@@ -27,6 +27,11 @@ export interface Experiment {
   source?: string;
   what: string;
   notes?: string;
+  /**
+   * The title is a plural noun phrase ("estados de execução"), so words that
+   * agree with it in a sentence take the plural. Only a translation needs it.
+   */
+  titlePlural?: boolean;
   surface?: ExperimentSurface;
 }
 
@@ -124,6 +129,7 @@ export const portugueseExperiments: Experiment[] = [
     locale: "pt-BR",
     slug: "estados-de-execucao",
     title: "estados de execução",
+    titlePlural: true,
     description:
       "experimente as transições que o Orbit permite — e as que ele rejeita",
     what: "Quais operações cada estado aceita, e como é uma operação rejeitada? Uma representação interativa das regras atuais do domínio Execution do Orbit. As mudanças de estado acontecem neste exemplo no navegador: nenhum comando é executado e não há nenhum agendador por trás da página.",
@@ -135,7 +141,7 @@ export const portugueseExperiments: Experiment[] = [
     locale: "pt-BR",
     slug: "classificador-de-arquivos",
     title: "classificador de arquivos",
-    description: "veja onde o Sweep coloca um nome de arquivo",
+    description: "descubra como o Sweep classifica um nome de arquivo",
     what: "Com apenas um nome de arquivo, qual categoria o Sweep escolhe e qual seria o destino? O Sweep classifica pela última extensão antes de decidir onde o arquivo pertence. Esta página reproduz essa pequena parte do comportamento no navegador; o Sweep não está em execução aqui.",
     notes:
       "Baseado na revisão 3544d36 do Sweep. Apenas as extensões dos nomes são consideradas. Nenhum arquivo é enviado, inspecionado ou movido.",

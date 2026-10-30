@@ -75,6 +75,10 @@ test("Portuguese classifier translates live output, preserves actual destination
   await expect(
     page.locator("tbody tr").first().locator("td").nth(1),
   ).toHaveText("Images (imagens)");
+  await page.locator("#filenames").fill("");
+  await expect(page.locator("[data-summary]")).toHaveText(
+    "nenhum arquivo classificado · Images 0 · Documents 0 · Archives 0 · Other 0",
+  );
   await page.locator("#filenames").fill("photo.png");
   await expect(page.locator("[data-summary]")).toHaveText(
     "1 arquivo classificado · Images 1 · Documents 0 · Archives 0 · Other 0",
@@ -375,4 +379,45 @@ test("Portuguese Terms and Privacy are declared, linked from the footer without 
     expect(response.status()).toBe(200);
     expect(response.headers()["content-type"]).toContain("image/png");
   }
+});
+
+test("every experiment renders its notes under Fidelity in both languages", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  const pages = [
+    ["", "boot-sector", "Based on x86-os-experiment revision e966889."],
+    ["", "execution-states", "Based on Orbit revision cd97666."],
+    ["", "filename-classifier", "Based on Sweep revision 3544d36."],
+    [
+      "/pt",
+      "setor-de-boot",
+      "Baseado na revisão e966889 do x86-os-experiment.",
+    ],
+    ["/pt", "estados-de-execucao", "Baseado na revisão cd97666 do Orbit."],
+    [
+      "/pt",
+      "classificador-de-arquivos",
+      "Baseado na revisão 3544d36 do Sweep.",
+    ],
+  ] as const;
+  for (const [prefix, slug, notes] of pages) {
+    await page.goto(`${base("lab")}${prefix}/experiments/${slug}/`);
+    await expect(
+      page.locator("section", { hasText: /^03\./ }).locator("p"),
+    ).toContainText(notes);
+  }
+});
+
+test("the Portuguese notebook entries agree with their titles", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  await page.goto(`${base("lab")}/pt/`);
+  const entries = page.locator("section:has(#notebook) a");
+  await expect(entries.nth(0)).toContainText("setor de boot registrado");
+  await expect(entries.nth(1)).toContainText("estados de execução registrados");
+  await expect(entries.nth(2)).toContainText(
+    "classificador de arquivos registrado",
+  );
 });
