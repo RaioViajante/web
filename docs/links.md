@@ -22,7 +22,9 @@ Dump publishes rather than what production still serves. Without that, removing
 a post fails the crawl until the removal is deployed. Root honours only a
 loopback `http` origin (`feedSourceOrigin` in `apps/root/lib/writing.ts`);
 production never sets it and keeps reading the deployed feed. No link is
-exempted: a link to a missing page still fails.
+exempted: a link to a missing page still fails. A server already listening on
+a port is reused as it is, without this setting, so stop a locally running
+`next start` before trusting a crawl.
 
 ## Internal links
 
