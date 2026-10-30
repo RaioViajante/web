@@ -501,3 +501,34 @@ test("English post comments keep the lazy Giscus boundary", async ({
   await expect(page.getByRole("heading", { name: "Comments" })).toHaveCount(1);
   await expect(page.locator(".comments")).toHaveCount(1);
 });
+
+test("Dump marks English fragments in Portuguese posts and dates the notes it adds", async ({
+  page,
+}) => {
+  await page.goto(`${base("dump")}/pt/posts/nao-existe-printf-aqui-embaixo`);
+  await expectLang(page, "pt-BR");
+  await expect(page.locator("main [lang='en']")).toHaveText([
+    "Building an OS",
+    "end line",
+    "jump",
+  ]);
+
+  await page.goto(
+    `${base("dump")}/pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma`,
+  );
+  await expect(page.locator("main [lang='en']")).toHaveText([
+    "Compiler Foundation",
+    "Compiler Foundation",
+  ]);
+
+  // The rollout essay keeps its dated sentences in the past tense and states
+  // what is true now in a marked note, in both languages.
+  await page.goto(
+    `${base("dump")}/pt/posts/traduzir-o-site-sem-fingir-que-tudo-ja-existe`,
+  );
+  await expect(page.getByText("Atualização", { exact: true })).toHaveCount(3);
+  await page.goto(
+    `${base("dump")}/posts/translating-the-site-without-pretending-everything-already-exists`,
+  );
+  await expect(page.getByText("Update", { exact: true })).toHaveCount(3);
+});
