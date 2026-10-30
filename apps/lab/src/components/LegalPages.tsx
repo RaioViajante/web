@@ -71,7 +71,7 @@ const terms = {
     inShort: [
       { label: "leitura", value: "gratuita" },
       { label: "código", value: "licença de cada repositório" },
-      { label: "garantia", value: "nenhuma — experimentos podem falhar" },
+      { label: "garantia", value: "nenhuma — as coisas podem quebrar" },
     ],
     sections: [
       {
@@ -88,8 +88,8 @@ const terms = {
         title: "Código",
         body: (
           <p>
-            O código exibido aqui segue a licença do repositório de onde vem. As
-            revisões de origem são identificadas em cada experimento.
+            O código exibido aqui segue a licença do repositório de onde ele
+            vem. As revisões de origem são identificadas em cada experimento.
           </p>
         ),
       },

@@ -427,3 +427,18 @@ test("the Portuguese notebook entries agree with their titles", async ({
     "classificador de arquivos registrado",
   );
 });
+
+test("the Portuguese Terms keep the wording shared with the other apps", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  await page.goto(`${base("lab")}/pt/terms/`);
+  await expect(page.locator("main")).toContainText(
+    "nenhuma — as coisas podem quebrar",
+  );
+  await expect(page.locator("main")).toContainText(
+    "segue a licença do repositório de onde ele vem.",
+  );
+  await page.goto(`${base("lab")}/terms/`);
+  await expect(page.locator("main")).toContainText("none — things may break");
+});
