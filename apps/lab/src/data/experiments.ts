@@ -27,6 +27,11 @@ export interface Experiment {
   source?: string;
   what: string;
   notes?: string;
+  /**
+   * The title is a plural noun phrase ("estados de execução"), so words that
+   * agree with it in a sentence take the plural. Only a translation needs it.
+   */
+  titlePlural?: boolean;
   surface?: ExperimentSurface;
 }
 
@@ -96,10 +101,43 @@ export function getExperiment(slug: string): Experiment | undefined {
   return experiments.find((experiment) => experiment.slug === slug);
 }
 
-/** Published versions only. Stable facts are inherited from the English original. */
+/** The English original of a work, whose stable facts every translation inherits. */
+function original(id: string): Experiment {
+  const found = experiments.find((experiment) => experiment.id === id);
+  if (!found) throw new Error(`Unknown experiment ${id}`);
+  return found;
+}
+
+/**
+ * Published translations only, newest number first like the originals. Stable
+ * facts (id, project, revision, dates, source, status, fidelity, surface) are
+ * inherited from the English original; only authored text differs.
+ */
 export const portugueseExperiments: Experiment[] = [
   {
-    ...experiments[2],
+    ...original("003"),
+    locale: "pt-BR",
+    slug: "setor-de-boot",
+    title: "setor de boot",
+    description: "o assembly por trás de um hello world da BIOS",
+    what: "Como este setor de boot coloca uma mensagem na tela usando serviços da BIOS? O assembly real de um experimento para aprender x86, junto com o comportamento registrado em suas anotações de aprendizado. O Lab apresenta o código-fonte; ele não faz o boot desse código nem o emula.",
+    notes:
+      "Baseado na revisão e966889 do x86-os-experiment. O resultado Hello, World! está documentado nas anotações do projeto e não foi reproduzido de forma independente aqui.",
+  },
+  {
+    ...original("002"),
+    locale: "pt-BR",
+    slug: "estados-de-execucao",
+    title: "estados de execução",
+    titlePlural: true,
+    description:
+      "experimente as transições que o Orbit permite — e as que ele rejeita",
+    what: "Quais operações cada estado aceita, e como é uma operação rejeitada? Uma representação interativa das regras atuais do domínio Execution do Orbit. As mudanças de estado acontecem neste exemplo no navegador: nenhum comando é executado e não há nenhum agendador por trás da página.",
+    notes:
+      "Baseado na revisão cd97666 do Orbit. Os timestamps são valores de exemplo gerados pelo navegador, sem persistência. As configurações de retry e timeout existem apenas como configuração.",
+  },
+  {
+    ...original("001"),
     locale: "pt-BR",
     slug: "classificador-de-arquivos",
     title: "classificador de arquivos",

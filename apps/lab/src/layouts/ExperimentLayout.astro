@@ -24,19 +24,17 @@ const text = textFor(experiment.locale);
   counterparts={counterpartsOf(experiment)}
 >
   <ExperimentHeader experiment={experiment} />
-  <Section number="01." title={text.question}>
+  <Section number="01." title={text.headings.question}>
     <p>{experiment.what}</p>
   </Section>
-  <Section number="02." title={text.bench}>
+  <Section number="02." title={text.headings.bench}>
     <slot name="surface" />
   </Section>
-  <Section number="03." title={text.fidelity}>
+  <Section number="03." title={text.headings.fidelity}>
     <Fidelity experiment={experiment} />
-    {experiment.locale === "pt-BR" && experiment.notes && (
-      <p>{experiment.notes}</p>
-    )}
+    {experiment.notes && <p>{experiment.notes}</p>}
   </Section>
-  <Section number="04." title={text.related}>
+  <Section number="04." title={text.headings.related}>
     <ExperimentRelated experiment={experiment} />
   </Section>
   <ExperimentPager experiment={experiment} />

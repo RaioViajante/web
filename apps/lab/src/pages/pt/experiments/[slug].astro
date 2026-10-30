@@ -1,11 +1,13 @@
 ---
 import type { InferGetStaticPropsType } from "astro";
 import ExperimentLayout from "../../../layouts/ExperimentLayout.astro";
+import BootSector from "../../../components/surfaces/BootSector.astro";
+import ExecutionStates from "../../../components/surfaces/ExecutionStates.astro";
 import FilenameClassifier from "../../../components/surfaces/FilenameClassifier.astro";
-import { portugueseExperiments } from "../../../data/experiments";
+import { experimentsFor } from "../../../data/experiments";
 
 export function getStaticPaths() {
-  return portugueseExperiments.map((experiment) => ({
+  return experimentsFor("pt-BR").map((experiment) => ({
     params: { slug: experiment.slug },
     props: { experiment },
   }));
@@ -16,6 +18,12 @@ const { experiment } = Astro.props as Props;
 
 <ExperimentLayout experiment={experiment}>
   {experiment.surface === "filename-classifier" && (
-    <FilenameClassifier slot="surface" locale="pt-BR" />
+    <FilenameClassifier slot="surface" locale={experiment.locale} />
+  )}
+  {experiment.surface === "execution-states" && (
+    <ExecutionStates slot="surface" locale={experiment.locale} />
+  )}
+  {experiment.surface === "boot-sector" && (
+    <BootSector slot="surface" locale={experiment.locale} />
   )}
 </ExperimentLayout>

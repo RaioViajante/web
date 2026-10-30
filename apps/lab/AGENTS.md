@@ -26,6 +26,8 @@ stays consistent; each experiment owns its interactive surface.
   fidelity and public source links. Preserve 001–003 and descending index order.
 - Follow [docs/content.md](docs/content.md). Check pinned real source before
   changing behavior; sibling repositories are read-only evidence.
+- Localized text, counts and the Portuguese `001` preservation rules are in
+  [docs/i18n.md](docs/i18n.md).
 - Filename suffixes reproduce Python 3.14 POSIX `Path.suffix`, lowercased for
   Sweep matching. Preserve spaces. A trailing dot is suffix `.`.
 - Execution rules reproduce Orbit `cd97666`, including Java blank-message

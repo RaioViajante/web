@@ -6,8 +6,17 @@ import {
   Callout,
 } from "@raioviajante/design/components";
 import { classifyFilename } from "../../lib/filename-classifier";
-import { classifierCopy } from "../../lib/copy";
-import type { LocaleId } from "../../../../../site/locales";
+import { classifierCopy, type ClassifierCategory } from "../../lib/bench-copy";
+import {
+  destinationParts,
+  emptyCounts,
+  summaryParts,
+  type TextPart,
+} from "../../lib/classifier-view";
+import { foreignLang } from "../../lib/copy";
+import { LOCALES, type LocaleId } from "../../../../../site/locales";
+import { Rich } from "../Rich";
+
 export const initialNames = [
   "photo.png",
   "REPORT.PDF",
@@ -15,17 +24,40 @@ export const initialNames = [
   "README",
   ".hidden",
 ];
+
+function Parts({ parts }: { parts: TextPart[] }) {
+  return (
+    <>
+      {parts.map((part, index) =>
+        part.lang ? (
+          <span key={index} lang={part.lang}>
+            {part.text}
+          </span>
+        ) : (
+          part.text
+        ),
+      )}
+    </>
+  );
+}
+
 export function ClassifierBench({ locale }: { locale: LocaleId }) {
   const text = classifierCopy[locale];
+  // Sweep's category folders are English identifiers on every page.
+  const folderLang = foreignLang(locale, "en");
+  const rows = initialNames.map(classifyFilename);
+  const counts = emptyCounts();
+  for (const row of rows) counts[row.category as ClassifierCategory]++;
   return (
     <div
       data-classifier
+      data-locale={locale}
       data-copy={JSON.stringify({
-        categories: text.categories,
+        intlLocale: LOCALES[locale].intlLocale,
         none: text.none,
-        file: text.file,
-        files: text.files,
-        classified: text.classified,
+        categoryLabel: text.categoryLabel,
+        folderLang: folderLang ?? null,
+        summary: text.summary,
       })}
     >
       <LabBench
@@ -85,20 +117,25 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
                 </tr>
               </thead>
               <tbody>
-                {initialNames.map(classifyFilename).map((row) => (
+                {rows.map((row) => (
                   <tr key={row.filename}>
                     <th scope="row" className="tok-string">
                       {row.filename}
                     </th>
                     <td className="tok-number">{row.suffix || text.none}</td>
                     <td className="tok-type">
-                      {
-                        text.categories[
-                          row.category as keyof typeof text.categories
-                        ]
-                      }
+                      {text.categoryLabel[row.category as ClassifierCategory]}
                     </td>
-                    <td>{`~/Downloads/${row.category}/${row.filename}`}</td>
+                    <td>
+                      <Parts
+                        parts={destinationParts(
+                          "~/Downloads",
+                          row.category as ClassifierCategory,
+                          row.filename,
+                          folderLang,
+                        )}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -111,26 +148,21 @@ export function ClassifierBench({ locale }: { locale: LocaleId }) {
             aria-atomic="true"
             data-summary
           >
-            5 {text.files} {text.classified} · {text.categories.Images} 1 ·{" "}
-            {text.categories.Documents} 1 · {text.categories.Archives} 1 ·{" "}
-            {text.categories.Other} 2
+            <Parts
+              parts={summaryParts(
+                LOCALES[locale].intlLocale,
+                rows.length,
+                counts,
+                text.summary,
+                text.categoryLabel,
+              )}
+            />
           </p>
         </BenchBand>
       </LabBench>
       <Callout label={text.why}>
         <span id="filename-help">
-          {locale === "en" ? (
-            <>
-              Python 3.14 <code>Path.suffix</code> treats a leading dot as part
-              of the name. Only the final suffix counts:{" "}
-              <code>archive.tar.gz</code> uses <code>.gz</code>. A trailing dot
-              is suffix <code>.</code>, so <code>image.</code> is Other.
-              Filename spaces are preserved. Destinations are previews; no files
-              move.
-            </>
-          ) : (
-            text.explanation
-          )}
+          <Rich text={text.explanation} />
         </span>
       </Callout>
       <noscript>{text.noscript}</noscript>

@@ -4,10 +4,10 @@ import ExecutionStates from "../../components/surfaces/ExecutionStates.astro";
 import FilenameClassifier from "../../components/surfaces/FilenameClassifier.astro";
 import type { InferGetStaticPropsType } from "astro";
 import ExperimentLayout from "../../layouts/ExperimentLayout.astro";
-import { experiments } from "../../data/experiments";
+import { experimentsFor } from "../../data/experiments";
 
 export function getStaticPaths() {
-  return experiments.map((experiment) => ({
+  return experimentsFor("en").map((experiment) => ({
     params: { slug: experiment.slug },
     props: { experiment },
   }));
@@ -20,10 +20,12 @@ const { experiment } = Astro.props as Props;
 
 <ExperimentLayout experiment={experiment}>
   {experiment.surface === "filename-classifier" && (
-    <FilenameClassifier slot="surface" locale="en" />
+    <FilenameClassifier slot="surface" locale={experiment.locale} />
   )}
   {experiment.surface === "execution-states" && (
-    <ExecutionStates slot="surface" />
+    <ExecutionStates slot="surface" locale={experiment.locale} />
   )}
-  {experiment.surface === "boot-sector" && <BootSector slot="surface" />}
+  {experiment.surface === "boot-sector" && (
+    <BootSector slot="surface" locale={experiment.locale} />
+  )}
 </ExperimentLayout>

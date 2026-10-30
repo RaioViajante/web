@@ -2,12 +2,20 @@
 import { DEFAULT_LOCALE } from "../../../../site/locales";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SearchPage } from "@raioviajante/design/search";
+import { textFor } from "../lib/copy";
+import { routeCounterparts } from "../lib/routes";
+import { searchSuggestions } from "../lib/search";
+const text = textFor(DEFAULT_LOCALE);
 ---
 
 <BaseLayout
-  counterparts={[{ locale: "pt-BR", path: "/pt/search/" }]}
-  pageTitle="search"
-  description="Ask RaioViajante — search lab experiments and the ecosystem."
+  counterparts={routeCounterparts("search", DEFAULT_LOCALE)}
+  pageTitle={text.search.title}
+  description={text.search.description}
 >
-  <SearchPage site="lab" locale={DEFAULT_LOCALE} />
+  <SearchPage
+    site="lab"
+    locale={DEFAULT_LOCALE}
+    suggestions={searchSuggestions[DEFAULT_LOCALE]}
+  />
 </BaseLayout>

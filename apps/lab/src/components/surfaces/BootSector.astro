@@ -1,9 +1,15 @@
 ---
 import { highlightBlock } from "@raioviajante/design/components";
-import { sections } from "../../data/boot-sector";
+import { sectionsFor } from "../../data/boot-sector";
+import { bootCopy } from "../../lib/bench-copy";
 import { BootBench } from "./BootBench";
+import type { LocaleId } from "../../../../../site/locales";
+interface Props {
+  locale: LocaleId;
+}
+const { locale } = Astro.props;
 const models = await Promise.all(
-  sections.map((section) =>
+  sectionsFor(locale).map((section) =>
     highlightBlock({
       code: section.code,
       lang: "asm",
@@ -14,25 +20,35 @@ const models = await Promise.all(
 const output = await highlightBlock({
   code: "Hello, World!",
   lang: "text",
-  meta: 'title="documented result · qemu"',
+  meta: `title="${bootCopy[locale].resultTitle}"`,
 });
 ---
 
-<BootBench models={models} output={output} />
+<BootBench locale={locale} models={models} output={output} />
 <script>
   import { playSound } from "@raioviajante/design/sound";
+  import { fill } from "../../lib/template";
   const container = document.querySelector<HTMLElement>("[data-boot]")!;
+  // Rendered into the page at build time; never read from the browser.
+  const text = JSON.parse(container.dataset.copy!) as {
+    progress: string;
+    rejectedPrevious: string;
+    rejectedNext: string;
+  };
   const buttons = [
     ...container.querySelectorAll<HTMLButtonElement>("[data-section]"),
   ];
   const panels = [...container.querySelectorAll<HTMLElement>("[data-panel]")];
   const previous = container.querySelector<HTMLButtonElement>("[data-prev]")!;
   const next = container.querySelector<HTMLButtonElement>("[data-next]")!;
+  const progress = container.querySelector("[data-progress]")!;
   let index = 0;
   function show(target: number, sound = true) {
     if (target < 0 || target >= buttons.length) {
-      container.querySelector("[data-progress]")!.textContent =
-        `rejected: no ${target < 0 ? "previous" : "next"} section · ${index + 1} / ${buttons.length}`;
+      progress.textContent = fill(
+        target < 0 ? text.rejectedPrevious : text.rejectedNext,
+        { number: index + 1, total: buttons.length },
+      );
       playSound("reject");
       return;
     }
@@ -41,8 +57,11 @@ const output = await highlightBlock({
       button.setAttribute("aria-pressed", String(number === index)),
     );
     panels.forEach((panel, number) => (panel.hidden = number !== index));
-    container.querySelector("[data-progress]")!.textContent =
-      `${index + 1} / ${buttons.length} · ${buttons[index].textContent!.slice(3)}`;
+    progress.textContent = fill(text.progress, {
+      number: index + 1,
+      total: buttons.length,
+      title: buttons[index].dataset.title!,
+    });
     [previous, next].forEach((button, number) => {
       const rejected =
         number === 0 ? index === 0 : index === buttons.length - 1;
