@@ -8,9 +8,9 @@ interface PrivacyText {
 }
 
 /**
- * The Privacy Policy, one complete text per locale. English is the
- * authoritative text; the Portuguese one is a faithful translation of it that
- * adds and removes no clause (docs/i18n.md, "Legal pages").
+ * The Privacy Policy, one complete text per locale. The Portuguese one is a
+ * translation of the English one that adds and removes no clause; it needs the
+ * owner's and legal review before publication (apps/docs/docs/content.md).
  */
 const text = {
 	en: {

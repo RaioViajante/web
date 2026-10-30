@@ -56,24 +56,40 @@ the other language's navigation and its `LANG` offers the other home.
 
 ### Portuguese legal pages and cross-site links
 
-- `/pt/terms/` and `/pt/privacy/` are faithful translations of the English
-  Terms of Use and Privacy Policy (`src/components/TermsPage.tsx`,
-  `PrivacyPage.tsx`): same sections and facts, no clause added or removed, and
-  no date because the English pages show none. English remains the authoritative
-  text (stated in [docs/i18n.md](../../../docs/i18n.md#legal-pages), not on the
-  page, as for Root). The Portuguese footer links them without the "em inglês"
-  qualifier. Any change to an English legal text needs the Portuguese text
-  reviewed in the same change.
+- `/pt/terms/` and `/pt/privacy/` are translations of the English Terms of Use
+  and Privacy Policy (`src/components/TermsPage.tsx`, `PrivacyPage.tsx`): same
+  sections and facts, no clause added or removed, and no date because the
+  English pages show none. The Portuguese footer links them without the "em
+  inglês" qualifier. Any change to an English legal text needs the Portuguese
+  text reviewed in the same change.
+- **Legal status.** The Portuguese texts are an AI translation checked section
+  by section against the English; they are not legal advice, and no page states
+  or implies that they or the English text prevail. They need the owner's and
+  legal review before publication. Open questions, none answered by the pages
+  and none added to them: which text controls where the two differ; the English
+  sources identify no data controller beyond the operator and CNPJ, state no
+  legal basis for processing, no data-subject rights (LGPD), no international
+  transfer statement (the host is Vercel) and no last-updated date. Wording to
+  read: "operado por … CNPJ", "a fonte definitiva", "o provedor de hospedagem
+  (Vercel)", "endereço IP, navegador e a página solicitada", the cookie clause,
+  and the `starlight-theme` leftover.
 - The Portuguese Sweep guide links Lab's Portuguese experiment
   (`https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/`),
-  which has been published since before the Docs translation, so no merge order
-  is involved. The Portuguese Sweep guide links its two Dump posts, and the
-  Portuguese home links the Dump posts about Orbit and yanawa, in English, with
-  `hreflang="en"` and "em inglês" in the text, because their Portuguese versions
-  are not on the default branch yet (the Dump localization PR adds them). When
-  they land, point those four links at the Portuguese URLs and drop the
-  qualifier; run `pnpm links:check` afterwards, which follows links between the
-  four apps.
+  which is published on the default branch, so no merge order is involved.
+- **Merge order: Dump first.** Four Portuguese links point to the Portuguese
+  Dump posts that the Dump localization PR (#99) adds: in the Sweep guide
+  `/pt/posts/aparentemente-mover-um-arquivo-tem-casos-de-borda` and
+  `/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era`, and in the home notes
+  `/pt/posts/cansei-de-crud-entao-estou-construindo-um-agendador` (Orbit) and
+  `/pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma`
+  (yanawa). They are valid only once #99 is merged: merge Dump #99 first, or
+  accept a temporary 404 on those four links. `pnpm links:check` follows links
+  between the four apps against the local builds, so it would fail on them;
+  `pendingRoutes` in `links/check.mjs` lists exactly those four paths, allows
+  only HTTP 404 for them, prints them on every run, and reports a route that
+  exists so its entry gets removed (delete the entries when #99 is on `main`).
+  Re-check the slugs against `apps/dump/content/posts` if the Dump PR renames
+  one.
 
 ## Potential future information architecture
 
