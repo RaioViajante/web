@@ -38,6 +38,8 @@ export interface DumpCopy {
     feed: string;
     code: string;
     parts: (count: number) => string;
+    /** Accessible names of the flipping avatar (the shared defaults are English). */
+    avatar: { label: string; reduced: string };
   };
   archive: {
     label: string;
@@ -143,6 +145,10 @@ const copy = {
       code: "code ↗",
       parts: (count) =>
         `${count} ${pluralCategory("en", count) === "one" ? "part" : "parts"}`,
+      avatar: {
+        label: "Flip RaioViajante avatar",
+        reduced: "Illustrated RaioViajante character",
+      },
     },
     archive: {
       label: "Archive",
@@ -244,6 +250,10 @@ const copy = {
       code: "código ↗",
       parts: (count) =>
         `${count} ${pluralCategory("pt-BR", count) === "one" ? "parte" : "partes"}`,
+      avatar: {
+        label: "Virar o avatar do RaioViajante",
+        reduced: "Personagem ilustrado do RaioViajante",
+      },
     },
     archive: {
       label: "Arquivo",
@@ -292,9 +302,8 @@ const copy = {
         { label: "tags", value: "assuntos", href: "/pt/tags" },
         {
           label: "raioviajante.com",
-          value: "início (em inglês)",
-          href: "https://raioviajante.com",
-          hrefLang: "en",
+          value: "início",
+          href: "https://raioviajante.com/pt",
         },
       ],
     },

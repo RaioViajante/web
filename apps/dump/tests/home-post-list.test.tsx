@@ -156,3 +156,28 @@ describe("<HomePostList />", () => {
     expect(screen.getByText(/^3 min de leitura/)).toBeInTheDocument();
   });
 });
+
+describe("home avatar", () => {
+  it("names the flipping avatar in the page's language, and the empty home too", () => {
+    const { unmount } = render(<HomePostList posts={posts} />);
+    expect(
+      screen.getByRole("button", { name: "Flip RaioViajante avatar" }),
+    ).toBeInTheDocument();
+    unmount();
+    const pt = render(<HomePostList posts={posts} locale="pt-BR" />);
+    const button = pt.container.querySelector("[data-avatar-coin]");
+    expect(button?.getAttribute("aria-label")).toBe(
+      "Virar o avatar do RaioViajante",
+    );
+    expect(button?.getAttribute("data-avatar-reduced-label")).toBe(
+      "Personagem ilustrado do RaioViajante",
+    );
+    pt.unmount();
+    const empty = render(<HomePostList posts={[]} locale="pt-BR" />);
+    expect(
+      empty.container
+        .querySelector("[data-avatar-coin]")
+        ?.getAttribute("aria-label"),
+    ).toBe("Virar o avatar do RaioViajante");
+  });
+});

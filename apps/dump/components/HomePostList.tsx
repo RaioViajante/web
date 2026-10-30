@@ -67,7 +67,12 @@ export function HomePostList({
         <IndexHeader
           name="dump"
           line={copy.home.line}
-          avatar={<AvatarCoin />}
+          avatar={
+            <AvatarCoin
+              label={copy.home.avatar.label}
+              reducedMotionLabel={copy.home.avatar.reduced}
+            />
+          }
         />
         <p className="home-empty">{copy.home.empty}</p>
       </>
@@ -86,7 +91,16 @@ export function HomePostList({
   const followNumber = `00.${nextSection}`;
   return (
     <>
-      <IndexHeader name="dump" line={copy.home.line} avatar={<AvatarCoin />} />
+      <IndexHeader
+        name="dump"
+        line={copy.home.line}
+        avatar={
+          <AvatarCoin
+            label={copy.home.avatar.label}
+            reducedMotionLabel={copy.home.avatar.reduced}
+          />
+        }
+      />
       <Section number="00." title={copy.home.latest} id="latest-heading" index>
         <Link
           className="featured-post"

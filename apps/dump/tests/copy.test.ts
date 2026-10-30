@@ -119,3 +119,18 @@ describe("post dates", () => {
     );
   });
 });
+
+describe("404 links to Root", () => {
+  it("sends the Portuguese 404 to Root's Portuguese home without an English qualifier", () => {
+    const root = (locale: "en" | "pt-BR") =>
+      dumpCopy(locale).notFound.tryInstead.find(
+        (link) => link.label === "raioviajante.com",
+      )!;
+    expect(root("en").href).toBe("https://raioviajante.com");
+    expect(root("pt-BR")).toEqual({
+      label: "raioviajante.com",
+      value: "início",
+      href: "https://raioviajante.com/pt",
+    });
+  });
+});

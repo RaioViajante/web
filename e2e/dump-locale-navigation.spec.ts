@@ -411,9 +411,10 @@ test("Dump dynamic misses use localized server-rendered 404 documents", async ({
   await expect(
     page.getByRole("heading", { name: "Procurei em todo lugar." }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: /início \(em inglês\)/ }),
-  ).toHaveAttribute("hreflang", "en");
+  await expect(page.getByRole("link", { name: /início/ })).toHaveAttribute(
+    "href",
+    "https://raioviajante.com/pt",
+  );
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
   await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
 });
