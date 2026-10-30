@@ -257,6 +257,25 @@ test("cancelling frees the slot at once for the next job", () => {
   assert.equal(events(state, "cancelled").length, 1);
 });
 
+test("a job can still be cancelled after the tick limit halted the run", () => {
+  const halted = run(
+    sim(1, makeJob("job-1", { failureKind: "hang", failAttempts: 1 })),
+  );
+  assert.ok(halted.halted);
+  const after = cancel(halted, "job-1");
+  assert.equal(job(after, "job-1").status, "cancelled");
+  assert.equal(after.halted, true);
+});
+
+test("unknown backoff and failure kinds are refused", () => {
+  const issues = (overrides) =>
+    validateConfig({ concurrency: 1, jobs: [makeJob("a", overrides)] }).map(
+      (i) => i.issue,
+    );
+  assert.deepEqual(issues({ backoff: "linear" }), ["unknown-option"]);
+  assert.deepEqual(issues({ failureKind: "crash" }), ["unknown-option"]);
+});
+
 test("cancelling a pending, final or unknown job is safe", () => {
   const state = sim(1, makeJob("job-1"));
   assert.equal(job(cancel(state, "job-1"), "job-1").status, "cancelled");

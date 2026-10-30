@@ -227,8 +227,11 @@ const text = schedulerCopy[locale];
         textContent: text.timelineCaption,
         className: "rv-sr-only",
       });
+      // Follow the newest tick unless the reader scrolled back to look.
+      const following =
+        timeline.scrollLeft + timeline.clientWidth >= timeline.scrollWidth - 4;
       timeline.replaceChildren(table);
-      timeline.scrollLeft = timeline.scrollWidth;
+      if (following) timeline.scrollLeft = timeline.scrollWidth;
 
       // Jobs table.
       const grid = document.createElement("table");
@@ -300,7 +303,7 @@ const text = schedulerCopy[locale];
       render();
     }
 
-    function announce(before: SimState, after: SimState) {
+    function announce(before: SimState, after: SimState, auto: boolean) {
       if (isOver(after)) {
         say(progressText(copy, intl, count, after));
         return;
@@ -308,21 +311,22 @@ const text = schedulerCopy[locale];
       const significant = after.events
         .slice(before.events.length)
         .some((e) => e.kind === "completed" || e.kind === "gave-up");
-      if (significant || !timer) say(progressText(copy, intl, count, after));
+      // While a run plays, only outcomes are announced; a manual step always is.
+      if (significant || !auto) say(progressText(copy, intl, count, after));
     }
 
-    function advance() {
+    function advance(auto = false) {
       const before = ensure();
       const after = step(before);
       sim = after;
       render();
-      announce(before, after);
+      announce(before, after, auto);
       return after;
     }
 
     function tickLoop() {
       timer = undefined;
-      const after = advance();
+      const after = advance(true);
       if (isOver(after)) {
         stop();
         return;

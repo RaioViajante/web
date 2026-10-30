@@ -296,6 +296,7 @@ export const schedulerCopy = {
       "failures-range": "Failing attempts must be between 0 and 6.",
       "submit-range": "Submit tick must be between 0 and 30.",
       "not-integer": "Use whole numbers only.",
+      "unknown-option": "Choose one of the listed options.",
     },
     conceptsHeading: "What to watch",
     concepts: [
@@ -496,11 +497,11 @@ export const schedulerCopy = {
     messages: {
       ready: "Escolha um cenário ou edite os jobs e depois avance ou execute.",
       progress:
-        "Tick {tick}: {running} executando, {pending} pendentes, {completed} concluídos, {failed} com falha.",
+        "Tick {tick}: executando {running}, pendentes {pending}, concluídos {completed}, com falha {failed}.",
       finished:
         "Terminou após {ticks}: {completed}, {failed}, {cancelled}. As vagas ficaram ocupadas em {utilization} do tempo.",
       halted:
-        "Parou no limite de {ticks}: {running} ainda executando, {pending} ainda pendentes. Nada mais vai acontecer.",
+        "Parou no limite de {ticks}: ainda executando {running}, ainda pendentes {pending}. Nada mais vai acontecer.",
       running: "Executando.",
       paused: "Pausado.",
       reset: "Reiniciado no tick 0 com a configuração atual.",
@@ -525,6 +526,7 @@ export const schedulerCopy = {
       "failures-range": "As tentativas com falha devem ficar entre 0 e 6.",
       "submit-range": "O tick de envio deve ficar entre 0 e 30.",
       "not-integer": "Use apenas números inteiros.",
+      "unknown-option": "Escolha uma das opções listadas.",
     },
     conceptsHeading: "O que observar",
     concepts: [

@@ -141,7 +141,8 @@ export type ConfigIssue =
   | "backoff-range"
   | "failures-range"
   | "submit-range"
-  | "not-integer";
+  | "not-integer"
+  | "unknown-option";
 
 export interface IssueAt {
   issue: ConfigIssue;
@@ -164,6 +165,10 @@ export function validateConfig(config: SimConfig): IssueAt[] {
   if (config.jobs.length > LIMITS.maxJobs) add("too-many-jobs");
   const seen = new Set<string>();
   config.jobs.forEach((job, index) => {
+    if (!["none", "fixed", "exponential"].includes(job.backoff))
+      add("unknown-option", index);
+    if (!["error", "hang"].includes(job.failureKind))
+      add("unknown-option", index);
     if (seen.has(job.id)) add("duplicate-id", index);
     seen.add(job.id);
     const numbers = [
@@ -394,7 +399,7 @@ export function run(state: SimState): SimState {
 export function cancel(state: SimState, jobId: string): SimState {
   const index = state.jobs.findIndex((job) => job.config.id === jobId);
   const target = state.jobs[index];
-  if (!target || isFinal(target.status) || state.halted) return state;
+  if (!target || isFinal(target.status)) return state;
   const jobs = state.jobs.map((job) => ({ ...job }));
   const job = jobs[index]!;
   move(job, "cancelled");
