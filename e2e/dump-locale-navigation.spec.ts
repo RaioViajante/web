@@ -533,3 +533,43 @@ test("Dump marks English fragments in Portuguese posts and dates the notes it ad
   );
   await expect(page.getByText("Update", { exact: true })).toHaveCount(3);
 });
+
+test("Dump Portuguese posts link the Portuguese sibling sites and the Portuguese Lab page", async ({
+  page,
+}) => {
+  await page.goto(
+    `${base("dump")}/pt/posts/dividi-minha-internet-em-quatro-tipos-diferentes-de-lugar`,
+  );
+  const hrefs = await page
+    .locator("main article a[href^='https://']")
+    .evaluateAll((links) => links.map((a) => a.getAttribute("href")));
+  for (const root of [
+    "https://raioviajante.com/pt",
+    "https://dump.raioviajante.com/pt",
+    "https://docs.raioviajante.com/pt/",
+    "https://lab.raioviajante.com/pt/",
+  ])
+    expect(hrefs).toContain(root);
+  for (const english of [
+    "https://raioviajante.com",
+    "https://dump.raioviajante.com",
+    "https://docs.raioviajante.com",
+    "https://lab.raioviajante.com",
+  ])
+    expect(hrefs).not.toContain(english);
+
+  // The classifier has a Portuguese page; the other Lab targets do not yet.
+  await page.goto(
+    `${base("dump")}/pt/posts/um-arquivo-toml-mudou-o-que-o-sweep-era`,
+  );
+  await expect(page.getByText("Experimente", { exact: true })).toHaveCount(1);
+  await expect(
+    page.locator(
+      "a[href='https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/']",
+    ),
+  ).toHaveCount(1);
+  await page.goto(`${base("dump")}/pt/posts/nao-existe-printf-aqui-embaixo`);
+  await expect(page.getByText("Experimente", { exact: true })).toHaveCount(0);
+  await page.goto(`${base("dump")}/posts/there-is-no-printf-down-here`);
+  await expect(page.getByText("Try it", { exact: true })).toHaveCount(1);
+});

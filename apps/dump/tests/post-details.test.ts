@@ -1,3 +1,4 @@
+import { labSuggestions } from "@/lib/lab-suggestions";
 import { headingSlug, headingText, labForPost } from "@/lib/post-details";
 import type { Post } from "@/lib/posts";
 
@@ -43,9 +44,42 @@ describe("automatic Lab links", () => {
     );
   });
 
-  it("suppresses the automatic English-only link in Portuguese", () => {
+  it("offers the Portuguese Lab page only where it is published", () => {
+    const make = (
+      tags: string[],
+      locale: "en" | "pt-BR",
+      contentId: string,
+    ) => ({
+      ...post,
+      contentId,
+      tags,
+      locale,
+      originalLocale: locale,
+    });
+    // The Sweep series reaches the classifier, whose Portuguese page exists.
     expect(
-      labForPost({ ...post, locale: "pt-BR", originalLocale: "pt-BR" }),
-    ).toBeNull();
+      labForPost(make([], "pt-BR", "a-toml-file-changed-what-sweep-was")),
+    ).toEqual({
+      title: "Classificador de arquivos",
+      href: "https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/",
+    });
+    expect(
+      labForPost(make([], "en", "a-toml-file-changed-what-sweep-was")),
+    ).toEqual({
+      title: "Filename classifier",
+      href: "https://lab.raioviajante.com/experiments/filename-classifier/",
+    });
+    // Orbit and boot-sector Portuguese pages are not published yet: no
+    // suggestion, and never the English page in their place.
+    expect(labForPost(make([], "pt-BR", "building-orbit"))).toBeNull();
+    expect(labForPost(make(["osdev"], "pt-BR", "boot"))).toBeNull();
+    expect(labForPost(make([], "en", "building-orbit"))?.href).toBe(
+      "https://lab.raioviajante.com/experiments/execution-states/",
+    );
+  });
+
+  it("never points a Portuguese suggestion at an English page", () => {
+    for (const suggestion of Object.values(labSuggestions["pt-BR"]))
+      expect(suggestion.href).toContain("/pt/experiments/");
   });
 });
