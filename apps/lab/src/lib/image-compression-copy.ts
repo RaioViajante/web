@@ -96,7 +96,7 @@ export const imageCompressionCopy = {
     choose: "Choose an image",
     useSample: "use the sample picture",
     fileHelp:
-      "The file is read by this tab and never uploaded. JPEG, PNG, WebP, GIF, AVIF or BMP up to 20 MB and 36 megapixels, as far as your browser can decode them.",
+      "The file is read by this tab and never uploaded. JPEG, PNG, WebP, GIF or BMP up to 20 MB and 36 megapixels, as far as your browser can decode them.",
     presetsBand: "Presets",
     presetsAria: "Presets",
     presets: {
@@ -230,7 +230,7 @@ export const imageCompressionCopy = {
     limits: [
       "This is a teaching experiment, not a compression tool. It does not try to hit a size and does not produce a download.",
       "It uses your browser’s own encoders (canvas). Mochifile’s engine uses its own codecs so results match across browsers; the numbers here will not match it.",
-      "WebP encoding is missing in some browsers; the page detects it and says so instead of showing a PNG as WebP. AVIF and GIF are readable but not offered as outputs.",
+      "WebP encoding is missing in some browsers; the page detects it and says so instead of showing a PNG as WebP. GIF and BMP can be read but are not offered as outputs.",
       "The pixel size is read from the file header and anything over 36 megapixels (or whose header cannot be read) is refused before decoding. AVIF is not accepted because its size cannot be checked that way. Animated GIFs use their first frame. EXIF orientation is applied; other metadata and color profiles are not kept.",
       "Some browsers (notably Safari) limit canvas size, so a very large image may fail to encode at full size, and browsers that protect against fingerprinting add noise to canvas readback, which would show up in the difference view. Zoom magnifies the centre only.",
       "Everything stays in this tab: no upload, no storage, no download. Previews are drawn on canvases and the decoded image is released when you pick another one or leave the page.",
@@ -244,7 +244,7 @@ export const imageCompressionCopy = {
     choose: "Escolher uma imagem",
     useSample: "usar a imagem de exemplo",
     fileHelp:
-      "O arquivo é lido por esta aba e nunca é enviado. JPEG, PNG, WebP, GIF, AVIF ou BMP de até 20 MB e 36 megapixels, desde que o navegador consiga decodificá-los.",
+      "O arquivo é lido por esta aba e nunca é enviado. JPEG, PNG, WebP, GIF ou BMP de até 20 MB e 36 megapixels, desde que o navegador consiga decodificá-los.",
     presetsBand: "Predefinições",
     presetsAria: "Predefinições",
     presets: {
@@ -382,7 +382,7 @@ export const imageCompressionCopy = {
     limits: [
       "Este é um experimento didático, não uma ferramenta de compressão. Ele não tenta atingir um tamanho e não gera download.",
       "Usa os codificadores do próprio navegador (canvas). O motor do Mochifile usa codecs próprios para que os resultados sejam iguais entre navegadores; os números daqui não vão coincidir com os dele.",
-      "A codificação em WebP falta em alguns navegadores; a página detecta isso e avisa em vez de mostrar um PNG como se fosse WebP. AVIF e GIF podem ser lidos, mas não são oferecidos como saída.",
+      "A codificação em WebP falta em alguns navegadores; a página detecta isso e avisa em vez de mostrar um PNG como se fosse WebP. GIF e BMP podem ser lidos, mas não são oferecidos como saída.",
       "O tamanho em pixels é lido do cabeçalho do arquivo, e o que passa de 36 megapixels (ou tem cabeçalho ilegível) é recusado antes de decodificar. O AVIF não é aceito porque o tamanho dele não pode ser verificado assim. GIFs animados usam o primeiro quadro. A orientação EXIF é aplicada; os outros metadados e os perfis de cor não são mantidos.",
       "Alguns navegadores (principalmente o Safari) limitam o tamanho do canvas, então uma imagem muito grande pode falhar ao codificar no tamanho total, e navegadores que protegem contra rastreamento acrescentam ruído à leitura do canvas, o que apareceria na visão de diferença. O zoom amplia apenas o centro.",
       "Tudo fica nesta aba: sem envio, sem armazenamento, sem download. As prévias são desenhadas em canvas, e a imagem decodificada é liberada quando você escolhe outra ou sai da página.",

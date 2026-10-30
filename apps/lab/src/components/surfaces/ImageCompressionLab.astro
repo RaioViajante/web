@@ -215,8 +215,13 @@ const text = imageCompressionCopy[locale];
         return;
       }
       if (outcome.support === "fallback") {
-        // The browser answered with a different format: show no numbers for it.
+        // The browser answered with a different format: show no numbers for it,
+        // and drop the figures and pictures of the previous encoding.
         last = null;
+        for (const row of ["file", "dimensions", "saved", "factor", "raw"])
+          cell(`${row}-output`, "—");
+        result.width = 0;
+        diffCanvas.hidden = true;
         say(
           fill(text.messages.unsupported, {
             format: text.formatNames[spec.format].split(" ")[0]!,
