@@ -132,7 +132,7 @@ export const copy = {
     description:
       "Experimentos técnicos do RaioViajante, com limites e código-fonte documentados.",
     avatar: {
-      label: "Girar o avatar do RaioViajante",
+      label: "Virar o avatar do RaioViajante",
       reduced: "Personagem ilustrado do RaioViajante",
     },
     nav: { experiments: "experimentos", notebook: "caderno" },

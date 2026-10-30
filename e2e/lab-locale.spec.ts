@@ -222,7 +222,7 @@ test("Lab avatar keeps language-specific names with and without reduced motion",
     ["/", "Flip RaioViajante avatar", "Illustrated RaioViajante character"],
     [
       "/pt/",
-      "Girar o avatar do RaioViajante",
+      "Virar o avatar do RaioViajante",
       "Personagem ilustrado do RaioViajante",
     ],
   ] as const) {
