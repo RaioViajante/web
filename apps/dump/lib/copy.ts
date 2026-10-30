@@ -1,4 +1,5 @@
 import { localeById, type LocaleId } from "../../../site/locales";
+import { commentsUiCopy, type CommentsUiCopy } from "./comments-copy";
 import type { RouteKey } from "./routes";
 
 // Dump's editorial and interface copy, one complete object per locale. Shared
@@ -69,14 +70,7 @@ export interface DumpCopy {
     minutesRead: (minutes: number) => string;
     comments: string;
     commentsPowered: string;
-    commentsUi: {
-      waiting: string;
-      manual: string;
-      loading: string;
-      failed: string;
-      load: string;
-      retry: string;
-    };
+    commentsUi: CommentsUiCopy;
   };
   notFound: {
     metadata: PageSeoCopy;
@@ -183,16 +177,7 @@ const copy = {
       minutesRead: (minutes) => `${minutes} min read`,
       comments: "Comments",
       commentsPowered: "Powered by GitHub Discussions.",
-      commentsUi: {
-        waiting:
-          "Comments load from giscus (GitHub Discussions) when you scroll to this section.",
-        manual:
-          "Comments are provided by giscus (GitHub Discussions). Loading them connects to giscus.app and GitHub.",
-        loading: "Loading comments…",
-        failed: "Comments could not be loaded.",
-        load: "Load comments",
-        retry: "Try again",
-      },
+      commentsUi: commentsUiCopy.en,
     },
     notFound: {
       metadata: {
@@ -293,16 +278,7 @@ const copy = {
       minutesRead: (minutes) => `${minutes} min de leitura`,
       comments: "Comentários",
       commentsPowered: "Com tecnologia do GitHub Discussions.",
-      commentsUi: {
-        waiting:
-          "Os comentários carregam do giscus (GitHub Discussions) quando você chega a esta seção.",
-        manual:
-          "Os comentários são fornecidos pelo giscus (GitHub Discussions). Carregá-los conecta ao giscus.app e ao GitHub.",
-        loading: "Carregando comentários…",
-        failed: "Não foi possível carregar os comentários.",
-        load: "Carregar comentários",
-        retry: "Tentar novamente",
-      },
+      commentsUi: commentsUiCopy["pt-BR"],
     },
     notFound: {
       metadata: {

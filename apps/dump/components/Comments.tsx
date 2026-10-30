@@ -10,7 +10,7 @@ import {
 
 import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 import { GISCUS, commentKey, giscusLang } from "@/lib/comment-key";
-import { dumpCopy } from "@/lib/copy";
+import { commentsUiCopy } from "@/lib/comments-copy";
 
 /** Distance below the viewport at which scrolling toward the comments starts loading them. */
 const ROOT_MARGIN = "200px";
@@ -62,7 +62,7 @@ export function Comments({
   contentId: string;
   locale?: LocaleId;
 }) {
-  const text = dumpCopy(locale).post.commentsUi;
+  const text = commentsUiCopy[locale];
   const mountRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
   const started = useRef(false);
