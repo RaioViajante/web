@@ -97,9 +97,10 @@ const toEnglishRoot = (link: string) =>
 
 describe("translation parity", () => {
   it("compares every translated work with its original", () => {
-    // 8 English originals translated to Portuguese, plus the Portuguese
-    // original translated to English.
-    expect(pairs).toHaveLength(9);
+    // Every work has exactly one original and one translation.
+    expect(pairs).toHaveLength(new Set(posts.map((p) => p.contentId)).size);
+    for (const { original, translation } of pairs)
+      expect(original.locale).not.toBe(translation.locale);
   });
 
   it.each(pairs.map((pair) => [pair.contentId, pair] as const))(

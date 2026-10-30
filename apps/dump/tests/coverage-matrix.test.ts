@@ -23,6 +23,7 @@ const works = (() => {
 })();
 
 const ENGLISH_ORIGINALS = [
+  "for-those-who-never-quite-belonged",
   "gave-one-operation-more-than-one-deadline",
   "kept-building-and-stopped-writing-it-down",
   "maybe-this-can-be-something-someday",
@@ -46,10 +47,11 @@ const ORIGINAL_DATES: Record<string, string> = {
   "started-writing-down-the-failures-before-the-features": "2026-09-27",
   "there-is-no-printf-down-here": "2026-09-05",
   "traduzir-o-site-sem-fingir-que-tudo-ja-existe": "2026-10-19",
+  "for-those-who-never-quite-belonged": "2026-10-30",
 };
 
 describe("works x locale coverage", () => {
-  it("covers all nine published works", () => {
+  it("covers all ten published works", () => {
     expect([...works.keys()].sort()).toEqual(
       [...ENGLISH_ORIGINALS, ...PORTUGUESE_ORIGINALS].sort(),
     );
