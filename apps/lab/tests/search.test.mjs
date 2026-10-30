@@ -29,7 +29,7 @@ test("each locale's index lists exactly its published experiments, in its own la
     assert.equal(entries.length, experimentsFor(locale).length);
     assert.deepEqual(
       entries.map((entry) => entry.contentId),
-      ["003", "002", "001"],
+      ["006", "003", "002", "001"],
     );
     for (const entry of entries) {
       assert.equal(entry.locale, locale);
@@ -38,12 +38,12 @@ test("each locale's index lists exactly its published experiments, in its own la
       assert.equal(entry.href.includes("/pt/"), locale === "pt-BR");
     }
   }
-  const [boot] = searchEntries("pt-BR");
+  const boot = searchEntries("pt-BR").find((e) => e.contentId === "003");
   assert.equal(boot.title, "setor de boot");
   assert.equal(boot.description, "x86-os-experiment · apenas código-fonte");
   // The English index keeps its original entry shape and raw fidelity key.
   assert.equal(
-    searchEntries("en")[0].description,
+    searchEntries("en").find((e) => e.contentId === "003").description,
     "x86-os-experiment · source only",
   );
 });
@@ -66,13 +66,21 @@ test("every Portuguese suggestion finds at least one published Portuguese experi
       hits(entries, term, "pt-BR").map((entry) => entry.contentId),
     ),
   );
-  assert.deepEqual([...reached].sort(), ["001", "002", "003"]);
+  assert.deepEqual([...reached].sort(), ["001", "002", "003", "006"]);
 });
 
 test("Portuguese search ignores accents and case like the shared engine", () => {
   const entries = searchEntries("pt-BR");
-  assert.equal(hits(entries, "EXECUCAO", "pt-BR")[0].contentId, "002");
-  assert.equal(hits(entries, "execução", "pt-BR")[0].contentId, "002");
+  assert.ok(
+    hits(entries, "EXECUCAO", "pt-BR").some(
+      (entry) => entry.contentId === "002",
+    ),
+  );
+  assert.ok(
+    hits(entries, "execução", "pt-BR").some(
+      (entry) => entry.contentId === "002",
+    ),
+  );
   assert.equal(hits(entries, "bios", "pt-BR")[0].contentId, "003");
   assert.equal(hits(entries, "nothing-published", "pt-BR").length, 0);
 });
