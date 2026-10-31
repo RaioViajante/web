@@ -166,6 +166,38 @@ export const fidelityRows = {
       },
     ],
   },
+  "tiny-language-playground": {
+    en: [
+      {
+        label: "syntax",
+        value: "subset read from yanawa notes · revision 7fd082e",
+      },
+      { label: "yanawa compiler", value: "none exists yet · this is not it" },
+      {
+        label: "execution",
+        value: "own tree-walking interpreter · bounded · no JavaScript eval",
+      },
+      { label: "persistence", value: "none · source stays in this tab" },
+    ],
+    "pt-BR": [
+      {
+        label: "sintaxe",
+        value: "subconjunto lido das notas do yanawa · revisão 7fd082e",
+      },
+      {
+        label: "compilador do yanawa",
+        value: "ainda não existe · este não é ele",
+      },
+      {
+        label: "execução",
+        value: "interpretador próprio · limitado · sem eval de JavaScript",
+      },
+      {
+        label: "persistência",
+        value: "nenhuma · o código fica nesta aba",
+      },
+    ],
+  },
 } as const satisfies Record<
   ExperimentSurface,
   Record<LocaleId, readonly FidelityRow[]>
@@ -302,6 +334,46 @@ export const relatedRows = {
         value: "wikipedia ↗",
         href: "https://en.wikipedia.org/wiki/A*_search_algorithm",
         language: "en",
+      },
+    ],
+  },
+  "tiny-language-playground": {
+    en: [
+      {
+        label: "yanawa syntax notes",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa/blob/7fd082e806d55f293c81281f9acee1c02a683744/docs/syntax.md",
+        language: "en",
+      },
+      {
+        label: "yanawa compiler architecture notes",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa/blob/7fd082e806d55f293c81281f9acee1c02a683744/docs/compiler-architecture.md",
+        language: "en",
+      },
+      {
+        label: "yanawa repository",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa",
+      },
+    ],
+    "pt-BR": [
+      {
+        label: "notas de sintaxe do yanawa",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa/blob/7fd082e806d55f293c81281f9acee1c02a683744/docs/syntax.md",
+        language: "en",
+      },
+      {
+        label: "notas de arquitetura do compilador do yanawa",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa/blob/7fd082e806d55f293c81281f9acee1c02a683744/docs/compiler-architecture.md",
+        language: "en",
+      },
+      {
+        label: "repositório do yanawa",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa",
       },
     ],
   },

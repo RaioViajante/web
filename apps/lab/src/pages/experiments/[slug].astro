@@ -4,6 +4,7 @@ import ExecutionStates from "../../components/surfaces/ExecutionStates.astro";
 import FilenameClassifier from "../../components/surfaces/FilenameClassifier.astro";
 import SchedulerSimulator from "../../components/surfaces/SchedulerSimulator.astro";
 import PathfindingPlayground from "../../components/surfaces/PathfindingPlayground.astro";
+import TinyLanguagePlayground from "../../components/surfaces/TinyLanguagePlayground.astro";
 import type { InferGetStaticPropsType } from "astro";
 import ExperimentLayout from "../../layouts/ExperimentLayout.astro";
 import { experimentsFor } from "../../data/experiments";
@@ -35,5 +36,8 @@ const { experiment } = Astro.props as Props;
   )}
   {experiment.surface === "pathfinding-playground" && (
     <PathfindingPlayground slot="surface" locale={experiment.locale} />
+  )}
+  {experiment.surface === "tiny-language-playground" && (
+    <TinyLanguagePlayground slot="surface" locale={experiment.locale} />
   )}
 </ExperimentLayout>

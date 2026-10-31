@@ -273,6 +273,24 @@
         "requests": 11
       }
     },
+    "lab/tiny-language-playground": {
+      "baseline": {
+        "total": 85517,
+        "script": 23835,
+        "stylesheet": 9841,
+        "font": 33315,
+        "image": 10066,
+        "requests": 9
+      },
+      "max": {
+        "total": 102400,
+        "script": 31744,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 11
+      }
+    },
     "lab/search": {
       "baseline": {
         "total": 102471,

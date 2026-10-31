@@ -43,6 +43,11 @@ export const pages = [
     name: "pathfinding-playground",
     path: "/experiments/pathfinding-playground/",
   },
+  {
+    app: "lab",
+    name: "tiny-language-playground",
+    path: "/experiments/tiny-language-playground/",
+  },
   { app: "lab", name: "search", path: "/search/" },
 ];
 export const profiles = ["mobile", "desktop"];

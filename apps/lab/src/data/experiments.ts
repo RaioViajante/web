@@ -13,7 +13,8 @@ export type ExperimentSurface =
   | "execution-states"
   | "boot-sector"
   | "scheduler-simulator"
-  | "pathfinding-playground";
+  | "pathfinding-playground"
+  | "tiny-language-playground";
 
 export interface Experiment {
   id: string;
@@ -42,6 +43,25 @@ export interface Experiment {
 
 /** Real experiments, ordered by descending publication number. */
 export const experiments: Experiment[] = [
+  {
+    id: "006",
+    contentId: "006",
+    locale: "en",
+    originalLocale: "en",
+    slug: "tiny-language-playground",
+    surface: "tiny-language-playground",
+    title: "tiny language playground",
+    description: "tokens, a syntax tree, diagnostics and a bounded interpreter",
+    status: "active",
+    project: "yanawa",
+    revision: "7fd082e",
+    fidelity: "simulated",
+    created: "2026-10-30",
+    source: "https://github.com/yanawa/yanawa",
+    what: "What does a language do with a few lines of source before it runs them? Edit a small program and see its tokens, its syntax tree, readable errors and a bounded run, one stage at a time. The syntax is a small subset read from yanawa’s design notes; yanawa has no compiler yet, and this is not it.",
+    notes:
+      "Based on the syntax and compiler-architecture notes of yanawa revision 7fd082e. The notes leave several rules open (range ends, integer division, indentation width) and this page chose its own. Nothing is compiled or evaluated as JavaScript, and the source is never stored or sent.",
+  },
   {
     id: "005",
     contentId: "005",
@@ -155,6 +175,17 @@ function original(id: string): Experiment {
  * inherited from the English original; only authored text differs.
  */
 export const portugueseExperiments: Experiment[] = [
+  {
+    ...original("006"),
+    locale: "pt-BR",
+    slug: "linguagem-minima",
+    title: "playground de linguagem mínima",
+    description:
+      "tokens, árvore sintática, diagnósticos e um interpretador limitado",
+    what: "O que uma linguagem faz com algumas linhas de código antes de executá-las? Edite um programa pequeno e veja seus tokens, sua árvore sintática, erros legíveis e uma execução limitada, uma etapa por vez. A sintaxe é um pequeno subconjunto lido das notas de design do yanawa; o yanawa ainda não tem compilador, e este não é ele.",
+    notes:
+      "Baseado nas notas de sintaxe e de arquitetura do compilador da revisão 7fd082e do yanawa. As notas deixam várias regras em aberto (fim do intervalo, divisão de inteiros, largura da indentação) e esta página fez suas próprias escolhas. Nada é compilado nem avaliado como JavaScript, e o código nunca é guardado nem enviado.",
+  },
   {
     ...original("005"),
     locale: "pt-BR",
