@@ -93,6 +93,22 @@ that is rare and was judged not worth the bytes. Other artwork is unchanged.
 - **Soft** (printed, never failing): FCP, LCP, TBT and Speed Index against
   generous thresholds, a performance score under the 95 target, and images much
   larger than their slot.
+- **`docs/search` total (October 2026).** The Docs search page loads the full
+  search index, so its weight grows with the documentation. With the yanawa,
+  Orbit, Mochifile and Ordelis pages the page measures 127,181 bytes (the same
+  on two runs), about 17,800 more than the same page on the previous `main`
+  (an estimate: the total minus the measured index growth; the recorded
+  baseline of 104,312 predates other changes to `main`): the English index
+  went from 4,883 to 22,656 bytes gzipped (103 entries instead of 27, no
+  duplicated text) and the Portuguese one from 5,351 to 24,439. The old limit
+  of 124,928 bytes would have failed. The new `max.total` is 143,360 bytes
+  (140 KiB), the old limit plus the growth rounded up, which leaves about 16 KB (12.7%) over
+  the measurement, a little less than the 20.6 KB the old limit left over the
+  recorded baseline, and less than the 150,528 bytes the +15% +4 KB rule would
+  give. Only `total` of this one page changed; its
+  script, stylesheet, font, image and request limits, and every other page, are
+  as before. Revisit it when the index grows again, or if a leaner index
+  (shorter indexed bodies) is chosen.
 - Budgets are never rewritten by a tool. `node perf/check.mjs --baseline` prints
   the measurements and writes `perf/.results/suggested.json`; change the file
   by hand in a reviewed commit and say why.
