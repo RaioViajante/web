@@ -37,7 +37,8 @@ minimumReleaseAgeExclude:
 #   patched one. The named `minimatch` and `Minimatch` exports they use exist in
 #   11, so the ranges move to the patched releases. minimatch 3.1.5 (eslint 9 and
 #   its plugins) calls the module itself, which 11 does not export, so it goes
-#   to security/minimatch-compat, a shim over 11 with the 3 call shape. Remove
+#   to security/minimatch-compat, a shim over 11 with the 3 call shape (see
+#   docs/security-maintenance.md for its limits). Remove
 #   an entry when its owning packages ship the fix.
 overrides:
   "fflate@0.7.3": "0.7.5"

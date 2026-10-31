@@ -35,41 +35,104 @@ decision and expiry in the JSON. Nothing extends an exception automatically.
 
 ### minimatch and glob (October 2026)
 
-GHSA-g3hv-75wg-m249 (minimatch, fixed in 11.0.1) and GHSA-3g3m-2fjr-6pw4 (glob,
-fixed in 14.0.2) were published on 2026-10-30. Both are moderate and reach only
-development tooling; `pnpm audit --prod` reports nothing. No release of the
-owning packages asks for a patched range, so `pnpm-workspace.yaml` overrides
-minimatch 9 and 10 and glob 10 and 13 to the patched releases. That is safe
-because their consumers (typescript-estree, glob, test-exclude, Jest) use the
-named exports that minimatch 11 keeps. Lint, tests, builds and the browser
-suite pass with the overrides.
+**What was reported.** On 2026-10-30 two moderate advisories were published, and
+`dependency-audit` failed on every branch. Neither reaches production
+(`pnpm audit --prod` is empty); both reach only development tooling.
 
-minimatch 3.1.5 is reached through eslint 9, `@eslint/config-array`,
-`@eslint/eslintrc`, `eslint-plugin-import`, `eslint-plugin-jsx-a11y` and
-`eslint-plugin-react`, all development lint tooling. No upstream release fixes
-it (the newest eslint asks for `^10.2.x`, also vulnerable), and a plain override
-to 11 breaks the three plugins because they call the module itself and 11 has
-named exports only. So `security/minimatch-compat` is a private shim: it
-re-exports minimatch 11's `minimatch` function, which carries `Minimatch`,
-`filter`, `match`, `sep`, `GLOBSTAR`, `defaults`, `braceExpand`, `escape` and
-`unescape`, as the module's default export, and the override
-`minimatch@3.1.5` points at it. The audit then sees minimatch 11.0.3 and the
-advisory is fixed, not excepted. Before adoption, 900 checks (calls, options
-`dot`, `matchBase`, `nocase`, `allowWindowsEscape`, negation, braces, extglobs)
-gave the same results on 3.1.5 and the shim.
+- GHSA-g3hv-75wg-m249, minimatch, affected `< 11.0.1`: input-controlled growth
+  of `globParts` in `firstPhasePreProcess()` when `optimizationLevel` is 2 or
+  higher. It was reported for 10.2.6, 9.0.9 and 3.1.5 in the lockfile.
+- GHSA-3g3m-2fjr-6pw4, glob, affected `>= 9.0.0, <= 14.0.1`: an `AbortSignal`
+  cancellation bypass. It was reported for 10.5.0 and 13.0.6.
 
-Note on exposure: the advisory's code (`firstPhasePreProcess`,
-`optimizationLevel`) does not exist in 3.1.5, so that version was probably not
-exploitable; the shim removes the version from the tree regardless. Every pattern
-reaching these packages comes from repository config, never from users.
-Gaps: minimatch 11 dropped `makeRe`, so the shim has none, and
-`eslint-plugin-import`'s `import/no-internal-modules` rule with `allow` or
-`forbid` would throw; no app config enables it. Minimatch 11 also brings one
-young transitive package, `@isaacs/nonrecursive-glob-match` (first published
-2026-10-26), within the default release-age policy. Editing the shim needs
-`pnpm install` again because `file:` copies it.
-Remove the shim and override when eslint and its plugins ask for minimatch 11
-or later.
+**Remediation.** `pnpm-workspace.yaml` replaces the vulnerable releases with
+minimatch 11.0.3 and glob 14.0.3 (published, integrity-checked npm releases,
+at or above the fixed versions). No exception was added to
+`security/audit-exceptions.json`.
+
+- minimatch 9 and 10 and glob 10 and 13 are overridden directly. Their consumers
+  (typescript-estree, glob, test-exclude, Jest) use only the named exports that
+  minimatch 11 keeps, and no release of those packages asks for a patched range.
+- minimatch 3.1.5 cannot be overridden directly. Its consumers (eslint 9,
+  `@eslint/config-array`, `@eslint/eslintrc`, `eslint-plugin-import`,
+  `-jsx-a11y` and `-react`) call the module itself, and minimatch 11 has named
+  exports only, no default export, and is not callable. The newest eslint still
+  asks for `^10.2.x`, which is also affected, so there is no upstream release to
+  wait for. The override `minimatch@3.1.5` therefore points at
+  `security/minimatch-compat`.
+
+**The shim.** `security/minimatch-compat` is a private package whose entire code
+is `module.exports = require("minimatch-modern").minimatch`, where
+`minimatch-modern` is `npm:minimatch@11.0.3`. It is a compatibility wrapper, not
+a reimplementation: every match, expansion and preprocessing step runs in the
+published minimatch 11.0.3. Its `minimatch` function carries `Minimatch`,
+`filter`, `match`, `braceExpand`, `sep`, `GLOBSTAR`, `defaults`, `escape` and
+`unescape`, which is what the consumers use. The audit now reports the
+dependency as minimatch 11.0.3. That is a replacement of the dependency by a
+wrapper over a patched release, not an upstream fix of 3.1.5, and it says
+nothing about vulnerabilities in other glob or pattern code.
+
+**Why 3.1.5 did not contain the examined code path.** The advisory's affected
+range covers every release below 11.0.1, but the vulnerable function
+`firstPhasePreProcess` and the `optimizationLevel` option do not exist in the
+3.1.5 source, and passing `optimizationLevel: 2` to it has no effect. That was
+checked by reading the source and by a bounded reproduction (separate process,
+256 MB heap, 20 s deadline) using the pattern from the upstream fix's test: 10.2.6
+built 256, 1,024, 4,096 and 8,192 pattern sets for 8, 10, 12 and 13 repetitions,
+3.1.5 built one, and 11.0.3 and the shim stop at the `braceExpandMax` limit. None
+of eslint, `@eslint/config-array`, `@eslint/eslintrc` or the three plugins sets
+`optimizationLevel`; the default is 1. Replacing 3.1.5 removes a release the
+audit flags without evidence of exposure, and puts the code with the upstream
+fix in its place. The 11.0.3 fix bounds the work (it caps the set at
+`braceExpandMax`, 100,000 by default, and skips the quadratic comparison above
+1,000 sets); it does not make an unusually large pattern free.
+
+**Verified compatibility.** Against minimatch 3.1.5 itself, the callable form
+agreed in 5,730 of 5,733 combinations of 21 patterns, 21 paths and 13 option
+sets, and the `Minimatch` class used by eslint, eslintrc and config-array agreed
+in 1,323 of 1,323. The three differences are `!(a|b)*` with `nonegate: true`,
+which no config here sets. With the exact ESLint 9.39.5 and plugin versions,
+seven of the eight plugin rules that call minimatch gave the same findings as
+with 3.1.5. `pnpm lint`, the unit tests, the builds, the browser suite and the
+performance budgets pass. `security/minimatch-compat.test.mjs` keeps this from
+regressing: it resolves `minimatch` the way eslint does and checks the version,
+the call shape, 21 results taken from 3.1.5, and the patched preprocessing limit
+in a child process.
+
+**Remaining incompatibilities.**
+
+- minimatch 11 has no `makeRe`, so the shim has none. `eslint-plugin-import`'s
+  `import/no-internal-modules` rule calls `minimatch.makeRe` and fails to load
+  with `makeRe is not a function` if it is enabled with `allow` or `forbid`. No
+  app config enables it. A faithful `makeRe` would mean re-implementing 3.x's
+  regular-expression builder, so none was added; a stand-in that only loaded the
+  rule would hide wrong results. The test above records the gap.
+- `nonegate: true` with a leading extglob negation (`!(...)`) differs, as above.
+
+**Maintenance.**
+
+- Whoever changes eslint, `eslint-config-next` or the three plugins runs
+  `pnpm audit:check` and `pnpm lint` afterwards. If a dependency now asks for a
+  different minimatch 3 release, the override no longer matches it and the audit
+  fails, which is the intended behaviour.
+- Editing the shim needs `pnpm install` again, because `file:` copies it, and
+  it has no integrity hash: review it like code.
+- The shim brings in minimatch 11's own transitive dependencies, among them
+  `@isaacs/nonrecursive-glob-match`, first published 2026-10-26 and accepted
+  under the default release-age policy.
+- Any new advisory for minimatch 11 or glob 14 is reported by the audit, since
+  those are the versions in the tree.
+
+**Remove the shim and the `minimatch@3.1.5` override** when eslint and the
+plugins ask for minimatch 11 or later (or stop using it), after which the
+remaining minimatch and glob overrides can be reviewed one by one. Watch
+[eslint/eslint](https://github.com/eslint/eslint),
+[eslint/eslintrc](https://github.com/eslint/eslintrc),
+[eslint/rewrite](https://github.com/eslint/rewrite) (`@eslint/config-array`),
+[import-js/eslint-plugin-import](https://github.com/import-js/eslint-plugin-import),
+[jsx-eslint/eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react),
+[jsx-eslint/eslint-plugin-jsx-a11y](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y)
+and [isaacs/minimatch](https://github.com/isaacs/minimatch).
 
 The former `satori` advisory (GHSA-wx4j-mvgx-mqwp, SVG escaping, fixed in
 0.33.5) is not an exception: `@vercel/og` 0.11.1 pins `satori` 0.25.0 exactly, so
