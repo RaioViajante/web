@@ -19,15 +19,16 @@ const byId = (list, id) => list.find((experiment) => experiment.id === id);
 test("stable identities, shared provenance and real reciprocal counterparts", () => {
   assert.deepEqual(
     experiments.map(({ id }) => id),
-    ["004", "003", "002", "001"],
+    ["005", "004", "003", "002", "001"],
   );
   assert.deepEqual(
     portugueseExperiments.map(({ contentId }) => contentId),
-    ["004", "003", "002", "001"],
+    ["005", "004", "003", "002", "001"],
   );
   assert.deepEqual(
     portugueseExperiments.map((experiment) => experimentPath(experiment)),
     [
+      "/pt/experiments/busca-de-caminhos/",
       "/pt/experiments/simulador-de-agendamento/",
       "/pt/experiments/setor-de-boot/",
       "/pt/experiments/estados-de-execucao/",
@@ -56,9 +57,9 @@ test("stable identities, shared provenance and real reciprocal counterparts", ()
     ])
       assert.equal(portuguese[key], english[key], `${english.id} ${key}`);
   }
-  assert.deepEqual(experimentsFor("en").length, 4);
-  assert.deepEqual(experimentsFor("pt-BR").length, 4);
-  assert.deepEqual(publishedExperiments.length, 8);
+  assert.deepEqual(experimentsFor("en").length, 5);
+  assert.deepEqual(experimentsFor("pt-BR").length, 5);
+  assert.deepEqual(publishedExperiments.length, 10);
 });
 
 test("every experiment is fully authored in Portuguese, not copied from English", () => {
@@ -81,6 +82,15 @@ test("every experiment is fully authored in Portuguese, not copied from English"
 test("revisions and technical names survive translation verbatim", () => {
   for (const english of experiments) {
     const portuguese = byId(portugueseExperiments, english.id);
+    // An experiment with no source project has no revision or project to keep.
+    if (!english.revision) {
+      assert.equal(
+        english.source,
+        undefined,
+        `${english.id} has no revision and no source`,
+      );
+      continue;
+    }
     assert.ok(
       portuguese.notes.includes(english.revision),
       `${english.id} notes keep revision ${english.revision}`,

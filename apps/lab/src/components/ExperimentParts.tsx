@@ -28,7 +28,7 @@ export function ExperimentHeader({
           {text.fields.created}{" "}
           <time dateTime={e.created}>{displayDate(e)}</time>
         </>,
-        `${e.project} ${e.revision}`,
+        e.revision ? `${e.project} ${e.revision}` : e.project,
         ...(e.source
           ? [
               <a key="source" href={e.source} data-sound="nav">

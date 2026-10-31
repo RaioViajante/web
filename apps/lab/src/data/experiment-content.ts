@@ -137,6 +137,35 @@ export const fidelityRows = {
       { label: "aleatoriedade", value: "nenhuma · toda execução se repete" },
     ],
   },
+  "pathfinding-playground": {
+    en: [
+      {
+        label: "algorithms",
+        value: "written for the Lab · not tied to a project",
+      },
+      { label: "tie-breaking", value: "fixed · every run repeats" },
+      { label: "movement", value: "four directions · mud is the only weight" },
+      { label: "persistence", value: "none · reload starts over" },
+    ],
+    "pt-BR": [
+      {
+        label: "algoritmos",
+        value: "escritos para o Lab · sem ligação com um projeto",
+      },
+      {
+        label: "desempate",
+        value: "fixo · toda execução se repete",
+      },
+      {
+        label: "movimento",
+        value: "quatro direções · a lama é o único peso",
+      },
+      {
+        label: "persistência",
+        value: "nenhuma · recarregar a página recomeça do zero",
+      },
+    ],
+  },
 } as const satisfies Record<
   ExperimentSurface,
   Record<LocaleId, readonly FidelityRow[]>
@@ -243,6 +272,36 @@ export const relatedRows = {
         label: "código-fonte do Orbit",
         value: "github ↗",
         href: "https://github.com/RaioViajante/orbit",
+      },
+    ],
+  },
+  "pathfinding-playground": {
+    en: [
+      {
+        label: "Dijkstra's algorithm",
+        value: "wikipedia ↗",
+        href: "https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm",
+        language: "en",
+      },
+      {
+        label: "A* search algorithm",
+        value: "wikipedia ↗",
+        href: "https://en.wikipedia.org/wiki/A*_search_algorithm",
+        language: "en",
+      },
+    ],
+    "pt-BR": [
+      {
+        label: "algoritmo de Dijkstra",
+        value: "wikipedia ↗",
+        href: "https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm",
+        language: "en",
+      },
+      {
+        label: "algoritmo A*",
+        value: "wikipedia ↗",
+        href: "https://en.wikipedia.org/wiki/A*_search_algorithm",
+        language: "en",
       },
     ],
   },

@@ -12,7 +12,8 @@ export type ExperimentSurface =
   | "filename-classifier"
   | "execution-states"
   | "boot-sector"
-  | "scheduler-simulator";
+  | "scheduler-simulator"
+  | "pathfinding-playground";
 
 export interface Experiment {
   id: string;
@@ -24,7 +25,8 @@ export interface Experiment {
   description: string;
   status: ExperimentStatus;
   project: string;
-  revision: string;
+  /** Pinned revision of the source project; absent when the experiment has no source project. */
+  revision?: string;
   fidelity: "runs here" | "simulated" | "source only";
   created: string;
   source?: string;
@@ -40,6 +42,23 @@ export interface Experiment {
 
 /** Real experiments, ordered by descending publication number. */
 export const experiments: Experiment[] = [
+  {
+    id: "005",
+    contentId: "005",
+    locale: "en",
+    originalLocale: "en",
+    slug: "pathfinding-playground",
+    surface: "pathfinding-playground",
+    title: "pathfinding playground",
+    description: "BFS, DFS, Dijkstra and A* exploring a grid you draw",
+    status: "active",
+    project: "algorithms",
+    fidelity: "runs here",
+    created: "2026-10-30",
+    what: "How do four pathfinding algorithms differ on the same grid? Draw walls and mud, move the start and the goal, then step through breadth-first search, depth-first search, Dijkstra and A* and watch the frontier, the explored cells and the final path. Everything runs in this browser; it is not tied to any project.",
+    notes:
+      "A teaching implementation written for the Lab, with fixed tie-breaking so every run repeats. Movement is four-directional and mud is the only weight. Explored counts are not timings.",
+  },
   {
     id: "004",
     contentId: "004",
@@ -136,6 +155,17 @@ function original(id: string): Experiment {
  * inherited from the English original; only authored text differs.
  */
 export const portugueseExperiments: Experiment[] = [
+  {
+    ...original("005"),
+    locale: "pt-BR",
+    slug: "busca-de-caminhos",
+    title: "busca de caminhos",
+    description:
+      "BFS, DFS, Dijkstra e A* explorando uma grade que você desenha",
+    what: "Como quatro algoritmos de busca de caminhos se comportam na mesma grade? Desenhe paredes e lama, mova o início e o destino e avance pela busca em largura, pela busca em profundidade, por Dijkstra e por A*, observando a fronteira, as células exploradas e o caminho final. Tudo roda neste navegador; o experimento não está ligado a nenhum projeto.",
+    notes:
+      "Uma implementação didática escrita para o Lab, com critérios de desempate fixos para que toda busca se repita igual. O movimento é em quatro direções e a lama é o único peso. Células exploradas não são medidas de tempo.",
+  },
   {
     ...original("004"),
     locale: "pt-BR",
