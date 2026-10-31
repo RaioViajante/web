@@ -110,7 +110,8 @@ export function drawOn(
 ): void {
   target.width = size.width;
   target.height = size.height;
-  const context = target.getContext("2d")!;
+  // These canvases are read back for the difference view.
+  const context = target.getContext("2d", { willReadFrequently: true })!;
   if (onWhite) {
     context.fillStyle = "#ffffff";
     context.fillRect(0, 0, size.width, size.height);

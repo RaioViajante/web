@@ -26,7 +26,9 @@ bytes); the notes state it is not Mochifile's engine.
 - No object URL is created. The Lab's CSP allows `img-src 'self'` only, so
   previews are drawn on canvases instead of `blob:` images, and nothing is
   offered for download. A test asserts the module and the page create none.
-- Bitmaps are closed when another image replaces them and on `pagehide`; encode
+- The header probe reads only the first 256 KiB of the file; an image whose size cannot be found there (for example a JPEG behind a huge metadata block) is refused. A GIF or WebP whose header declares a smaller canvas than its frames is bounded by the browser, not by this check.
+- Previews are decoded at preview size (2,000 px on the long side), not at output size.
+- Bitmaps are closed when another image replaces them and on `pagehide`; a page restored from the back/forward cache (`pageshow` with `persisted`) starts clean instead of showing an image it no longer holds; encode
   canvases are shrunk to 0 × 0 after use; the only timer is a 150 ms debounce,
   cleared on `pagehide`.
 

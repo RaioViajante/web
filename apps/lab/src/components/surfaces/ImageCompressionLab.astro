@@ -92,6 +92,8 @@ const text = imageCompressionCopy[locale];
     const session = new CompressionSession(browserEncoder);
     let last: Extract<EncodeResult, { ok: true }> | null = null;
     let debounce: number | undefined;
+    /** The newest file or sample choice; an older one that finishes late is dropped. */
+    let choice = 0;
 
     const say = (message: string) => {
       status.textContent = message;
@@ -156,12 +158,20 @@ const text = imageCompressionCopy[locale];
       cell("raw-output", bytes(m.rawOutput));
     }
 
-    function showLoaded(loaded: Extract<LoadResult, { ok: true }>) {
+    /** Forgets the previous result: figures, previews and the sweep table. */
+    function clearOutputs() {
+      last = null;
+      for (const row of ["file", "dimensions", "saved", "factor", "raw"])
+        cell(`${row}-output`, "—");
+      for (const canvas of [original, result, diffCanvas]) canvas.width = 0;
+      diffCanvas.hidden = true;
+      sweepOut.replaceChildren();
+    }
+
+    function showLoaded() {
       stage.hidden = false;
       controls.hidden = false;
-      last = null;
-      void loaded;
-      sweepOut.replaceChildren();
+      clearOutputs();
     }
 
     function setSplit() {
@@ -175,16 +185,26 @@ const text = imageCompressionCopy[locale];
       if (!decoded || !mine) return;
       // Bounded: a 36-megapixel image is shown at 2000 px on its long side.
       const size = fitWithin(mine.measurement.output, 2000);
-      const bitmap = await createImageBitmap(mine.blob).catch(() => null);
+      // Decode at preview size, not at the (possibly 36 MP) output size.
+      const bitmap = await createImageBitmap(mine.blob, {
+        resizeWidth: size.width,
+        resizeHeight: size.height,
+        resizeQuality: "high",
+      })
+        .catch(() => createImageBitmap(mine.blob))
+        .catch(() => null);
       // A newer encoding or image may have arrived while this one decoded.
       if (!bitmap || last !== mine || session.decoded !== decoded) {
         bitmap?.close();
         return;
       }
       // JPEG output sits on white, so the original is shown on white too.
-      drawOn(original, decoded.bitmap, size, formatSelect.value === "jpeg");
-      drawOn(result, bitmap, size, false);
-      bitmap.close();
+      try {
+        drawOn(original, decoded.bitmap, size, formatSelect.value === "jpeg");
+        drawOn(result, bitmap, size, false);
+      } finally {
+        bitmap.close();
+      }
       await updateDifference();
     }
 
@@ -217,11 +237,7 @@ const text = imageCompressionCopy[locale];
       if (outcome.support === "fallback") {
         // The browser answered with a different format: show no numbers for it,
         // and drop the figures and pictures of the previous encoding.
-        last = null;
-        for (const row of ["file", "dimensions", "saved", "factor", "raw"])
-          cell(`${row}-output`, "—");
-        result.width = 0;
-        diffCanvas.hidden = true;
+        clearOutputs();
         say(
           fill(text.messages.unsupported, {
             format: text.formatNames[spec.format].split(" ")[0]!,
@@ -244,7 +260,7 @@ const text = imageCompressionCopy[locale];
                 larger: fill(text.largerValue, { value: percentOf(-m.saved) }),
               }),
         );
-      void drawPreviews();
+      void drawPreviews().catch(() => say(text.messages.encodeFailed));
     }
 
     function scheduleEncode(announce = true) {
@@ -263,21 +279,24 @@ const text = imageCompressionCopy[locale];
         playSound("reject");
         return;
       }
-      showLoaded(loaded);
+      showLoaded();
       cell(
         "file-original",
         `${bytes(loaded.originalBytes)} · ${exact(loaded.originalBytes)}`,
       );
       say(describe(loaded));
       playSound("success");
-      await encode();
+      // The load confirmation stays in the live region; the figures are in the table.
+      await encode(false);
     }
 
     fileInput.addEventListener("change", async () => {
       const file = fileInput.files?.[0];
       if (!file) return;
+      const mine = ++choice;
       say(text.messages.loading);
       const loaded = await session.load(file);
+      if (mine !== choice && loaded.ok) return; // a newer choice replaced it while it loaded
       fileInput.value = ""; // choosing the same file again must fire `change`
       await afterLoad(loaded, (l) =>
         fill(text.messages.loaded, {
@@ -290,6 +309,7 @@ const text = imageCompressionCopy[locale];
     });
 
     $("[data-sample]").addEventListener("click", async () => {
+      const mine = ++choice;
       const width = 800;
       const height = 600;
       const canvas = document.createElement("canvas");
@@ -319,6 +339,10 @@ const text = imageCompressionCopy[locale];
       const bitmap = await createImageBitmap(blob).catch(() => null);
       if (!bitmap) {
         say(text.messages.encodeFailed);
+        return;
+      }
+      if (mine !== choice) {
+        bitmap.close(); // the user picked a file while the sample was being made
         return;
       }
       const decoded: BitmapDecoded = {
@@ -368,6 +392,7 @@ const text = imageCompressionCopy[locale];
           .querySelectorAll("[data-preset]")
           .forEach((button) => button.setAttribute("aria-pressed", "false"));
         renderSettings();
+        sweepOut.replaceChildren(); // a table for other settings would mislead
         // While a slider moves the numbers update silently; release announces once.
         if (session.hasImage) scheduleEncode(false);
       });
@@ -398,6 +423,16 @@ const text = imageCompressionCopy[locale];
 
     sweepButton.addEventListener("click", async () => {
       const { format, scale: percent } = setting();
+      if (session.hasImage && isLossy(format) && !last) {
+        // The browser did not produce this format, so there is nothing to sweep.
+        say(
+          fill(text.messages.unsupported, {
+            format: text.formatNames[format].split(" ")[0]!,
+          }),
+        );
+        playSound("reject");
+        return;
+      }
       if (!session.hasImage || !isLossy(format) || !last) {
         say(
           session.hasImage && !isLossy(format)
@@ -443,6 +478,17 @@ const text = imageCompressionCopy[locale];
     window.addEventListener("pagehide", () => {
       window.clearTimeout(debounce);
       session.dispose();
+      clearOutputs();
+    });
+    // A page restored from the back/forward cache has lost its image: start clean.
+    window.addEventListener("pageshow", (event) => {
+      if (!event.persisted) return;
+      stage.hidden = true;
+      controls.hidden = true;
+      clearOutputs();
+      cell("file-original", "—");
+      cell("dimensions-original", "—");
+      say(text.messages.ready);
     });
     renderSettings();
     setSplit();
