@@ -83,15 +83,15 @@ built 256, 1,024, 4,096 and 8,192 pattern sets for 8, 10, 12 and 13 repetitions,
 of eslint, `@eslint/config-array`, `@eslint/eslintrc` or the three plugins sets
 `optimizationLevel`; the default is 1. Replacing 3.1.5 removes a release the
 audit flags without evidence of exposure, and puts the code with the upstream
-fix in its place. The 11.0.3 fix bounds the work (it caps the set at
+fix in its place. The 11.0.3 fix bounds the work (it stops splitting at
 `braceExpandMax`, 100,000 by default, and skips the quadratic comparison above
 1,000 sets); it does not make an unusually large pattern free.
 
-**Verified compatibility.** Against minimatch 3.1.5 itself, the callable form
+**Verified compatibility.** In an ad hoc comparison against minimatch 3.1.5 itself (a script run once, not kept in the repository), the callable form
 agreed in 5,730 of 5,733 combinations of 21 patterns, 21 paths and 13 option
 sets, and the `Minimatch` class used by eslint, eslintrc and config-array agreed
 in 1,323 of 1,323. The three differences are `!(a|b)*` with `nonegate: true`,
-which no config here sets. With the exact ESLint 9.39.5 and plugin versions,
+which no config here sets. A second ad hoc comparison with the options eslint uses (2,176 combinations, `Minimatch.match` with `dot` and `matchBase`) found 12 differences, all for paths with a `..` segment; see below. With the exact ESLint 9.39.5 and plugin versions,
 seven of the eight plugin rules that call minimatch gave the same findings as
 with 3.1.5. `pnpm lint`, the unit tests, the builds, the browser suite and the
 performance budgets pass. `security/minimatch-compat.test.mjs` keeps this from
@@ -108,6 +108,10 @@ in a child process.
   regular-expression builder, so none was added; a stand-in that only loaded the
   rule would hide wrong results. The test above records the gap.
 - `nonegate: true` with a leading extglob negation (`!(...)`) differs, as above.
+- Paths containing a `..` segment: with `dot: true`, 3.1.5 matched `/abs/..`
+  against `.*` and `**/.*`, and 11.0.3 does not. It is the stricter result and
+  does not affect any pattern or path in this repository's configs, but it is a
+  behavior change.
 
 **Maintenance.**
 
@@ -117,9 +121,11 @@ in a child process.
   fails, which is the intended behaviour.
 - Editing the shim needs `pnpm install` again, because `file:` copies it, and
   it has no integrity hash: review it like code.
-- The shim brings in minimatch 11's own transitive dependencies, among them
-  `@isaacs/nonrecursive-glob-match`, first published 2026-10-26 and accepted
-  under the default release-age policy.
+- The tree now contains very recent releases, all accepted under the default
+  release-age policy with no exclusion: minimatch 11.0.3 and glob 14.0.3
+  (2026-10-28), `path-scurry` 3.0.0 (2026-10-27) and
+  `@isaacs/nonrecursive-glob-match` 1.0.3 (2026-10-28, first published
+  2026-10-26).
 - Any new advisory for minimatch 11 or glob 14 is reported by the audit, since
   those are the versions in the tree.
 
