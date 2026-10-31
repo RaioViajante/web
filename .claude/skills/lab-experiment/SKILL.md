@@ -9,8 +9,8 @@ argument-hint: "[experiment idea or id]"
 Rules live in `apps/lab/AGENTS.md`, `apps/lab/docs/content.md` (provenance,
 numbering, content model), `docs/architecture.md`, `i18n.md`, `design.md`,
 `development.md` in `apps/lab/docs/`, plus `docs/i18n.md`, `docs/performance.md`,
-`docs/browser-checks.md`. Read them, then look at the newest experiment
-(`scheduler-simulator`, `pathfinding-playground`) as the pattern. Git/PR flow:
+`docs/browser-checks.md`. Read them, then use the highest-numbered entry in
+`src/data/experiments.ts` as the pattern. Git/PR flow:
 `safe-pr`.
 
 ## 1. Decide what it is
@@ -54,7 +54,7 @@ fact. A source link is published only if the repository is publicly accessible
 - `src/data/experiments.ts`: next sequential `id` (three digits, never reused),
   `slug`, `status`, `project`, `revision`, `fidelity`, `created` (the experiment's
   Lab date, not a translation date), `what`, `notes`, optional `source`,
-  `surface`. Keep descending order (001-003 preserved).
+  `surface`. Keep descending order; never renumber existing ids.
 - `src/data/experiment-content.ts` and `src/lib/<name>-copy.ts` for localized
   text; counts via `src/lib/plural*.ts`; `experiment-count.ts` and similar count
   helpers; a Portuguese slug independent of the English one; `contentId` (the

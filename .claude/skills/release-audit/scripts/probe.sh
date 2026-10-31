@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Read-only production probe: one GET/HEAD per URL, no retries, no loops.
 # Usage: probe.sh [root|dump|docs|lab ...]   (default: all four)
+# Docs and Lab use trailing slashes, so /pt may show a 3xx there: not a failure.
 # Prints status, content-type and a few security headers. Judge the output
 # against docs/security-headers.md and docs/seo.md; this script asserts nothing.
 set -u
@@ -24,6 +25,6 @@ for s in "${sites[@]}"; do
     echo "$p  $code  $ct"
   done
   curl -sS -o /dev/null -D - --max-time 20 "https://$h/" | tr -d '\r' \
-    | grep -iE '^(strict-transport-security|content-security-policy|x-content-type-options|referrer-policy|permissions-policy|cross-origin-opener-policy|x-vercel-id|age|cache-control|x-robots-tag):' \
+    | grep -iE '^(strict-transport-security|content-security-policy|x-content-type-options|referrer-policy|permissions-policy|cross-origin-opener-policy|x-vercel-id|x-vercel-cache|age|cache-control|x-robots-tag):' \
     | cut -c1-140
 done

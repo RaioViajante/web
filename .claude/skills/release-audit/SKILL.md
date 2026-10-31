@@ -77,8 +77,8 @@ let the owner decide.
 
 ## 4. Verify production URLs
 
-`bash ${CLAUDE_SKILL_DIR}/scripts/probe.sh [root|dump|docs|lab ...]` makes one
-request per URL (statuses, content types, security headers). Keep requests few;
+`bash ${CLAUDE_SKILL_DIR}/scripts/probe.sh [root|dump|docs|lab ...]` makes about
+one request per URL (statuses, content types, security headers). Keep requests few;
 no loops, no retries against a failing host. Then check, for the hosts the
 change affects:
 
