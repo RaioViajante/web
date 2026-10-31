@@ -1,17 +1,58 @@
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { expect, test, type Locator } from "@playwright/test";
 import { audit } from "./audit";
 import { base, isolate } from "./support";
 
+const content = fileURLToPath(
+  new URL("../apps/docs/src/content/docs/", import.meta.url),
+);
+
+const files = (directory: string): string[] =>
+  readdirSync(directory).flatMap((name) => {
+    const path = join(directory, name);
+    return statSync(path).isDirectory()
+      ? files(path)
+      : name.endsWith(".md")
+        ? [path]
+        : [];
+  });
+
+/** The published documents, read from the content files so a new page needs no edit here. */
+const documents = files(content).map((path) => {
+  const front = /^---\n([\s\S]*?)\n---\n/.exec(readFileSync(path, "utf8"))![1]!;
+  const field = (key: string) =>
+    new RegExp(`^${key}: ?(.*)$`, "m").exec(front)?.[1]?.trim() ?? "";
+  return {
+    contentId: field("contentId"),
+    locale: field("locale"),
+    path: field("path"),
+    order: Number(field("order")),
+    sub: field("sub") === "true",
+    group: field("group"),
+    label: (field("label") || field("title")).toLowerCase(),
+  };
+});
+const inOrder = (locale: string) =>
+  documents.filter((d) => d.locale === locale).sort((a, b) => a.order - b.order);
+const english = inOrder("en");
+const portuguese = inOrder("pt-BR");
+/** The home-page project rows that still point away from Docs. */
+const external = ["hum", "orbit", "yanawa"].filter(
+  (id) => !english.some((d) => d.contentId === `projects/${id}`),
+);
+
 /** Every Docs page that exists in both languages: English path, Portuguese path. */
 const pairs = [
   ["/", "/pt/"],
-  ["/projects/sweep/", "/pt/projetos/sweep/"],
-  ["/projects/sweep/cli/", "/pt/projetos/sweep/cli/"],
-  ["/raioviajante/design-language/", "/pt/raioviajante/linguagem-de-design/"],
-  [
-    "/raioviajante/repository-conventions/",
-    "/pt/raioviajante/convencoes-de-repositorio/",
-  ],
+  ...english.map(
+    (d) =>
+      [
+        d.path,
+        portuguese.find((p) => p.contentId === d.contentId)!.path,
+      ] as const,
+  ),
   ["/terms/", "/pt/terms/"],
   ["/privacy/", "/pt/privacy/"],
   ["/search/", "/pt/search/"],
@@ -27,11 +68,14 @@ test("Portuguese Docs navigation and LANG use real counterparts", async ({
       page.locator('.rv-lang[data-lang-state="link"] a'),
     ).toHaveAttribute("href", counterpart);
     await expect(page.locator(".rv-lang a")).toHaveAttribute("hreflang", "en");
-    // home, four documents and search, all in Portuguese and none missing
-    await expect(page.locator('.rv-nav[data-nav="pages"] a')).toHaveCount(6);
+    // home, every document and search, all in Portuguese and none missing
+    const navCount = portuguese.length + 2;
+    await expect(page.locator('.rv-nav[data-nav="pages"] a')).toHaveCount(
+      navCount,
+    );
     await expect(
       page.locator('.rv-nav[data-nav="pages"] a[href^="/pt/"]'),
-    ).toHaveCount(6);
+    ).toHaveCount(navCount);
     // The footer links the Portuguese legal pages, without an English qualifier.
     const legal = page.getByRole("navigation", { name: "Informações legais" });
     await expect(legal.getByRole("link")).toHaveText([
@@ -89,14 +133,22 @@ test("Portuguese Docs home lists everything the English home lists", async ({
     locator
       .locator(".docs-entry .rv-leader span:first-child")
       .allTextContents();
-  const english = await labels(page.locator("main"));
+  const englishLabels = await labels(page.locator("main"));
   await page.goto(base("docs") + "/pt/");
   await expect(page.locator(".docs-entry")).toHaveCount(englishCount);
-  // The projects that are not documented here are listed in both languages.
-  const portuguese = await labels(page.locator("main"));
-  expect(portuguese.slice(0, 4)).toEqual(["sweep", "hum", "orbit", "yanawa"]);
-  expect(portuguese.length).toBe(english.length);
-  await expect(page.getByText("ainda não documentado")).toHaveCount(2);
+  // Documented projects come first; the rest are listed in both languages.
+  const portugueseLabels = await labels(page.locator("main"));
+  const projects = portuguese
+    .filter((d) => d.group === "projects" && !d.sub)
+    .map((d) => d.label);
+  expect(portugueseLabels.slice(0, projects.length + external.length)).toEqual([
+    ...projects,
+    ...external,
+  ]);
+  expect(portugueseLabels.length).toBe(englishLabels.length);
+  await expect(page.getByText("ainda não documentado")).toHaveCount(
+    external.filter((id) => id !== "hum").length,
+  );
   await expect(page.getByRole("heading", { level: 2 })).toHaveText([
     "01.projetos/",
     "02.raioviajante/",
