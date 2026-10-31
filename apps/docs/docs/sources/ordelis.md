@@ -28,6 +28,13 @@ counterpart. Not published.
 | macOS only | stated | `docs/product/features.md` K; not independently re-run |
 | 59 Python test modules | counted | `ls tests/test_*.py` |
 
+## Search sentinel
+
+`e2e/dump-locale-navigation.spec.ts` treats the query `nenhum resultado publicado` as
+"no result" across all hosts. A single Portuguese entry containing all three
+words makes it match, which breaks that test. The Portuguese security page says
+"divulgado" instead of "publicado" for that reason; keep the three words apart.
+
 ## Re-verifying
 
 Compare the roadmap phases and the features table with the repository at the new

@@ -19,7 +19,7 @@ summary: fronteiras de confiança, portão de segurança e o que ainda não foi 
 
 ## Escopo
 
-Esta página resume o modelo de segurança publicado no repositório do Ordelis, conferido no código no commit `a9cf7d5`. Descreve apenas arquitetura e decisões verificadas. Para relatar uma vulnerabilidade, use o canal privado da política de segurança do repositório, nunca uma issue pública.
+Esta página resume o modelo de segurança divulgado no repositório do Ordelis, conferido no código no commit `a9cf7d5`. Descreve apenas arquitetura e decisões verificadas. Para relatar uma vulnerabilidade, use o canal privado da política de segurança do repositório, nunca uma issue pública.
 
 ## Princípios
 
