@@ -6,6 +6,8 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { copyFor } from "../src/lib/copy.ts";
+import { navNumbers } from "../src/lib/nav.ts";
+import { bare, documentedProjects, documentsOf } from "./inventory.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 
@@ -39,7 +41,7 @@ test("a cold-cache production build keeps semantic headings in the search index"
 	assert.ok(ptEntries.every(({ locale, href }) => locale === "pt-BR" && href.startsWith(ptHome)));
 	assert.deepEqual(
 		[...new Set(ptEntries.map(({ contentId }) => contentId))].sort(),
-		["projects/sweep", "projects/sweep/cli", "raioviajante/design-language", "raioviajante/repository-conventions"],
+		documentsOf("en").map(({ contentId }) => contentId).sort(),
 		"every English document is searchable in Portuguese",
 	);
 	assert.ok(entries.some(({ href }) => href.endsWith("/projects/sweep/cli/")));
@@ -76,11 +78,12 @@ test("a cold-cache production build keeps semantic headings in the search index"
 
 	// Every English document has a Portuguese counterpart at its declared path,
 	// and each pair links to the other through hreflang and LANG.
+	const documents = documentsOf("en").map((document) => [
+		bare(document.path),
+		bare(documentsOf("pt-BR").find(({ contentId }) => contentId === document.contentId).path),
+	]);
 	const pairs = [
-		["projects/sweep", "pt/projetos/sweep"],
-		["projects/sweep/cli", "pt/projetos/sweep/cli"],
-		["raioviajante/design-language", "pt/raioviajante/linguagem-de-design"],
-		["raioviajante/repository-conventions", "pt/raioviajante/convencoes-de-repositorio"],
+		...documents,
 		["terms", "pt/terms"],
 		["privacy", "pt/privacy"],
 		["", "pt"],
@@ -152,12 +155,16 @@ test("a cold-cache production build keeps semantic headings in the search index"
 
 	// Portuguese navigation omits nothing that exists: the home lists every
 	// document and every project, the sidebar numbers them like English.
-	for (const href of ["/pt/projetos/sweep/", "/pt/raioviajante/linguagem-de-design/", "/pt/raioviajante/convencoes-de-repositorio/"]) {
-		assert.ok(home.includes(`href="${href}"`), `Portuguese home lists ${href}`);
+	for (const { path, sub } of documentsOf("pt-BR")) {
+		if (!sub) assert.ok(home.includes(`href="${path}"`), `Portuguese home lists ${path}`);
 	}
 	assert.match(home, /guia · referência da cli/);
-	for (const row of ["hum", "orbit", "yanawa"]) assert.match(home, new RegExp(`<span>${row}</span>`), row);
-	assert.equal((home.match(/ainda não documentado/g) ?? []).length, 2);
+	// A project with a page of its own is listed once, as that page: the rows for
+	// the projects documented elsewhere stay, the rest give way to their pages.
+	const external = ["hum", "orbit", "yanawa"].filter((id) => !documentedProjects.has(id));
+	for (const row of ["hum", "orbit", "yanawa"])
+		assert.equal(home.split('class="docs-entry"').slice(1).filter((entry) => entry.includes(`<span>${row}</span>`)).length, 1, `${row} is listed once`);
+	assert.equal((home.match(/ainda não documentado/g) ?? []).length, external.filter((id) => id !== "hum").length);
 	assert.ok(home.includes('<h2><span class="rv-num" aria-hidden="true">01.</span>projetos/</h2>'), "projects section is 01.");
 	assert.ok(home.includes('<h2><span class="rv-num" aria-hidden="true">02.</span>raioviajante/</h2>'), "raioviajante section is 02.");
 	const homeEn = enHome;
@@ -167,14 +174,18 @@ test("a cold-cache production build keeps semantic headings in the search index"
 		"the Portuguese home lists as many entries as the English one",
 	);
 	const sidebar = (html) => [...html.matchAll(/<a href="([^"]+)"[^>]*><span class="rv-nav__num">([^<]+)<\/span>/g)].map(([, href, number]) => [href, number]);
-	assert.deepEqual(sidebar(home).map(([, number]) => number), ["00.", "01.", "01.1", "02.", "03."]);
+	const pages = documentsOf("pt-BR");
+	const numbers = navNumbers(pages);
+	assert.deepEqual(sidebar(home).map(([, number]) => number), ["00.", ...numbers]);
 	assert.deepEqual(sidebar(home).map(([, number]) => number), sidebar(homeEn).map(([, number]) => number));
-	assert.ok(home.includes('<span class="rv-search__num">04.</span><span>busca</span>'), "search follows the last page");
+	const last = String(pages.filter(({ sub }) => !sub).length + 1).padStart(2, "0");
+	assert.ok(home.includes(`<span class="rv-search__num">${last}.</span><span>busca</span>`), "search follows the last page");
 	const cli = read("pt/projetos/sweep/cli/index.html");
 	assert.match(cli, /<span aria-current="page">referência da cli<\/span>/);
 	assert.match(cli, /<a href="\/pt\/projetos\/sweep\/">sweep<\/a>/);
 	assert.match(cli, /rel="prev"[^>]*>(?:<span class="rv-label">← Anterior<\/span>)<span>sweep<\/span>/);
-	assert.match(cli, /rel="next"[^>]*>(?:<span class="rv-label">Próximo →<\/span>)<span>linguagem de design<\/span>/);
+	const afterCli = pages[pages.findIndex(({ contentId }) => contentId === "projects/sweep/cli") + 1];
+	assert.match(cli, new RegExp(`rel="next"[^>]*>(?:<span class="rv-label">Próximo →</span>)<span>${afterCli.label}</span>`));
 
 	// Dates are formatted in the page's locale, never printed raw.
 	assert.doesNotMatch(read("pt/projetos/sweep/index.html"), /\d{4}-\d{2}-\d{2}(?!T)/);
@@ -182,17 +193,11 @@ test("a cold-cache production build keeps semantic headings in the search index"
 	const sitemap = read("sitemap.xml");
 	for (const path of [
 		"/",
-		"/projects/sweep/",
-		"/projects/sweep/cli/",
-		"/raioviajante/design-language/",
-		"/raioviajante/repository-conventions/",
+		...documentsOf("en").map(({ path }) => path),
 		"/terms/",
 		"/privacy/",
 		"/pt/",
-		"/pt/projetos/sweep/",
-		"/pt/projetos/sweep/cli/",
-		"/pt/raioviajante/linguagem-de-design/",
-		"/pt/raioviajante/convencoes-de-repositorio/",
+		...documentsOf("pt-BR").map(({ path }) => path),
 		"/pt/terms/",
 		"/pt/privacy/",
 	]) {
@@ -204,13 +209,10 @@ test("a cold-cache production build keeps semantic headings in the search index"
 		[
 			"index.html",
 			"privacy/index.html",
-			"projetos/sweep/cli/index.html",
-			"projetos/sweep/index.html",
-			"raioviajante/convencoes-de-repositorio/index.html",
-			"raioviajante/linguagem-de-design/index.html",
+			...documentsOf("pt-BR").map(({ path }) => `${bare(path).replace(/^pt\//, "")}/index.html`),
 			"search/index.html",
 			"terms/index.html",
-		],
+		].sort(),
 	);
 	for (const path of ["index.html", "search/index.html", "search-index.json"]) {
 		assert.ok(existsSync(join(outDir, "pt", path)), `declared Portuguese route ${path} was built`);

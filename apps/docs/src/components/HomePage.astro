@@ -32,9 +32,12 @@ const external: Record<ExternalProjectId, Record<LocaleId, string>> = {
 		"pt-BR": `${dump}/pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma`,
 	},
 };
-const externalIds = Object.keys(external) as ExternalProjectId[];
 
 const all = await getPages(locale);
+// A project that gains a page of its own (`projects/<id>`) is listed as that
+// page, not also as an external row.
+const documented = new Set(all.map((entry) => entry.data.contentId));
+const externalIds = (Object.keys(external) as ExternalProjectId[]).filter((id) => !documented.has(`projects/${id}`));
 const nav = await navPages(locale);
 // A project's guide is followed by the pages listed under it (the Sweep CLI
 // reference): the note names them, so a guide without any shows no note.
