@@ -42,13 +42,13 @@ the user allows executing project code; otherwise say tests were read, not run.
 
 Classify every claim (this vocabulary matches existing evidence files):
 
-| Status | Meaning | May the page say it in present tense? |
-| --- | --- | --- |
-| implemented | present in code at the cited revision, exercised by tests or verified use | yes |
-| partial | exists with documented limits | yes, with the limit stated beside it |
-| experimental | behind a flag, unstable or unreleased | only labeled as such |
-| planned | stated intent, design doc or issue, no code | only under an explicit "planned" label, or omitted |
-| unverified | could not be confirmed | no: omit it and list it in the report |
+| Status       | Meaning                                                                   | May the page say it in present tense?              |
+| ------------ | ------------------------------------------------------------------------- | -------------------------------------------------- |
+| implemented  | present in code at the cited revision, exercised by tests or verified use | yes                                                |
+| partial      | exists with documented limits                                             | yes, with the limit stated beside it               |
+| experimental | behind a flag, unstable or unreleased                                     | only labeled as such                               |
+| planned      | stated intent, design doc or issue, no code                               | only under an explicit "planned" label, or omitted |
+| unverified   | could not be confirmed                                                    | no: omit it and list it in the report              |
 
 Never describe a planned capability as shipped. Design documents and ADRs
 describe intent and may predate code (an existing evidence file notes an ADR

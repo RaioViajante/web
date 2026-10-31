@@ -105,6 +105,7 @@ build and a port you started: `pnpm seo:verify`, `pnpm links:check`,
 `pnpm browser:check` (axe, overflow, 1440/390).
 
 Spot-check the built output in both locales:
+
 - the post renders at its slug, one `h1` (the title), correct `lang`;
 - listed on home, archive and its tag pages; absent when `draft: true`;
 - `rss.xml`: item with the original's `pubDate`; a new English item uses the

@@ -27,18 +27,18 @@ git diff --name-only <merge-commit>^1 <merge-commit>
 - Current `origin/main` SHA, the PR's merge commit and whether the merge commit
   is an ancestor of `origin/main` (`git merge-base --is-ancestor`). Later
   commits may have landed; say so.
-- From the changed paths derive which projects *should* rebuild. Vercel decides
+- From the changed paths derive which projects _should_ rebuild. Vercel decides
   with `security/vercel-ignore.mjs` (see `deployment.md`): shared paths
   (`packages/design`, `security/`, `seo/`, `site/`) rebuild all four; one app
   directory rebuilds that app; docs-only rebuilds none. "Canceled by Ignored
   Build Step" is the correct outcome for an unaffected project, not a failure.
 
-| Domain | Vercel project | Root Directory |
-| --- | --- | --- |
-| raioviajante.com | `raioviajante.com` | `apps/root` |
-| dump.raioviajante.com | `dump` | `apps/dump` |
-| docs.raioviajante.com | `docs` | `apps/docs` |
-| lab.raioviajante.com | `lab` | `apps/lab` |
+| Domain                | Vercel project     | Root Directory |
+| --------------------- | ------------------ | -------------- |
+| raioviajante.com      | `raioviajante.com` | `apps/root`    |
+| dump.raioviajante.com | `dump`             | `apps/dump`    |
+| docs.raioviajante.com | `docs`             | `apps/docs`    |
+| lab.raioviajante.com  | `lab`              | `apps/lab`     |
 
 (Confirm against `docs/deployment.md`; if it has changed, that doc wins.)
 

@@ -70,12 +70,12 @@ gh pr list --state open
 
 Tell the user exactly which checks ran; never imply the rest did.
 
-| Change touches | Minimum |
-| --- | --- |
-| One app only | that app's scripts from the `AGENTS.md` table (`pnpm --filter @raioviajante/<app> ...`) |
-| `packages/design`, `site/`, `seo/`, `security/`, workflows, lockfile | `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate` |
-| Rendered UI | the above plus `pnpm browser:check` and a desktop (1440) and mobile (390) look, keyboard included |
-| Markdown or skills only | `pnpm commits:check` and a format check where a formatter covers the path; say that no app code changed |
+| Change touches                                                       | Minimum                                                                                                 |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| One app only                                                         | that app's scripts from the `AGENTS.md` table (`pnpm --filter @raioviajante/<app> ...`)                 |
+| `packages/design`, `site/`, `seo/`, `security/`, workflows, lockfile | `NEXT_PUBLIC_SITE_URL=https://dump.raioviajante.com pnpm validate`                                      |
+| Rendered UI                                                          | the above plus `pnpm browser:check` and a desktop (1440) and mobile (390) look, keyboard included       |
+| Markdown or skills only                                              | `pnpm commits:check` and a format check where a formatter covers the path; say that no app code changed |
 
 Remember `docs` has no lint or format scripts. Read failures; do not weaken a
 budget, test or gate to get green.
