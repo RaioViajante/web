@@ -228,9 +228,8 @@ export function SchedulerBench({ locale }: { locale: LocaleId }) {
         <BenchBand label={text.timelineBand}>
           <div
             className="sched-scroll"
-            role="region"
-            aria-label={text.timelineCaption}
-            tabIndex={0}
+            data-scroll-region
+            data-scroll-label={text.timelineCaption}
             data-timeline
           />
           <ul className="sched-legend">
@@ -254,7 +253,12 @@ export function SchedulerBench({ locale }: { locale: LocaleId }) {
           </ul>
         </BenchBand>
         <BenchBand label={text.statusBand}>
-          <div className="sched-scroll" data-jobs-table />
+          <div
+            className="sched-scroll"
+            data-scroll-region
+            data-scroll-label={text.statusBand}
+            data-jobs-table
+          />
         </BenchBand>
         <BenchBand label={text.logBand}>
           <ol className="bench-history sched-log" data-log />
