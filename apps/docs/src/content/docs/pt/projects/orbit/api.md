@@ -111,5 +111,5 @@ A execução permanece `QUEUED`. Os estados `RUNNING`, `SUCCEEDED`, `FAILED` e `
 
 ## Referências
 
-- [Controladores](https://github.com/RaioViajante/orbit/tree/2967494/orbit-server/src/main/java/dev/raioviajante/orbit)
+- [Código-fonte](https://github.com/RaioViajante/orbit/tree/2967494/orbit-server/src/main/java/dev/raioviajante/orbit)
 - [Migrações](https://github.com/RaioViajante/orbit/tree/2967494/orbit-server/src/main/resources/db/migration)

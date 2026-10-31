@@ -99,7 +99,7 @@ QUEUED | RUNNING --cancel--> CANCELLED
 
 ## Validação
 
-A entrada é conferida duas vezes. Os records de requisição usam Bean Validation: o nome é obrigatório e tem no máximo 120 caracteres, o comando é obrigatório, a expressão cron é opcional mas não pode estar em branco nem passar de 100 caracteres, as retentativas devem ser zero ou mais, e o timeout deve ser maior que zero. As classes de domínio então impõem as mesmas regras de novo, de modo que uma entidade não pode ser construída em estado inválido por nenhum chamador. A expressão cron não é interpretada, então um valor que não seja cron válido é aceito hoje.
+A entrada é conferida duas vezes. Os records de requisição usam Bean Validation: o nome é obrigatório e tem no máximo 120 caracteres, o comando é obrigatório, a expressão cron é opcional mas não pode estar em branco nem passar de 100 caracteres, as retentativas devem ser zero ou mais, e o timeout deve ser maior que zero. As classes de domínio então impõem a maior parte das mesmas regras de novo, de modo que uma entidade não pode ser construída em estado inválido por nenhum chamador. A expressão cron não é interpretada, então um valor que não seja cron válido é aceito hoje.
 
 ## Testes
 

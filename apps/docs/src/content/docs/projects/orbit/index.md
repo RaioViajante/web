@@ -99,7 +99,7 @@ QUEUED | RUNNING --cancel--> CANCELLED
 
 ## Validation
 
-Input is checked twice. Request records use Bean Validation: the name is required and at most 120 characters, the command is required, the cron expression is optional but cannot be blank or exceed 100 characters, retries must be zero or more, and the timeout must be greater than zero. The domain classes then enforce the same rules again, so an entity cannot be built in an invalid state from any caller. The cron expression is not parsed, so a value that is not valid cron is currently accepted.
+Input is checked twice. Request records use Bean Validation: the name is required and at most 120 characters, the command is required, the cron expression is optional but cannot be blank or exceed 100 characters, retries must be zero or more, and the timeout must be greater than zero. The domain classes then enforce most of the same rules again, so an entity cannot be built in an invalid state from any caller. The cron expression is not parsed, so a value that is not valid cron is currently accepted.
 
 ## Testing
 

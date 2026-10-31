@@ -23,6 +23,11 @@ counterpart. Not published.
 | No controller tests, no CI workflow | verified absence | no `.github`, no `@WebMvcTest` |
 | Format of validation failures | not verified | no `@ControllerAdvice`, no web test |
 
+Issues #22 to #26 (execution repository, service, manual trigger, query
+endpoints) are still open although the code implements them: the tracker is
+stale, the pages follow the code. Domain validation repeats most, not all, of
+the request rules (the cron length limit is only in the request and the column).
+
 ## Re-verifying
 
 Check `git log` after `2967494`. The scheduler, worker, retry and timeout rows
