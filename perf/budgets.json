@@ -149,7 +149,7 @@
     },
     "docs/search": {
       "baseline": {
-        "total": 104312,
+        "total": 127181,
         "script": 7106,
         "stylesheet": 7292,
         "font": 33251,
@@ -157,7 +157,7 @@
         "requests": 7
       },
       "max": {
-        "total": 124928,
+        "total": 143360,
         "script": 12288,
         "stylesheet": 13312,
         "font": 43008,
