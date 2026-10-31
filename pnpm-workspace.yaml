@@ -35,11 +35,10 @@ minimumReleaseAgeExclude:
 #   glob, test-exclude) and of glob 10 and 13 (Jest and its coverage tooling)
 #   asks for a vulnerable range, and no release of those packages asks for a
 #   patched one. The named `minimatch` and `Minimatch` exports they use exist in
-#   11, so the ranges move to the patched releases. minimatch 3.x is not
-#   included: eslint-plugin-import, -jsx-a11y and -react call it as a function
-#   or through its default export, and 11 provides neither; eslint 9,
-#   @eslint/config-array and @eslint/eslintrc share the same 3.x entry. Remove an entry when its owning
-#   packages ship the fix.
+#   11, so the ranges move to the patched releases. minimatch 3.1.5 (eslint 9 and
+#   its plugins) calls the module itself, which 11 does not export, so it goes
+#   to security/minimatch-compat, a shim over 11 with the 3 call shape. Remove
+#   an entry when its owning packages ship the fix.
 overrides:
   "fflate@0.7.3": "0.7.5"
   "satori@0.25.0": "0.33.5"
@@ -47,3 +46,4 @@ overrides:
   "zod@^3.25.0 || ^4.0.0": "4.6.7"
   "minimatch@>=9.0.0 <11.0.1": "11.0.3"
   "glob@>=9.0.0 <14.0.2": "14.0.3"
+  "minimatch@3.1.5": "file:security/minimatch-compat"

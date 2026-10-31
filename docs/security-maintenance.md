@@ -44,14 +44,25 @@ because their consumers (typescript-estree, glob, test-exclude, Jest) use the
 named exports that minimatch 11 keeps. Lint, tests, builds and the browser
 suite pass with the overrides.
 
-One advisory remains: minimatch 3.1.5, reached through eslint 9,
-`@eslint/config-array`, `@eslint/eslintrc`, `eslint-plugin-import`,
-`eslint-plugin-jsx-a11y` and `eslint-plugin-react`. Minimatch 11 exports no
-default and is not callable, and the three plugins call it that way, so
-overriding it would break them. No upstream
-release fixes it: the newest eslint still asks for `^10.2.x`, which is also
-vulnerable. The gate keeps failing until an upstream release or a person's
-decision (an expiring exception, or a patch of the six packages) resolves it.
+minimatch 3.1.5 is reached through eslint 9, `@eslint/config-array`,
+`@eslint/eslintrc`, `eslint-plugin-import`, `eslint-plugin-jsx-a11y` and
+`eslint-plugin-react`, all development lint tooling. No upstream release fixes
+it (the newest eslint asks for `^10.2.x`, also vulnerable), and a plain override
+to 11 breaks the three plugins because they call the module itself and 11 has
+named exports only. So `security/minimatch-compat` is a private shim: it
+re-exports minimatch 11's `minimatch` function, which carries `Minimatch`,
+`filter`, `match` and the rest, as the module's default export, and the override
+`minimatch@3.1.5` points at it. The audit then sees minimatch 11.0.3 and the
+advisory is fixed, not excepted. Before adoption, 900 checks (calls, options
+`dot`, `matchBase`, `nocase`, `allowWindowsEscape`, negation, braces, extglobs)
+gave the same results on 3.1.5 and the shim.
+
+Note on exposure: the advisory's code (`firstPhasePreProcess`,
+`optimizationLevel`) does not exist in 3.1.5, so that version was probably not
+exploitable; the shim removes the version from the tree regardless. Every pattern
+reaching these packages comes from repository config, never from users.
+Remove the shim and override when eslint and its plugins ask for minimatch 11
+or later.
 
 The former `satori` advisory (GHSA-wx4j-mvgx-mqwp, SVG escaping, fixed in
 0.33.5) is not an exception: `@vercel/og` 0.11.1 pins `satori` 0.25.0 exactly, so
