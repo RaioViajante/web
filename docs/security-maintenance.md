@@ -51,7 +51,8 @@ it (the newest eslint asks for `^10.2.x`, also vulnerable), and a plain override
 to 11 breaks the three plugins because they call the module itself and 11 has
 named exports only. So `security/minimatch-compat` is a private shim: it
 re-exports minimatch 11's `minimatch` function, which carries `Minimatch`,
-`filter`, `match` and the rest, as the module's default export, and the override
+`filter`, `match`, `sep`, `GLOBSTAR`, `defaults`, `braceExpand`, `escape` and
+`unescape`, as the module's default export, and the override
 `minimatch@3.1.5` points at it. The audit then sees minimatch 11.0.3 and the
 advisory is fixed, not excepted. Before adoption, 900 checks (calls, options
 `dot`, `matchBase`, `nocase`, `allowWindowsEscape`, negation, braces, extglobs)
@@ -61,6 +62,12 @@ Note on exposure: the advisory's code (`firstPhasePreProcess`,
 `optimizationLevel`) does not exist in 3.1.5, so that version was probably not
 exploitable; the shim removes the version from the tree regardless. Every pattern
 reaching these packages comes from repository config, never from users.
+Gaps: minimatch 11 dropped `makeRe`, so the shim has none, and
+`eslint-plugin-import`'s `import/no-internal-modules` rule with `allow` or
+`forbid` would throw; no app config enables it. Minimatch 11 also brings one
+young transitive package, `@isaacs/nonrecursive-glob-match` (first published
+2026-10-26), within the default release-age policy. Editing the shim needs
+`pnpm install` again because `file:` copies it.
 Remove the shim and override when eslint and its plugins ask for minimatch 11
 or later.
 
