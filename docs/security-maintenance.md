@@ -47,7 +47,8 @@ suite pass with the overrides.
 One advisory remains: minimatch 3.1.5, reached through eslint 9,
 `@eslint/config-array`, `@eslint/eslintrc`, `eslint-plugin-import`,
 `eslint-plugin-jsx-a11y` and `eslint-plugin-react`. Minimatch 11 exports no
-default and is not callable, so overriding it would break all six. No upstream
+default and is not callable, and the three plugins call it that way, so
+overriding it would break them. No upstream
 release fixes it: the newest eslint still asks for `^10.2.x`, which is also
 vulnerable. The gate keeps failing until an upstream release or a person's
 decision (an expiring exception, or a patch of the six packages) resolves it.

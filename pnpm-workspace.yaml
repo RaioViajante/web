@@ -36,9 +36,9 @@ minimumReleaseAgeExclude:
 #   asks for a vulnerable range, and no release of those packages asks for a
 #   patched one. The named `minimatch` and `Minimatch` exports they use exist in
 #   11, so the ranges move to the patched releases. minimatch 3.x is not
-#   included: its consumers (eslint 9, @eslint/config-array, @eslint/eslintrc,
-#   eslint-plugin-import, -jsx-a11y and -react) call it as a function or import
-#   its default export, and 11 provides neither. Remove an entry when its owning
+#   included: eslint-plugin-import, -jsx-a11y and -react call it as a function
+#   or through its default export, and 11 provides neither; eslint 9,
+#   @eslint/config-array and @eslint/eslintrc share the same 3.x entry. Remove an entry when its owning
 #   packages ship the fix.
 overrides:
   "fflate@0.7.3": "0.7.5"
