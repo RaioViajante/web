@@ -1,0 +1,496 @@
+---
+import { ImageCompressionBench } from "./ImageCompressionBench";
+import { imageCompressionCopy } from "../../lib/image-compression-copy";
+import type { LocaleId } from "../../../../../site/locales";
+import "../../styles/image-compression.css";
+interface Props {
+  locale: LocaleId;
+}
+const { locale } = Astro.props;
+const text = imageCompressionCopy[locale];
+---
+
+<ImageCompressionBench locale={locale} />
+<h3 class="ic-heading">{text.conceptsHeading}</h3>
+<dl class="ic-concepts">
+  {text.concepts.map((item) => (
+    <>
+      <dt>{item.term}</dt>
+      <dd>{item.text}</dd>
+    </>
+  ))}
+</dl>
+<h3 class="ic-heading">{text.limitsHeading}</h3>
+<ul class="ic-limits">
+  {text.limits.map((item) => (
+    <li>{item}</li>
+  ))}
+</ul>
+<script>
+  import {
+    CompressionSession,
+    differencePixels,
+    fitWithin,
+    formatBytes,
+    formatMegapixels,
+    formatNumber,
+    formatPercent,
+    isLossy,
+    mimeOf,
+    presets,
+    samplePixels,
+    type EncodeResult,
+    type LoadResult,
+    type Measurement,
+    type OutputFormat,
+  } from "../../lib/image-compression";
+  import {
+    browserEncoder,
+    paintPixels,
+    drawOn,
+    readPixels,
+    type BitmapDecoded,
+  } from "../../lib/image-compression-browser";
+  import { pickForm, type OneCounts } from "../../lib/plural-lookup";
+  import type { ImageCompressionCopy } from "../../lib/image-compression-copy";
+  import { fill } from "../../lib/template";
+  import { playSound } from "@raioviajante/design/sound";
+
+  type ClientCopy = Omit<
+    ImageCompressionCopy,
+    "concepts" | "limits" | "conceptsHeading" | "limitsHeading" | "noscript"
+  > & { intlLocale: string; oneCounts: OneCounts };
+
+  const root = document.querySelector<HTMLElement>("[data-compress]");
+  if (root) {
+    // Rendered into the page at build time; never read from the browser.
+    const text = JSON.parse(root.dataset.copy!) as ClientCopy;
+    const intl = text.intlLocale;
+    const one = text.oneCounts;
+    const $ = <T extends HTMLElement>(selector: string) =>
+      root.querySelector<T>(selector)!;
+    const fileInput = $<HTMLInputElement>("[data-file]");
+    const formatSelect = $<HTMLSelectElement>("[data-format]");
+    const quality = $<HTMLInputElement>("[data-quality]");
+    const scale = $<HTMLInputElement>("[data-scale]");
+    const qualityText = $("[data-quality-text]");
+    const scaleText = $("[data-scale-text]");
+    const qualityNote = $("[data-quality-note]");
+    const transparencyNote = $("[data-transparency-note]");
+    const status = $("[data-status]");
+    const stage = $("[data-stage]");
+    const controls = $("[data-compare-controls]");
+    const original = $<HTMLCanvasElement>("[data-original]");
+    const result = $<HTMLCanvasElement>("[data-result]");
+    const diffCanvas = $<HTMLCanvasElement>("[data-difference]");
+    const split = $<HTMLInputElement>("[data-split]");
+    const diffButton = $<HTMLButtonElement>("[data-diff]");
+    const zoomButton = $<HTMLButtonElement>("[data-zoom]");
+    const sweepOut = $("[data-sweep-out]");
+    const sweepButton = $<HTMLButtonElement>("[data-sweep]");
+
+    const session = new CompressionSession(browserEncoder);
+    let last: Extract<EncodeResult, { ok: true }> | null = null;
+    let debounce: number | undefined;
+    /** The newest file or sample choice; an older one that finishes late is dropped. */
+    let choice = 0;
+
+    const say = (message: string) => {
+      status.textContent = message;
+    };
+    const bytes = (n: number) => formatBytes(n, intl);
+    const exact = (n: number) =>
+      pickForm(text.exactBytes, n, one, formatNumber(n, intl));
+    const percentOf = (fraction: number) => formatPercent(fraction, intl);
+    const cell = (name: string, value: string) => {
+      $(`[data-cell="${name}"]`).textContent = value;
+    };
+    const setting = () => ({
+      format: formatSelect.value as OutputFormat,
+      quality: quality.valueAsNumber,
+      scale: scale.valueAsNumber,
+    });
+
+    function renderSettings() {
+      const { format } = setting();
+      qualityText.textContent = isLossy(format)
+        ? fill(text.qualityValue, { quality: quality.value })
+        : "—";
+      scaleText.textContent = fill(text.scaleValue, {
+        percent: percentOf(scale.valueAsNumber / 100),
+      });
+      quality.disabled = !isLossy(format);
+      qualityNote.hidden = isLossy(format);
+      transparencyNote.hidden = format !== "jpeg";
+    }
+
+    function renderMeasurement(m: Measurement) {
+      cell(
+        "file-original",
+        `${bytes(m.originalBytes)} · ${exact(m.originalBytes)}`,
+      );
+      cell("file-output", `${bytes(m.outputBytes)} · ${exact(m.outputBytes)}`);
+      const dims = (d: { width: number; height: number }) =>
+        fill(text.dimensionsValue, {
+          width: formatNumber(d.width, intl),
+          height: formatNumber(d.height, intl),
+          megapixels: formatMegapixels(d, intl),
+        });
+      cell("dimensions-original", dims(m.original));
+      cell("dimensions-output", dims(m.output));
+      cell("saved-original", "—");
+      cell(
+        "saved-output",
+        m.saved >= 0
+          ? fill(text.savedValue, { value: percentOf(m.saved) })
+          : fill(text.largerValue, { value: percentOf(-m.saved) }),
+      );
+      cell("factor-original", "—");
+      cell(
+        "factor-output",
+        fill(text.factorValue, {
+          factor: new Intl.NumberFormat(intl, {
+            maximumFractionDigits: 1,
+          }).format(m.compressionFactor),
+        }),
+      );
+      cell("raw-original", bytes(m.rawOriginal));
+      cell("raw-output", bytes(m.rawOutput));
+    }
+
+    /** Forgets the previous result: figures, previews and the sweep table. */
+    function clearOutputs() {
+      last = null;
+      for (const row of ["file", "dimensions", "saved", "factor", "raw"])
+        cell(`${row}-output`, "—");
+      for (const canvas of [original, result, diffCanvas]) canvas.width = 0;
+      diffCanvas.hidden = true;
+      sweepOut.replaceChildren();
+    }
+
+    function showLoaded() {
+      stage.hidden = false;
+      controls.hidden = false;
+      clearOutputs();
+    }
+
+    function setSplit() {
+      stage.style.setProperty("--split", `${split.value}%`);
+    }
+
+    /** Draws both pictures at one preview size, so what is compared is on the same pixel grid. */
+    async function drawPreviews() {
+      const decoded = session.decoded as BitmapDecoded | null;
+      const mine = last;
+      if (!decoded || !mine) return;
+      // Bounded: a 36-megapixel image is shown at 2000 px on its long side.
+      const size = fitWithin(mine.measurement.output, 2000);
+      // Decode at preview size, not at the (possibly 36 MP) output size.
+      const bitmap = await createImageBitmap(mine.blob, {
+        resizeWidth: size.width,
+        resizeHeight: size.height,
+        resizeQuality: "high",
+      })
+        .catch(() => createImageBitmap(mine.blob))
+        .catch(() => null);
+      // A newer encoding or image may have arrived while this one decoded.
+      if (!bitmap || last !== mine || session.decoded !== decoded) {
+        bitmap?.close();
+        return;
+      }
+      // JPEG output sits on white, so the original is shown on white too.
+      try {
+        drawOn(original, decoded.bitmap, size, formatSelect.value === "jpeg");
+        drawOn(result, bitmap, size, false);
+      } finally {
+        bitmap.close();
+      }
+      await updateDifference();
+    }
+
+    async function updateDifference() {
+      if (diffButton.getAttribute("aria-pressed") !== "true") {
+        diffCanvas.hidden = true;
+        return;
+      }
+      if (!last || original.width === 0 || original.width !== result.width)
+        return;
+      paintPixels(
+        diffCanvas,
+        differencePixels(readPixels(original), readPixels(result)),
+        { width: original.width, height: original.height },
+      );
+      diffCanvas.hidden = false;
+    }
+
+    async function encode(announce = true) {
+      if (!session.hasImage) {
+        say(text.messages.noImage);
+        return;
+      }
+      const spec = setting();
+      const outcome = await session.encode(spec);
+      if (!outcome.ok) {
+        if (outcome.reason === "failed") say(text.messages.encodeFailed);
+        return;
+      }
+      if (outcome.support === "fallback") {
+        // The browser answered with a different format: show no numbers for it,
+        // and drop the figures and pictures of the previous encoding.
+        clearOutputs();
+        say(
+          fill(text.messages.unsupported, {
+            format: text.formatNames[spec.format].split(" ")[0]!,
+          }),
+        );
+        return;
+      }
+      last = outcome;
+      renderMeasurement(outcome.measurement);
+      const m = outcome.measurement;
+      if (announce)
+        say(
+          m.saved >= 0
+            ? fill(text.messages.smaller, {
+                size: bytes(m.outputBytes),
+                saved: fill(text.savedValue, { value: percentOf(m.saved) }),
+              })
+            : fill(text.messages.larger, {
+                size: bytes(m.outputBytes),
+                larger: fill(text.largerValue, { value: percentOf(-m.saved) }),
+              }),
+        );
+      void drawPreviews().catch(() => say(text.messages.encodeFailed));
+    }
+
+    function scheduleEncode(announce = true) {
+      window.clearTimeout(debounce);
+      debounce = window.setTimeout(() => void encode(announce), 150);
+    }
+
+    async function afterLoad(
+      loaded: LoadResult,
+      describe: (l: Extract<LoadResult, { ok: true }>) => string,
+    ) {
+      // A newer choice already took over; saying anything here would be noise.
+      if (!loaded.ok && loaded.reason === "stale") return;
+      if (!loaded.ok) {
+        say(text.messages.problems[loaded.reason]);
+        playSound("reject");
+        return;
+      }
+      showLoaded();
+      cell(
+        "file-original",
+        `${bytes(loaded.originalBytes)} · ${exact(loaded.originalBytes)}`,
+      );
+      say(describe(loaded));
+      playSound("success");
+      // The load confirmation stays in the live region; the figures are in the table.
+      await encode(false);
+    }
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      ++choice; // a sample still being made will see it and step aside
+      say(text.messages.loading);
+      const loaded = await session.load(file);
+      fileInput.value = ""; // choosing the same file again must fire `change`
+      await afterLoad(loaded, (l) =>
+        fill(text.messages.loaded, {
+          name: file.name,
+          width: formatNumber(l.original.width, intl),
+          height: formatNumber(l.original.height, intl),
+          size: bytes(l.originalBytes),
+        }),
+      );
+    });
+
+    $("[data-sample]").addEventListener("click", async () => {
+      const mine = ++choice;
+      const width = 800;
+      const height = 600;
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas
+        .getContext("2d")!
+        .putImageData(
+          new ImageData(
+            samplePixels(
+              width,
+              height,
+            ) as unknown as Uint8ClampedArray<ArrayBuffer>,
+            width,
+            height,
+          ),
+          0,
+          0,
+        );
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, mimeOf.png),
+      );
+      if (!blob) {
+        say(text.messages.encodeFailed);
+        return;
+      }
+      const bitmap = await createImageBitmap(blob).catch(() => null);
+      if (!bitmap) {
+        say(text.messages.encodeFailed);
+        return;
+      }
+      if (mine !== choice) {
+        bitmap.close(); // the user picked a file while the sample was being made
+        return;
+      }
+      const decoded: BitmapDecoded = {
+        bitmap,
+        width,
+        height,
+        close: () => bitmap.close(),
+      };
+      const loaded = session.adopt(decoded, blob);
+      await afterLoad(loaded, (l) =>
+        fill(text.messages.sampleLoaded, {
+          width: formatNumber(l.original.width, intl),
+          height: formatNumber(l.original.height, intl),
+          size: bytes(l.originalBytes),
+        }),
+      );
+    });
+
+    root
+      .querySelectorAll<HTMLButtonElement>("[data-preset]")
+      .forEach((button) =>
+        button.addEventListener("click", () => {
+          const preset = presets.find(
+            (item) => item.id === button.dataset.preset,
+          )!;
+          formatSelect.value = preset.format;
+          quality.value = String(preset.quality);
+          scale.value = String(preset.scale);
+          root!
+            .querySelectorAll("[data-preset]")
+            .forEach((other) =>
+              other.setAttribute("aria-pressed", String(other === button)),
+            );
+          renderSettings();
+          const entry = text.presets[preset.id];
+          say(
+            fill(text.messages.preset, { name: entry.name, hint: entry.hint }),
+          );
+          playSound("success");
+          if (session.hasImage) scheduleEncode();
+        }),
+      );
+
+    for (const control of [formatSelect, quality, scale])
+      control.addEventListener("input", () => {
+        root!
+          .querySelectorAll("[data-preset]")
+          .forEach((button) => button.setAttribute("aria-pressed", "false"));
+        renderSettings();
+        sweepOut.replaceChildren(); // a table for other settings would mislead
+        // While a slider moves the numbers update silently; release announces once.
+        if (session.hasImage) scheduleEncode(false);
+      });
+    for (const control of [formatSelect, quality, scale])
+      control.addEventListener("change", () => {
+        if (session.hasImage) scheduleEncode(true);
+      });
+
+    split.addEventListener("input", setSplit);
+    for (const [button, apply] of [
+      [diffButton, () => void updateDifference()],
+      [
+        zoomButton,
+        () =>
+          stage.classList.toggle(
+            "is-zoomed",
+            zoomButton.getAttribute("aria-pressed") === "true",
+          ),
+      ],
+    ] as const)
+      button.addEventListener("click", () => {
+        button.setAttribute(
+          "aria-pressed",
+          String(button.getAttribute("aria-pressed") !== "true"),
+        );
+        apply();
+      });
+
+    sweepButton.addEventListener("click", async () => {
+      const { format, scale: percent } = setting();
+      if (session.hasImage && isLossy(format) && !last) {
+        // The browser did not produce this format, so there is nothing to sweep.
+        say(
+          fill(text.messages.unsupported, {
+            format: text.formatNames[format].split(" ")[0]!,
+          }),
+        );
+        playSound("reject");
+        return;
+      }
+      if (!session.hasImage || !isLossy(format) || !last) {
+        say(
+          session.hasImage && !isLossy(format)
+            ? text.sweepLossless
+            : text.messages.sweepSkipped,
+        );
+        playSound("reject");
+        return;
+      }
+      const base = last;
+      say(text.messages.sweepBusy);
+      sweepButton.disabled = true;
+      const rows = await session.sweep(format, percent).finally(() => {
+        sweepButton.disabled = false;
+      });
+      if (!rows) {
+        say(text.messages.sweepSkipped);
+        return;
+      }
+      const table = document.createElement("table");
+      table.createCaption().textContent = text.sweepCaption;
+      const head = table.createTHead().insertRow();
+      for (const title of text.sweepHeaders) {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.textContent = title;
+        head.append(th);
+      }
+      const body = table.createTBody();
+      for (const row of rows) {
+        const tr = body.insertRow();
+        tr.insertCell().textContent = String(row.quality);
+        tr.insertCell().textContent = bytes(row.bytes);
+        tr.insertCell().textContent = percentOf(
+          row.bytes / base.measurement.originalBytes,
+        );
+      }
+      sweepOut.replaceChildren(table);
+      say(text.messages.sweepDone);
+      playSound("success");
+    });
+
+    // Nothing may outlive the page: the decoded bitmap and the timer are released.
+    window.addEventListener("pagehide", () => {
+      window.clearTimeout(debounce);
+      session.dispose();
+      clearOutputs();
+    });
+    // A page restored from the back/forward cache has lost its image: start clean.
+    window.addEventListener("pageshow", (event) => {
+      if (!event.persisted) return;
+      stage.hidden = true;
+      controls.hidden = true;
+      clearOutputs();
+      cell("file-original", "—");
+      cell("dimensions-original", "—");
+      say(text.messages.ready);
+    });
+    renderSettings();
+    setSplit();
+  }
+</script>
