@@ -47,6 +47,10 @@ The current public documentation contains:
 
 - `projects/`
   - `sweep`
+  - `mochifile`
+  - `orbit`
+  - `ordelis`
+  - `yanawa`
 - `raioviajante/`
   - design language
   - repository conventions
