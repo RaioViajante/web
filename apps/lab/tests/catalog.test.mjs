@@ -133,10 +133,16 @@ test("boot sections share one source and keep their technical tokens exact", () 
 test("related rows point to the same destinations in both locales, except the localized docs page and the Portuguese printf post", () => {
   for (const [surface, byLocale] of Object.entries(relatedRows)) {
     if (surface === "filename-classifier") continue; // pinned in localization.test.mjs
-    const hosts = (rows) => rows.map((row) => new URL(row.href).hostname);
+    // Links to another Lab page are site-relative and carry the locale prefix.
+    const external = (rows) => rows.filter((row) => !row.href.startsWith("/"));
+    for (const row of byLocale["pt-BR"].filter((r) => r.href.startsWith("/")))
+      assert.ok(row.href.startsWith("/pt/"), `${surface} ${row.href}`);
+    const hosts = (rows) =>
+      external(rows).map((row) => new URL(row.href).hostname);
     assert.deepEqual(hosts(byLocale["pt-BR"]), hosts(byLocale.en), surface);
     byLocale.en.forEach((row, index) => {
       const pt = byLocale["pt-BR"][index];
+      if (row.href.startsWith("/")) return;
       if (new URL(row.href).hostname === "docs.raioviajante.com")
         assert.ok(pt.href.includes("/pt/"));
       else if (row.href.endsWith("/posts/there-is-no-printf-down-here"))
