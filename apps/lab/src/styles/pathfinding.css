@@ -1,0 +1,195 @@
+/* Pathfinding playground: grid, legend and notes. Colors come from tokens. */
+.path-size {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 16px;
+  margin-top: 16px;
+}
+.path-size label {
+  display: block;
+}
+.path-size .rv-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.path-size select {
+  min-width: 140px;
+}
+.path-grid {
+  --cols: 20;
+  --cell: 28px;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.path-grid[data-grid-size="small"] {
+  --cols: 12;
+  --cell: 34px;
+}
+.path-grid[data-grid-size="large"] {
+  --cols: 30;
+  --cell: 24px;
+}
+.path-row {
+  display: grid;
+  width: max-content;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+}
+.path-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cell);
+  height: var(--cell);
+  border: 1px solid var(--block-hairline);
+  color: var(--fg-2);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+.path-cell:focus-visible,
+.path-grid:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  position: relative;
+  z-index: 1;
+}
+.path-cell[data-kind="wall"],
+.path-key[data-kind="wall"] {
+  background: var(--fg-3);
+  color: var(--bg);
+}
+.path-cell[data-kind="mud"],
+.path-key[data-kind="mud"] {
+  background: var(--block-inner);
+  color: var(--fg);
+}
+.path-cell[data-kind="start"],
+.path-cell[data-kind="goal"],
+.path-key[data-kind="start"],
+.path-key[data-kind="goal"] {
+  background: var(--fg);
+  color: var(--bg);
+  font-weight: 650;
+}
+.path-cell[data-state="expanded"],
+.path-cell[data-state="current"] {
+  color: var(--syn-function);
+}
+.path-cell[data-state="current"] {
+  border-color: var(--fg);
+}
+.path-cell[data-state="frontier"],
+.path-key[data-kind="frontier"] {
+  border-style: dotted;
+  border-color: var(--fg-2);
+  color: var(--syn-keyword);
+}
+.path-cell[data-state="path"],
+.path-key[data-kind="path"] {
+  border-color: var(--fg);
+  color: var(--syn-string);
+  font-weight: 650;
+}
+.path-cell[data-kind="start"][data-state],
+.path-cell[data-kind="goal"][data-state] {
+  border-color: var(--fg);
+  color: var(--bg);
+}
+.path-key[data-kind="expanded"] {
+  color: var(--syn-function);
+}
+.path-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 6px 16px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12.5px;
+  color: var(--fg-2);
+}
+.path-key {
+  display: inline-block;
+  min-width: 24px;
+  padding: 1px 4px;
+  border: 1px solid var(--block-hairline);
+  text-align: center;
+}
+.path-speed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 16px;
+  font-size: 13px;
+}
+.path-speed label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.path-speed input[type="range"] {
+  accent-color: var(--fg);
+  min-height: var(--touch);
+  width: 160px;
+}
+.path-speed input[type="range"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.path-compare {
+  overflow-x: auto;
+}
+.path-compare table {
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.path-compare caption {
+  caption-side: top;
+  padding-bottom: 8px;
+  text-align: left;
+  color: var(--fg-3);
+}
+.path-compare th,
+.path-compare td {
+  padding: 4px 12px 4px 0;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--table-rule);
+}
+.path-heading {
+  margin: 32px 0 12px;
+  font-size: var(--size-small);
+  font-weight: var(--weight-heading);
+}
+.path-concepts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 24px;
+  margin: 0;
+  font-size: 14px;
+}
+.path-concepts dd {
+  margin: 0;
+  color: var(--fg-2);
+}
+.path-limits {
+  padding-left: 20px;
+  font-size: 14px;
+  color: var(--fg-2);
+}
+@media (max-width: 760px) {
+  .path-concepts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .path-concepts dd {
+    margin-bottom: 12px;
+  }
+}

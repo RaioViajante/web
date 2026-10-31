@@ -1,0 +1,488 @@
+---
+import { SchedulerBench } from "./SchedulerBench";
+import { schedulerCopy } from "../../lib/scheduler-copy";
+import type { LocaleId } from "../../../../../site/locales";
+interface Props {
+  locale: LocaleId;
+}
+const { locale } = Astro.props;
+const text = schedulerCopy[locale];
+---
+
+<SchedulerBench locale={locale} />
+<h3 class="sched-heading">{text.conceptsHeading}</h3>
+<dl class="sched-concepts">
+  {text.concepts.map((item) => (
+    <>
+      <dt>{item.term}</dt>
+      <dd>{item.text}</dd>
+    </>
+  ))}
+</dl>
+<h3 class="sched-heading">{text.limitsHeading}</h3>
+<ul class="sched-limits">
+  {text.limits.map((item) => (
+    <li>{item}</li>
+  ))}
+</ul>
+<script>
+  // Imported by the script, not the frontmatter: the stylesheet then ships with
+  // this experiment's script and only its page links it.
+  import "../../styles/scheduler.css";
+  import {
+    LIMITS,
+    cancel,
+    createSimulation,
+    isOver,
+    makeJob,
+    preset,
+    run,
+    step,
+    validateConfig,
+    type BackoffKind,
+    type ConfigIssue,
+    type FailureKind,
+    type JobConfig,
+    type PresetId,
+    type SimConfig,
+    type SimState,
+  } from "../../lib/scheduler-sim";
+  import {
+    cellMark,
+    detailText,
+    eventText,
+    progressText,
+    tableCounter,
+    type CountTable,
+  } from "../../lib/scheduler-view";
+  import type { SchedulerCopy } from "../../lib/scheduler-copy";
+  import { fill } from "../../lib/template";
+  import { playSound } from "@raioviajante/design/sound";
+
+  type ClientCopy = Omit<
+    SchedulerCopy,
+    "concepts" | "limits" | "conceptsHeading" | "limitsHeading" | "noscript"
+  > & { intlLocale: string; counts: CountTable };
+
+  const root = document.querySelector<HTMLElement>("[data-scheduler]");
+  if (root) {
+    // Rendered into the page at build time; never read from the browser.
+    const text = JSON.parse(root.dataset.copy!) as ClientCopy;
+    const copy = text as unknown as SchedulerCopy;
+    const intl = text.intlLocale;
+    const count = tableCounter(text.counts);
+    const $ = <T extends HTMLElement>(selector: string) =>
+      root.querySelector<T>(selector)!;
+    const jobsBox = $("[data-jobs]");
+    const template = $<HTMLTemplateElement>("[data-job-template]");
+    const concurrency = $<HTMLInputElement>("#sched-concurrency");
+    const status = $("[data-status]");
+    const tickOut = $("[data-tick]");
+    const timeline = $("[data-timeline]");
+    const jobsTable = $("[data-jobs-table]");
+    const log = $("[data-log]");
+    const stepButton = $<HTMLButtonElement>("[data-step]");
+    const runButton = $<HTMLButtonElement>("[data-run]");
+    const speed = $<HTMLInputElement>("[data-speed]");
+    const speedText = $("[data-speed-text]");
+    const hint = $("[data-preset-hint]");
+    const reducedNote = $("[data-reduced]");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const RATES = [1, 2, 4, 8, 16];
+
+    let sim: SimState | null = null;
+    let timer: number | undefined;
+    let issues: { issue: ConfigIssue; job: number }[] = [];
+
+    const say = (message: string) => {
+      status.textContent = message;
+    };
+    const rows = () => [...jobsBox.querySelectorAll<HTMLElement>("[data-job]")];
+
+    function readConfig(): SimConfig {
+      const num = (el: HTMLElement, field: string) =>
+        el.querySelector<HTMLInputElement>(`[data-field="${field}"]`)!
+          .valueAsNumber;
+      const sel = (el: HTMLElement, field: string) =>
+        el.querySelector<HTMLSelectElement>(`[data-field="${field}"]`)!.value;
+      const jobs: JobConfig[] = rows().map((el) => ({
+        id: el.dataset.id!,
+        duration: num(el, "duration"),
+        timeout: num(el, "timeout"),
+        maxRetries: num(el, "maxRetries"),
+        backoff: sel(el, "backoff") as BackoffKind,
+        backoffBase: num(el, "backoffBase"),
+        failAttempts: num(el, "failAttempts"),
+        failureKind: sel(el, "failureKind") as FailureKind,
+        submitAt: num(el, "submitAt"),
+      }));
+      return { concurrency: concurrency.valueAsNumber, jobs };
+    }
+
+    function writeConfig(config: SimConfig) {
+      concurrency.value = String(config.concurrency);
+      jobsBox.replaceChildren();
+      config.jobs.forEach((job) => jobsBox.append(buildRow(job)));
+    }
+
+    function buildRow(job: JobConfig): HTMLElement {
+      const row = template.content.firstElementChild!.cloneNode(
+        true,
+      ) as HTMLElement;
+      row.dataset.id = job.id;
+      row.querySelector("[data-job-id]")!.textContent = job.id;
+      const remove = row.querySelector<HTMLButtonElement>("[data-remove]")!;
+      remove.textContent = remove.ariaLabel = fill(text.removeJob, {
+        id: job.id,
+      });
+      for (const [field, value] of Object.entries(job)) {
+        const input = row.querySelector<HTMLInputElement | HTMLSelectElement>(
+          `[data-field="${field}"]`,
+        );
+        if (input) input.value = String(value);
+      }
+      return row;
+    }
+
+    function nextId(): string {
+      const used = new Set(rows().map((el) => el.dataset.id));
+      for (let n = 1; ; n += 1) if (!used.has(`job-${n}`)) return `job-${n}`;
+    }
+
+    function stop() {
+      if (timer !== undefined) window.clearTimeout(timer);
+      timer = undefined;
+      runButton.textContent = text.run;
+    }
+
+    function speedLabel() {
+      const rate = RATES[speed.valueAsNumber - 1] ?? RATES[2]!;
+      speedText.textContent = count("speedValue", rate);
+      return rate;
+    }
+
+    function validate(): boolean {
+      issues = validateConfig(readConfig());
+      const bad = new Set(issues.map((i) => i.job));
+      rows().forEach((el, index) =>
+        el
+          .querySelectorAll("input")
+          .forEach((input) =>
+            input.setAttribute(
+              "aria-invalid",
+              String(bad.has(index) && !input.checkValidity()),
+            ),
+          ),
+      );
+      concurrency.setAttribute(
+        "aria-invalid",
+        String(!concurrency.checkValidity()),
+      );
+      const invalid = issues.length > 0;
+      for (const button of [stepButton, runButton]) {
+        button.classList.toggle("rv-btn--rejected", invalid);
+        button.setAttribute("aria-disabled", String(invalid));
+      }
+      return !invalid;
+    }
+
+    function issueMessage(): string {
+      return [...new Set(issues.map((i) => text.issues[i.issue]))].join(" ");
+    }
+
+    function render() {
+      const state = sim ?? createSimulation(readConfig());
+      tickOut.textContent = String(state.now);
+      // Timeline: one row per job, one column per tick processed so far.
+      const columns = state.now;
+      const table = document.createElement("table");
+      table.className = "sched-grid";
+      const head = table.createTHead().insertRow();
+      const corner = document.createElement("th");
+      corner.scope = "col";
+      corner.textContent = text.timelineJob;
+      head.append(corner);
+      for (let t = 0; t < columns; t += 1) {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.textContent = String(t);
+        head.append(th);
+      }
+      const body = table.createTBody();
+      state.jobs.forEach((job, index) => {
+        const tr = body.insertRow();
+        const th = document.createElement("th");
+        th.scope = "row";
+        th.textContent = job.config.id;
+        tr.append(th);
+        const trace = state.trace[index]!;
+        for (let t = 0; t < columns; t += 1) {
+          const td = tr.insertCell();
+          td.dataset.cell = trace[t]!;
+          td.textContent = cellMark(copy, trace, t);
+          td.title = copy.legend[trace[t]!];
+        }
+      });
+      table.caption = Object.assign(document.createElement("caption"), {
+        textContent: text.timelineCaption,
+        className: "rv-sr-only",
+      });
+      // Follow the newest tick unless the reader scrolled back to look.
+      const following =
+        timeline.scrollLeft + timeline.clientWidth >= timeline.scrollWidth - 4;
+      timeline.replaceChildren(table);
+      if (following) timeline.scrollLeft = timeline.scrollWidth;
+
+      // Jobs table.
+      const grid = document.createElement("table");
+      const gh = grid.createTHead().insertRow();
+      for (const title of text.statusHeaders) {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.textContent = title;
+        gh.append(th);
+      }
+      const gb = grid.createTBody();
+      state.jobs.forEach((job) => {
+        const tr = gb.insertRow();
+        const name = document.createElement("th");
+        name.scope = "row";
+        name.textContent = job.config.id;
+        tr.append(name);
+        tr.insertCell().textContent = text.status[job.status];
+        tr.insertCell().textContent = String(job.attempts);
+        tr.insertCell().textContent = detailText(copy, job, state.now);
+        const action = tr.insertCell();
+        const final =
+          job.status === "completed" ||
+          job.status === "failed" ||
+          job.status === "cancelled";
+        if (final) action.textContent = text.noAction;
+        else {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "rv-btn rv-btn--quiet";
+          button.dataset.cancel = job.config.id;
+          button.textContent = fill(text.cancel, { id: job.config.id });
+          action.append(button);
+        }
+      });
+      jobsTable.replaceChildren(grid);
+
+      // Log: the most recent events, oldest first.
+      log.replaceChildren(
+        ...state.events.slice(-60).map((event) => {
+          const li = document.createElement("li");
+          li.textContent = eventText(copy, count, event);
+          return li;
+        }),
+      );
+    }
+
+    function ensure(): SimState {
+      if (!sim) sim = createSimulation(readConfig());
+      return sim;
+    }
+
+    function reset(message: string, sound = false) {
+      stop();
+      sim = null;
+      const ok = validate();
+      renderOrClear();
+      say(ok ? message : issueMessage());
+      if (sound) playSound("success");
+    }
+    function renderOrClear() {
+      if (issues.length > 0) {
+        timeline.replaceChildren();
+        jobsTable.replaceChildren();
+        log.replaceChildren();
+        tickOut.textContent = "0";
+        return;
+      }
+      render();
+    }
+
+    function announce(before: SimState, after: SimState, auto: boolean) {
+      if (isOver(after)) {
+        say(progressText(copy, intl, count, after));
+        return;
+      }
+      const significant = after.events
+        .slice(before.events.length)
+        .some((e) => e.kind === "completed" || e.kind === "gave-up");
+      // While a run plays, only outcomes are announced; a manual step always is.
+      if (significant || !auto) say(progressText(copy, intl, count, after));
+    }
+
+    function advance(auto = false) {
+      const before = ensure();
+      const after = step(before);
+      sim = after;
+      render();
+      announce(before, after, auto);
+      return after;
+    }
+
+    function tickLoop() {
+      timer = undefined;
+      const after = advance(true);
+      if (isOver(after)) {
+        stop();
+        return;
+      }
+      timer = window.setTimeout(tickLoop, 1000 / speedLabel());
+    }
+
+    stepButton.addEventListener("click", () => {
+      if (!validate()) {
+        say(issueMessage());
+        playSound("reject");
+        return;
+      }
+      stop();
+      if (isOver(ensure())) {
+        say(text.messages.stepAfterEnd);
+        playSound("reject");
+        return;
+      }
+      advance();
+      playSound("success");
+    });
+
+    runButton.addEventListener("click", () => {
+      if (timer !== undefined) {
+        stop();
+        say(text.messages.paused);
+        playSound("success");
+        return;
+      }
+      if (!validate()) {
+        say(issueMessage());
+        playSound("reject");
+        return;
+      }
+      if (isOver(ensure())) {
+        say(text.messages.stepAfterEnd);
+        playSound("reject");
+        return;
+      }
+      playSound("success");
+      if (reduced.matches) {
+        const before = ensure();
+        sim = run(before);
+        render();
+        say(progressText(copy, intl, count, sim));
+        return;
+      }
+      runButton.textContent = text.pause;
+      say(text.messages.running);
+      timer = window.setTimeout(tickLoop, 0);
+    });
+
+    $("[data-reset]").addEventListener("click", () =>
+      reset(text.messages.reset, true),
+    );
+
+    function press(id: string | null) {
+      root!
+        .querySelectorAll<HTMLButtonElement>("[data-preset]")
+        .forEach((button) =>
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.preset === id),
+          ),
+        );
+    }
+
+    root
+      .querySelectorAll<HTMLButtonElement>("[data-preset]")
+      .forEach((button) =>
+        button.addEventListener("click", () => {
+          const id = button.dataset.preset as PresetId;
+          const entry = text.presets[id];
+          writeConfig(preset(id).config);
+          press(id);
+          hint.textContent = entry.hint;
+          reset(
+            fill(text.messages.presetLoaded, {
+              name: entry.name,
+              hint: entry.hint,
+            }),
+            true,
+          );
+        }),
+      );
+
+    $("[data-add]").addEventListener("click", () => {
+      if (rows().length >= LIMITS.maxJobs) {
+        say(text.messages.atLimit);
+        playSound("reject");
+        return;
+      }
+      const id = nextId();
+      jobsBox.append(buildRow(makeJob(id)));
+      press(null);
+      reset(fill(text.messages.jobAdded, { id }), true);
+    });
+
+    root.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement;
+      const remove = target.closest<HTMLElement>("[data-remove]");
+      if (remove) {
+        const row = remove.closest<HTMLElement>("[data-job]")!;
+        if (rows().length <= 1) {
+          say(text.messages.lastJob);
+          playSound("reject");
+          return;
+        }
+        const id = row.dataset.id!;
+        row.remove();
+        press(null);
+        reset(fill(text.messages.jobRemoved, { id }), true);
+        return;
+      }
+      const cancelButton = target.closest<HTMLElement>("[data-cancel]");
+      if (cancelButton) {
+        const id = cancelButton.dataset.cancel!;
+        const before = ensure();
+        const after = cancel(before, id);
+        if (after === before) {
+          say(fill(text.messages.cancelRejected, { id }));
+          playSound("reject");
+          return;
+        }
+        sim = after;
+        render();
+        say(eventText(copy, count, after.events[after.events.length - 1]!));
+        playSound("success");
+      }
+    });
+
+    // Editing any input starts over: a half-run trace of an old configuration is misleading.
+    root.addEventListener("input", (event) => {
+      const target = event.target as HTMLElement;
+      if (target === speed) {
+        speedLabel();
+        return;
+      }
+      if (!target.closest("[data-job], #sched-concurrency")) return;
+      press(null);
+      const hadProgress = sim !== null && sim.now > 0;
+      reset(
+        hadProgress ? text.messages.editedWhileRunning : text.messages.ready,
+      );
+    });
+
+    function syncMotion() {
+      reducedNote.hidden = !reduced.matches;
+      speed.disabled = reduced.matches;
+    }
+    reduced.addEventListener("change", syncMotion);
+    syncMotion();
+    speedLabel();
+    // No timer may outlive the page (back/forward cache included).
+    window.addEventListener("pagehide", stop);
+    reset(text.messages.ready);
+  }
+</script>
