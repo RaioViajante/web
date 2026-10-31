@@ -1,0 +1,543 @@
+---
+import { PathfindingBench } from "./PathfindingBench";
+import { pathfindingCopy } from "../../lib/pathfinding-copy";
+import type { LocaleId } from "../../../../../site/locales";
+import "../../styles/pathfinding.css";
+interface Props {
+  locale: LocaleId;
+}
+const { locale } = Astro.props;
+const text = pathfindingCopy[locale];
+---
+
+<PathfindingBench locale={locale} />
+<h3 class="path-heading">{text.conceptsHeading}</h3>
+<dl class="path-concepts">
+  {text.concepts.map((item) => (
+    <>
+      <dt>{item.term}</dt>
+      <dd>{item.text}</dd>
+    </>
+  ))}
+</dl>
+<h3 class="path-heading">{text.limitsHeading}</h3>
+<ul class="path-limits">
+  {text.limits.map((item) => (
+    <li>{item}</li>
+  ))}
+</ul>
+<script>
+  import {
+    WALL,
+    GROUND,
+    MUD,
+    clearGrid,
+    columnOf,
+    compare,
+    createGrid,
+    createSearch,
+    generate,
+    paint,
+    place,
+    rowOf,
+    stepSearch,
+    type Algorithm,
+    type Grid,
+    type Search,
+    type SizeName,
+    type Weight,
+  } from "../../lib/pathfinding";
+  import {
+    kindOf,
+    labelOf,
+    markOf,
+    pickForm,
+    type CellState,
+    type OneCounts,
+  } from "../../lib/pathfinding-view";
+  import type { PathfindingCopy, Tool } from "../../lib/pathfinding-copy";
+  import { fill } from "../../lib/template";
+  import { playSound } from "@raioviajante/design/sound";
+
+  type ClientCopy = Omit<
+    PathfindingCopy,
+    "concepts" | "limits" | "conceptsHeading" | "limitsHeading" | "noscript"
+  > & { oneCounts: OneCounts };
+
+  const root = document.querySelector<HTMLElement>("[data-pathfinding]");
+  if (root) {
+    // Rendered into the page at build time; never read from the browser.
+    const text = JSON.parse(root.dataset.copy!) as ClientCopy;
+    const one = text.oneCounts;
+    const $ = <T extends HTMLElement>(selector: string) =>
+      root.querySelector<T>(selector)!;
+    const gridEl = $("[data-grid]");
+    const status = $("[data-status]");
+    const note = $("[data-algorithm-note]");
+    const sizeSelect = $<HTMLSelectElement>("[data-size]");
+    const runButton = $<HTMLButtonElement>("[data-run]");
+    const stepButton = $<HTMLButtonElement>("[data-step]");
+    const speed = $<HTMLInputElement>("[data-speed]");
+    const speedText = $("[data-speed-text]");
+    const reducedNote = $("[data-reduced]");
+    const compareOut = $("[data-compare-out]");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const RATES = [2, 6, 15, 30, 60];
+
+    let grid: Grid = createGrid("medium");
+    let algorithm: Algorithm = "bfs";
+    let tool: Tool = "wall";
+    let search: Search | null = null;
+    let timer: number | undefined;
+    let seed = 0;
+    let focused = 0;
+    let painting = false;
+    let lastPointer = "mouse";
+    let cells: HTMLElement[] = [];
+    const labels: string[] = [];
+
+    const say = (message: string) => {
+      status.textContent = message;
+    };
+    const name = () => text.algorithmNames[algorithm];
+    const explored = (n: number) => pickForm(text.cellsExplored, n, one);
+
+    function stop() {
+      if (timer !== undefined) window.clearTimeout(timer);
+      timer = undefined;
+      runButton.textContent = text.run;
+    }
+
+    function build() {
+      const { width, height } = grid;
+      gridEl.dataset.gridSize =
+        width === 12 ? "small" : width === 30 ? "large" : "medium";
+      gridEl.setAttribute("aria-rowcount", String(height));
+      gridEl.setAttribute("aria-colcount", String(width));
+      cells = [];
+      labels.length = 0;
+      const rows: HTMLElement[] = [];
+      for (let r = 0; r < height; r += 1) {
+        const row = document.createElement("div");
+        row.setAttribute("role", "row");
+        row.className = "path-row";
+        for (let c = 0; c < width; c += 1) {
+          const cell = document.createElement("div");
+          cell.setAttribute("role", "gridcell");
+          cell.className = "path-cell";
+          cell.dataset.cell = String(r * width + c);
+          cell.tabIndex = -1;
+          row.append(cell);
+          cells.push(cell);
+        }
+        rows.push(row);
+      }
+      gridEl.replaceChildren(...rows);
+      focused = Math.min(focused, cells.length - 1);
+      cells[focused]!.tabIndex = 0;
+    }
+
+    function states(): Map<number, CellState> {
+      const map = new Map<number, CellState>();
+      if (!search) return map;
+      for (const cell of search.expanded) map.set(cell, "expanded");
+      for (const cell of search.frontier) map.set(cell, "frontier");
+      for (const cell of search.path) map.set(cell, "path");
+      if (search.status === "running" && search.current >= 0)
+        map.set(search.current, "current");
+      return map;
+    }
+
+    function render() {
+      const map = states();
+      cells.forEach((el, i) => {
+        const kind = kindOf(grid, i);
+        const state = map.get(i) ?? "none";
+        if (el.dataset.kind !== kind) el.dataset.kind = kind;
+        if (el.dataset.state !== state) el.dataset.state = state;
+        const mark = markOf(text as unknown as PathfindingCopy, kind, state);
+        if (el.textContent !== mark) el.textContent = mark;
+        const label = labelOf(
+          text as unknown as PathfindingCopy,
+          grid,
+          i,
+          state,
+        );
+        if (labels[i] !== label) {
+          labels[i] = label;
+          el.setAttribute("aria-label", label);
+        }
+      });
+      const s = search;
+      const set = (key: string, value: string) => {
+        $(`[data-stat="${key}"]`).textContent = value;
+      };
+      set("status", text.statusNames[s ? s.status : "idle"]);
+      set("explored", String(s ? s.expanded.length : 0));
+      set("frontier", String(s ? s.frontier.length : 0));
+      const found = s?.status === "found";
+      set("moves", found ? String(s!.pathSteps) : text.none);
+      set("cost", found ? String(s!.pathCost) : text.none);
+    }
+
+    function resetSearch(silent = false) {
+      stop();
+      const had = search !== null;
+      search = null;
+      render();
+      return had && !silent;
+    }
+
+    function focusCell(i: number) {
+      cells[focused]!.tabIndex = -1;
+      focused = Math.max(0, Math.min(cells.length - 1, i));
+      cells[focused]!.tabIndex = 0;
+      cells[focused]!.focus();
+    }
+
+    /** Applies the selected tool; returns the message for the live region, or null when nothing changed. */
+    function apply(i: number): {
+      message: string;
+      ok: boolean;
+      quiet?: boolean;
+    } {
+      const before = grid;
+      const row = rowOf(grid, i) + 1;
+      const column = columnOf(grid, i) + 1;
+      if (tool === "start" || tool === "goal") {
+        const other = tool === "start" ? grid.goal : grid.start;
+        grid = place(grid, tool, i);
+        if (grid === before) {
+          // Already there: nothing was refused, so say so quietly like painting does.
+          if (i === grid[tool])
+            return {
+              ok: true,
+              quiet: true,
+              message: fill(text.messages.unchanged, {
+                kind: text.kinds[tool],
+              }),
+            };
+          const same = i === other;
+          const wall = grid.cells[i] === WALL;
+          return {
+            ok: false,
+            message: same
+              ? text.messages.rejectedSame
+              : wall
+                ? text.messages.rejectedWall
+                : text.messages.rejectedOther,
+          };
+        }
+      } else {
+        const weight: Weight =
+          tool === "wall" ? WALL : tool === "mud" ? MUD : GROUND;
+        grid = paint(grid, i, weight);
+        if (grid === before) {
+          if (tool === "wall" && (i === grid.start || i === grid.goal))
+            return { ok: false, message: text.messages.rejectedWall };
+          // Already in that state: nothing was refused, so no rejection sound.
+          return {
+            ok: true,
+            quiet: true,
+            message: fill(text.messages.unchanged, {
+              kind: text.kinds[kindOf(grid, i)],
+            }),
+          };
+        }
+      }
+      const reset = resetSearch();
+      const base =
+        tool === "start" || tool === "goal"
+          ? fill(text.messages.placed, {
+              which:
+                tool === "start"
+                  ? text.messages.startName
+                  : text.messages.goalName,
+              row,
+              column,
+            })
+          : fill(text.messages.painted, {
+              kind: text.kinds[
+                tool === "wall" ? "wall" : tool === "mud" ? "mud" : "ground"
+              ],
+              row,
+              column,
+            });
+      return {
+        ok: true,
+        message: reset ? `${base} ${text.messages.editResets}` : base,
+      };
+    }
+
+    function finishEdit(result: {
+      message: string;
+      ok: boolean;
+      quiet?: boolean;
+    }) {
+      render();
+      say(result.message);
+      if (!result.quiet) playSound(result.ok ? "success" : "reject");
+    }
+
+    // Pointer: mouse and pen drag to draw; touch taps, so dragging still scrolls.
+    gridEl.addEventListener("pointerdown", (event) => {
+      lastPointer = event.pointerType;
+      if (event.pointerType === "touch") return;
+      const cell = (event.target as HTMLElement).closest<HTMLElement>(
+        "[data-cell]",
+      );
+      if (!cell) return;
+      event.preventDefault();
+      painting = tool === "wall" || tool === "mud" || tool === "erase";
+      const i = Number(cell.dataset.cell);
+      focusCell(i);
+      finishEdit(apply(i));
+    });
+    gridEl.addEventListener("pointerover", (event) => {
+      if (!painting || event.buttons !== 1) return;
+      const cell = (event.target as HTMLElement).closest<HTMLElement>(
+        "[data-cell]",
+      );
+      if (!cell) return;
+      const i = Number(cell.dataset.cell);
+      const result = apply(i);
+      if (result.ok) {
+        render();
+        say(result.message);
+      }
+    });
+    window.addEventListener("pointerup", () => {
+      painting = false;
+    });
+    gridEl.addEventListener("click", (event) => {
+      // Touch taps, and clicks with no pointer behind them (assistive technology).
+      if (lastPointer !== "touch" && event.detail !== 0) return;
+      const cell = (event.target as HTMLElement).closest<HTMLElement>(
+        "[data-cell]",
+      );
+      if (!cell) return;
+      const i = Number(cell.dataset.cell);
+      focusCell(i);
+      finishEdit(apply(i));
+    });
+    gridEl.addEventListener("keydown", (event) => {
+      const cell = (event.target as HTMLElement).closest<HTMLElement>(
+        "[data-cell]",
+      );
+      if (!cell) return;
+      const i = Number(cell.dataset.cell);
+      const { width } = grid;
+      const moves: Record<string, number> = {
+        ArrowUp: i - width >= 0 ? i - width : i,
+        ArrowDown: i + width < cells.length ? i + width : i,
+        ArrowLeft: i % width > 0 ? i - 1 : i,
+        ArrowRight: i % width < width - 1 ? i + 1 : i,
+        Home: i - (i % width),
+        End: i - (i % width) + width - 1,
+      };
+      if (event.key in moves) {
+        event.preventDefault();
+        focusCell(moves[event.key]!);
+      } else if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        finishEdit(apply(i));
+      }
+    });
+
+    function press(selector: string, attribute: string, value: string) {
+      root!
+        .querySelectorAll<HTMLButtonElement>(selector)
+        .forEach((button) =>
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset[attribute] === value),
+          ),
+        );
+    }
+
+    root.querySelectorAll<HTMLButtonElement>("[data-tool]").forEach((button) =>
+      button.addEventListener("click", () => {
+        tool = button.dataset.tool as Tool;
+        press("[data-tool]", "tool", tool);
+        say(fill(text.toolSelected, { tool: text.tools[tool] }));
+      }),
+    );
+    root
+      .querySelectorAll<HTMLButtonElement>("[data-algorithm]")
+      .forEach((button) =>
+        button.addEventListener("click", () => {
+          algorithm = button.dataset.algorithm as Algorithm;
+          press("[data-algorithm]", "algorithm", algorithm);
+          note.textContent = text.algorithmNotes[algorithm];
+          resetSearch();
+          say(fill(text.messages.algorithmChanged, { algorithm: name() }));
+          playSound("success");
+        }),
+      );
+
+    sizeSelect.addEventListener("change", () => {
+      const size = sizeSelect.value as SizeName;
+      stop();
+      search = null;
+      grid = createGrid(size);
+      focused = 0;
+      build();
+      render();
+      say(fill(text.messages.sizeChanged, { size: text.sizes[size] }));
+      playSound("success");
+    });
+    $("[data-clear]").addEventListener("click", () => {
+      grid = clearGrid(grid);
+      resetSearch();
+      render();
+      say(text.messages.cleared);
+      playSound("success");
+    });
+    $("[data-generate]").addEventListener("click", () => {
+      seed += 1;
+      grid = generate(grid, seed);
+      resetSearch();
+      render();
+      say(fill(text.messages.generated, { seed }));
+      playSound("success");
+    });
+    $("[data-reset-search]").addEventListener("click", () => {
+      resetSearch();
+      say(text.messages.searchReset);
+      playSound("success");
+    });
+
+    function advance(auto: boolean): boolean {
+      if (!search) search = createSearch(grid, algorithm);
+      const before = search.status;
+      search = stepSearch(search);
+      render();
+      const count = explored(search.expanded.length);
+      if (search.status === "found")
+        say(
+          fill(text.messages.found, {
+            algorithm: name(),
+            moves: pickForm(text.movesOnPath, search.pathSteps, one),
+            cost: search.pathCost,
+            explored: count,
+          }),
+        );
+      else if (search.status === "unreachable")
+        say(
+          fill(text.messages.unreachable, {
+            algorithm: name(),
+            explored: count,
+          }),
+        );
+      else if (!auto && before === "running" && search.steps === 1)
+        say(
+          fill(text.messages.started, { algorithm: name(), explored: count }),
+        );
+      return search.status === "running";
+    }
+
+    function speedLabel(): number {
+      const rate = RATES[speed.valueAsNumber - 1] ?? RATES[2]!;
+      speedText.textContent = pickForm(text.speedValue, rate, one);
+      return rate;
+    }
+
+    function loop() {
+      timer = undefined;
+      if (!advance(true)) {
+        stop();
+        return;
+      }
+      timer = window.setTimeout(loop, 1000 / speedLabel());
+    }
+
+    stepButton.addEventListener("click", () => {
+      stop();
+      if (search && search.status !== "running") {
+        say(text.messages.finished);
+        playSound("reject");
+        return;
+      }
+      advance(false);
+      playSound("success");
+    });
+    runButton.addEventListener("click", () => {
+      if (timer !== undefined) {
+        stop();
+        say(text.messages.paused);
+        playSound("success");
+        return;
+      }
+      if (search && search.status !== "running") {
+        say(text.messages.finished);
+        playSound("reject");
+        return;
+      }
+      playSound("success");
+      if (reduced.matches) {
+        // Bounded by the grid: every cell is explored once and queued at most four times.
+        for (let i = 0, limit = grid.cells.length * 5 + 10; i < limit; i += 1)
+          if (!advance(true)) break;
+        return;
+      }
+      runButton.textContent = text.pause;
+      say(text.messages.running);
+      timer = window.setTimeout(loop, 0);
+    });
+
+    $("[data-compare]").addEventListener("click", () => {
+      const rows = compare(grid);
+      const table = document.createElement("table");
+      table.createCaption().textContent = text.compareCaption;
+      const head = table.createTHead().insertRow();
+      for (const title of text.compareHeaders) {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.textContent = title;
+        head.append(th);
+      }
+      const body = table.createTBody();
+      for (const row of rows) {
+        const tr = body.insertRow();
+        const th = document.createElement("th");
+        th.scope = "row";
+        th.textContent = text.algorithmNames[row.algorithm];
+        tr.append(th);
+        const found = row.status === "found";
+        const yes = text.compareYes;
+        const no = text.compareNo;
+        const optimal = (flag: boolean) =>
+          !found ? text.compareNa : flag ? yes : no;
+        for (const value of [
+          text.statusNames[row.status],
+          String(row.explored),
+          found ? String(row.pathSteps) : text.none,
+          found ? String(row.pathCost) : text.none,
+          optimal(row.fewestSteps),
+          optimal(row.lowestCost),
+        ])
+          tr.insertCell().textContent = value;
+      }
+      compareOut.replaceChildren(table);
+      // The table can scroll sideways on a phone, so keyboard users must reach it.
+      // The shared scroll-region behavior gives it a tab stop only if it overflows.
+      compareOut.dataset.scrollRegion = "";
+      compareOut.dataset.scrollLabel = text.compareCaption;
+      say(text.compareCaption);
+      playSound("success");
+    });
+
+    function syncMotion() {
+      reducedNote.hidden = !reduced.matches;
+      speed.disabled = reduced.matches;
+    }
+    reduced.addEventListener("change", syncMotion);
+    speed.addEventListener("input", speedLabel);
+    syncMotion();
+    speedLabel();
+    // No timer may outlive the page (back/forward cache included).
+    window.addEventListener("pagehide", stop);
+    build();
+    render();
+  }
+</script>

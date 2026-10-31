@@ -52,6 +52,7 @@ function shape(body) {
 const localizedLinks = new Map([
 	["https://lab.raioviajante.com/experiments/filename-classifier/", "https://lab.raioviajante.com/pt/experiments/classificador-de-arquivos/"],
 	["https://www.conventionalcommits.org/", "https://www.conventionalcommits.org/pt-br/v1.0.0/"],
+	["https://dump.raioviajante.com/posts/started-designing-a-language-before-i-could-compile-one", "https://dump.raioviajante.com/pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma"],
 ]);
 
 test("every English document has a Portuguese translation sharing its identity", () => {
