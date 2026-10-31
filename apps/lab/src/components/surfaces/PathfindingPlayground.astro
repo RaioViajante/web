@@ -208,18 +208,24 @@ const text = pathfindingCopy[locale];
         const other = tool === "start" ? grid.goal : grid.start;
         grid = place(grid, tool, i);
         if (grid === before) {
+          // Already there: nothing was refused, so say so quietly like painting does.
+          if (i === grid[tool])
+            return {
+              ok: true,
+              quiet: true,
+              message: fill(text.messages.unchanged, {
+                kind: text.kinds[tool],
+              }),
+            };
           const same = i === other;
           const wall = grid.cells[i] === WALL;
           return {
             ok: false,
-            message:
-              i === grid[tool]
-                ? text.messages.rejectedOther
-                : same
-                  ? text.messages.rejectedSame
-                  : wall
-                    ? text.messages.rejectedWall
-                    : text.messages.rejectedOther,
+            message: same
+              ? text.messages.rejectedSame
+              : wall
+                ? text.messages.rejectedWall
+                : text.messages.rejectedOther,
           };
         }
       } else {
@@ -514,9 +520,9 @@ const text = pathfindingCopy[locale];
       }
       compareOut.replaceChildren(table);
       // The table can scroll sideways on a phone, so keyboard users must reach it.
-      compareOut.setAttribute("role", "region");
-      compareOut.setAttribute("aria-label", text.compareCaption);
-      compareOut.tabIndex = 0;
+      // The shared scroll-region behavior gives it a tab stop only if it overflows.
+      compareOut.dataset.scrollRegion = "";
+      compareOut.dataset.scrollLabel = text.compareCaption;
       say(text.compareCaption);
       playSound("success");
     });
