@@ -33,6 +33,25 @@ days after its decision. When the date passes, the gate fails and a person must
 review: fix or upgrade the dependency, or renew deliberately by editing the
 decision and expiry in the JSON. Nothing extends an exception automatically.
 
+### minimatch and glob (October 2026)
+
+GHSA-g3hv-75wg-m249 (minimatch, fixed in 11.0.1) and GHSA-3g3m-2fjr-6pw4 (glob,
+fixed in 14.0.2) were published on 2026-10-30. Both are moderate and reach only
+development tooling; `pnpm audit --prod` reports nothing. No release of the
+owning packages asks for a patched range, so `pnpm-workspace.yaml` overrides
+minimatch 9 and 10 and glob 10 and 13 to the patched releases. That is safe
+because their consumers (typescript-estree, glob, test-exclude, Jest) use the
+named exports that minimatch 11 keeps. Lint, tests, builds and the browser
+suite pass with the overrides.
+
+One advisory remains: minimatch 3.1.5, reached through eslint 9,
+`@eslint/config-array`, `@eslint/eslintrc`, `eslint-plugin-import`,
+`eslint-plugin-jsx-a11y` and `eslint-plugin-react`. Minimatch 11 exports no
+default and is not callable, so overriding it would break all six. No upstream
+release fixes it: the newest eslint still asks for `^10.2.x`, which is also
+vulnerable. The gate keeps failing until an upstream release or a person's
+decision (an expiring exception, or a patch of the six packages) resolves it.
+
 The former `satori` advisory (GHSA-wx4j-mvgx-mqwp, SVG escaping, fixed in
 0.33.5) is not an exception: `@vercel/og` 0.11.1 pins `satori` 0.25.0 exactly, so
 a `pnpm-workspace.yaml` override moves it to 0.33.5. The generated social images
