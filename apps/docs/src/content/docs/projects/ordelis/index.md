@@ -72,7 +72,7 @@ Kimi is part of the product vision, but no Kimi adapter exists in the runtime. T
 
 ## Execution
 
-What runs today is the inherited runtime. `mco run` sends one prompt to several agents in parallel or in a chain, with a deadline per invocation, a stall timeout, a deadline for the whole run, cancellation, and per-invocation status and artifacts. Three execution modes are translated to each provider's own controls:
+What runs today is the inherited runtime. `mco run` sends one prompt to several agents in parallel or in a chain, with a deadline per invocation, a stall timeout, a deadline for the whole run, cancellation, and per-invocation status and artifacts. Three execution modes are translated to each provider's own controls, where the provider has them (Hermes, for one, has none for `read_only` or `write`):
 
 | Mode | Intent |
 | --- | --- |

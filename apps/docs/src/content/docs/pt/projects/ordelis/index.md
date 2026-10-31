@@ -72,7 +72,7 @@ O Kimi faz parte da visão do produto, mas não existe adaptador do Kimi no runt
 
 ## Execução
 
-O que roda hoje é o runtime herdado. O `mco run` envia um prompt a vários agentes em paralelo ou em cadeia, com um prazo por invocação, um timeout de estagnação, um prazo para a execução inteira, cancelamento, e status e artefatos por invocação. Três modos de execução são traduzidos para os controles de cada provedor:
+O que roda hoje é o runtime herdado. O `mco run` envia um prompt a vários agentes em paralelo ou em cadeia, com um prazo por invocação, um timeout de estagnação, um prazo para a execução inteira, cancelamento, e status e artefatos por invocação. Três modos de execução são traduzidos para os controles de cada provedor, quando ele os tem (o Hermes, por exemplo, não tem nenhum para `read_only` nem `write`):
 
 | Modo | Intenção |
 | --- | --- |
