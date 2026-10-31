@@ -19,16 +19,17 @@ const byId = (list, id) => list.find((experiment) => experiment.id === id);
 test("stable identities, shared provenance and real reciprocal counterparts", () => {
   assert.deepEqual(
     experiments.map(({ id }) => id),
-    ["005", "003", "002", "001"],
+    ["005", "004", "003", "002", "001"],
   );
   assert.deepEqual(
     portugueseExperiments.map(({ contentId }) => contentId),
-    ["005", "003", "002", "001"],
+    ["005", "004", "003", "002", "001"],
   );
   assert.deepEqual(
     portugueseExperiments.map((experiment) => experimentPath(experiment)),
     [
       "/pt/experiments/busca-de-caminhos/",
+      "/pt/experiments/simulador-de-agendamento/",
       "/pt/experiments/setor-de-boot/",
       "/pt/experiments/estados-de-execucao/",
       "/pt/experiments/classificador-de-arquivos/",
@@ -56,9 +57,9 @@ test("stable identities, shared provenance and real reciprocal counterparts", ()
     ])
       assert.equal(portuguese[key], english[key], `${english.id} ${key}`);
   }
-  assert.deepEqual(experimentsFor("en").length, 4);
-  assert.deepEqual(experimentsFor("pt-BR").length, 4);
-  assert.deepEqual(publishedExperiments.length, 8);
+  assert.deepEqual(experimentsFor("en").length, 5);
+  assert.deepEqual(experimentsFor("pt-BR").length, 5);
+  assert.deepEqual(publishedExperiments.length, 10);
 });
 
 test("every experiment is fully authored in Portuguese, not copied from English", () => {

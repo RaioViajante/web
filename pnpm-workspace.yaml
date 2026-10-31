@@ -30,8 +30,21 @@ minimumReleaseAgeExclude:
 #   1.0.3 asks for the same version but is not used (see sharp above).
 # - zod: chromium-bidi accepts either ^3.25.0 or ^4.0.0, but the lockfile kept
 #   vulnerable 3.25.76. 4.6.7 fixes GHSA-mrhx-c7xc-m3w5.
+# - minimatch and glob (GHSA-g3hv-75wg-m249, patched in 11.0.1; GHSA-3g3m-2fjr-6pw4,
+#   patched in 14.0.2): every consumer of minimatch 9 and 10 (typescript-estree,
+#   glob, test-exclude) and of glob 10 and 13 (Jest and its coverage tooling)
+#   asks for a vulnerable range, and no release of those packages asks for a
+#   patched one. The named `minimatch` and `Minimatch` exports they use exist in
+#   11, so the ranges move to the patched releases. minimatch 3.1.5 (eslint 9 and
+#   its plugins) calls the module itself, which 11 does not export, so it goes
+#   to security/minimatch-compat, a shim over 11 with the 3 call shape (see
+#   docs/security-maintenance.md for its limits). Remove
+#   an entry when its owning packages ship the fix.
 overrides:
   "fflate@0.7.3": "0.7.5"
   "satori@0.25.0": "0.33.5"
   "sharp@0.34.5": "0.35.5"
   "zod@^3.25.0 || ^4.0.0": "4.6.7"
+  "minimatch@>=9.0.0 <11.0.1": "11.0.3"
+  "glob@>=9.0.0 <14.0.2": "14.0.3"
+  "minimatch@3.1.5": "file:security/minimatch-compat"

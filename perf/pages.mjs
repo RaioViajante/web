@@ -35,6 +35,11 @@ export const pages = [
   },
   {
     app: "lab",
+    name: "scheduler-simulator",
+    path: "/experiments/scheduler-simulator/",
+  },
+  {
+    app: "lab",
     name: "pathfinding-playground",
     path: "/experiments/pathfinding-playground/",
   },

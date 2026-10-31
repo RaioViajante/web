@@ -19,6 +19,13 @@ const ADDED_ENGLISH = [
     tags: ["personal", "writing"],
   },
   {
+    slug: "some-things-dont-know-how-to-end",
+    contentId: "algumas-coisas-nao-sabem-como-terminar",
+    originalLocale: "pt-BR",
+    publishedAt: "2026-10-30",
+    tags: ["personal", "writing"],
+  },
+  {
     slug: "translating-the-site-without-pretending-everything-already-exists",
     contentId: "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
     originalLocale: "pt-BR",
