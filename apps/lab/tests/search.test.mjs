@@ -29,7 +29,7 @@ test("each locale's index lists exactly its published experiments, in its own la
     assert.equal(entries.length, experimentsFor(locale).length);
     assert.deepEqual(
       entries.map((entry) => entry.contentId),
-      ["006", "005", "004", "003", "002", "001"],
+      ["007", "006", "005", "004", "003", "002", "001"],
     );
     for (const entry of entries) {
       assert.equal(entry.locale, locale);
@@ -73,6 +73,7 @@ test("every Portuguese suggestion finds at least one published Portuguese experi
     "004",
     "005",
     "006",
+    "007",
   ]);
 });
 

@@ -48,6 +48,11 @@ export const pages = [
     name: "tiny-language-playground",
     path: "/experiments/tiny-language-playground/",
   },
+  {
+    app: "lab",
+    name: "image-compression-lab",
+    path: "/experiments/image-compression-lab/",
+  },
   { app: "lab", name: "search", path: "/search/" },
 ];
 export const profiles = ["mobile", "desktop"];

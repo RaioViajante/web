@@ -7,6 +7,7 @@ import FilenameClassifier from "../../../components/surfaces/FilenameClassifier.
 import SchedulerSimulator from "../../../components/surfaces/SchedulerSimulator.astro";
 import PathfindingPlayground from "../../../components/surfaces/PathfindingPlayground.astro";
 import TinyLanguagePlayground from "../../../components/surfaces/TinyLanguagePlayground.astro";
+import ImageCompressionLab from "../../../components/surfaces/ImageCompressionLab.astro";
 import { experimentsFor } from "../../../data/experiments";
 
 export function getStaticPaths() {
@@ -37,5 +38,8 @@ const { experiment } = Astro.props as Props;
   )}
   {experiment.surface === "tiny-language-playground" && (
     <TinyLanguagePlayground slot="surface" locale={experiment.locale} />
+  )}
+  {experiment.surface === "image-compression-lab" && (
+    <ImageCompressionLab slot="surface" locale={experiment.locale} />
   )}
 </ExperimentLayout>

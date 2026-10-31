@@ -14,7 +14,8 @@ export type ExperimentSurface =
   | "boot-sector"
   | "scheduler-simulator"
   | "pathfinding-playground"
-  | "tiny-language-playground";
+  | "tiny-language-playground"
+  | "image-compression-lab";
 
 export interface Experiment {
   id: string;
@@ -43,6 +44,25 @@ export interface Experiment {
 
 /** Real experiments, ordered by descending publication number. */
 export const experiments: Experiment[] = [
+  {
+    id: "007",
+    contentId: "007",
+    locale: "en",
+    originalLocale: "en",
+    slug: "image-compression-lab",
+    surface: "image-compression-lab",
+    title: "image compression lab",
+    description: "what quality, size and format do to a file and a picture",
+    status: "active",
+    project: "mochifile",
+    revision: "f674bf1",
+    fidelity: "runs here",
+    created: "2026-10-30",
+    source: "https://github.com/mochifile/mochifile",
+    what: "What do quality, size and format change about an image file, and what do they cost the picture? Re-encode a picture in your browser, read the real byte counts, slide between before and after, look at the difference and sweep the quality. It is a teaching bench, not a compressor; the image never leaves your browser.",
+    notes:
+      "Inspired by the problem Mochifile solves, not by its interface or engine: Mochifile ships its own codecs so results match across browsers, while this page uses your browser’s encoders, so numbers differ. Revision f674bf1 is the Mochifile state read for its image-engine notes. Byte counts are measured; pixel sizes are labeled theoretical.",
+  },
   {
     id: "006",
     contentId: "006",
@@ -175,6 +195,17 @@ function original(id: string): Experiment {
  * inherited from the English original; only authored text differs.
  */
 export const portugueseExperiments: Experiment[] = [
+  {
+    ...original("007"),
+    locale: "pt-BR",
+    slug: "compressao-de-imagens",
+    title: "laboratório de compressão de imagens",
+    description:
+      "o que qualidade, tamanho e formato fazem com um arquivo e com a imagem",
+    what: "O que qualidade, tamanho e formato mudam num arquivo de imagem, e quanto custam à imagem? Recodifique uma imagem no navegador, leia as contagens reais de bytes, deslize entre antes e depois, veja a diferença e varra as qualidades. É uma bancada didática, não um compressor; a imagem nunca sai do seu navegador.",
+    notes:
+      "Inspirado no problema que o Mochifile resolve, não na interface nem no motor dele: o Mochifile usa codecs próprios para que os resultados sejam iguais entre navegadores, enquanto esta página usa os codificadores do seu navegador, então os números mudam. A revisão f674bf1 é o estado do Mochifile lido para as notas do motor de imagens. As contagens de bytes são medidas; os tamanhos de pixels são rotulados como teóricos.",
+  },
   {
     ...original("006"),
     locale: "pt-BR",
