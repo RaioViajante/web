@@ -12,6 +12,8 @@ export type ExperimentSurface =
   | "filename-classifier"
   | "execution-states"
   | "boot-sector"
+  | "scheduler-simulator"
+  | "pathfinding-playground"
   | "tiny-language-playground";
 
 export interface Experiment {
@@ -24,7 +26,8 @@ export interface Experiment {
   description: string;
   status: ExperimentStatus;
   project: string;
-  revision: string;
+  /** Pinned revision of the source project; absent when the experiment has no source project. */
+  revision?: string;
   fidelity: "runs here" | "simulated" | "source only";
   created: string;
   source?: string;
@@ -58,6 +61,42 @@ export const experiments: Experiment[] = [
     what: "What does a language do with a few lines of source before it runs them? Edit a small program and see its tokens, its syntax tree, readable errors and a bounded run, one stage at a time. The syntax is a small subset read from yanawa’s design notes; yanawa has no compiler yet, and this is not it.",
     notes:
       "Based on the syntax and compiler-architecture notes of yanawa revision 7fd082e. The notes leave several rules open (range ends, integer division, indentation width) and this page chose its own. Nothing is compiled or evaluated as JavaScript, and the source is never stored or sent.",
+  },
+  {
+    id: "005",
+    contentId: "005",
+    locale: "en",
+    originalLocale: "en",
+    slug: "pathfinding-playground",
+    surface: "pathfinding-playground",
+    title: "pathfinding playground",
+    description: "BFS, DFS, Dijkstra and A* exploring a grid you draw",
+    status: "active",
+    project: "algorithms",
+    fidelity: "runs here",
+    created: "2026-10-30",
+    what: "How do four pathfinding algorithms differ on the same grid? Draw walls and mud, move the start and the goal, then step through breadth-first search, depth-first search, Dijkstra and A* and watch the frontier, the explored cells and the final path. Everything runs in this browser; it is not tied to any project.",
+    notes:
+      "A teaching implementation written for the Lab, with fixed tie-breaking so every run repeats. Movement is four-directional and mud is the only weight. Explored counts are not timings.",
+  },
+  {
+    id: "004",
+    contentId: "004",
+    locale: "en",
+    originalLocale: "en",
+    slug: "scheduler-simulator",
+    surface: "scheduler-simulator",
+    title: "scheduler simulator",
+    description: "queues, slots, retries and timeouts on a deterministic clock",
+    status: "active",
+    project: "orbit",
+    revision: "2967494",
+    fidelity: "simulated",
+    created: "2026-10-30",
+    source: "https://github.com/RaioViajante/orbit",
+    what: "What happens to a job when slots are limited, an attempt fails, or a timeout fires? A teaching model of a job scheduler: change durations, retries, backoff and failures, then step through the queue one tick at a time. It illustrates the idea behind Orbit’s job settings; Orbit has no scheduler yet, and this page does not run it.",
+    notes:
+      "Inspired by the job settings in Orbit revision 2967494 (maximum retries and execution timeout). Orbit’s architecture notes put retries and workers outside its initial scope, so no Orbit behavior is reproduced. Time is an integer clock, nothing runs in the background, and nothing is stored.",
   },
   {
     id: "003",
@@ -146,6 +185,28 @@ export const portugueseExperiments: Experiment[] = [
     what: "O que uma linguagem faz com algumas linhas de código antes de executá-las? Edite um programa pequeno e veja seus tokens, sua árvore sintática, erros legíveis e uma execução limitada, uma etapa por vez. A sintaxe é um pequeno subconjunto lido das notas de design do yanawa; o yanawa ainda não tem compilador, e este não é ele.",
     notes:
       "Baseado nas notas de sintaxe e de arquitetura do compilador da revisão 7fd082e do yanawa. As notas deixam várias regras em aberto (fim do intervalo, divisão de inteiros, largura da indentação) e esta página fez suas próprias escolhas. Nada é compilado nem avaliado como JavaScript, e o código nunca é guardado nem enviado.",
+  },
+  {
+    ...original("005"),
+    locale: "pt-BR",
+    slug: "busca-de-caminhos",
+    title: "busca de caminhos",
+    description:
+      "BFS, DFS, Dijkstra e A* explorando uma grade que você desenha",
+    what: "Como quatro algoritmos de busca de caminhos se comportam na mesma grade? Desenhe paredes e lama, mova o início e o destino e avance pela busca em largura, pela busca em profundidade, por Dijkstra e por A*, observando a fronteira, as células exploradas e o caminho final. Tudo roda neste navegador; o experimento não está ligado a nenhum projeto.",
+    notes:
+      "Uma implementação didática escrita para o Lab, com critérios de desempate fixos para que toda busca se repita igual. O movimento é em quatro direções e a lama é o único peso. Células exploradas não são medidas de tempo.",
+  },
+  {
+    ...original("004"),
+    locale: "pt-BR",
+    slug: "simulador-de-agendamento",
+    title: "simulador de agendamento",
+    description:
+      "filas, vagas, retries e timeouts em um relógio determinístico",
+    what: "O que acontece com um job quando as vagas são limitadas, uma tentativa falha ou um timeout dispara? Um modelo didático de agendador de jobs: mude durações, retries, backoff e falhas e avance pela fila um tick por vez. Ele ilustra a ideia por trás das configurações de job do Orbit; o Orbit ainda não tem agendador, e esta página não o executa.",
+    notes:
+      "Inspirado nas configurações de job da revisão 2967494 do Orbit (máximo de retries e timeout de execução). As notas de arquitetura do Orbit deixam retries e workers fora do escopo inicial, então nenhum comportamento do Orbit é reproduzido. O tempo é um relógio de números inteiros, nada roda em segundo plano e nada é guardado.",
   },
   {
     ...original("003"),
