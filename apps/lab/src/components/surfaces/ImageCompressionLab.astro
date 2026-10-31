@@ -293,10 +293,9 @@ const text = imageCompressionCopy[locale];
     fileInput.addEventListener("change", async () => {
       const file = fileInput.files?.[0];
       if (!file) return;
-      const mine = ++choice;
+      ++choice; // a sample still being made will see it and step aside
       say(text.messages.loading);
       const loaded = await session.load(file);
-      if (mine !== choice && loaded.ok) return; // a newer choice replaced it while it loaded
       fileInput.value = ""; // choosing the same file again must fire `change`
       await afterLoad(loaded, (l) =>
         fill(text.messages.loaded, {
@@ -442,6 +441,7 @@ const text = imageCompressionCopy[locale];
         playSound("reject");
         return;
       }
+      const base = last;
       say(text.messages.sweepBusy);
       sweepButton.disabled = true;
       const rows = await session.sweep(format, percent).finally(() => {
@@ -466,7 +466,7 @@ const text = imageCompressionCopy[locale];
         tr.insertCell().textContent = String(row.quality);
         tr.insertCell().textContent = bytes(row.bytes);
         tr.insertCell().textContent = percentOf(
-          row.bytes / last.measurement.originalBytes,
+          row.bytes / base.measurement.originalBytes,
         );
       }
       sweepOut.replaceChildren(table);
