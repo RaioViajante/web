@@ -9,8 +9,12 @@ test("Portuguese Lab lists every experiment with active LANG and count-aware fil
   await page.setViewportSize(viewports.mobile);
   await page.goto(`${base("lab")}/pt/`);
   await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
-  await expect(page.locator("[data-experiment-list] article")).toHaveCount(3);
+  await expect(page.locator("[data-experiment-list] article")).toHaveCount(7);
   for (const title of [
+    "busca de caminhos",
+    "simulador de agendamento",
+    "playground de linguagem mínima",
+    "laboratório de compressão de imagens",
     "classificador de arquivos",
     "estados de execução",
     "setor de boot",
@@ -21,12 +25,12 @@ test("Portuguese Lab lists every experiment with active LANG and count-aware fil
   );
   await expect(page.locator("main time").first()).toHaveAttribute(
     "datetime",
-    "2026-09-13",
+    "2026-10-30",
   );
   await expect(page.locator("main time").first()).toHaveText(
-    "13 de setembro de 2026",
+    "30 de outubro de 2026",
   );
-  await expect(page.locator("section:has(#notebook) a")).toHaveCount(3);
+  await expect(page.locator("section:has(#notebook) a")).toHaveCount(7);
   await expect(page.locator(".rv-lang")).toHaveAttribute(
     "data-lang-state",
     "link",
@@ -43,11 +47,11 @@ test("Portuguese Lab lists every experiment with active LANG and count-aware fil
   );
   await page.locator('[data-filter="active"]').click();
   await expect(page.locator("[data-filter-result]")).toHaveText(
-    "2 experimentos",
+    "6 experimentos",
   );
   await page.locator('[data-filter="all"]').click();
   await expect(page.locator("[data-filter-result]")).toHaveText(
-    "3 experimentos",
+    "7 experimentos",
   );
   expect(
     await page.evaluate(
@@ -125,6 +129,26 @@ test("Portuguese search is locale-pure, English slugs under /pt use the English 
   expect(index.ok()).toBe(true);
   expect(await index.json()).toEqual([
     expect.objectContaining({
+      contentId: "007",
+      locale: "pt-BR",
+      href: "https://lab.raioviajante.com/pt/experiments/compressao-de-imagens/",
+    }),
+    expect.objectContaining({
+      contentId: "006",
+      locale: "pt-BR",
+      href: "https://lab.raioviajante.com/pt/experiments/linguagem-minima/",
+    }),
+    expect.objectContaining({
+      contentId: "005",
+      locale: "pt-BR",
+      href: "https://lab.raioviajante.com/pt/experiments/busca-de-caminhos/",
+    }),
+    expect.objectContaining({
+      contentId: "004",
+      locale: "pt-BR",
+      href: "https://lab.raioviajante.com/pt/experiments/simulador-de-agendamento/",
+    }),
+    expect.objectContaining({
       contentId: "003",
       locale: "pt-BR",
       href: "https://lab.raioviajante.com/pt/experiments/setor-de-boot/",
@@ -186,11 +210,21 @@ test("every Portuguese Lab suggestion leads to the experiment it names in both s
     );
     await expect(suggestions.first()).toBeVisible();
     const terms = await suggestions.allTextContents();
-    expect(terms).toEqual(["classificador", "execução", "boot"]);
+    expect(terms).toEqual([
+      "classificador",
+      "execução",
+      "boot",
+      "caminhos",
+      "linguagem",
+      "compressão",
+    ]);
     const destination = {
       classificador: "classificador-de-arquivos",
       execução: "estados-de-execucao",
       boot: "setor-de-boot",
+      caminhos: "busca-de-caminhos",
+      linguagem: "linguagem-minima",
+      compressão: "compressao-de-imagens",
     } as const;
     for (const [index, term] of terms.entries()) {
       const button = page
@@ -421,9 +455,19 @@ test("the Portuguese notebook entries agree with their titles", async ({
   await isolate(page, []);
   await page.goto(`${base("lab")}/pt/`);
   const entries = page.locator("section:has(#notebook) a");
-  await expect(entries.nth(0)).toContainText("setor de boot registrado");
-  await expect(entries.nth(1)).toContainText("estados de execução registrados");
-  await expect(entries.nth(2)).toContainText(
+  await expect(entries.nth(0)).toContainText(
+    "laboratório de compressão de imagens registrado",
+  );
+  await expect(entries.nth(1)).toContainText(
+    "playground de linguagem mínima registrado",
+  );
+  await expect(entries.nth(2)).toContainText("busca de caminhos registrado");
+  await expect(entries.nth(3)).toContainText(
+    "simulador de agendamento registrado",
+  );
+  await expect(entries.nth(4)).toContainText("setor de boot registrado");
+  await expect(entries.nth(5)).toContainText("estados de execução registrados");
+  await expect(entries.nth(6)).toContainText(
     "classificador de arquivos registrado",
   );
 });

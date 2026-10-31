@@ -237,6 +237,78 @@
         "requests": 10
       }
     },
+    "lab/scheduler-simulator": {
+      "baseline": {
+        "total": 81961,
+        "script": 20632,
+        "stylesheet": 10045,
+        "font": 33315,
+        "image": 10066,
+        "requests": 9
+      },
+      "max": {
+        "total": 98304,
+        "script": 22528,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 11
+      }
+    },
+    "lab/pathfinding-playground": {
+      "baseline": {
+        "total": 80752,
+        "script": 20084,
+        "stylesheet": 10167,
+        "font": 33315,
+        "image": 10066,
+        "requests": 9
+      },
+      "max": {
+        "total": 98304,
+        "script": 22528,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 11
+      }
+    },
+    "lab/tiny-language-playground": {
+      "baseline": {
+        "total": 85517,
+        "script": 23835,
+        "stylesheet": 9841,
+        "font": 33315,
+        "image": 10066,
+        "requests": 9
+      },
+      "max": {
+        "total": 102400,
+        "script": 31744,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 11
+      }
+    },
+    "lab/image-compression-lab": {
+      "baseline": {
+        "total": 80649,
+        "script": 20003,
+        "stylesheet": 10015,
+        "font": 33315,
+        "image": 10066,
+        "requests": 9
+      },
+      "max": {
+        "total": 98304,
+        "script": 27648,
+        "stylesheet": 13312,
+        "font": 43008,
+        "image": 16384,
+        "requests": 11
+      }
+    },
     "lab/search": {
       "baseline": {
         "total": 102471,

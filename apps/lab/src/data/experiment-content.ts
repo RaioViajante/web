@@ -114,6 +114,122 @@ export const fidelityRows = {
       { label: "resultado", value: "documentado nas anotações do projeto" },
     ],
   },
+  "scheduler-simulator": {
+    en: [
+      { label: "model", value: "teaching simulation · integer clock" },
+      { label: "orbit", value: "job settings only · no scheduler exists yet" },
+      {
+        label: "background work, persistence",
+        value: "none · reload starts over",
+      },
+      { label: "randomness", value: "none · every run repeats" },
+    ],
+    "pt-BR": [
+      { label: "modelo", value: "simulação didática · relógio de inteiros" },
+      {
+        label: "orbit",
+        value: "apenas as configurações de job · ainda não há agendador",
+      },
+      {
+        label: "trabalho em segundo plano, persistência",
+        value: "nenhum · recarregar a página recomeça do zero",
+      },
+      { label: "aleatoriedade", value: "nenhuma · toda execução se repete" },
+    ],
+  },
+  "pathfinding-playground": {
+    en: [
+      {
+        label: "algorithms",
+        value: "written for the Lab · not tied to a project",
+      },
+      { label: "tie-breaking", value: "fixed · every run repeats" },
+      { label: "movement", value: "four directions · mud is the only weight" },
+      { label: "persistence", value: "none · reload starts over" },
+    ],
+    "pt-BR": [
+      {
+        label: "algoritmos",
+        value: "escritos para o Lab · sem ligação com um projeto",
+      },
+      {
+        label: "desempate",
+        value: "fixo · toda execução se repete",
+      },
+      {
+        label: "movimento",
+        value: "quatro direções · a lama é o único peso",
+      },
+      {
+        label: "persistência",
+        value: "nenhuma · recarregar a página recomeça do zero",
+      },
+    ],
+  },
+  "tiny-language-playground": {
+    en: [
+      {
+        label: "syntax",
+        value: "subset read from yanawa notes · revision 7fd082e",
+      },
+      { label: "yanawa compiler", value: "none exists yet · this is not it" },
+      {
+        label: "execution",
+        value: "own tree-walking interpreter · bounded · no JavaScript eval",
+      },
+      { label: "persistence", value: "none · source stays in this tab" },
+    ],
+    "pt-BR": [
+      {
+        label: "sintaxe",
+        value: "subconjunto lido das notas do yanawa · revisão 7fd082e",
+      },
+      {
+        label: "compilador do yanawa",
+        value: "ainda não existe · este não é ele",
+      },
+      {
+        label: "execução",
+        value: "interpretador próprio · limitado · sem eval de JavaScript",
+      },
+      {
+        label: "persistência",
+        value: "nenhuma · o código fica nesta aba",
+      },
+    ],
+  },
+  "image-compression-lab": {
+    en: [
+      {
+        label: "encoding",
+        value: "your browser’s own encoders · real, measured bytes",
+      },
+      {
+        label: "mochifile",
+        value: "inspiration only · its engine is not used",
+      },
+      { label: "upload, storage", value: "none · the image stays in this tab" },
+      { label: "target sizes", value: "not offered · not guaranteeable" },
+    ],
+    "pt-BR": [
+      {
+        label: "codificação",
+        value: "codificadores do seu navegador · bytes reais e medidos",
+      },
+      {
+        label: "mochifile",
+        value: "apenas inspiração · o motor dele não é usado",
+      },
+      {
+        label: "envio, armazenamento",
+        value: "nenhum · a imagem fica nesta aba",
+      },
+      {
+        label: "tamanhos-alvo",
+        value: "não oferecidos · não podem ser garantidos",
+      },
+    ],
+  },
 } as const satisfies Record<
   ExperimentSurface,
   Record<LocaleId, readonly FidelityRow[]>
@@ -182,6 +298,154 @@ export const relatedRows = {
         value: "github ↗",
         href: learningNotes,
         language: "en",
+      },
+    ],
+  },
+  "scheduler-simulator": {
+    en: [
+      {
+        label: "execution states",
+        value: "lab · 002",
+        href: "/experiments/execution-states/",
+      },
+      {
+        label: "Orbit architecture notes",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit/blob/2967494085ec5f66085e09ee9cc15c9d5be368e0/docs/architecture.md",
+        language: "en",
+      },
+      {
+        label: "Orbit source code",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit",
+      },
+    ],
+    "pt-BR": [
+      {
+        label: "estados de execução",
+        value: "lab · 002",
+        href: "/pt/experiments/estados-de-execucao/",
+      },
+      {
+        label: "notas de arquitetura do Orbit",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit/blob/2967494085ec5f66085e09ee9cc15c9d5be368e0/docs/architecture.md",
+        language: "en",
+      },
+      {
+        label: "código-fonte do Orbit",
+        value: "github ↗",
+        href: "https://github.com/RaioViajante/orbit",
+      },
+    ],
+  },
+  "pathfinding-playground": {
+    en: [
+      {
+        label: "Dijkstra's algorithm",
+        value: "wikipedia ↗",
+        href: "https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm",
+        language: "en",
+      },
+      {
+        label: "A* search algorithm",
+        value: "wikipedia ↗",
+        href: "https://en.wikipedia.org/wiki/A*_search_algorithm",
+        language: "en",
+      },
+    ],
+    "pt-BR": [
+      {
+        label: "algoritmo de Dijkstra",
+        value: "wikipedia ↗",
+        href: "https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm",
+        language: "en",
+      },
+      {
+        label: "algoritmo A*",
+        value: "wikipedia ↗",
+        href: "https://en.wikipedia.org/wiki/A*_search_algorithm",
+        language: "en",
+      },
+    ],
+  },
+  "tiny-language-playground": {
+    en: [
+      {
+        label: "yanawa syntax notes",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa/blob/7fd082e806d55f293c81281f9acee1c02a683744/docs/syntax.md",
+        language: "en",
+      },
+      {
+        label: "yanawa compiler architecture notes",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa/blob/7fd082e806d55f293c81281f9acee1c02a683744/docs/compiler-architecture.md",
+        language: "en",
+      },
+      {
+        label: "yanawa repository",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa",
+      },
+    ],
+    "pt-BR": [
+      {
+        label: "notas de sintaxe do yanawa",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa/blob/7fd082e806d55f293c81281f9acee1c02a683744/docs/syntax.md",
+        language: "en",
+      },
+      {
+        label: "notas de arquitetura do compilador do yanawa",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa/blob/7fd082e806d55f293c81281f9acee1c02a683744/docs/compiler-architecture.md",
+        language: "en",
+      },
+      {
+        label: "repositório do yanawa",
+        value: "github ↗",
+        href: "https://github.com/yanawa/yanawa",
+      },
+    ],
+  },
+  "image-compression-lab": {
+    en: [
+      {
+        label: "Mochifile · image engine notes",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile/blob/f674bf16f7ffee4ad8094bf079567ccf1bc001c2/docs/adr/0016-image-engine-jsquash-with-native-decoding.md",
+        language: "en",
+      },
+      {
+        label: "Mochifile · size-targeting notes",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile/blob/f674bf16f7ffee4ad8094bf079567ccf1bc001c2/docs/adr/0017-size-targeting-algorithm.md",
+        language: "en",
+      },
+      {
+        label: "Mochifile source code",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile",
+      },
+    ],
+    "pt-BR": [
+      {
+        label: "Mochifile · notas do motor de imagens",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile/blob/f674bf16f7ffee4ad8094bf079567ccf1bc001c2/docs/adr/0016-image-engine-jsquash-with-native-decoding.md",
+        language: "en",
+      },
+      {
+        label: "Mochifile · notas sobre tamanho-alvo",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile/blob/f674bf16f7ffee4ad8094bf079567ccf1bc001c2/docs/adr/0017-size-targeting-algorithm.md",
+        language: "en",
+      },
+      {
+        label: "código-fonte do Mochifile",
+        value: "github ↗",
+        href: "https://github.com/mochifile/mochifile",
       },
     ],
   },

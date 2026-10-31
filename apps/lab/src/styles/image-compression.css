@@ -1,0 +1,160 @@
+/* Image compression lab: file picker, controls, result table and comparison. Colors come from tokens. */
+.ic-file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 16px;
+}
+.ic-file label {
+  display: block;
+  min-width: 0;
+  flex: 1 1 260px;
+}
+.ic-file .rv-label,
+.ic-settings .rv-label,
+.ic-compare .rv-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.ic-settings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.ic-settings label,
+.ic-compare label {
+  display: block;
+  min-width: 0;
+}
+.ic-settings input[type="range"],
+.ic-compare input[type="range"] {
+  width: 100%;
+  accent-color: var(--fg);
+  min-height: var(--touch);
+}
+.ic-settings input[type="range"]:focus-visible,
+.ic-compare input[type="range"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.ic-value {
+  display: block;
+  font-size: 12.5px;
+  color: var(--fg-2);
+}
+.ic-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.ic-scroll:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.ic-table,
+.ic-scroll table {
+  border-collapse: collapse;
+  font-size: 12.5px;
+  width: 100%;
+}
+.ic-table th,
+.ic-table td,
+.ic-scroll th,
+.ic-scroll td {
+  padding: 6px 14px 6px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--table-rule);
+  overflow-wrap: anywhere;
+}
+.ic-table small {
+  color: var(--fg-3);
+  font-size: 11.5px;
+}
+.ic-scroll caption {
+  caption-side: top;
+  padding-bottom: 8px;
+  text-align: left;
+  color: var(--fg-3);
+}
+.ic-stage {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background: var(--block-terminal);
+  border-radius: var(--radius-control);
+  --split: 50%;
+}
+.ic-stage canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: auto;
+}
+.ic-stage canvas[data-result],
+.ic-stage canvas[data-difference] {
+  position: absolute;
+  inset: 0;
+}
+.ic-stage canvas[data-result] {
+  clip-path: inset(0 0 0 var(--split));
+}
+.ic-stage canvas[hidden] {
+  display: none;
+}
+.ic-stage.is-zoomed canvas {
+  transform: scale(4);
+  transform-origin: center;
+  image-rendering: pixelated;
+}
+.ic-tag {
+  position: absolute;
+  top: 8px;
+  padding: 2px 8px;
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 12px;
+}
+.ic-tag-left {
+  left: 8px;
+}
+.ic-tag-right {
+  right: 8px;
+}
+.ic-compare {
+  margin-top: 16px;
+}
+.ic-heading {
+  margin: 32px 0 12px;
+  font-size: var(--size-small);
+  font-weight: var(--weight-heading);
+}
+.ic-concepts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 24px;
+  margin: 0;
+  font-size: 14px;
+}
+.ic-concepts dd {
+  margin: 0;
+  color: var(--fg-2);
+}
+.ic-limits {
+  padding-left: 20px;
+  font-size: 14px;
+  color: var(--fg-2);
+}
+@media (max-width: 760px) {
+  .ic-settings {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ic-concepts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .ic-concepts dd {
+    margin-bottom: 12px;
+  }
+}
