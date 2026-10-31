@@ -57,7 +57,21 @@ export interface SearchSuggestions {
 export const searchSuggestions = {
   en: undefined,
   "pt-BR": {
-    site: ["classificador", "execução", "boot", "compressão"],
-    everywhere: ["classificador", "execução", "boot", "compressão"],
+    site: [
+      "classificador",
+      "execução",
+      "boot",
+      "caminhos",
+      "linguagem",
+      "compressão",
+    ],
+    everywhere: [
+      "classificador",
+      "execução",
+      "boot",
+      "caminhos",
+      "linguagem",
+      "compressão",
+    ],
   },
 } satisfies Record<LocaleId, SearchSuggestions | undefined>;

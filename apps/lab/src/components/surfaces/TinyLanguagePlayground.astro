@@ -1,0 +1,388 @@
+---
+import { TinyLanguageBench } from "./TinyLanguageBench";
+import { tinyLanguageCopy } from "../../lib/tiny-language-copy";
+import type { LocaleId } from "../../../../../site/locales";
+import "../../styles/tiny-language.css";
+interface Props {
+  locale: LocaleId;
+}
+const { locale } = Astro.props;
+const text = tinyLanguageCopy[locale];
+---
+
+<TinyLanguageBench locale={locale} />
+<h3 class="tiny-heading">{text.conceptsHeading}</h3>
+<dl class="tiny-concepts">
+  {text.concepts.map((item) => (
+    <>
+      <dt>{item.term}</dt>
+      <dd>{item.text}</dd>
+    </>
+  ))}
+</dl>
+<h3 class="tiny-heading">{text.limitsHeading}</h3>
+<ul class="tiny-limits">
+  {text.limits.map((item) => (
+    <li>{item}</li>
+  ))}
+</ul>
+<script>
+  import {
+    analyze,
+    astTree,
+    excerpt,
+    execute,
+    type Analysis,
+    type Diagnostic,
+    type RunResult,
+    type TreeNode,
+  } from "../../lib/tiny-language";
+  import { formatDiagnostic } from "../../lib/tiny-language-view";
+  import { pickForm, type OneCounts } from "../../lib/plural-lookup";
+  import type { Panel, TinyLanguageCopy } from "../../lib/tiny-language-copy";
+  import { fill } from "../../lib/template";
+  import { playSound } from "@raioviajante/design/sound";
+
+  type ClientCopy = Omit<
+    TinyLanguageCopy,
+    "concepts" | "limits" | "conceptsHeading" | "limitsHeading" | "noscript"
+  > & {
+    intlLocale: string;
+    maxChars: number;
+    oneCounts: OneCounts;
+    sources: Record<string, string>;
+  };
+
+  const root = document.querySelector<HTMLElement>("[data-tiny]");
+  if (root) {
+    // Rendered into the page at build time; never read from the browser.
+    const text = JSON.parse(root.dataset.copy!) as ClientCopy;
+    const copy = text as unknown as TinyLanguageCopy;
+    const one = text.oneCounts;
+    const number = new Intl.NumberFormat(text.intlLocale);
+    const $ = <T extends HTMLElement>(selector: string) =>
+      root.querySelector<T>(selector)!;
+    const source = $<HTMLTextAreaElement>("[data-source]");
+    const chars = $("[data-chars]");
+    const status = $("[data-status]");
+    const problemsEl = $("[data-problems]");
+    const hint = $("[data-example-hint]");
+    const panelHelp = $("[data-panel-help]");
+    const output = $("[data-output]");
+    const traceEl = $("[data-trace]");
+    const PANELS: Panel[] = ["tokens", "tree", "run"];
+    const MAX_TOKEN_ROWS = 400;
+
+    let analysis: Analysis = analyze(source.value);
+    let result: RunResult | null = null;
+    let shown = 0;
+    let panel: Panel = "tokens";
+    let debounce: number | undefined;
+    let lastStatus = "";
+
+    const say = (message: string) => {
+      if (message === lastStatus) return;
+      lastStatus = message;
+      status.textContent = message;
+    };
+    const plural = (forms: Parameters<typeof pickForm>[0], n: number) =>
+      pickForm(forms, n, one);
+
+    function renderProblems() {
+      const list: Diagnostic[] = [
+        ...analysis.diagnostics,
+        ...(result ? result.diagnostics : []),
+      ];
+      const items = list.map((d) => {
+        const li = document.createElement("li");
+        const head = document.createElement("div");
+        head.textContent = `${text.severityError} · ${copy.stageNames[d.stage]} · ${fill(text.position, { line: d.line, column: d.column })}: ${formatDiagnostic(copy, d)}`;
+        li.append(head);
+        if (d.code !== "source-too-large") {
+          const { text: line, underline } = excerpt(source.value, d);
+          const pre = document.createElement("pre");
+          pre.className = "tiny-excerpt";
+          pre.textContent = `${line}\n${underline}`;
+          li.append(pre);
+        }
+        return li;
+      });
+      if (items.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = text.noProblems;
+        items.push(li);
+      }
+      problemsEl.replaceChildren(...items);
+    }
+
+    function renderTokens() {
+      const tokens = analysis.tokens;
+      const table = document.createElement("table");
+      const head = table.createTHead().insertRow();
+      for (const title of text.tokenHeaders) {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.textContent = title;
+        head.append(th);
+      }
+      const body = table.createTBody();
+      for (const token of tokens.slice(0, MAX_TOKEN_ROWS)) {
+        const tr = body.insertRow();
+        const type = tr.insertCell();
+        type.textContent = token.type;
+        type.lang = text.tokenTypeLang;
+        tr.insertCell().textContent = token.text === "" ? "—" : token.text;
+        tr.insertCell().textContent = String(token.line);
+        tr.insertCell().textContent = String(token.column);
+      }
+      const holder = $('[data-panel="tokens"]');
+      const summary = document.createElement("p");
+      summary.className = "bench-help";
+      summary.textContent =
+        plural(text.tokenCount, tokens.length) +
+        (tokens.length > MAX_TOKEN_ROWS
+          ? ` · ${fill(text.tokensShown, { shown: MAX_TOKEN_ROWS, total: tokens.length })}`
+          : "");
+      const scroll = document.createElement("div");
+      scroll.className = "tiny-scroll";
+      // The shared scroll-region behavior adds the tab stop only if it overflows.
+      scroll.dataset.scrollRegion = "";
+      scroll.dataset.scrollLabel = text.panels.tokens;
+      scroll.append(table);
+      holder.replaceChildren(summary, scroll);
+    }
+
+    function treeList(tree: TreeNode, root = false): HTMLElement {
+      const ul = document.createElement("ul");
+      if (root) ul.className = "tiny-tree";
+      const li = document.createElement("li");
+      const label = document.createElement("span");
+      label.textContent = tree.label;
+      li.append(label);
+      if (tree.children.length > 0) {
+        const inner = document.createElement("ul");
+        for (const child of tree.children) inner.append(treeList(child));
+        li.append(inner);
+      }
+      ul.append(li);
+      return ul;
+    }
+    function renderTree() {
+      const holder = $('[data-panel="tree"]');
+      if (!analysis.program) {
+        const p = document.createElement("p");
+        p.className = "bench-help";
+        p.textContent = text.treeBlocked;
+        holder.replaceChildren(p);
+        return;
+      }
+      holder.replaceChildren(treeList(astTree(analysis.program), true));
+    }
+
+    function renderRun() {
+      const lines = result ? result.output : [];
+      const events = result ? result.trace : [];
+      // The k-th print event produced the k-th output line.
+      let printed = 0;
+      for (const event of events.slice(0, shown))
+        if (event.kind === "print") printed += 1;
+      const visible = shown >= events.length ? lines : lines.slice(0, printed);
+      output.textContent =
+        visible.length === 0 ? text.outputEmpty : visible.join("\n");
+      const table = document.createElement("table");
+      const head = table.createTHead().insertRow();
+      for (const title of text.traceHeaders) {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.textContent = title;
+        head.append(th);
+      }
+      const body = table.createTBody();
+      events.slice(0, shown).forEach((event, index) => {
+        const tr = body.insertRow();
+        if (index === shown - 1) tr.className = "tiny-current";
+        tr.insertCell().textContent = String(event.line);
+        tr.insertCell().textContent = text.traceKinds[event.kind] ?? event.kind;
+        tr.insertCell().textContent = event.detail;
+      });
+      const scroll = document.createElement("div");
+      scroll.className = "tiny-scroll";
+      scroll.dataset.scrollRegion = "";
+      scroll.dataset.scrollLabel = text.traceLabel;
+      if (shown > 0) scroll.append(table);
+      traceEl.replaceChildren(scroll);
+    }
+
+    function renderAll() {
+      chars.textContent = fill(text.characters, {
+        count: number.format(source.value.length),
+        max: number.format(text.maxChars),
+      });
+      renderProblems();
+      renderTokens();
+      renderTree();
+      renderRun();
+    }
+
+    function showPanel(next: Panel) {
+      panel = next;
+      for (const name of PANELS) {
+        $(`[data-panel="${name}"]`).hidden = name !== next;
+      }
+      root!
+        .querySelectorAll<HTMLButtonElement>("[data-panel-button]")
+        .forEach((button) =>
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.panelButton === next),
+          ),
+        );
+      panelHelp.textContent = text.panelHelp[next];
+    }
+
+    function analysisMessage(): string {
+      const count = analysis.diagnostics.length;
+      return count === 0
+        ? fill(text.messages.analyzedClean, {
+            tokens: plural(text.tokenCount, analysis.tokens.length),
+          })
+        : fill(text.messages.analyzed, {
+            problems: plural(text.problems, count),
+          });
+    }
+
+    function refresh(announce: boolean) {
+      debounce = undefined;
+      result = null;
+      shown = 0;
+      analysis = analyze(source.value);
+      renderAll();
+      if (announce) say(analysisMessage());
+    }
+
+    function prepareRun() {
+      // Run what is on screen, not the analysis from before the last keystrokes.
+      if (debounce !== undefined) {
+        window.clearTimeout(debounce);
+        debounce = undefined;
+        refresh(false);
+      }
+      if (analysis.diagnostics.length > 0 || !analysis.program) {
+        say(text.runBlocked);
+        playSound("reject");
+        return false;
+      }
+      if (!result) {
+        result = execute(analysis.program);
+        renderProblems();
+      }
+      return true;
+    }
+
+    function describeRun(): string {
+      const r = result!;
+      const msg =
+        r.diagnostics.length > 0 ? text.messages.ranFailed : text.messages.ran;
+      return fill(msg, {
+        output: plural(text.outputLines, r.output.length),
+        steps: plural(text.steps, r.steps),
+      });
+    }
+
+    $("[data-run]").addEventListener("click", () => {
+      if (!prepareRun()) return;
+      shown = result!.trace.length;
+      renderRun();
+      say(
+        describeRun() + (result!.truncated ? ` ${text.messages.traceCut}` : ""),
+      );
+      playSound("success");
+    });
+    $("[data-step]").addEventListener("click", () => {
+      if (!prepareRun()) return;
+      const total = result!.trace.length;
+      if (shown >= total) {
+        say(fill(text.messages.stepsDone, { total }));
+        playSound("reject");
+        return;
+      }
+      shown += 1;
+      renderRun();
+      say(
+        shown >= total
+          ? `${fill(text.messages.stepped, { shown, total })} ${describeRun()}`
+          : fill(text.messages.stepped, { shown, total }),
+      );
+      playSound("success");
+    });
+    $("[data-reset-run]").addEventListener("click", () => {
+      result = null;
+      shown = 0;
+      renderProblems();
+      renderRun();
+      say(text.messages.reset);
+      playSound("success");
+    });
+
+    root
+      .querySelectorAll<HTMLButtonElement>("[data-panel-button]")
+      .forEach((button) =>
+        button.addEventListener("click", () => {
+          showPanel(button.dataset.panelButton as Panel);
+          say(fill(text.messages.panel, { panel: text.panels[panel] }));
+        }),
+      );
+    $("[data-previous]").addEventListener("click", () => {
+      showPanel(PANELS[Math.max(0, PANELS.indexOf(panel) - 1)]!);
+      say(fill(text.messages.panel, { panel: text.panels[panel] }));
+    });
+    $("[data-next]").addEventListener("click", () => {
+      showPanel(
+        PANELS[Math.min(PANELS.length - 1, PANELS.indexOf(panel) + 1)]!,
+      );
+      say(fill(text.messages.panel, { panel: text.panels[panel] }));
+    });
+
+    root
+      .querySelectorAll<HTMLButtonElement>("[data-example]")
+      .forEach((button) =>
+        button.addEventListener("click", () => {
+          const id = button.dataset.example!;
+          const entry = text.examples[id as keyof typeof text.examples];
+          window.clearTimeout(debounce);
+          source.value = text.sources[id]!;
+          root!
+            .querySelectorAll<HTMLButtonElement>("[data-example]")
+            .forEach((other) =>
+              other.setAttribute("aria-pressed", String(other === button)),
+            );
+          hint.textContent = entry.hint;
+          refresh(false);
+          say(
+            fill(text.messages.exampleLoaded, {
+              name: entry.name,
+              hint: entry.hint,
+            }),
+          );
+          playSound("success");
+        }),
+      );
+
+    // Typing re-analyzes after a short pause; no stage runs on every keystroke.
+    source.addEventListener("input", () => {
+      root!
+        .querySelectorAll("[data-example]")
+        .forEach((button) => button.setAttribute("aria-pressed", "false"));
+      chars.textContent = fill(text.characters, {
+        count: number.format(source.value.length),
+        max: number.format(text.maxChars),
+      });
+      window.clearTimeout(debounce);
+      debounce = window.setTimeout(() => refresh(true), 250);
+    });
+    window.addEventListener("pagehide", () => window.clearTimeout(debounce));
+
+    showPanel("tokens");
+    renderAll();
+  }
+</script>

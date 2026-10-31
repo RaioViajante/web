@@ -153,6 +153,7 @@ describe("post collection", () => {
       "started-writing-down-the-failures-before-the-features": "2026-09-27",
       "there-is-no-printf-down-here": "2026-09-05",
       "for-those-who-never-quite-belonged": "2026-10-30",
+      "some-things-dont-know-how-to-end": "2026-10-30",
       // The English translation of the Portuguese original keeps its date.
       "translating-the-site-without-pretending-everything-already-exists":
         "2026-10-19",

@@ -1,0 +1,11 @@
+{
+  "name": "minimatch-compat",
+  "version": "3.1.5-compat.1",
+  "description": "minimatch 3 call shape on top of minimatch 11 (GHSA-g3hv-75wg-m249)",
+  "private": true,
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "minimatch-modern": "npm:minimatch@11.0.3"
+  }
+}

@@ -1,0 +1,122 @@
+/* Tiny language playground: editor, panels and notes. Colors come from tokens. */
+.tiny-source {
+  display: block;
+}
+.tiny-code {
+  font-family: var(--font);
+  font-size: 13.5px;
+  line-height: 1.5;
+  tab-size: 4;
+  white-space: pre;
+  overflow: auto;
+  resize: vertical;
+  min-height: 12em;
+}
+.tiny-problems {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.tiny-problems li {
+  margin: 0 0 12px;
+}
+.tiny-excerpt {
+  margin: 6px 0 0;
+  padding: 8px 12px;
+  background: var(--block-terminal);
+  border-radius: var(--radius-control);
+  font-size: 12.5px;
+  overflow-x: auto;
+  color: var(--syn-number);
+}
+.tiny-panel {
+  margin-top: 16px;
+}
+.tiny-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.tiny-scroll:focus-visible,
+.tiny-output:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.tiny-scroll table {
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.tiny-scroll th,
+.tiny-scroll td {
+  padding: 4px 14px 4px 0;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--table-rule);
+}
+.tiny-current td {
+  color: var(--fg);
+}
+.tiny-label {
+  display: block;
+  margin: 18px 0 8px;
+  font-size: 12px;
+}
+.tiny-output {
+  margin: 0;
+  padding: 10px 12px;
+  min-height: 3em;
+  max-height: 260px;
+  overflow: auto;
+  background: var(--block-terminal);
+  border-radius: var(--radius-control);
+  font-size: 13px;
+  color: var(--syn-string);
+}
+.tiny-tree,
+.tiny-tree ul {
+  margin: 0;
+  padding-left: 18px;
+  list-style: none;
+  font-size: 12.5px;
+}
+.tiny-tree {
+  padding-left: 0;
+  max-height: 420px;
+  overflow: auto;
+}
+.tiny-tree li {
+  border-left: 1px solid var(--block-hairline);
+  padding-left: 10px;
+  margin: 2px 0;
+}
+.tiny-heading {
+  margin: 32px 0 12px;
+  font-size: var(--size-small);
+  font-weight: var(--weight-heading);
+}
+.tiny-concepts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 24px;
+  margin: 0;
+  font-size: 14px;
+}
+.tiny-concepts dd {
+  margin: 0;
+  color: var(--fg-2);
+}
+.tiny-limits {
+  padding-left: 20px;
+  font-size: 14px;
+  color: var(--fg-2);
+}
+@media (max-width: 760px) {
+  .tiny-concepts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .tiny-concepts dd {
+    margin-bottom: 12px;
+  }
+}
