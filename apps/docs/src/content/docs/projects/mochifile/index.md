@@ -60,7 +60,7 @@ Every tool is a package with a data manifest, a pure processing function and a s
 
 ## Browsers and accessibility
 
-The end-to-end suite runs in Chromium, Firefox and WebKit, and 16 of its specifications run automated accessibility checks with axe, including the compressor's. Image decoding adapts to the browser: native decoders are used where a probe shows they work, and WebAssembly decoders step in otherwise, which is how HEIC photos can be read outside Safari. Memory is bounded by rejecting inputs over 100 megapixels and processing at no more than 16 megapixels.
+The end-to-end suite runs in Chromium, Firefox and WebKit, and 16 of its specifications run automated accessibility checks with axe, including the compressor's. Image decoding adapts to the browser: native decoders are used where a probe shows they work, and WebAssembly decoders step in otherwise. The engine can read HEIC photos this way outside Safari, but no tool exposes that yet. Memory is bounded by rejecting inputs over 100 megapixels and processing at no more than 16 megapixels.
 
 Mochifile does not publish a list of supported browser versions, so none is claimed here.
 

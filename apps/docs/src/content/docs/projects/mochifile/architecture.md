@@ -68,8 +68,8 @@ The engine encodes with WebAssembly builds of mozjpeg, libwebp and oxipng, and r
 
 Decoding is chosen per session by small probes:
 
-1. If reading pixels back from a canvas is not exact, as with anti-fingerprinting protections, the WebAssembly decoders are used at full size, up to 24 megapixels.
-2. Otherwise, for JPEG, a reduced-size decoder is used where a probe proves it works.
+1. If reading pixels back from a canvas is not exact, as with anti-fingerprinting protections, the WebAssembly decoders are used at full size, up to 25 megapixels.
+2. Otherwise, for JPEGs above 24 megapixels, a reduced-size decoder is used where a probe proves it works.
 3. Otherwise the browser's own bitmap decoder is used, with orientation applied.
 
 Inputs over 100 megapixels are rejected before decoding, and processing happens at no more than 16 megapixels. Because outputs are re-encoded from pixels, they carry no EXIF, GPS or XMP data.
@@ -88,7 +88,7 @@ The repository's decision record measured three to seven encodes per photo on it
 
 ## Hosting and security headers
 
-The site is static output served from Cloudflare as assets only. A strict content security policy allows scripts only from the same origin, build-time hashes for the inline island scripts and WebAssembly compilation, and allows no remote styles or fonts and no framing of the site. Cross-origin isolation is not enabled globally, because it would break third-party embeds; a tool that needs it must opt in per route.
+The site is static output served from Cloudflare as assets only. A strict content security policy allows scripts only from the same origin, with WebAssembly compilation and build-time hashes for the inline island scripts, and allows no remote styles or fonts and no framing of the site. Cross-origin isolation is not enabled globally, because it would break third-party embeds; a tool that needs it must opt in per route.
 
 ## Testing
 

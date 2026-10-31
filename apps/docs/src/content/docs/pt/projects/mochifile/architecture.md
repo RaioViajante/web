@@ -68,8 +68,8 @@ O motor codifica com versões WebAssembly do mozjpeg, do libwebp e do oxipng, e 
 
 A decodificação é escolhida por sessão, por pequenos testes:
 
-1. Se a leitura de pixels de um canvas não é exata, como nas proteções contra identificação por impressão digital, usam-se os decodificadores WebAssembly em tamanho total, até 24 megapixels.
-2. Caso contrário, para JPEG, usa-se um decodificador de tamanho reduzido onde um teste prova que funciona.
+1. Se a leitura de pixels de um canvas não é exata, como nas proteções contra identificação por impressão digital, usam-se os decodificadores WebAssembly em tamanho total, até 25 megapixels.
+2. Caso contrário, para JPEGs acima de 24 megapixels, usa-se um decodificador de tamanho reduzido onde um teste prova que funciona.
 3. Caso contrário, usa-se o decodificador de bitmap do próprio navegador, com a orientação aplicada.
 
 Entradas acima de 100 megapixels são rejeitadas antes da decodificação, e o processamento ocorre em no máximo 16 megapixels. Como as saídas são recodificadas a partir dos pixels, não levam dados EXIF, GPS nem XMP.
@@ -88,7 +88,7 @@ O registro de decisão do repositório mediu de três a sete codificações por 
 
 ## Hospedagem e cabeçalhos de segurança
 
-O site é uma saída estática servida pela Cloudflare apenas como arquivos. Uma política de segurança de conteúdo rígida permite scripts somente da mesma origem, de hashes gerados no build para os scripts inline das ilhas e da compilação de WebAssembly, e não permite estilos nem fontes remotos nem a incorporação do site em quadros. O isolamento entre origens não é ativado globalmente, porque quebraria incorporações de terceiros; uma ferramenta que precise dele deve optar por rota.
+O site é uma saída estática servida pela Cloudflare apenas como arquivos. Uma política de segurança de conteúdo rígida permite scripts somente da mesma origem, com a compilação de WebAssembly e hashes gerados no build para os scripts inline das ilhas, e não permite estilos nem fontes remotos nem a incorporação do site em quadros. O isolamento entre origens não é ativado globalmente, porque quebraria incorporações de terceiros; uma ferramenta que precise dele deve optar por rota.
 
 ## Testes
 

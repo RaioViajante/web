@@ -21,7 +21,7 @@ counterpart. Not published.
 | PDF, passport photo, video tools | planned | named as examples in `docs/architecture.md`; no code |
 | Processing in a Web Worker; contract split manifest and `process()` | implemented | `tool-kit/src/contract.ts`, ADR 0006 |
 | Size search: quality 40 to 90, 97% stop, `target-unreachable` | implemented | ADR 0017, `fit-to-size.ts`, `errors.ts` |
-| 100 MP rejection, 16 MP processing cap, 24 MP WebAssembly path | implemented | ADR 0016 |
+| 100 MP rejection, 16 MP processing cap, 25 MP WebAssembly path, reduced-size JPEG decode above 24 MP | implemented | `engine-image/src/decode.ts` (`WASM_MAX_PIXELS`, `IMAGE_DECODER_MIN_PIXELS`); ADR 0016 still says 24 MP and predates the change |
 | Metadata not carried over | implemented | ADR 0016, `strip-metadata.ts` |
 | No request follows file selection | project rule | ADR 0022; not machine-verified here |
 | Site sends `X-Robots-Tag: noindex` | observed | `curl -sI https://mochifile.com/` on 2026-10-30 |

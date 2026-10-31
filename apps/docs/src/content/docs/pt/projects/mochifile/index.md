@@ -60,7 +60,7 @@ Toda ferramenta é um pacote com um manifesto de dados, uma função de processa
 
 ## Navegadores e acessibilidade
 
-A suíte ponta a ponta roda em Chromium, Firefox e WebKit, e 16 de suas especificações executam verificações automáticas de acessibilidade com axe, incluindo a do compressor. A decodificação de imagens se adapta ao navegador: decodificadores nativos são usados onde um teste mostra que funcionam, e decodificadores WebAssembly entram nos demais casos, e é assim que fotos HEIC podem ser lidas fora do Safari. A memória é limitada rejeitando entradas acima de 100 megapixels e processando em no máximo 16 megapixels.
+A suíte ponta a ponta roda em Chromium, Firefox e WebKit, e 16 de suas especificações executam verificações automáticas de acessibilidade com axe, incluindo a do compressor. A decodificação de imagens se adapta ao navegador: decodificadores nativos são usados onde um teste mostra que funcionam, e decodificadores WebAssembly entram nos demais casos. O motor consegue ler fotos HEIC assim fora do Safari, mas nenhuma ferramenta expõe isso ainda. A memória é limitada rejeitando entradas acima de 100 megapixels e processando em no máximo 16 megapixels.
 
 O Mochifile não publica uma lista de versões de navegador suportadas, então nenhuma é afirmada aqui.
 
