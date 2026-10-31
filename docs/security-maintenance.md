@@ -87,17 +87,21 @@ fix in its place. The 11.0.3 fix bounds the work (it stops splitting at
 `braceExpandMax`, 100,000 by default, and skips the quadratic comparison above
 1,000 sets); it does not make an unusually large pattern free.
 
-**Verified compatibility.** In an ad hoc comparison against minimatch 3.1.5 itself (a script run once, not kept in the repository), the callable form
-agreed in 5,730 of 5,733 combinations of 21 patterns, 21 paths and 13 option
-sets, and the `Minimatch` class used by eslint, eslintrc and config-array agreed
-in 1,323 of 1,323. The three differences are `!(a|b)*` with `nonegate: true`,
-which no config here sets. A second ad hoc comparison with the options eslint uses (2,176 combinations, `Minimatch.match` with `dot` and `matchBase`) found 12 differences, all for paths with a `..` segment; see below. With the exact ESLint 9.39.5 and plugin versions,
-seven of the eight plugin rules that call minimatch gave the same findings as
-with 3.1.5. `pnpm lint`, the unit tests, the builds, the browser suite and the
-performance budgets pass. `security/minimatch-compat.test.mjs` keeps this from
-regressing: it resolves `minimatch` the way eslint does and checks the version,
-the call shape, 21 results taken from 3.1.5, and the patched preprocessing limit
-in a child process.
+**Verified compatibility.** In an ad hoc comparison against minimatch 3.1.5
+itself (a script run once, not kept in the repository), the callable form agreed
+in 5,730 of 5,733 combinations of 21 patterns, 21 paths and 13 option sets, and
+the `Minimatch` class used by eslint, eslintrc and config-array agreed in 1,323
+of 1,323. The three differences are `!(a|b)*` with `nonegate: true`, which no
+config here sets. A second ad hoc comparison with the options eslint uses (2,176
+combinations, `Minimatch.match` with `dot` and `matchBase`) found 12
+differences, all for paths with a `..` segment; see below. With the exact ESLint
+9.39.5 and plugin versions, seven of the eight plugin rules that call minimatch
+gave the same findings as with 3.1.5. `pnpm lint`, the unit tests, the builds,
+the browser suite and the performance budgets pass.
+`security/minimatch-compat.test.mjs` keeps this from regressing: it resolves
+`minimatch` the way eslint does and checks the version, the call shape, 21
+results taken from 3.1.5, and the patched preprocessing limit in a child
+process.
 
 **Remaining incompatibilities.**
 
@@ -108,8 +112,8 @@ in a child process.
   regular-expression builder, so none was added; a stand-in that only loaded the
   rule would hide wrong results. The test above records the gap.
 - `nonegate: true` with a leading extglob negation (`!(...)`) differs, as above.
-- Paths containing a `..` segment: with `dot: true`, 3.1.5 matched `/abs/..`
-  against `.*` and `**/.*`, and 11.0.3 does not. It is the stricter result and
+- Paths containing a `..` segment: with `dot: true` (and `matchBase: true` for
+  `.*`), 3.1.5 matched `/abs/..` against `.*` and `**/.*`, and 11.0.3 does not. It is the stricter result and
   does not affect any pattern or path in this repository's configs, but it is a
   behavior change.
 
