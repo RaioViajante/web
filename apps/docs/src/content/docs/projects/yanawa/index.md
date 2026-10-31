@@ -31,7 +31,7 @@ Every claim on this page comes from the design documents in the source repositor
 
 | Area | State | Evidence |
 | --- | --- | --- |
-| Language identity and principles | accepted | `docs/language-identity.md`, `docs/philosophy.md` |
+| Language identity and principles | stated principles, not a specification | `docs/language-identity.md`, `docs/philosophy.md` |
 | Sixteen syntax and semantics decisions | accepted, may still change | `docs/decisions.md` (D001 to D016) |
 | Types, errors, objects, modules | direction, with open questions | `docs/type-system.md`, `docs/errors.md`, `docs/object-model.md`, `docs/modules.md` |
 | Memory, concurrency, standard library, packages | direction, largely undecided | `docs/memory-model.md`, `docs/concurrency.md`, `docs/standard-library.md`, `docs/package-system.md` |
@@ -62,9 +62,9 @@ The following example uses only constructs that `docs/decisions.md` accepts: ind
 const MAX_RETRIES = 3
 
 fn describe(name: str, attempts: int) -> str:
-    if attempts >= MAX_RETRIES and name != "":
+    if attempts >= MAX_RETRIES and name == "Morgan":
         return "{name} has no attempts left"
-    return "{name} has {MAX_RETRIES - attempts} attempts left"
+    return "{name} can try again"
 
 fn main():
     let attempts = 1

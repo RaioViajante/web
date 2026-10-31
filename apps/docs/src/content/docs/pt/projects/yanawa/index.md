@@ -31,7 +31,7 @@ Cada afirmação desta página vem dos documentos de design do repositório de c
 
 | Área | Estado | Evidência |
 | --- | --- | --- |
-| Identidade e princípios da linguagem | aceito | `docs/language-identity.md`, `docs/philosophy.md` |
+| Identidade e princípios da linguagem | princípios declarados, não uma especificação | `docs/language-identity.md`, `docs/philosophy.md` |
 | Dezesseis decisões de sintaxe e semântica | aceitas, ainda podem mudar | `docs/decisions.md` (D001 a D016) |
 | Tipos, erros, objetos, módulos | direção, com perguntas em aberto | `docs/type-system.md`, `docs/errors.md`, `docs/object-model.md`, `docs/modules.md` |
 | Memória, concorrência, biblioteca padrão, pacotes | direção, em grande parte indefinida | `docs/memory-model.md`, `docs/concurrency.md`, `docs/standard-library.md`, `docs/package-system.md` |
@@ -62,9 +62,9 @@ O exemplo a seguir usa apenas construções que `docs/decisions.md` aceita: bloc
 const MAX_RETRIES = 3
 
 fn describe(name: str, attempts: int) -> str:
-    if attempts >= MAX_RETRIES and name != "":
+    if attempts >= MAX_RETRIES and name == "Morgan":
         return "{name} has no attempts left"
-    return "{name} has {MAX_RETRIES - attempts} attempts left"
+    return "{name} can try again"
 
 fn main():
     let attempts = 1

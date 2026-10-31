@@ -4,7 +4,7 @@ Maintenance record for `src/content/docs/projects/yanawa/` and its Portuguese
 counterpart. Not published.
 
 - **Source:** `yanawa/yanawa`, public, default branch, commit `7fd082e`
-  (16 commits, 2026-09-12 and 2026-09-13; six closed issues, no pull requests).
+  (16 commits, authored 2026-09-12; six issues closed 2026-09-13; no pull requests).
 - **Contents at that commit:** `README.md`, `AGENTS.md`, `CLAUDE.md` and 15
   design documents in `docs/`. No source code, grammar, tests or CI.
 - **Policy:** the pages state design only. Nothing may describe a compiler,
@@ -20,6 +20,9 @@ counterpart. Not published.
 | `yanawa.toml`, `yanawa.lock`, `yanawa.fs` and the other module names | candidates | `docs/package-system.md`, `docs/standard-library.md` |
 | Compiler stages | proposed, nothing built | `docs/compiler-architecture.md` "compilation pipeline" |
 | `yanawa` subcommands | intent, not implemented | `README.md` "tooling direction"; `docs/tooling.md` |
+
+The README says "language-design and early compiler phase"; the tree has no compiler
+source, so the pages follow the tree.
 
 ## Re-verifying
 
