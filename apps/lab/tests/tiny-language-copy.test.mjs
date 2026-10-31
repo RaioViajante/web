@@ -218,3 +218,15 @@ test("numbers are formatted by the locale", () => {
   assert.equal(new Intl.NumberFormat("en-US").format(4000), "4,000");
   assert.equal(new Intl.NumberFormat("pt-BR").format(4000), "4.000");
 });
+
+test("pickForm can show a count the page formatted itself", () => {
+  const one = oneCountsFor("pt-BR", 10);
+  const forms = {
+    one: "{count} byte",
+    other: "{count} bytes",
+    none: "nenhum byte",
+  };
+  assert.equal(pickForm(forms, 1234567, one, "1.234.567"), "1.234.567 bytes");
+  assert.equal(pickForm(forms, 1, one), "1 byte");
+  assert.equal(pickForm(forms, 0, one, "0"), "nenhum byte");
+});
