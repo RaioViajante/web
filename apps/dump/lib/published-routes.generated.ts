@@ -12,8 +12,10 @@ export const publishedPostPaths = {
     "/posts/started-writing-down-the-failures-before-the-features",
     "/posts/there-is-no-printf-down-here",
     "/posts/translating-the-site-without-pretending-everything-already-exists",
+    "/posts/we-probably-shouldnt-have-been-able-to-do-that",
   ],
   "pt-BR": [
+    "/pt/posts/acho-que-nao-deveriamos-ter-conseguido-fazer-isso",
     "/pt/posts/algumas-coisas-nao-sabem-como-terminar",
     "/pt/posts/comecei-a-escrever-as-falhas-antes-das-funcionalidades",
     "/pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma",
