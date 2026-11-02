@@ -1,0 +1,50 @@
+---
+contentId: "acho-que-nao-deveriamos-ter-conseguido-fazer-isso"
+locale: "pt-BR"
+originalLocale: "pt-BR"
+title: "Acho que não deveríamos ter conseguido fazer isso"
+description: "Sobre a vez em que um amigo e eu encontramos um price tampering e um IDOR em um ERP e reportamos as duas falhas."
+publishedAt: "2026-11-02"
+tags:
+  - personal
+  - security
+draft: false
+---
+
+Recentemente, um amigo e eu encontramos duas vulnerabilidades em um sistema bastante usado no Brasil. E, para ser sincero, não esperávamos encontrar o que encontramos.
+
+Tudo começou quando estávamos investigando como algumas funcionalidades de um ERP se comportavam. Nenhum de nós trabalha com segurança da informação. Eu estudo Engenharia de Software, gosto de programar e tenho essa mania de querer entender como as coisas funcionam. Às vezes até mais do que deveria.
+
+Em algum momento, conseguimos alterar o valor de uma cobrança de R$ 1.037,78 para R$ 1,00.
+
+Sim, um real.
+
+E o sistema não rejeitou a alteração em nenhuma das etapas que analisamos.
+
+Esse tipo de vulnerabilidade costuma ser chamado de <span lang="en">price tampering</span>. Basicamente, acontece quando um sistema não valida direito as informações de preço de uma transação e acaba aceitando um valor que não deveria aceitar.
+
+Isso não quer dizer que um pagamento de R$ 1,00 tenha sido concluído. O que conseguimos confirmar foi que o sistema aceitava a alteração, sem rejeitá-la, durante as etapas que observamos. O que já era preocupante o suficiente.
+
+A segunda vulnerabilidade era um IDOR (<span lang="en">Insecure Direct Object Reference</span>). Por causa de uma falha na validação de autorização, era possível acessar documentos financeiros de outros usuários.
+
+Uma coisa é encontrar um comportamento inesperado em uma funcionalidade. Outra é perceber que informações de outras pessoas estão acessíveis quando não deveriam.
+
+Durante os testes, usamos um cartão real e gravamos vídeos como evidência do que estava acontecendo.
+
+Como nenhum de nós é profissional de segurança, procuramos alguém com experiência na área para nos orientar. A gente não queria simplesmente sair dizendo por aí que tinha encontrado duas vulnerabilidades sem saber qual era a maneira certa de lidar com aquilo.
+
+Organizamos tudo em um relatório técnico e entramos em contato diretamente com a equipe responsável pelo sistema.
+
+Em dois dias, as duas vulnerabilidades que reportamos estavam corrigidas. Foi bem mais rápido do que a gente imaginava.
+
+Desde então, tenho pensado um pouco mais em segurança enquanto programo.
+
+Normalmente minha preocupação é fazer as coisas funcionarem, corrigir algum bug ou descobrir por que algo que funcionava cinco minutos atrás resolveu parar de funcionar. Agora também fico pensando em tudo aquilo que um sistema não deveria permitir.
+
+Acho que essa experiência também serviu para me lembrar de que ainda tenho muita coisa para aprender.
+
+Não vou dizer qual é o ERP nem compartilhar detalhes que permitam reproduzir as falhas. Não é isso que quero com este texto. Só achei que valia registrar a experiência por aqui, principalmente porque foi uma das primeiras vezes em que participei de algo assim fora de um ambiente de estudos.
+
+Ainda acho meio absurdo que tudo tenha começado com uma cobrança de R$ 1.037,78. E que, por algum motivo, a gente tenha conseguido transformá-la em um real.
+
+Pelo menos o sistema não aceita mais isso.

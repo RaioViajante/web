@@ -1,0 +1,50 @@
+---
+contentId: "acho-que-nao-deveriamos-ter-conseguido-fazer-isso"
+locale: "en"
+originalLocale: "pt-BR"
+title: "We Probably Shouldn't Have Been Able to Do That"
+description: "About the time a friend and I found a price tampering bug and an IDOR in an ERP, and reported both."
+publishedAt: "2026-11-02"
+tags:
+  - personal
+  - security
+draft: false
+---
+
+Recently, a friend and I found two vulnerabilities in a system that's pretty widely used in Brazil. And, to be honest, we didn't expect to find what we found.
+
+It all started when we were looking into how some features of an ERP behaved. Neither of us works in information security. I study Software Engineering, I like programming, and I have this habit of wanting to understand how things work. Sometimes more than I should.
+
+At some point, we managed to change the amount of a charge from R$ 1,037.78 to R$ 1.00.
+
+Yes, one real.
+
+And the system didn't reject the change at any of the stages we looked at.
+
+This kind of vulnerability is usually called price tampering. Basically, it happens when a system doesn't properly validate the price information in a transaction and ends up accepting a value it shouldn't.
+
+That doesn't mean a R$ 1.00 payment actually went through. What we could confirm was that the system accepted the change, without rejecting it, during the stages we observed. Which was worrying enough already.
+
+The second vulnerability was an IDOR (Insecure Direct Object Reference). Because of a flaw in how authorization was checked, it was possible to access other users' financial documents.
+
+It's one thing to find unexpected behavior in a feature. It's another to realize that other people's information is accessible when it shouldn't be.
+
+During the tests, we used a real payment card and recorded videos as evidence of what was happening.
+
+Since neither of us is a security professional, we looked for someone experienced in the field to guide us. We didn't want to just go around saying we'd found two vulnerabilities without knowing the right way to handle it.
+
+We put everything together in a technical report and contacted the team responsible for the system directly.
+
+Within two days, both vulnerabilities we reported had been fixed. That was a lot faster than we expected.
+
+Since then, I've been thinking a bit more about security while I code.
+
+Usually I'm worried about making things work, fixing some bug, or figuring out why something that worked five minutes ago decided to stop working. Now I also find myself thinking about everything a system shouldn't allow.
+
+I think this experience was also a good reminder that I still have a lot to learn.
+
+I'm not going to say which ERP it was or share details that would let anyone reproduce the issues. That's not what this post is for. I just thought it was worth writing the experience down here, mostly because it was one of the first times I took part in something like this outside of a study setting.
+
+I still think it's kind of absurd that it all started with a R$ 1,037.78 charge. And that, somehow, we managed to turn it into one real.
+
+At least the system doesn't accept that anymore.
