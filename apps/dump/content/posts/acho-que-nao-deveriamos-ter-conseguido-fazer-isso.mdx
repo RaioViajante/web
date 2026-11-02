@@ -3,7 +3,7 @@ contentId: "acho-que-nao-deveriamos-ter-conseguido-fazer-isso"
 locale: "pt-BR"
 originalLocale: "pt-BR"
 title: "Acho que não deveríamos ter conseguido fazer isso"
-description: "Sobre a vez em que um amigo e eu encontramos um price tampering e um IDOR em um ERP e reportamos as duas falhas."
+description: "Sobre a vez em que um amigo e eu encontramos uma falha de price tampering e um IDOR em um ERP e reportamos as duas falhas."
 publishedAt: "2026-11-02"
 tags:
   - personal
@@ -27,7 +27,7 @@ Isso não quer dizer que um pagamento de R$ 1,00 tenha sido concluído. O que co
 
 A segunda vulnerabilidade era um IDOR (<span lang="en">Insecure Direct Object Reference</span>). Por causa de uma falha na validação de autorização, era possível acessar documentos financeiros de outros usuários.
 
-Uma coisa é encontrar um comportamento inesperado em uma funcionalidade. Outra é perceber que informações de outras pessoas estão acessíveis quando não deveriam.
+Uma coisa é encontrar um comportamento inesperado em uma funcionalidade. Outra é perceber que informações de outras pessoas podem estar acessíveis quando não deveriam.
 
 Durante os testes, usamos um cartão real e gravamos vídeos como evidência do que estava acontecendo.
 
@@ -35,7 +35,7 @@ Como nenhum de nós é profissional de segurança, procuramos alguém com experi
 
 Organizamos tudo em um relatório técnico e entramos em contato diretamente com a equipe responsável pelo sistema.
 
-Em dois dias, as duas vulnerabilidades que reportamos estavam corrigidas. Foi bem mais rápido do que a gente imaginava.
+Em dois dias, as duas vulnerabilidades estavam corrigidas. Foi bem mais rápido do que a gente imaginava.
 
 Desde então, tenho pensado um pouco mais em segurança enquanto programo.
 
