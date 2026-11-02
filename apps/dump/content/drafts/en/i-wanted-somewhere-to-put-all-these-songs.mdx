@@ -1,0 +1,61 @@
+---
+contentId: "eu-queria-um-lugar-para-guardar-todas-essas-musicas"
+locale: "en"
+originalLocale: "pt-BR"
+title: "I Wanted Somewhere to Put All These Songs"
+description: "About music, the memories that get attached to songs, and how a university assignment turned into Refrain, my personal music journal."
+tags:
+  - personal
+  - projects
+draft: true
+---
+
+I listen to a lot of music. Probably more than I should.
+
+Sometimes I find a band and spend hours going through their entire discography, one record after another, until I realize it's late and I can't even remember which album I started with. Other times I go the other way: I come back to a song I haven't heard in months, or years, and suddenly remember a stretch of my life I had almost forgotten.
+
+I like the idea that the song stays exactly the same, while I'm not necessarily the same person who heard it the first time. And somehow it can still take me back there.
+
+Songs end up attached to people, places and older versions of ourselves. You don't really get to choose which ones.
+
+I also really like rating albums. I like discovering artists, making lists, and organizing things in a way that probably only makes sense to me.
+
+The problem is that a rating doesn't always explain much. A four and a half doesn't say why I played that record so many times, or what was going on when it started to matter. A few years from now, I'll look at that number and might not even remember why I gave it.
+
+I wanted to be able to remember the why.
+
+That's where Refrain came from.
+
+The idea is a personal music journal. A place where I can write about albums, songs, artists and bands, keep the memories tied to them, and remember what they meant to me at a particular point in time. Some of it might be public. A lot of it will probably stay just for me, and that's fine. Refrain isn't meant to be a social network: nobody's going to like anything, nobody's going to follow me, and nobody's going to comment that my taste in music is questionable. At least not there.
+
+One of the first albums I want to write about is *Grace*, by Jeff Buckley. I haven't written a single line about it yet. First I needed somewhere to keep whatever I end up writing.
+
+I also wanted the whole thing to look like a notebook. Almost everything in black and white, with hand-drawn details, and the color coming from album covers and artist photos. It makes sense to me that the color comes from the music.
+
+And, as if I didn't already have enough projects to finish, a university assignment came along.
+
+I study Software Engineering, and the assignment asked for an application that actually works, with a relational database behind it. The kind of project you present once and then forget in some folder.
+
+I didn't want to make one of those. Instead of inventing some random system just to meet the requirements, I decided to build Refrain. I got to combine something I had to do with something I love.
+
+The funny thing is that almost everything the assignment asked for already made sense for a music journal.
+
+An album has a title, a year, artists and a track list. That's catalog: information that exists whether I care about it or not. What I write about it is something else, and it has to stay separate. So they're different tables, related to each other, with the records, tracks and artists on one side and what I think about them on the other.
+
+CRUD showed up almost on its own, too. I need to create an entry, come back to read it later, edit it when I change my mind (which will happen), and delete it when I regret what I wrote (which will also happen). Actually, deleting first sends it to a recently deleted list, in case I regret regretting it.
+
+To show an album alongside the artists credited on it, I needed a JOIN. To know how many tracks on a record I've already written about, a COUNT does the job. And none of that matters if the screen where I write doesn't talk to the server, and the server doesn't save everything to the database. If I write three paragraphs about an album and they vanish when I close the browser, Refrain hasn't done much for me.
+
+At some point I realized I was building a relational database to store feelings. Or at least opinions about albums. With foreign keys and everything.
+
+Suddenly, the things I was learning at university had a purpose in something I actually wanted to use. And I got one more project to spend far too much time on.
+
+A good part of it already works on my computer. There's still plenty missing: memories, writing about artists, the Portuguese version of the interface, and Refrain isn't online anywhere yet. But the plan is for it to keep going after the presentation, instead of ending with it.
+
+Maybe a few years from now I'll open Refrain, find a song I haven't listened to in ages, and read something I wrote about it.
+
+Maybe I'll still agree with myself. Maybe I'll have absolutely no idea what I was thinking.
+
+Either way, I think it'll be nice to have it all kept somewhere.
+
+And if none of this works out, at least I'll have done my university assignment.

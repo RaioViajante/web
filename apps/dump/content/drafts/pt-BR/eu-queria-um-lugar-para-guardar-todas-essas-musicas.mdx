@@ -1,0 +1,61 @@
+---
+contentId: "eu-queria-um-lugar-para-guardar-todas-essas-musicas"
+locale: "pt-BR"
+originalLocale: "pt-BR"
+title: "Eu queria um lugar para guardar todas essas músicas"
+description: "Sobre música, as memórias que ficam presas às canções e como um trabalho da faculdade virou o Refrain, meu diário musical pessoal."
+tags:
+  - personal
+  - projects
+draft: true
+---
+
+Eu escuto muita música. Provavelmente mais do que deveria.
+
+Às vezes descubro uma banda e passo horas atravessando a discografia inteira, um disco depois do outro, até perceber que já está tarde e que nem lembro mais por qual álbum comecei. Outras vezes faço o caminho contrário: volto para uma música que não escutava fazia meses, ou anos, e de repente lembro de uma época que eu tinha quase esquecido.
+
+Gosto da ideia de que a música continua exatamente a mesma, enquanto eu não sou necessariamente a mesma pessoa que a escutou pela primeira vez. E, mesmo assim, ela ainda consegue me levar de volta para lá.
+
+Músicas acabam grudando em pessoas, lugares e versões mais antigas da gente. Não dá muito para escolher quais.
+
+Também gosto muito de dar nota para álbuns. Gosto de descobrir artistas, de fazer listas e de organizar as coisas de um jeito que provavelmente só faz sentido para mim.
+
+O problema é que uma nota nem sempre explica muita coisa. Um quatro e meio não diz por que eu escutei aquele disco tantas vezes, nem o que estava acontecendo quando ele começou a importar. Daqui a alguns anos, vou olhar para aquele número e talvez nem lembre por que dei aquela nota.
+
+Eu queria conseguir lembrar do porquê.
+
+Foi daí que surgiu o Refrain.
+
+A ideia é ter um diário musical pessoal. Um lugar onde eu possa escrever sobre álbuns, músicas, artistas e bandas, guardar memórias ligadas a eles e lembrar o que significaram para mim em um determinado momento. Alguns textos talvez fiquem públicos. Muitos outros provavelmente vão ficar só comigo, e tudo bem. O Refrain não é para ser uma rede social: ninguém vai curtir nada, ninguém vai me seguir e ninguém vai comentar que meu gosto musical é questionável. Pelo menos não por lá.
+
+Um dos primeiros álbuns sobre os quais quero escrever é *<span lang="en">Grace</span>*, do Jeff Buckley. Ainda não escrevi uma linha sobre ele. Primeiro eu precisava de um lugar para guardar o que eu for escrever.
+
+Também queria que tudo parecesse um caderno. Quase tudo em preto e branco, com detalhes desenhados à mão, e a cor vindo das capas dos discos e das fotos dos artistas. Faz sentido para mim que a cor venha da música.
+
+E, como se eu já não tivesse projetos suficientes para terminar, apareceu um trabalho da faculdade.
+
+Eu estudo Engenharia de Software, e o trabalho pedia uma aplicação funcionando de verdade, com um banco de dados relacional por trás. Daqueles projetos que a gente apresenta uma vez e depois esquece em alguma pasta.
+
+Eu não queria fazer um desses. Em vez de inventar um sistema qualquer só para cumprir os requisitos, resolvi construir o Refrain. Acabei unindo o útil ao agradável.
+
+O curioso é que quase tudo o que o trabalho pedia já fazia sentido para um diário musical.
+
+Um álbum tem título, ano, artistas e uma lista de faixas. Isso é catálogo: informação que existe independentemente de mim. O que eu escrevo sobre ele é outra coisa e precisa ficar separado. Então são tabelas diferentes, relacionadas entre si, com os discos, as faixas e os artistas de um lado e o que eu penso deles do outro.
+
+O CRUD também apareceu quase sozinho. Eu preciso criar um texto, voltar para lê-lo depois, editá-lo quando mudar de ideia (o que vai acontecer) e apagá-lo quando me arrepender do que escrevi (o que também vai acontecer). Na verdade, apagar primeiro manda o texto para uma lista de apagados recentemente, caso eu me arrependa de ter me arrependido.
+
+Para mostrar um álbum junto com os artistas creditados nele, precisei de um JOIN. Para saber quantas faixas de um disco eu já escrevi, um COUNT resolve. E nada disso adianta se a tela onde escrevo não conversar com o servidor, e o servidor não guardar tudo no banco. Se eu escrever três parágrafos sobre um disco e eles sumirem quando eu fechar o navegador, o Refrain não serviu para muita coisa.
+
+Em algum momento percebi que estava montando um banco de dados relacional para guardar sentimentos. Ou, pelo menos, opiniões sobre álbuns. Com chave estrangeira e tudo.
+
+De repente, as coisas que eu estava aprendendo na faculdade tinham um propósito em algo que eu realmente queria usar. E eu ganhei mais um projeto para passar tempo demais trabalhando nele.
+
+Boa parte disso já funciona no meu computador. Ainda falta bastante coisa: as memórias, os textos sobre artistas, a versão em português da interface, e o Refrain ainda não está no ar em lugar nenhum. Mas a ideia é que ele continue depois da apresentação, em vez de terminar junto com ela.
+
+Talvez daqui a alguns anos eu abra o Refrain, encontre uma música que não escuto há muito tempo e leia alguma coisa que escrevi sobre ela.
+
+Talvez eu ainda concorde comigo mesmo. Talvez não faça a menor ideia do que estava pensando.
+
+De qualquer maneira, acho que vai ser legal ter tudo isso guardado em algum lugar.
+
+E, se nada disso funcionar, pelo menos vou ter feito o trabalho da faculdade.
