@@ -127,6 +127,12 @@ describe("English /rss.xml against the production snapshot", () => {
     );
     expect(added).toEqual([
       {
+        guid: "tag:dump.raioviajante.com,2026:post/eu-queria-um-lugar-para-guardar-todas-essas-musicas/en",
+        isPermaLink: "false",
+        link: `${PRODUCTION_ORIGIN}/posts/i-wanted-somewhere-to-put-all-these-songs`,
+        pubDate: "Tue, 03 Nov 2026 00:00:00 GMT",
+      },
+      {
         guid: "tag:dump.raioviajante.com,2026:post/acho-que-nao-deveriamos-ter-conseguido-fazer-isso/en",
         isPermaLink: "false",
         link: `${PRODUCTION_ORIGIN}/posts/we-probably-shouldnt-have-been-able-to-do-that`,
