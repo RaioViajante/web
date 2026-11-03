@@ -155,6 +155,7 @@ describe("post collection", () => {
       "for-those-who-never-quite-belonged": "2026-10-30",
       "some-things-dont-know-how-to-end": "2026-10-30",
       "we-probably-shouldnt-have-been-able-to-do-that": "2026-11-02",
+      "i-wanted-somewhere-to-put-all-these-songs": "2026-11-03",
       // The English translation of the Portuguese original keeps its date.
       "translating-the-site-without-pretending-everything-already-exists":
         "2026-10-19",

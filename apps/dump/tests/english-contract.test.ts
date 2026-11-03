@@ -12,6 +12,13 @@ import { RECORDED_BEFORE_UPDATE, VERIFIED_UPDATES } from "./verified-updates";
 // frozen pre-migration set; everything else below must stay untouched.
 const ADDED_ENGLISH = [
   {
+    slug: "i-wanted-somewhere-to-put-all-these-songs",
+    contentId: "eu-queria-um-lugar-para-guardar-todas-essas-musicas",
+    originalLocale: "pt-BR",
+    publishedAt: "2026-11-03",
+    tags: ["personal", "projects"],
+  },
+  {
     slug: "we-probably-shouldnt-have-been-able-to-do-that",
     contentId: "acho-que-nao-deveriamos-ter-conseguido-fazer-isso",
     originalLocale: "pt-BR",

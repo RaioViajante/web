@@ -37,6 +37,7 @@ const PORTUGUESE_ORIGINALS = [
   "traduzir-o-site-sem-fingir-que-tudo-ja-existe",
   "algumas-coisas-nao-sabem-como-terminar",
   "acho-que-nao-deveriamos-ter-conseguido-fazer-isso",
+  "eu-queria-um-lugar-para-guardar-todas-essas-musicas",
 ];
 
 // When each work's original first went public (UTC), from the original's
@@ -54,10 +55,11 @@ const ORIGINAL_DATES: Record<string, string> = {
   "for-those-who-never-quite-belonged": "2026-10-30",
   "algumas-coisas-nao-sabem-como-terminar": "2026-10-30",
   "acho-que-nao-deveriamos-ter-conseguido-fazer-isso": "2026-11-02",
+  "eu-queria-um-lugar-para-guardar-todas-essas-musicas": "2026-11-03",
 };
 
 describe("works x locale coverage", () => {
-  it("covers all twelve published works", () => {
+  it("covers all thirteen published works", () => {
     expect([...works.keys()].sort()).toEqual(
       [...ENGLISH_ORIGINALS, ...PORTUGUESE_ORIGINALS].sort(),
     );

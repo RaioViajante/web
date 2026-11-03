@@ -3,6 +3,7 @@ export const publishedPostPaths = {
   en: [
     "/posts/for-those-who-never-quite-belonged",
     "/posts/gave-one-operation-more-than-one-deadline",
+    "/posts/i-wanted-somewhere-to-put-all-these-songs",
     "/posts/kept-building-and-stopped-writing-it-down",
     "/posts/maybe-this-can-be-something-someday",
     "/posts/my-project-cards-were-getting-ahead-of-my-projects",
@@ -22,6 +23,7 @@ export const publishedPostPaths = {
     "/pt/posts/continuei-construindo-e-parei-de-escrever",
     "/pt/posts/dei-mais-de-um-deadline-para-uma-unica-operacao",
     "/pt/posts/dividi-minha-internet-em-quatro-tipos-diferentes-de-lugar",
+    "/pt/posts/eu-queria-um-lugar-para-guardar-todas-essas-musicas",
     "/pt/posts/meus-cards-de-projeto-estavam-se-adiantando-aos-meus-projetos",
     "/pt/posts/nao-existe-printf-aqui-embaixo",
     "/pt/posts/para-aqueles-que-nunca-se-sentiram-pertencentes",
