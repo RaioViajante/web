@@ -1,0 +1,363 @@
+/*
+ * The parts of /projects and /projects/all that the home page does not show:
+ * the featured cards, the client-work state, the catalog's filters and tiles,
+ * the back link and the closing line. Gray, like every page.
+ */
+
+.rv-section p.pj-lead {
+  max-width: 58ch;
+  margin: 0 0 26px 66px;
+  color: var(--fg-2);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.pj-list {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.pj-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch);
+  color: var(--fg-2);
+  font-size: 13.5px;
+  text-decoration: none;
+  transition: color var(--ease-nav) ease;
+}
+
+.pj-back:hover,
+.pj-back:focus-visible {
+  color: var(--fg);
+}
+
+.pj-more {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  margin-top: 26px;
+  padding: 0 12px 0 20px;
+  border: 1px solid var(--table-rule);
+  border-radius: 999px;
+  color: var(--fg);
+  font-size: 14px;
+  text-decoration: none;
+  transition: border-color var(--ease-nav) ease;
+}
+
+.pj-more__dots {
+  flex: 1 1 24px;
+  border-bottom: 1px dotted var(--dots);
+}
+
+.pj-more:hover,
+.pj-more:focus-visible {
+  border-color: var(--rule-note);
+}
+
+.pj-cta {
+  margin: 34px 0 0;
+  color: var(--fg-2);
+  font-size: 14.5px;
+}
+
+.rv-section p.pj-cta {
+  margin-top: 34px;
+}
+
+.pj-cta a {
+  border-bottom: 1px solid var(--rule-note);
+  color: var(--fg);
+  text-decoration: none;
+  transition: color var(--ease-link) ease;
+}
+
+.pj-cta a:hover,
+.pj-cta a:focus-visible {
+  color: var(--hover-inline);
+}
+
+.pj-card {
+  position: relative;
+  padding: 8px;
+  border: 1px solid var(--table-rule);
+  border-radius: 26px;
+  background: var(--bg);
+  transition: border-color var(--ease-nav) ease;
+  scroll-margin-top: 24px;
+}
+
+.pj-card:hover,
+.pj-card:focus-within {
+  border-color: var(--rule-note);
+}
+
+.pj-card__art {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  container-type: inline-size;
+  isolation: isolate;
+}
+
+.pj-card__number {
+  position: absolute;
+  z-index: 6;
+  top: 12px;
+  right: 14px;
+  color: var(--sk-number, var(--fg-2));
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  pointer-events: none;
+}
+
+.pj-card__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 28px;
+  padding: 20px 20px 14px;
+}
+
+.pj-card__head {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 14px;
+}
+
+.pj-card__icon {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+}
+
+.pj-card__title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pj-card h3 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: var(--weight-heading);
+  line-height: 1.25;
+}
+
+.pj-card__meta {
+  color: var(--fg-3);
+  font-size: 12.5px;
+}
+
+.rv-section p.pj-card__description {
+  max-width: 60ch;
+  margin: 8px 0 0;
+  color: var(--fg-2);
+  font-size: 14.5px;
+  line-height: 1.8;
+}
+
+.pj-card__foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+/* client work, while no case is published */
+
+.pj-empty {
+  position: relative;
+  padding: 58px 24px 34px;
+  border: 1px dashed var(--rule-note);
+  border-radius: 18px;
+  text-align: center;
+}
+
+.pj-case__tab {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 4px 10px;
+  border: 1px dashed var(--rule-note);
+  border-radius: 8px 8px 0 0;
+  color: var(--fg-3);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.rv-section p.pj-empty__title {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.rv-section p.pj-empty__note {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 13.5px;
+}
+
+.pj-cases {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.pj-case .pj-card__body {
+  grid-template-columns: 1fr;
+}
+
+.pj-case .pj-card__foot {
+  justify-content: flex-start;
+}
+
+.pj-case__art {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  background: var(--block);
+}
+
+.pj-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin: 0 0 22px;
+}
+
+.pj-filters__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pj-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: var(--touch);
+  padding: 0 14px;
+  border: 1px solid var(--table-rule);
+  border-radius: 999px;
+  background: none;
+  color: var(--fg-2);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    border-color var(--ease-nav) ease,
+    color var(--ease-nav) ease,
+    background-color var(--ease-nav) ease;
+}
+
+.pj-filter:hover {
+  border-color: var(--rule-note);
+  color: var(--fg);
+}
+
+.pj-filter[aria-pressed="true"] {
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.pj-filter__count {
+  font-size: 11px;
+}
+
+.pj-filters__shown {
+  margin: 0 0 0 auto;
+  color: var(--fg-3);
+  font-size: 13px;
+}
+
+.pj-grid__item {
+  display: flex;
+}
+
+.pj-grid__item[hidden] {
+  display: none;
+}
+
+.pj-tile__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 10px 4px;
+}
+
+.pj-catalog p.pj-tile__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  color: var(--fg-3);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.pj-tile__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.pj-tile__icon {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+}
+
+.pj-catalog p.pj-tile__summary {
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.pj-tile__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 10px;
+  min-height: var(--touch);
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+@media (max-width: 760px) {
+  .rv-section p.pj-lead {
+    margin-left: 0;
+  }
+  .pj-card__number {
+    display: none;
+  }
+  .pj-card__body {
+    grid-template-columns: 1fr;
+    padding: 18px 14px 10px;
+  }
+  .pj-card__foot {
+    justify-content: flex-start;
+  }
+  .pj-filters__shown {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .pj-card__head {
+    flex-wrap: wrap;
+  }
+}

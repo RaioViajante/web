@@ -121,45 +121,8 @@ html {
   color: var(--hover-inline);
 }
 
-/* projects page */
-.project-entry {
-  margin-bottom: 38.72px;
-}
-
-.project-entry .rv-leader {
-  margin-bottom: 8.8px;
-  font-weight: 700;
-}
-
-.rv-section p.project-description {
-  margin: 0 0 9.68px;
-  color: var(--fg);
-}
-
-.rv-section p.project-detail {
-  margin: 4.4px 0;
-  color: var(--fg-2);
-}
-
-.project-detail strong {
-  color: var(--fg);
-  font-weight: 700;
-}
-
-.project-entry .project-detail a {
-  color: var(--inline-link);
-  text-decoration: underline;
-  text-underline-offset: 3.52px;
-  transition: color var(--ease-link) ease;
-}
-
-.project-entry .project-detail a:hover {
-  color: var(--hover-inline);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .home-feed-note a,
-  .project-entry .project-detail a,
   .setup-gear__link a {
     transition: none;
   }

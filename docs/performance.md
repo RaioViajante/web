@@ -109,6 +109,22 @@ that is rare and was judged not worth the bytes. Other artwork is unchanged.
   script, stylesheet, font, image and request limits, and every other page, are
   as before. Revisit it when the index grows again, or if a leaner index
   (shorter indexed bodies) is chosen.
+- **`root/home` image and requests (November 2026).** The redesigned home
+  page shows four project cards (Mochifile, Ordelis, Refrain, Orbit), each
+  with its approved icon, a 128-pixel WebP from
+  `packages/design/assets/projects/`. The cards add 28,623 bytes of images
+  and five requests (four icons and one stylesheet), measured on a cold mobile
+  load: images went from 131,711 to 160,334 bytes and requests from 21 to 26.
+  The old limits (155,648 bytes, 24 requests) would have failed. The new
+  `max.image` is 184,320 bytes and `max.requests` 29: the old limits plus the
+  measured growth, so the headroom over the measurement stays what it was.
+  Only those two fields of this one page changed; the page's total, script,
+  stylesheet and font limits and every other page are as before. The large
+  sketches' code and styles load only on `/projects` (about 7 KB of gzipped
+  script) and the catalog's on `/projects/all` (about 4 KB); the shared
+  chunks carry no project code. The sketch palettes live in
+  `packages/design/styles/project-art.css`, loaded only by those pages, so no
+  other page or site carries them.
 - Budgets are never rewritten by a tool. `node perf/check.mjs --baseline` prints
   the measurements and writes `perf/.results/suggested.json`; change the file
   by hand in a reviewed commit and say why.

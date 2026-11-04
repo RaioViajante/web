@@ -13,10 +13,9 @@ import {
 } from "@raioviajante/design/components";
 import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { PreviewRow } from "../components/PreviewRow";
-import { ProjectPreviewRow } from "../components/ProjectPreviewRow";
+import { HomeProjects } from "../components/projects/home";
 import { RootShell } from "../components/RootShell";
 import { primaryLinks } from "../lib/links";
-import { projects } from "../lib/projects";
 import { getRecentPosts } from "../lib/writing";
 import { publishedLocales } from "../lib/routes";
 
@@ -61,13 +60,7 @@ export default async function Home() {
         ))}
       </Section>
 
-      <Section number="00.1" title="Projects" id="projects-heading" index>
-        {projects
-          .filter((project) => project.name !== "Dump")
-          .map((project) => (
-            <ProjectPreviewRow key={project.name} project={project} />
-          ))}
-      </Section>
+      <HomeProjects locale="en" />
 
       <Section number="00.2" title="Latest writing" id="writing-heading" index>
         {posts.map((post) => (

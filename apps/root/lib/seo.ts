@@ -20,7 +20,12 @@ const english: Record<RouteKey, { title: string; description: string }> = {
   projects: {
     title: "projects",
     description:
-      "Software projects and experiments by RaioViajante, from tools to programming languages.",
+      "What RaioViajante builds: Mochifile, Ordelis, Refrain and Orbit, each with a small sketch you can try, and a place for client work.",
+  },
+  "projects-all": {
+    title: "all projects",
+    description:
+      "Every RaioViajante project, from file tools and music to a programming language and a game, filtered by kind.",
   },
   contact: {
     title: "contact",

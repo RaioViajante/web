@@ -1,12 +1,12 @@
 // Root's Portuguese (pt-BR) editorial copy. App-owned and manually authored:
 // the shared UI strings live in packages/design's catalog. Only pages that ship
-// in Portuguese appear here (Home, About, Projects, Contact, Gallery, This site,
-// Setup, Terms, Privacy, Search and the 404). The legal documents' bodies live
+// in Portuguese appear here (Home, About, Projects, All projects, Contact,
+// Gallery, This site, Setup, Terms, Privacy, Search and the 404). The legal documents' bodies live
 // in their pages, beside the English originals. Names, handles, the email
 // address and tool names are not translated.
 
 import type { GalleryCopy } from "./gallery.ts";
-import { projects, type Project, type ProjectName } from "./projects.ts";
+import type { ProjectsCopy } from "./projects.ts";
 import type { RouteKey } from "./routes.ts";
 import { localizedPath, participates } from "../../../site/locales.ts";
 import { siteOrigins, type SiteId } from "../../../site/sites.ts";
@@ -41,7 +41,12 @@ export const ptPageSeo: Partial<
   projects: {
     title: "projetos",
     description:
-      "Projetos e experimentos de software do RaioViajante, de ferramentas a linguagens de programação.",
+      "O que o RaioViajante constrói: Mochifile, Ordelis, Refrain e Orbit, cada um com um pequeno esboço para testar, e um espaço para trabalhos com clientes.",
+  },
+  "projects-all": {
+    title: "todos os projetos",
+    description:
+      "Todos os projetos do RaioViajante, de ferramentas de arquivo e música a uma linguagem de programação e um jogo, com filtros por tipo.",
   },
   contact: {
     title: "contato",
@@ -84,6 +89,7 @@ export const ptSearchDescriptions: Partial<Record<RouteKey, string>> = {
   home: "Casa pessoal e últimos textos",
   about: "Sobre RaioViajante",
   projects: "Projetos e trabalhos",
+  "projects-all": "Todos os projetos, por tipo",
   contact: "Formas de entrar em contato",
   gallery: "Arte e imagens",
   "this-site": "Como este site é construído",
@@ -102,7 +108,6 @@ export const ptNavigation = [
 export const ptHome = {
   line: "com curiosidade de sobra para construir por conta própria.",
   links: "Links",
-  projects: "Projetos",
   latestWriting: "Últimos textos",
   noWriting: "Ainda não há textos em português.",
   englishWriting: "Ver os textos em inglês no Dump →",
@@ -146,61 +151,231 @@ export const ptHome = {
   } as Record<string, { label?: string; note: string; description: string }>,
 };
 
-const ptProjectCopy: Record<
-  ProjectName,
-  Pick<Project, "description" | "kind" | "stack" | "status">
-> = {
-  Hum: {
-    description:
-      "Um player de música para terminal construído em Rust. Uma exploração de como pode ser uma interface de música focada sem sair da linha de comando.",
-    kind: "software / música",
-    stack: "rust",
-    status: "explorando",
+/** Every word of the projects pages, the home cards and the sketches. */
+export const ptProjectsCopy: ProjectsCopy = {
+  projects: {
+    mochifile: {
+      meta: "ferramentas de arquivo / web",
+      tagline: "ferramentas de arquivo no navegador",
+      description:
+        "Ferramentas de arquivo para tarefas do dia a dia, para quem só quer resolver o problema. Os arquivos são processados no seu navegador, sem envio. Hoje há uma ferramenta, que comprime uma imagem até um tamanho-alvo; outras estão planejadas.",
+      summary:
+        "Comprime uma imagem até um tamanho-alvo, direto no navegador. Outras ferramentas estão planejadas.",
+      status: "pré-lançamento",
+      action: "Abrir o Mochifile",
+      actionShort: "mochifile.com",
+    },
+    ordelis: {
+      meta: "agentes de código / orquestração",
+      tagline: "um espaço de trabalho para agentes de código",
+      description:
+        "Um espaço de trabalho local para desktop que coordena agentes de programação com IA: planejar uma tarefa, deixar os agentes trabalharem nela, revisar as evidências e decidir o que entra. Ainda é cedo: o desktop mostra dados de exemplo, e o runtime de agentes em que ele se apoia só roda pela linha de comando.",
+      summary:
+        "Um espaço de trabalho para desktop que coordena agentes de programação, com uma pessoa revisando e decidindo.",
+      status: "início do desenvolvimento",
+      action: "Ler a documentação",
+      actionShort: "a documentação",
+    },
+    refrain: {
+      meta: "diário musical / pessoal",
+      tagline: "um diário musical pessoal",
+      description:
+        "Meu diário musical pessoal: avaliações, reflexões e memórias sobre álbuns, músicas, artistas e bandas. Começou como um trabalho de Engenharia de Software na faculdade. Uma parte já funciona no meu computador; ainda não está online.",
+      summary:
+        "Meu diário musical pessoal: álbuns, músicas, artistas e as memórias em volta deles.",
+      status: "em desenvolvimento",
+      action: "Ler como começou",
+      actionShort: "como começou",
+    },
+    orbit: {
+      meta: "back-end / execuções de jobs",
+      tagline: "execuções de jobs e seus estados",
+      description:
+        "Um agendador de jobs self-hosted em fase inicial. Hoje ele guarda jobs, registra execuções e aplica as transições válidas entre os estados delas: na fila, executando, concluída, falhou e cancelada. O agendamento e a execução dos jobs ainda estão planejados.",
+      summary:
+        "Guarda jobs e registra como cada execução passa de um estado a outro. O agendamento ainda está planejado.",
+      status: "início do desenvolvimento",
+      action: "Testar o experimento",
+      actionShort: "o experimento no lab",
+    },
+    yanawa: {
+      meta: "linguagem de programação",
+      tagline: "uma linguagem de programação, no papel",
+      description:
+        "Uma linguagem experimental, com tipagem forte, para construir aplicações. Ela existe como documentos de design; ainda não há compilador.",
+      summary:
+        "Minha linguagem autoral, com tipagem forte e foco em aplicações. Ainda em design: não há compilador.",
+      status: "em design",
+      actionShort: "a documentação",
+    },
+    sweep: {
+      meta: "CLI / Python",
+      tagline: "um organizador de arquivos para o terminal",
+      description:
+        "Uma ferramenta de linha de comando em Python que organiza os arquivos de uma pasta em diretórios por categoria, de acordo com a extensão.",
+      summary:
+        "Organiza os arquivos de uma pasta em diretórios por categoria. O preview mostra o plano sem mover nada.",
+      status: "ativo",
+      actionShort: "a documentação",
+    },
+    hum: {
+      meta: "música / terminal",
+      tagline: "um player de música para terminal",
+      description:
+        "Um player de música local para o terminal, em Rust. Ele está sendo planejado e especificado; o player em si ainda não foi construído.",
+      summary:
+        "Um player de música local para o terminal, em Rust. Ainda em planejamento: o player não foi construído.",
+      status: "em planejamento",
+      actionShort: "repositório",
+    },
+    morrowferry: {
+      meta: "jogo / narrativa",
+      tagline: "um jogo narrativo em pixel art",
+      description:
+        "Um jogo narrativo curto em pixel art sobre um velho barqueiro e um menino que procura alguém.",
+      summary:
+        "Um jogo narrativo curto em pixel art sobre um velho barqueiro e um menino que procura alguém. Melancólico, um pouco estranho e acolhedor.",
+      status: "em desenvolvimento",
+    },
   },
-  Sweep: {
-    description:
-      "Uma ferramenta em Python para organizar arquivos pessoais com regras previsíveis. Estou trabalhando na configuração e nos limites de segurança antes de dar à ferramenta mais autonomia sobre o sistema de arquivos.",
-    kind: "ferramenta / automação",
-    stack: "python",
-    status: "ativo",
+  categories: {
+    tools: "ferramentas",
+    music: "música",
+    systems: "sistemas",
+    languages: "linguagens",
+    games: "jogos",
   },
-  Orbit: {
-    description:
-      "Um back-end de execução de tarefas construído com Java e Spring. No momento, ele modela tarefas, execuções e transições de estado válidas; o agendamento e a execução de processos ainda estão por vir.",
-    kind: "back-end / execução de tarefas",
-    stack: "java / spring",
-    status: "ativo",
+  noLink: "sem link público ainda",
+  englishOnly: " (em inglês)",
+  page: {
+    label: "projetos",
+    title: "Projetos",
+    line: "O que eu construo para mim, e o que construo com clientes.",
+    mine: "Meus projetos",
+    lead: "Quatro coisas que estou construindo agora. Cada card tem um pequeno esboço que roda no seu navegador: ele mostra a ideia, não o projeto de verdade.",
+    of: "de",
+    viewAll: "Ver todos os projetos",
+    clients: "Para clientes",
+    clientsLead:
+      "Trabalhos feitos com e para clientes. Os cases aparecem aqui quando estiverem escritos e liberados para publicação.",
+    clientsEmpty: "Nenhum case de cliente publicado ainda.",
+    clientsEmptyNote: "Cada um vai contar o que foi pedido e o que foi feito.",
+    caseLabel: "case",
+    caseSoon: "Case em breve",
+    cta: "Tem um projeto em mente? Escreva para",
   },
-  Yanawa: {
-    description:
-      "Uma linguagem de programação orientada a aplicações em fase de projeto. O trabalho atual é definir sua forma e seu comportamento antes de implementar o compilador.",
-    kind: "design de linguagem",
-    stack: "design de linguagem",
-    status: "explorando",
+  all: {
+    back: "Projetos",
+    label: "projetos / todos",
+    title: "Todos os projetos",
+    line: "Uma coleção pessoal do que eu construo: ferramentas, música, linguagens, jogos e experimentos.",
+    heading: "Todos os projetos",
+    filters: "Filtrar projetos por tipo",
+    all: "todos",
+    count: { one: "{n} projeto", other: "{n} projetos" },
+    cta: "Quer conversar sobre algum deles? Escreva para",
   },
-  Dump: {
-    description:
-      "textos técnicos, anotações e coisas aprendidas do jeito difícil",
-    kind: "escrita / notas técnicas",
-    stack: "next.js / mdx",
-    status: "ativo",
+  home: {
+    heading: "Meus projetos",
+    more: "Mais projetos e trabalhos para clientes",
   },
-};
-
-/** Localized presentation layered over the stable English project facts. */
-export const ptProjects: Project[] = projects.map((project) => ({
-  ...project,
-  ...ptProjectCopy[project.name],
-}));
-
-export const ptProjectsPage = {
-  label: "projetos",
-  title: "Projetos",
-  line: "Ferramentas, experimentos de software e textos.",
-  sectionTitle: "Projetos",
-  type: "Tipo:",
-  repository: "Repositório:",
-  url: "URL:",
+  art: {
+    label: {
+      mochifile:
+        "Esboço do Mochifile: uma foto comprimida até um tamanho-alvo, com valores de exemplo",
+      ordelis:
+        "Esboço do Ordelis: a etapa de revisão planejada, em que você aprova o trabalho dos agentes ou o devolve",
+      refrain:
+        "Esboço do Refrain: um diário musical desenhado à mão e um disco",
+      orbit:
+        "Esboço do Orbit: execuções passando de um estado a outro, simuladas no seu navegador",
+      yanawa:
+        "Esboço do yanawa: uma linha de sintaxe de design dividida em tokens e em uma árvore sintática",
+      sweep:
+        "Esboço do Sweep: um exemplo de execução organizando quatro arquivos em pastas",
+      hum: "Esboço do Hum: o player planejado, com um visualizador em movimento",
+      morrowferry:
+        "Esboço do Morrowferry: um barqueiro e um menino em um barco iluminado por uma lanterna, à noite",
+    },
+    example: "valores de exemplo",
+    simulated: "simulado no seu navegador",
+    mochifile: {
+      tool: "Comprimir uma imagem",
+      local: "no seu navegador",
+      original: "original",
+      result: "resultado",
+      file: "foto",
+      target: "tamanho-alvo",
+      under: "abaixo de {size}",
+      before: "antes",
+      after: "depois",
+    },
+    ordelis: {
+      note: "fluxo planejado · esboço",
+      task: "tarefa",
+      agents: "agentes",
+      review: "revisão",
+      taskTitle: "Adicionar busca na página de configurações",
+      plan: "planejar",
+      implement: "implementar",
+      test: "testar",
+      implementing: "implementando · 3 de 4",
+      writingTests: "escrevendo testes",
+      revising: "revisando com as suas notas",
+      done: "pronto",
+      another: "outro agente",
+      anotherNote: "entra quando precisar",
+      files: "6 arquivos",
+      testsPassing: "testes passando",
+      lintClean: "lint sem erros",
+      openComment: "1 comentário aberto",
+      you: "você",
+      waiting: "Esperando a sua revisão.",
+      approved: "Aprovado por você. Pronto para o merge.",
+      returned: "Devolvido com as suas notas.",
+      approve: "Aprovar",
+      requestChanges: "Pedir mudanças",
+    },
+    refrain: {
+      albums: "álbuns",
+      artists: "artistas",
+      memories: "memórias",
+      title: "faixa a faixa",
+      tagline: "algumas músicas levam a gente de volta.",
+      play: "tocar",
+      stop: "parar",
+      record: "o disco",
+    },
+    orbit: {
+      header: "orbit · estados de execução",
+      queued: "na fila",
+      running: "executando",
+      succeeded: "concluída",
+      failed: "falhou",
+      cancelled: "cancelada",
+      finished: "fim",
+      queue: "Enfileirar um job",
+      cancel: "Cancelar",
+      idle: "Nada na fila. Enfileire um job.",
+      log: "Mudanças de estado",
+      counts: "Execuções por estado",
+    },
+    yanawa: {
+      note: "sintaxe de design · nada executa isso ainda",
+      tokens: "tokens",
+      tree: "árvore sintática",
+    },
+    sweep: {
+      files: ["foto.png", "relatorio.pdf", "arquivo.tar.gz", "musica.mp3"],
+      done: "exemplo · 4 movidos · 0 ignorados",
+    },
+    hum: {
+      note: "interface planejada",
+      nowPlaying: "tocando agora",
+      track: "musica.flac",
+      volume: "vol",
+    },
+  },
 };
 
 export const ptAbout = {

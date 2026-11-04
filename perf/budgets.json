@@ -9,16 +9,16 @@
         "script": 156529,
         "stylesheet": 9203,
         "font": 33835,
-        "image": 131711,
-        "requests": 21
+        "image": 160334,
+        "requests": 26
       },
       "max": {
         "total": 397312,
         "script": 184320,
         "stylesheet": 15360,
         "font": 43008,
-        "image": 155648,
-        "requests": 24
+        "image": 184320,
+        "requests": 29
       }
     },
     "root/gallery": {

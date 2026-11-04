@@ -11,6 +11,7 @@ export type RouteKey =
   | "home"
   | "about"
   | "projects"
+  | "projects-all"
   | "contact"
   | "gallery"
   | "this-site"
@@ -25,6 +26,7 @@ export const routes: Record<RouteKey, RoutePaths> = {
   home: { en: "/", "pt-BR": "/pt" },
   about: { en: "/about", "pt-BR": "/pt/about" },
   projects: { en: "/projects", "pt-BR": "/pt/projects" },
+  "projects-all": { en: "/projects/all", "pt-BR": "/pt/projects/all" },
   contact: { en: "/contact", "pt-BR": "/pt/contact" },
   gallery: { en: "/gallery", "pt-BR": "/pt/gallery" },
   "this-site": { en: "/this-site", "pt-BR": "/pt/this-site" },
@@ -45,6 +47,14 @@ export function routeOfPath(
       if (declared === path) return { key, locale: locale as LocaleId };
   return undefined;
 }
+
+/**
+ * A page that lives under another page's navigation item: the catalog of all
+ * projects keeps "projects" current in the sidebar.
+ */
+export const navigationParent: Partial<Record<RouteKey, RouteKey>> = {
+  "projects-all": "projects",
+};
 
 /** The real counterparts of a page: its other declared locales. Never inferred from a path. */
 export function counterpartsOf(key: RouteKey, locale: LocaleId) {
