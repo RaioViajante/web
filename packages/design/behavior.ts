@@ -1,7 +1,7 @@
 /**
  * The one client script every page runs: sound toggle and preference, soft
  * block behavior (copy, tabs, collapse), keyboard access to sideways
- * scrolling regions, and the 404 requested path.
+ * scrolling regions, the 404 requested path and the page entrance motion.
  *
  * Astro:  <script>import { startBehavior } from "@raioviajante/design/behavior"; startBehavior();</script>
  * Next.js: render <Behavior /> from "@raioviajante/design/behavior-react" once in the layout.
@@ -13,6 +13,7 @@ import { attachScroll } from "./scroll";
 import { attachScrollRegions } from "./scroll-regions";
 import { attachSearch } from "./search/client";
 import { initOwnerClock, updateOwnerClocks } from "./clock";
+import { attachMotion } from "./motion";
 
 function fillRequestedPath() {
   document
@@ -37,6 +38,8 @@ export function startBehavior() {
     attachScrollRegions(),
     attachAvatarCoin(),
     initOwnerClock(),
+    // Last, so it measures the page the other helpers have prepared.
+    attachMotion(),
   ];
   refreshPageState();
   // Client-side navigation swaps the page without reloading the script.

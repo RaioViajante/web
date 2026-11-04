@@ -39,6 +39,15 @@
   --ease-press: 180ms;
   --ease-motion: cubic-bezier(0.2, 0.75, 0.2, 1);
 
+  /* page entrance (motion.ts mirrors these; a test keeps them equal) */
+  --enter-stagger: 65ms; /* between two targets */
+  --enter-cap: 450ms; /* the last delay, however many targets */
+  --enter-fade: 180ms; /* opacity 0 → 1 */
+  --enter-rise: 280ms; /* spring with a 0.99 / 1.01 squash */
+  --enter-rise-y: 12px;
+  --enter-bounce: 500ms; /* project cards and the index avatar: 0.95 / 1.035 */
+  --enter-bounce-y: 28px;
+
   /* soft blocks: code, terminals, notes, tables, lab benches */
   --block: #212121;
   --block-inner: #262626; /* inline code, active tab */
