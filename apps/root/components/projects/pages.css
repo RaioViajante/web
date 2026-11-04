@@ -318,6 +318,31 @@
   border-radius: 7px;
 }
 
+/* A project without a logo yet: its initial, sized to whichever icon slot it fills. */
+.pj-letter {
+  display: grid;
+  place-items: center;
+  container-type: inline-size;
+  background: var(--letter-bg);
+  color: var(--letter-fg);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pj-letter > span {
+  font-size: 62cqi;
+}
+
+.pj-letter[data-project="sweep"] {
+  --letter-bg: var(--sweep-ok);
+  --letter-fg: var(--sweep-bg);
+}
+
+.pj-letter[data-project="hum"] {
+  --letter-bg: var(--hum-accent);
+  --letter-fg: var(--hum-bg);
+}
+
 .pj-catalog p.pj-tile__summary {
   margin: 0;
   color: var(--fg-2);

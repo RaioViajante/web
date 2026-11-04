@@ -62,6 +62,9 @@ it("keeps the text inside project artwork at 4.5:1 on its surfaces", () => {
     ],
     [["sweep-fg", "sweep-file", "sweep-muted", "sweep-ok"], ["sweep-bg"]],
     [["hum-fg", "hum-bright", "hum-muted", "hum-accent"], ["hum-bg"]],
+    // the initials standing in for a logo (apps/root .pj-letter)
+    [["sweep-bg"], ["sweep-ok"]],
+    [["hum-bg"], ["hum-accent"]],
   ];
   for (const [foregrounds, backgrounds] of pairs)
     for (const fg of foregrounds)

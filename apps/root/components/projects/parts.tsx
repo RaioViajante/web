@@ -7,7 +7,11 @@ import {
   type ProjectsCopy,
 } from "../../lib/projects";
 
-/** A project's approved icon. Decorative: the name always sits beside it. */
+/**
+ * A project's approved icon, or, for a project without a logo yet, its
+ * initial on a square in its sketch colors. Decorative: the name always sits
+ * beside it.
+ */
 export function ProjectIcon({
   project,
   size,
@@ -17,7 +21,16 @@ export function ProjectIcon({
   size: number;
   className?: string;
 }) {
-  if (!project.icon) return null;
+  if (!project.icon)
+    return (
+      <span
+        className={`${className ?? ""} pj-letter`}
+        data-project={project.id}
+        aria-hidden="true"
+      >
+        <span>{project.name.charAt(0)}</span>
+      </span>
+    );
   const icon = projectIcons[project.id as keyof typeof projectIcons];
   return (
     // eslint-disable-next-line @next/next/no-img-element -- a fixed 128px derivative, no optimizer needed

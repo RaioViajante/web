@@ -81,7 +81,9 @@ word drawn inside the sketches. Components are in `components/projects/`.
   repositories and are never linked; Morrowferry says "no public link yet".
 - **Artwork.** The project icons and the Mochifile wordmark are 128-pixel
   derivatives in `packages/design/assets/projects/`
-  (`pnpm --filter @raioviajante/design project-icons`). The sketches are drawn
+  (`pnpm --filter @raioviajante/design project-icons`). Sweep and Hum have no
+  logo yet, so their icon slot shows their initial on a square in their sketch
+  colors (`.pj-letter`, CSS only); replace it when a logo is approved. The sketches are drawn
   in code: HTML/CSS, SVG, a seeded hand-drawn stroke generator for Refrain
   (`lib/sketch.ts`) and a token-colored pixel scene for Morrowferry. Their
   colors are the project-artwork tokens in `packages/design/styles/project-art.css`,

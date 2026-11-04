@@ -45,7 +45,7 @@ export interface Project {
   stage: ProjectStage;
   /** One of the four on /projects and the home page. */
   featured: boolean;
-  /** Projects with an approved icon; the others show none. */
+  /** Projects with an approved icon; the others show their initial instead. */
   icon: boolean;
   link?: ProjectLink;
 }

@@ -117,6 +117,15 @@ test("the catalog filters by kind, in both languages", async ({ page }) => {
   await expect(tiles).toHaveCount(8);
   const shown = page.locator(".pj-filters__shown");
   await expect(shown).toHaveText("08 projects");
+  // Projects without a logo show their initial in its place, hidden from
+  // assistive technology because the name sits beside it.
+  for (const [id, letter] of [
+    ["sweep", "S"],
+    ["hum", "H"],
+  ])
+    await expect(
+      page.locator(`#${id} .pj-letter[aria-hidden="true"]`),
+    ).toHaveText(letter);
   // Loops rest until a tile is hovered or focused (WCAG 2.2.2).
   const running = () =>
     page.evaluate(
