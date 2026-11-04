@@ -5,6 +5,7 @@
   "license": "MIT",
   "exports": {
     "./styles.css": "./styles/index.css",
+    "./project-art.css": "./styles/project-art.css",
     "./components": "./components/index.ts",
     "./art": "./components/art.tsx",
     "./shell": "./components/Shell.tsx",
@@ -19,6 +20,7 @@
     "./behavior-react": "./behavior-react.tsx",
     "./clock": "./clock.ts",
     "./gallery": "./components/gallery.ts",
+    "./projects": "./components/projects.ts",
     "./avatar": "./components/avatar.ts",
     "./theme-color": "./theme-color.ts",
     "./social-image": "./social-image.tsx",
@@ -63,7 +65,8 @@
     "test": "vitest run",
     "playground": "vite playground --open",
     "icons": "node scripts/icons.mjs",
-    "search-art": "node scripts/search-art.mjs"
+    "search-art": "node scripts/search-art.mjs",
+    "project-icons": "node scripts/project-icons.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0",

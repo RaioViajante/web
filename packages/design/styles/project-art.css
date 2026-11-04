@@ -1,0 +1,108 @@
+/*
+ * Project artwork tokens: the palettes of the code-drawn sketches inside
+ * Root's project cards (apps/root/components/projects). They are color tokens
+ * like those in tokens.css, kept in their own file so that only the pages
+ * showing project sketches load them; the other pages and sites never do.
+ * Like code and bench output, color lives only inside these frames; the page
+ * around them stays gray. Text pairs are held to 4.5:1 by
+ * tests/contrast.test.ts.
+ */
+
+:root {
+  --mochi-bg: #f3efec;
+  --mochi-window: #faf7f5;
+  --mochi-paper: #ffffff;
+  --mochi-ink: #0f0d1c;
+  --mochi-muted: #5b5866;
+  --mochi-faint: #625f6d;
+  --mochi-line: #e6dfda;
+  --mochi-track: #ece7e3;
+  --mochi-dash: #c9c3be;
+  --mochi-sky: #fbe1d4;
+  --mochi-sun: #fd504c;
+  --mochi-hill: #6fbb50;
+
+  --ordelis-bg: #111513;
+  --ordelis-dot: #232a27;
+  --ordelis-card: #181d1b;
+  --ordelis-you: #1c2220;
+  --ordelis-track: #26302c;
+  --ordelis-line: #2b3330;
+  --ordelis-line-strong: #4c5853;
+  --ordelis-link: #6f7c76;
+  --ordelis-fg: #f4f2f1;
+  --ordelis-fg-2: #a9b8b0;
+  --ordelis-fg-3: #849189;
+  --ordelis-ok: #9fd3a6;
+  --ordelis-removed: #e99a8c;
+  --ordelis-note: #e6c07b;
+
+  --refrain-paper: #fbfaf7;
+  --refrain-ink: #111111;
+  --refrain-ink-2: #4a4a4a;
+  --refrain-tape: #e3dccf;
+
+  --orbit-bg: #120e0a;
+  --orbit-fg: #f2dcb6;
+  --orbit-fg-2: #b9a687;
+  --orbit-accent: #f5af5b;
+  --orbit-light: #ffd79c;
+  --orbit-core: #c97f3a;
+  --orbit-failed: #ef8a76;
+  --orbit-cancelled: #a39a8a;
+  --orbit-button-fg: #1a1209;
+
+  --yanawa-bg: #110c1a;
+  --yanawa-node: #1a1226;
+  --yanawa-fg: #e6dcef;
+  --yanawa-muted: #9a8ab1;
+  --yanawa-keyword: #c79bf2;
+  --yanawa-type: #e8b6d2;
+  --yanawa-string: #b9d7a3;
+
+  --sweep-bg: #0f1311;
+  --sweep-fg: #c9d6cc;
+  --sweep-file: #dfe8e1;
+  --sweep-muted: #82907f;
+  --sweep-ok: #9fd3a6;
+
+  --hum-bg: #15121a;
+  --hum-line: #2e2737;
+  --hum-fg: #d8cfe3;
+  --hum-bright: #efe7f7;
+  --hum-muted: #948aa0;
+  --hum-accent: #c79be0;
+  --hum-bar: #8c6aa8;
+
+  /* Morrowferry: the pixel palette of a night on the river */
+  --ferry-night: #111014;
+  --ferry-water: #15161f;
+  --ferry-wave: #2e3448;
+  --ferry-wave-light: #3b4566;
+  --ferry-wave-dark: #252a3a;
+  --ferry-cloud: #2a2938;
+  --ferry-cloud-light: #3b3a4e;
+  --ferry-moon: #f9d7ac;
+  --ferry-moon-shade: #e7bf8c;
+  --ferry-reed: #4b5a2e;
+  --ferry-reed-tip: #6b7a3e;
+  --ferry-hull: #7a5232;
+  --ferry-hull-dark: #5a3a22;
+  --ferry-keel: #3e2716;
+  --ferry-moss: #4a5a2a;
+  --ferry-oar: #6a4a2a;
+  --ferry-pole: #8a6a40;
+  --ferry-pole-light: #b58a52;
+  --ferry-flag: #a83a32;
+  --ferry-cloak: #3f4f2a;
+  --ferry-cloak-dark: #2c3a1d;
+  --ferry-bone: #e8e0d0;
+  --ferry-bone-shade: #d9c2a0;
+  --ferry-cap: #4a5a78;
+  --ferry-hair: #1a1414;
+  --ferry-skin: #d9b090;
+  --ferry-coat: #7a2a24;
+  --ferry-bag: #6b6a34;
+  --ferry-lamp: #f0a040;
+  --ferry-lamp-light: #ffe2a0;
+}
