@@ -10,8 +10,13 @@ type Review = "waiting" | "approved" | "returned";
  * it or sends it back. A sketch of the intended workflow, played locally; the
  * Ordelis desktop cannot run agents yet, and the sketch says so.
  */
-export function OrdelisSketch({ copy }: { copy: ProjectArtCopy }) {
-  const text = copy.ordelis;
+export function OrdelisSketch({
+  label,
+  text,
+}: {
+  label: string;
+  text: ProjectArtCopy["ordelis"];
+}) {
   const [review, setReview] = useState<Review>("waiting");
   const reset = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(reset.current), []);
@@ -42,7 +47,7 @@ export function OrdelisSketch({ copy }: { copy: ProjectArtCopy }) {
       className="sk sk--ordelis"
       data-review={review}
       role="group"
-      aria-label={copy.label.ordelis}
+      aria-label={label}
     >
       <svg className="od-dots" aria-hidden="true">
         <defs>

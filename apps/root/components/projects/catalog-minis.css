@@ -202,7 +202,7 @@
   width: 0;
   overflow: hidden;
   vertical-align: bottom;
-  animation: pj-type 9s steps(var(--n)) infinite;
+  animation: pj-type 9s steps(var(--n)) -6s infinite;
 }
 
 .ya__cursor {
@@ -239,7 +239,7 @@
   line-height: 17px;
   visibility: hidden;
   animation: pj-token 9s ease infinite;
-  animation-delay: calc(var(--i) * 0.12s);
+  animation-delay: calc(var(--i) * 0.12s - 6s);
 }
 
 .ya__token:nth-child(2) {
@@ -280,7 +280,7 @@
   stroke: color-mix(in srgb, var(--yanawa-keyword) 45%, transparent);
   stroke-dasharray: 40;
   stroke-dashoffset: 40;
-  animation: pj-branch 9s ease infinite;
+  animation: pj-branch 9s ease -7s infinite;
 }
 
 .ya__node {
@@ -295,7 +295,7 @@
   visibility: hidden;
   transform: translate(-50%, -50%);
   animation: pj-node 9s ease infinite;
-  animation-delay: calc(var(--i) * 0.15s);
+  animation-delay: calc(var(--i) * 0.15s - 6.5s);
 }
 
 .ya__node.is-root {
@@ -339,7 +339,7 @@
   white-space: nowrap;
   visibility: hidden;
   animation: pj-row 8s ease infinite;
-  animation-delay: calc(0.5s + var(--i) * 0.55s);
+  animation-delay: calc(var(--i) * 0.55s - 5.5s);
 }
 
 /* Rows follow the path and the command line. */
@@ -385,7 +385,7 @@
   color: var(--sweep-muted);
   visibility: hidden;
   animation: pj-row 8s ease infinite;
-  animation-delay: 2.9s;
+  animation-delay: -3.1s;
 }
 
 .hu__box {
@@ -497,7 +497,7 @@
   left: 0;
   width: 0;
   background: var(--hum-accent);
-  animation: pj-progress 24s linear infinite;
+  animation: pj-progress 24s linear -9s infinite;
 }
 
 .mf__scene {

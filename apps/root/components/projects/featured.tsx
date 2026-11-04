@@ -19,6 +19,8 @@ import { OrbitSketch } from "./OrbitSketch";
 import { OrdelisSketch } from "./OrdelisSketch";
 import { RefrainSketch } from "./RefrainSketch";
 import "@raioviajante/design/project-art.css";
+// The large sketches share rules and reduced-motion handling with the small ones.
+import "./minis.css";
 import "./sketches.css";
 
 function Sketch({
@@ -34,17 +36,28 @@ function Sketch({
     case "mochifile":
       return (
         <MochifileSketch
-          copy={copy.art}
+          label={copy.art.label.mochifile}
+          example={copy.art.example}
+          text={copy.art.mochifile}
           intlLocale={intlLocale}
           wordmark={projectArt.mochifileWordmark}
         />
       );
     case "ordelis":
-      return <OrdelisSketch copy={copy.art} />;
+      return (
+        <OrdelisSketch label={copy.art.label.ordelis} text={copy.art.ordelis} />
+      );
     case "refrain":
       return <RefrainSketch copy={copy.art} />;
     case "orbit":
-      return <OrbitSketch copy={copy.art} intlLocale={intlLocale} />;
+      return (
+        <OrbitSketch
+          label={copy.art.label.orbit}
+          simulated={copy.art.simulated}
+          text={copy.art.orbit}
+          intlLocale={intlLocale}
+        />
+      );
     default:
       // Only the four featured projects have a large sketch.
       return null;

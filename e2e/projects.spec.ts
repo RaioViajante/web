@@ -84,11 +84,14 @@ for (const width of [1440, 390, 360]) {
       orbit.getByRole("list", { name: "State changes" }),
     ).toContainText("queued");
     const cancel = orbit.getByRole("button", { name: "Cancel" });
-    await expect(cancel).toBeEnabled();
-    await cancel.click();
+    await expect(cancel).toHaveAttribute("aria-disabled", "false");
+    await cancel.focus();
+    await page.keyboard.press("Enter");
     await expect(
       orbit.getByRole("list", { name: "State changes" }),
     ).toContainText("cancelled");
+    // Focus stays on Cancel even when nothing is left to cancel.
+    await expect(cancel).toBeFocused();
 
     // Client work: honest empty state, and no route that does not exist.
     await expect(
@@ -112,39 +115,91 @@ test("the catalog filters by kind, in both languages", async ({ page }) => {
   const { health } = await open(page, "/projects/all");
   const tiles = page.locator(".pj-grid__item:visible");
   await expect(tiles).toHaveCount(8);
-  await expect(page.getByText("08 projects")).toBeVisible();
+  const shown = page.locator(".pj-filters__shown");
+  await expect(shown).toHaveText("08 projects");
+  // Loops rest until a tile is hovered or focused (WCAG 2.2.2).
+  const running = () =>
+    page.evaluate(
+      () =>
+        document
+          .getAnimations()
+          .filter(
+            (animation) =>
+              animation.playState === "running" &&
+              (animation.effect as KeyframeEffect | null)?.target?.closest?.(
+                ".mn",
+              ),
+          ).length,
+    );
+  expect(await running()).toBe(0);
+  await page.locator(".pj-tile", { hasText: "Hum" }).hover();
+  await expect.poll(running).toBeGreaterThan(0);
   const music = page.getByRole("button", { name: /^music/ });
   await music.focus();
   await page.keyboard.press("Space");
   await expect(music).toHaveAttribute("aria-pressed", "true");
   await expect(tiles).toHaveCount(2);
-  await expect(page.getByText("02 projects")).toBeVisible();
+  await expect(shown).toHaveText("02 projects · music");
   await expect(tiles.getByRole("heading", { level: 3 })).toHaveText([
     "Refrain",
     "Hum",
   ]);
   await page.getByRole("button", { name: /^games/ }).click();
   await expect(tiles).toHaveCount(1);
-  await expect(page.getByText("01 project", { exact: true })).toBeVisible();
+  await expect(shown).toHaveText("01 project · games");
   await page.getByRole("button", { name: /^all/ }).click();
   await expect(tiles).toHaveCount(8);
-  // The catalog keeps "projects" current in the sidebar.
-  await expect(
-    page
-      .getByRole("link", { name: /projects/, exact: false })
-      .and(page.locator('[aria-current="page"]')),
-  ).toHaveAttribute("href", "/projects");
+  // The catalog marks "projects" as its section, not as the current page.
+  const pagesNav = page.locator('.rv-nav[data-nav="pages"]');
+  await expect(pagesNav.locator('[aria-current="true"]')).toHaveAttribute(
+    "href",
+    "/projects",
+  );
+  await expect(pagesNav.locator('[aria-current="page"]')).toHaveCount(0);
   await axe(page);
 
   await page.goto(base("root") + "/pt/projects/all");
   await page.getByRole("button", { name: /^música/ }).click();
   await expect(tiles).toHaveCount(2);
-  await expect(page.getByText("02 projetos")).toBeVisible();
+  await expect(shown).toHaveText("02 projetos · música");
   await expect(page.locator(".rv-lang a")).toHaveAttribute(
     "href",
     "/projects/all",
   );
   expect(health).toEqual([]);
+});
+
+for (const width of [390, 360])
+  test(`Portuguese projects pages fit and pass axe at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    for (const path of ["/pt", "/pt/projects", "/pt/projects/all"]) {
+      const { health } = await open(page, path);
+      expect(
+        await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+        ),
+        path,
+      ).toBeLessThanOrEqual(0);
+      await axe(page);
+      expect(health, path).toEqual([]);
+    }
+  });
+
+test("the small sketches say when they show planned or simulated work", async ({
+  page,
+}) => {
+  await open(page, "/");
+  await expect(page.locator(".mn--ordelis")).toContainText(
+    "planned workflow · sketch",
+  );
+  await expect(page.locator(".mn--orbit")).toContainText(
+    "simulated in your browser",
+  );
+  await expect(page.locator(".mn--mochifile")).toContainText("example values");
 });
 
 test("projects pages link only to real pages and public destinations", async ({

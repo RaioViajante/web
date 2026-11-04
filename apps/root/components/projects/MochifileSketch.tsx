@@ -25,19 +25,22 @@ function Picture() {
  * target size. Choosing a target updates example values; no file is read.
  */
 export function MochifileSketch({
-  copy,
+  label,
+  example,
+  text,
   intlLocale,
   wordmark,
 }: {
-  copy: ProjectArtCopy;
+  label: string;
+  example: string;
+  text: ProjectArtCopy["mochifile"];
   intlLocale: string;
   wordmark: { src: string; width: number; height: number };
 }) {
   const [target, setTarget] = useState<MochifileTarget>(200);
-  const text = copy.mochifile;
   const result = mochifileResult(target);
   // Set through the CSSOM: Root's CSP blocks server-rendered style attributes.
-  // projects.css gives the default target's width before this runs.
+  // sketches.css gives the default target's width before this runs.
   const afterBar = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     afterBar.current?.style.setProperty("width", `${result.share}%`);
@@ -45,11 +48,7 @@ export function MochifileSketch({
   const size = (kb: number) => formatSize(kb, intlLocale);
   const dimensions = `${new Intl.NumberFormat(intlLocale, { useGrouping: false }).format(mochifileOriginal.width)} × ${new Intl.NumberFormat(intlLocale, { useGrouping: false }).format(mochifileOriginal.height)}`;
   return (
-    <div
-      className="sk sk--mochifile"
-      role="group"
-      aria-label={copy.label.mochifile}
-    >
+    <div className="sk sk--mochifile" role="group" aria-label={label}>
       <div className="mo-window">
         <div className="mo-top">
           {/* eslint-disable-next-line @next/next/no-img-element -- fixed derivative */}
@@ -59,7 +58,7 @@ export function MochifileSketch({
             alt="Mochifile"
             width={108}
             height={20}
-            loading="lazy"
+            loading="eager"
             decoding="async"
           />
           <span className="mo-tool">{text.tool}</span>
@@ -122,7 +121,7 @@ export function MochifileSketch({
             <b>{size(result.kb)}</b>
           </span>
         </div>
-        <p className="mo-note">{copy.example}</p>
+        <p className="mo-note">{example}</p>
       </div>
     </div>
   );

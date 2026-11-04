@@ -3,9 +3,12 @@
 // sketches. Portuguese copy is `ptProjectsCopy` in pt.ts, typed by the same
 // `ProjectsCopy`, so a missing translation is a type error.
 //
-// Facts here were checked on 2026-11-04 against each project's public source
-// or Docs page (Docs pages record their verified commits). Private
-// repositories (Refrain, Morrowferry) are never linked. A sketch illustrates a
+// Facts here were checked on 2026-11-04: Mochifile, Ordelis, Orbit, yanawa
+// and Sweep against their Docs pages (which record their verified commits),
+// Hum against its public README, Refrain against its Dump essay. Refrain and
+// Morrowferry have private repositories, which are never linked; their
+// descriptions were confirmed against the owner's own READMEs and the
+// approved design copy, and say nothing more specific than those. A sketch illustrates a
 // project; it never claims a capability the project does not have, and
 // example numbers say so where they appear. This file imports types only
 // (and the locale registry), so a plain Node test can load it.
@@ -279,6 +282,7 @@ export interface ProjectArtCopy {
     queue: string;
     cancel: string;
     idle: string;
+    full: string;
     log: string;
     counts: string;
   };
@@ -311,7 +315,6 @@ export interface ProjectsCopy {
     line: string;
     mine: string;
     lead: string;
-    of: string;
     viewAll: string;
     clients: string;
     clientsLead: string;
@@ -440,7 +443,6 @@ export const projectsCopy: ProjectsCopy = {
     line: "What I build for myself, and what I build with clients.",
     mine: "My projects",
     lead: "Four things I am building right now. Each card has a small sketch that runs in your browser: it shows the idea, not the real project.",
-    of: "of",
     viewAll: "View all projects",
     clients: "Client work",
     clientsLead:
@@ -542,6 +544,7 @@ export const projectsCopy: ProjectsCopy = {
       queue: "Queue a job",
       cancel: "Cancel",
       idle: "Nothing queued. Queue a job.",
+      full: "Six executions at once is the limit here.",
       log: "State changes",
       counts: "Executions by state",
     },
@@ -563,7 +566,4 @@ export const projectsCopy: ProjectsCopy = {
   },
 };
 
-/** `{n} projects` in the locale's plural form. */
-export function countLabel(count: ProjectsCopy["all"]["count"], n: number) {
-  return (n === 1 ? count.one : count.other).replace("{n}", String(n));
-}
+export { countLabel } from "./count-label.ts";

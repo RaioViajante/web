@@ -253,7 +253,6 @@ export const ptProjectsCopy: ProjectsCopy = {
     line: "O que eu construo para mim, e o que construo com clientes.",
     mine: "Meus projetos",
     lead: "Quatro coisas que estou construindo agora. Cada card tem um pequeno esboço que roda no seu navegador: ele mostra a ideia, não o projeto de verdade.",
-    of: "de",
     viewAll: "Ver todos os projetos",
     clients: "Para clientes",
     clientsLead:
@@ -357,6 +356,7 @@ export const ptProjectsCopy: ProjectsCopy = {
       queue: "Enfileirar um job",
       cancel: "Cancelar",
       idle: "Nada na fila. Enfileire um job.",
+      full: "Seis execuções ao mesmo tempo é o limite aqui.",
       log: "Mudanças de estado",
       counts: "Execuções por estado",
     },

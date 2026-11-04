@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { countLabel } from "../../lib/count-label";
 import type { ProjectCategory } from "../../lib/projects";
 
 type Filter = ProjectCategory | "all";
@@ -47,10 +48,15 @@ export function ProjectCatalog({
             </button>
           ))}
         </div>
+        {/* The filter's name is part of the message, so changing between two
+            kinds with the same count is still announced. */}
         <p className="pj-filters__shown" aria-live="polite">
-          {(shown === 1 ? countOne : countOther).replace(
-            "{n}",
-            String(shown).padStart(2, "0"),
+          {countLabel({ one: countOne, other: countOther }, shown)}
+          {filter === "all" ? null : (
+            <span className="rv-sr-only">
+              {" "}
+              · {filters.find(({ value }) => value === filter)?.label}
+            </span>
           )}
         </p>
       </div>

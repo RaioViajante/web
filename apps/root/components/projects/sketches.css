@@ -1213,7 +1213,7 @@
   border-color: var(--orbit-accent);
 }
 
-.ob-button:disabled {
+.ob-button[aria-disabled="true"] {
   opacity: 0.45;
   cursor: default;
 }
@@ -1262,4 +1262,30 @@
   [data-playing] .rf-note {
     opacity: 1;
   }
+}
+
+/*
+ * The large sketches' loops play while the visitor points at or works in the
+ * card (WCAG 2.2.2), and the record while it plays. Interactions themselves
+ * (choices, state changes) always respond.
+ */
+.sk .mo-track > span,
+.sk .od-links path,
+.sk .od-steps .is-now::before,
+.sk .od-progress > span,
+.sk .ob-execution {
+  animation-play-state: paused;
+}
+
+.pj-card:hover .sk .mo-track > span,
+.pj-card:hover .sk .od-links path,
+.pj-card:hover .sk .od-steps .is-now::before,
+.pj-card:hover .sk .od-progress > span,
+.pj-card:hover .sk .ob-execution,
+.pj-card:focus-within .sk .mo-track > span,
+.pj-card:focus-within .sk .od-links path,
+.pj-card:focus-within .sk .od-steps .is-now::before,
+.pj-card:focus-within .sk .od-progress > span,
+.pj-card:focus-within .sk .ob-execution {
+  animation-play-state: running;
 }

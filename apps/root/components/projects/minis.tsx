@@ -1,8 +1,8 @@
 // The small sketches of the four featured projects (home page and catalog).
-// Server-rendered,
-// decorative (each card names and describes its project in text), animated
-// only by CSS, and still under reduced motion. No inline styles: Root's CSP
-// blocks style attributes, so positions and timings live in projects.css.
+// Server-rendered and decorative (each card names and describes its project
+// in text). Animated only by CSS, only while the card is hovered or focused,
+// and still under reduced motion. No inline styles: Root's CSP blocks style
+// attributes, so positions and timings live in minis.css.
 
 import { projectIcons } from "@raioviajante/design/projects";
 import type { ProjectArtCopy } from "../../lib/projects";
@@ -104,6 +104,7 @@ function OrdelisMini({ copy }: { copy: ProjectArtCopy }) {
           <span className="mn-ord__ok">✓</span>
         </span>
       </span>
+      <span className="mn-note">{copy.ordelis.note}</span>
     </>
   );
 }
@@ -182,6 +183,7 @@ function OrbitMini({ copy }: { copy: ProjectArtCopy }) {
           <b>exec-0143</b> {orbit.queued} → {orbit.running}
         </span>
       </span>
+      <span className="mn-note">{copy.simulated}</span>
     </>
   );
 }

@@ -190,7 +190,7 @@ test("hand-drawn strokes are deterministic", () => {
 });
 
 test("the catalog count uses each language's plural", () => {
-  assert.equal(countLabel(projectsCopy.all.count, 1), "1 project");
-  assert.equal(countLabel(projectsCopy.all.count, 8), "8 projects");
-  assert.equal(countLabel(ptProjectsCopy.all.count, 3), "3 projetos");
+  assert.equal(countLabel(projectsCopy.all.count, 1), "01 project");
+  assert.equal(countLabel(projectsCopy.all.count, 8), "08 projects");
+  assert.equal(countLabel(ptProjectsCopy.all.count, 3), "03 projetos");
 });

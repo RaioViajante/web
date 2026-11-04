@@ -62,7 +62,7 @@ export function RootShell({
     : undefined;
   // A page under another page's item keeps that item current in the sidebar.
   const parent = route ? navigationParent[route.key] : undefined;
-  const navigationCurrent = parent ? routes[parent][locale] : current;
+  const section = parent ? routes[parent][locale] : undefined;
   return (
     <Shell
       site="root"
@@ -76,7 +76,8 @@ export function RootShell({
       {...legalLinks(locale)}
       linkComponent={Link}
       pages={pages}
-      currentPage={navigationCurrent}
+      currentPage={current}
+      currentSection={section}
       pagesExtra={
         <SearchNavItem
           number={`${String(pages.length).padStart(2, "0")}.`}

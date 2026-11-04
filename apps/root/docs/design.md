@@ -87,29 +87,38 @@ word drawn inside the sketches. Components are in `components/projects/`.
   colors are the project-artwork tokens in `packages/design/styles/project-art.css`,
   loaded only by these pages; the page chrome stays
   gray, and there are no gradients, glows or shadows.
-- **Delivery.** No inline `style` attributes (the CSP blocks them): timings and
-  positions are classes in `cards.css`, `minis.css` and `sketches.css`, and the
-  one dynamic width is set through the CSSOM. The home page loads only the
-  cards and small sketches; the large sketches' CSS and client code load only
-  on `/projects`. Every animation stops under reduced motion, and Orbit starts
-  executions on its own only while on screen.
-  The gallery opens from an isolated, gently floating Work of Art cover, with a
-  small muted hint below the sticker. Activating its keyboard-accessible button
-  reveals or hides Branding, Profiles, and Personal, with a short unfolding motion
-  and staggered sticker release. Focus
-  stays on the cover, which scrolls into view as the collection enters normal document
-  flow. Reduced motion
-  stops the float and reveals immediately; without JavaScript the server-rendered
-  collection remains visible. The local export starts open and has no opening
-  choreography; this entry interaction refines it without changing the final layout.
-  Gallery artwork uses the shared `data-sound="gallery"` hover/click voice, including
-  the cover, with no additional manual sound dispatch. Thirty
-  stickers share one transparent atlas (a 1080px AVIF preview, with the 2160px WebP
-  original reserved for the viewer and downloads); the avatar uses the existing shared animation
-  and shows its ten frames. Personal artwork forms a responsive overlapping collage.
-  The artwork model lives in `lib/gallery.ts`, the client interaction in
-  `components/GalleryBoard.tsx`, and the route styles in `app/gallery/gallery.css`.
-  Artwork stays in the shared design package; the twelve Personal images live there.
+- **Delivery.** No server-rendered `style` attributes (the CSP blocks them):
+  timings and positions are classes in `cards.css`, `pages.css`, `minis.css`,
+  `catalog-minis.css` and `sketches.css`. Values known only in the browser
+  (the Mochifile bar width, the Orbit orbits) are set on the client through
+  the CSSOM. The home page loads only the cards and the four small sketches;
+  the catalog adds its own; the large sketches' CSS and client code load only
+  on `/projects`.
+- **Motion.** Looping animations play only while a card is hovered or has
+  focus, and otherwise rest on a complete frame (WCAG 2.2.2); a playing
+  Refrain record keeps spinning. Orbit queues one execution the first time
+  its sketch comes into view, and after that only when the visitor asks.
+  Everything stops under reduced motion.
+
+### Gallery
+
+The gallery opens from an isolated, gently floating Work of Art cover, with a
+small muted hint below the sticker. Activating its keyboard-accessible button
+reveals or hides Branding, Profiles, and Personal, with a short unfolding motion
+and staggered sticker release. Focus
+stays on the cover, which scrolls into view as the collection enters normal document
+flow. Reduced motion
+stops the float and reveals immediately; without JavaScript the server-rendered
+collection remains visible. The local export starts open and has no opening
+choreography; this entry interaction refines it without changing the final layout.
+Gallery artwork uses the shared `data-sound="gallery"` hover/click voice, including
+the cover, with no additional manual sound dispatch. Thirty
+stickers share one transparent atlas (a 1080px AVIF preview, with the 2160px WebP
+original reserved for the viewer and downloads); the avatar uses the existing shared animation
+and shows its ten frames. Personal artwork forms a responsive overlapping collage.
+The artwork model lives in `lib/gallery.ts`, the client interaction in
+`components/GalleryBoard.tsx`, and the route styles in `app/gallery/gallery.css`.
+Artwork stays in the shared design package; the twelve Personal images live there.
 
 Selecting a piece opens a native modal dialog with title, category, supported usage
 metadata, unboxed ←/→ controls named Previous artwork / Next artwork, arrow-key navigation, Escape, and focus restoration.

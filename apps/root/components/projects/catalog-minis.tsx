@@ -78,7 +78,7 @@ function SweepSketch({ copy }: { copy: ProjectArtCopy }) {
   );
 }
 
-// Twenty-four bars; projects.css staggers their timings.
+// Twenty-four bars; catalog-minis.css staggers their timings.
 const humBars = Array.from({ length: 24 });
 
 function HumSketch({ copy }: { copy: ProjectArtCopy }) {

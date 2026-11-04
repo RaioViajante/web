@@ -32,7 +32,6 @@ interface Snapshot {
 }
 
 const MAX_LIVE = 6;
-const AUTO_RUNS = 10;
 
 /**
  * The simulation, outside React: timers stand in for the scheduler and the
@@ -129,13 +128,16 @@ function createSimulation(
  * transitions Orbit's domain allows. Nothing is scheduled or run.
  */
 export function OrbitSketch({
-  copy,
+  label,
+  simulated,
+  text,
   intlLocale,
 }: {
-  copy: ProjectArtCopy;
+  label: string;
+  simulated: string;
+  text: ProjectArtCopy["orbit"];
   intlLocale: string;
 }) {
-  const text = copy.orbit;
   const [{ executions, log }, setSnapshot] = useState<Snapshot>({
     executions: [],
     log: [],
@@ -144,8 +146,9 @@ export function OrbitSketch({
   const simulation = useRef<ReturnType<typeof createSimulation>>(undefined);
   const root = useRef<HTMLDivElement>(null);
 
-  // A few executions start on their own while the sketch is on screen; with
-  // reduced motion, only the first.
+  // One execution starts on its own the first time the sketch comes into
+  // view, and runs its course in a few seconds; after that, only the visitor
+  // starts them (WCAG 2.2.2).
   useEffect(() => {
     const clock = new Intl.DateTimeFormat(intlLocale, {
       hour: "2-digit",
@@ -157,28 +160,13 @@ export function OrbitSketch({
       clock.format(new Date()),
     );
     simulation.current = current;
-    const reduce = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    let runs = 0;
-    let interval: ReturnType<typeof setInterval> | undefined;
-    const stop = () => clearInterval(interval);
-    const start = () => {
-      stop();
-      if (reduce || runs >= AUTO_RUNS) return;
-      interval = setInterval(() => {
-        if (++runs >= AUTO_RUNS) stop();
-        current.queue();
-      }, 4200);
-    };
-    const first = setTimeout(() => current.queue(), 600);
-    const observer = new IntersectionObserver(([entry]) =>
-      entry?.isIntersecting ? start() : stop(),
-    );
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      observer.disconnect();
+      current.queue();
+    });
     if (root.current) observer.observe(root.current);
     return () => {
-      clearTimeout(first);
-      stop();
       observer.disconnect();
       current.dispose();
     };
@@ -186,16 +174,8 @@ export function OrbitSketch({
 
   const queue = () => {
     const id = simulation.current?.queue();
-    if (id) setAnnouncement(`${id}: ${text.queued}`);
+    setAnnouncement(id ? `${id}: ${text.queued}` : text.full);
   };
-  const cancel = () => {
-    const change = simulation.current?.cancel();
-    if (change)
-      setAnnouncement(
-        `${change.id}: ${text[change.from]} → ${text[change.to]}`,
-      );
-  };
-
   const counts: Record<ExecutionState, number> = {
     queued: 0,
     running: 0,
@@ -208,13 +188,19 @@ export function OrbitSketch({
     (item) => !item.gone && !isFinished(item.state),
   );
 
+  // `aria-disabled` rather than `disabled`, so focus stays on the button when
+  // the last execution finishes under it.
+  const cancel = () => {
+    if (!cancellable) return;
+    const change = simulation.current?.cancel();
+    if (change)
+      setAnnouncement(
+        `${change.id}: ${text[change.from]} → ${text[change.to]}`,
+      );
+  };
+
   return (
-    <div
-      className="sk sk--orbit"
-      ref={root}
-      role="group"
-      aria-label={copy.label.orbit}
-    >
+    <div className="sk sk--orbit" ref={root} role="group" aria-label={label}>
       <div className="ob-system" aria-hidden="true">
         <span className="ob-ring is-outer" />
         <span className="ob-ring is-middle" />
@@ -244,7 +230,7 @@ export function OrbitSketch({
       <div className="ob-side">
         <div className="ob-head">
           <span className="ob-head__name">{text.header}</span>
-          <span>{copy.simulated}</span>
+          <span>{simulated}</span>
         </div>
         <ol className="ob-log" aria-label={text.log}>
           {log.length ? (
@@ -276,7 +262,7 @@ export function OrbitSketch({
             className="ob-button is-quiet"
             data-sound="click"
             onClick={cancel}
-            disabled={!cancellable}
+            aria-disabled={!cancellable}
           >
             {text.cancel}
           </button>
