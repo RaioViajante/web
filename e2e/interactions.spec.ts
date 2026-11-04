@@ -602,6 +602,8 @@ test.describe("reduced motion", () => {
     for (const [site, path] of [
       ["root", "/"],
       ["root", "/gallery"],
+      ["root", "/projects"],
+      ["root", "/projects/all"],
       ["dump", "/"],
       ["docs", "/"],
       ["lab", "/"],

@@ -1,0 +1,255 @@
+/*
+ * Root's project cards: the chrome of /projects, the catalog on /projects/all
+ * and the home page's project cards. Gray like every page; color appears only
+ * inside the sketches (minis.css, sketches.css).
+ */
+
+.pj-more__arrow,
+.pj-action__arrow,
+.pj-home-card__arrow {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--rule-note);
+  border-radius: 50%;
+  transition:
+    transform var(--ease-nav) ease,
+    background-color var(--ease-nav) ease,
+    border-color var(--ease-nav) ease,
+    color var(--ease-nav) ease;
+}
+
+.pj-more__arrow {
+  width: 30px;
+  height: 30px;
+}
+
+.pj-more:hover .pj-more__arrow,
+.pj-more:focus-visible .pj-more__arrow {
+  transform: translateX(3px);
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+/* status: a word, with a solid or dashed mark that repeats it */
+
+.pj-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 11px 3px 9px;
+  border: 1px solid var(--rule-note);
+  border-radius: 999px;
+  color: var(--block-notes);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.pj-status.is-small,
+.pj-tile .pj-status {
+  padding: 0;
+  border: 0;
+  font-size: 11.5px;
+}
+
+.pj-status__mark {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--fg-2);
+}
+
+.pj-status[data-stage="building"] .pj-status__mark {
+  width: 7px;
+  height: 7px;
+  border: 1px dashed var(--block-notes);
+  background: none;
+}
+
+/* where to see a project */
+
+.pj-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+  color: var(--fg);
+  font-size: 13.5px;
+  text-decoration: none;
+}
+
+.pj-action__arrow {
+  width: 34px;
+  height: 34px;
+  font-size: 13px;
+}
+
+.pj-action:hover .pj-action__arrow,
+.pj-action:focus-visible .pj-action__arrow {
+  transform: rotate(45deg);
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.pj-action.is-small {
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.pj-action.is-small .pj-action__arrow {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+
+.pj-action.is-none {
+  color: var(--fg-3);
+  font-size: 12.5px;
+}
+
+.pj-card__head .pj-status {
+  margin-left: auto;
+}
+
+.pj-grid,
+.pj-home {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.pj-home {
+  gap: 14px;
+}
+
+.pj-tile,
+.pj-home-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 6px;
+  border: 1px solid var(--table-rule);
+  border-radius: 20px;
+  background: var(--bg);
+  transition: border-color var(--ease-nav) ease;
+  scroll-margin-top: 24px;
+}
+
+.pj-tile:hover,
+.pj-tile:focus-within,
+.pj-home-card:hover,
+.pj-home-card:focus-visible {
+  border-color: var(--rule-note);
+}
+
+.pj-tile__art {
+  position: relative;
+  display: block;
+  height: 148px;
+  overflow: hidden;
+  border-radius: 15px;
+  isolation: isolate;
+}
+
+.pj-tile h3 {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: var(--weight-heading);
+  line-height: 1.3;
+}
+
+.pj-home-card {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.pj-home-card__row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 10px 8px;
+}
+
+.pj-home-card__icon {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+.pj-home-card__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.pj-home-card__name {
+  font-size: 14.5px;
+  font-weight: var(--weight-heading);
+}
+
+.pj-home-card__tagline {
+  overflow: hidden;
+  color: var(--fg-3);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pj-home-card .pj-status {
+  margin-top: 2px;
+}
+
+.pj-home-card__arrow {
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.pj-home-card:hover .pj-home-card__arrow,
+.pj-home-card:focus-visible .pj-home-card__arrow {
+  transform: translateX(2px);
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.pj-home-more {
+  margin-top: 18px;
+}
+
+@media (max-width: 760px) {
+  .pj-grid,
+  .pj-home,
+  .pj-cases {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pj-tile__art {
+    height: 136px;
+  }
+}
+
+@media (max-width: 420px) {
+  .pj-card__head .pj-status {
+    margin-left: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pj-more__arrow,
+  .pj-action__arrow,
+  .pj-home-card__arrow,
+  .pj-card,
+  .pj-tile,
+  .pj-home-card,
+  .pj-filter,
+  .pj-back,
+  .pj-cta a {
+    transition: none !important;
+  }
+}

@@ -63,6 +63,25 @@ describe("Shell", () => {
     );
   });
 
+  it("marks the section of a page that has no item of its own, not as the page", () => {
+    const nested = renderToStaticMarkup(
+      <Shell
+        locale="en"
+        site="root"
+        pages={pages}
+        currentPage="/archive/all"
+        currentSection="/archive"
+      >
+        <p>content</p>
+      </Shell>,
+    );
+    expect(nested).toMatch(
+      /aria-current="true"[^>]*><span class="rv-nav__num">01\./,
+    );
+    expect(nested).not.toContain('aria-current="page"');
+    expect(css).toMatch(/\.rv-nav a\[aria-current="true"\]/);
+  });
+
   it("puts the sound toggle first, centered over the content column, then content, then the footer", () => {
     expect(html.indexOf("rv-sound")).toBeLessThan(html.indexOf("rv-sidebar"));
     const column = html.slice(html.indexOf('class="rv-column"'));

@@ -18,11 +18,12 @@ page metadata, the social cards under `/og/`, `sitemap.xml` and `robots.txt`.
 
 Root keeps only what is its own, in `app/globals.css` and `components/`: the
 avatar flip (`AvatarCoin`), the hover descriptions on home rows (`PreviewRow`),
-the projects list, the gallery board, and the font binding for `next/font`.
+the projects pages and their sketches, the gallery board, and the font binding
+for `next/font`.
 Artwork is not stored in the app: the avatar frames, the gallery images and the
 "work of art" sticker come from `packages/design/assets`. Gallery styles are scoped to its route; the shared shell keeps its existing geometry.
 
-Root has routes for home, about, projects, contact, gallery, this site, setup,
+Root has routes for home, about, projects, all projects, contact, gallery, this site, setup,
 search, privacy, and terms of use, and a 404 page (`app/not-found.tsx`) built on
 the shared template. The primary navigation contains the local content
 routes except Setup,
@@ -48,9 +49,63 @@ Its ten-frame illustration loops every three seconds after the frames have
 loaded. Reduced motion keeps the centered portrait still and disables the flip.
 Sound is off until enabled by the visitor; the shared preference is the
 `rv-sound` cookie on `.raioviajante.com`.
-Its text toggle sits alone at the top of the reading column. The Projects page
-uses an editorial list with name, status, description, type, and destination for
-each entry.
+Its text toggle sits alone at the top of the reading column.
+
+### Projects
+
+The projects area implements the approved Claude Design handoff
+(`reference/raioviajante-projects.zip`, local and untracked) inside the shared
+shell. Facts and English copy live in `lib/projects.ts`; Portuguese copy in
+`ptProjectsCopy` (`lib/pt.ts`), typed by the same `ProjectsCopy`, including every
+word drawn inside the sketches. Components are in `components/projects/`.
+
+- **Home (00.1).** Four cards (Mochifile, Ordelis, Refrain, Orbit), each a
+  single link to its card on `/projects`, with a small CSS-only sketch, icon,
+  short line and status, then "More projects and client work" to `/projects`.
+- **`/projects`.** "02. My projects": the same four with large sketches that
+  work as local demonstrations (Mochifile: the design's Compress, Convert and
+  Resize tabs with example values; Compress picks a target size, as the real
+  tool does, and Convert and Resize, which Mochifile lists as coming soon,
+  say "coming soon to Mochifile" in their note; Ordelis: approve or request changes in the planned review step;
+  Refrain: play or stop the record; Orbit: queue and cancel executions that
+  follow Orbit's transition rules, simulated in the browser). Then "View all
+  projects" and "02.1 Client work". `clientCases` is empty, so the section
+  shows a localized empty state and no link to a client catalog; the client
+  card component renders only real cases.
+- **`/projects/all`.** All eight projects as smaller tiles, filtered by kind
+  (all, tools, music, systems, languages, games) with pressed-state buttons and
+  a polite count. Without JavaScript every tile stays visible. The sidebar
+  keeps "projects" current (`navigationParent` in `lib/routes.ts`).
+- **Honesty.** Status is a word with a solid (usable) or dashed (still being
+  built) mark. Example numbers are labelled; Orbit is described as not
+  scheduling or running anything yet; Ordelis and Hum sketches say they show a
+  planned workflow or interface. Refrain and Morrowferry have private
+  repositories and are never linked; Morrowferry says "no public link yet".
+- **Artwork.** The project icons and the Mochifile wordmark are 128-pixel
+  derivatives in `packages/design/assets/projects/`
+  (`pnpm --filter @raioviajante/design project-icons`). Sweep and Hum have no
+  logo yet, so their icon slot shows their initial on a square in their sketch
+  colors (`.pj-letter`, CSS only); replace it when a logo is approved. The sketches are drawn
+  in code: HTML/CSS, SVG, a seeded hand-drawn stroke generator for Refrain
+  (`lib/sketch.ts`) and a token-colored pixel scene for Morrowferry. Their
+  colors are the project-artwork tokens in `packages/design/styles/project-art.css`,
+  loaded only by these pages; the page chrome stays
+  gray, and there are no gradients, glows or shadows.
+- **Delivery.** No server-rendered `style` attributes (the CSP blocks them):
+  timings and positions are classes in `cards.css`, `pages.css`, `minis.css`,
+  `catalog-minis.css` and `sketches.css`. Values known only in the browser
+  (the Mochifile bar widths, the Orbit orbits) are set on the client through
+  the CSSOM. The home page loads only the cards and the four small sketches;
+  the catalog adds its own; the large sketches' CSS and client code load only
+  on `/projects`.
+- **Motion.** Looping animations play only while a card is hovered or has
+  focus, and otherwise rest on a complete frame (WCAG 2.2.2); a playing
+  Refrain record keeps spinning. Orbit queues one execution the first time
+  its sketch comes into view, and after that only when the visitor asks.
+  Everything stops under reduced motion.
+
+### Gallery
+
 The gallery opens from an isolated, gently floating Work of Art cover, with a
 small muted hint below the sticker. Activating its keyboard-accessible button
 reveals or hides Branding, Profiles, and Personal, with a short unfolding motion

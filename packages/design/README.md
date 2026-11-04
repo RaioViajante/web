@@ -14,7 +14,8 @@ in [docs/design-migration-plan.md](../../docs/design-migration-plan.md).
 styles/      tokens.css, base.css, blocks.css, search.css (styles.css imports them);
              fonts.css for Astro
 fonts/       Noto Sans Mono: Latin variable WOFF2 for pages, TTF weights for social cards
-assets/      character/, stickers/, search/ (search/head/ static head, source/), gallery/, icons/
+assets/      character/, stickers/, search/ (search/head/ static head, source/), gallery/, icons/,
+             projects/ (project icons and the Mochifile wordmark, derived from source/)
 sound/       Web Audio synthesis, sound map, shared preference, player
 blocks/      Shiki theme, highlighting, markup builder, rehype/remark plugins, client behavior (words come from the catalog's `blocks` section, by locale)
 components/  Shell, page parts, soft blocks, lab bench, legal and 404 templates

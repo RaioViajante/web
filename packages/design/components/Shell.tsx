@@ -26,6 +26,11 @@ export interface NavGroupProps {
   items: NavItem[];
   /** The item whose `href` equals this value is current. */
   current?: string;
+  /**
+   * The item whose `href` equals this value is the section the current page
+   * belongs to (`aria-current="true"`), for a page with no item of its own.
+   */
+  section?: string;
   ariaLabel?: string;
   /** A stable hook for styles, independent of the localized label. */
   nav?: string;
@@ -45,6 +50,7 @@ export function NavGroup({
   label,
   items,
   current,
+  section,
   ariaLabel,
   nav,
   extra,
@@ -58,7 +64,13 @@ export function NavGroup({
       href={item.href}
       data-sound="nav"
       className={item.sub ? "rv-nav__sub" : undefined}
-      aria-current={item.href === current ? "page" : undefined}
+      aria-current={
+        item.href === current
+          ? "page"
+          : item.href === section
+            ? "true"
+            : undefined
+      }
     >
       <span className="rv-nav__num">{item.number ?? pad(index)}</span>
       <span>{item.label}</span>
@@ -243,6 +255,8 @@ export interface ShellProps extends FooterProps {
   /** PAGES. */
   pages: NavItem[];
   currentPage?: string;
+  /** The PAGES item a page without its own item belongs to. */
+  currentSection?: string;
   /** Rendered last inside PAGES: the search menu item. */
   pagesExtra?: ReactNode;
   /** ON THIS PAGE. */
@@ -263,6 +277,7 @@ export interface ShellProps extends FooterProps {
 export function Shell({
   pages,
   currentPage,
+  currentSection,
   pagesExtra,
   toc,
   currentToc,
@@ -292,6 +307,7 @@ export function Shell({
             nav="pages"
             items={pages}
             current={currentPage}
+            section={currentSection}
             extra={pagesExtra}
             linkComponent={linkComponent}
           />

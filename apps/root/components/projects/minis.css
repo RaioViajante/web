@@ -1,0 +1,677 @@
+/*
+ * The small project sketches (catalog and home), plus the rules and
+ * animations they share with the large ones on /projects. Color comes only
+ * from the tokens in @raioviajante/design/project-art.css.
+ */
+
+.sk,
+.mn {
+  position: relative;
+  display: block;
+}
+
+.mn {
+  position: absolute;
+  inset: 0;
+}
+
+.sk svg path,
+.mn svg path {
+  vector-effect: non-scaling-stroke;
+}
+
+.mo-picture,
+.mn-thumb {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--mochi-sky);
+}
+
+.mo-picture__sun,
+.mn-thumb__sun {
+  position: absolute;
+  top: 16%;
+  left: 58%;
+  width: 26%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--mochi-sun);
+}
+
+.mo-picture__hill,
+.mn-thumb__hill {
+  position: absolute;
+  right: -10%;
+  bottom: -38%;
+  left: -10%;
+  height: 78%;
+  border-radius: 50%;
+  background: var(--mochi-hill);
+}
+
+.mo-picture__dark,
+.mn-thumb__dark {
+  position: absolute;
+  right: -30%;
+  bottom: -52%;
+  left: 30%;
+  height: 80%;
+  border-radius: 50%;
+  background: var(--mochi-ink);
+}
+
+.mo-track,
+.mn-mochi__track {
+  position: relative;
+  display: block;
+  border-top: 2px dashed var(--mochi-dash);
+}
+
+.mo-track > span,
+.mn-mochi__track > span {
+  position: absolute;
+  top: -6px;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mochi-ink);
+  animation: pj-packet 2.2s cubic-bezier(0.5, 0, 0.5, 1) -1.1s infinite;
+}
+
+@keyframes pj-packet {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 10px);
+    opacity: 0;
+  }
+}
+
+.od-links path,
+.mn-ord__links path {
+  fill: none;
+  stroke: var(--ordelis-link);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 5;
+  animation: pj-flow 1.6s linear infinite;
+}
+
+@keyframes pj-flow {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+.od-progress,
+.mn-ord__run {
+  display: block;
+  grid-column: 1 / -1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--ordelis-track);
+}
+
+.od-progress > span,
+.mn-ord__run::after {
+  content: "";
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: var(--ordelis-fg-2);
+  /* At rest the bar shows work in progress, not an empty track. */
+  animation: pj-work 2.8s ease-in-out -1.4s infinite;
+}
+
+.od-agent.is-second .od-progress > span,
+.mn-ord__agent.is-second .mn-ord__run::after {
+  animation-duration: 3.6s;
+  animation-delay: -1.2s;
+}
+
+@keyframes pj-work {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(260%);
+  }
+}
+
+.sk--refrain svg path,
+.mn--refrain svg path {
+  fill: none;
+  stroke: var(--refrain-ink);
+  stroke-linecap: round;
+  stroke-width: 1.2;
+}
+
+.sk--refrain svg path.is-thin,
+.mn--refrain svg path.is-thin {
+  stroke-width: 0.8;
+}
+
+.rf-disc,
+.mn-rf__disc {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: pj-spin 12s linear infinite paused;
+}
+
+@keyframes pj-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rf-sticker img,
+.mn-rf__sticker img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.rf-tape,
+.mn-rf__sticker::before {
+  position: absolute;
+  top: -9px;
+  left: 22%;
+  width: 56%;
+  height: 18px;
+  background: var(--refrain-tape);
+  opacity: 0.85;
+  transform: rotate(-5deg);
+}
+
+.ob-ring,
+.mn-ob__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 1px solid color-mix(in srgb, var(--orbit-accent) 22%, transparent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ob-core,
+.mn-ob__core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12cqw;
+  height: 12cqw;
+  border: 2px solid var(--orbit-light);
+  border-radius: 50%;
+  background: var(--orbit-core);
+  transform: translate(-50%, -50%);
+}
+
+.ob-execution,
+.mn-ob__job {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  animation: pj-spin var(--speed, 16s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.mn--mochifile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 18px;
+  background: var(--mochi-bg);
+  color: var(--mochi-ink);
+}
+
+.mn-mochi__files {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mn-mochi__file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 8px 6px 6px;
+  border: 1px solid var(--mochi-line);
+  border-radius: 10px;
+  background: var(--mochi-paper);
+}
+
+.mn-thumb {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 26px;
+  border-radius: 5px;
+}
+
+.mn-mochi__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.mn-mochi__text b {
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+.mn-mochi__text > span {
+  color: var(--mochi-faint);
+  white-space: nowrap;
+}
+
+.mn-mochi__track {
+  flex: 1 1 auto;
+  min-width: 14px;
+}
+
+.mn-mochi__track > span {
+  top: -5px;
+  width: 8px;
+  height: 8px;
+}
+
+.mn-mochi__badge {
+  margin-left: 2px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--mochi-hill);
+  font-size: 10px;
+}
+
+.mn-mochi__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mn-mochi__bars i {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--mochi-track);
+}
+
+.mn-mochi__bars i::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--mochi-sun);
+}
+
+/* The 200 KB example: mochifileResult(200).share in lib/sketch-demos.ts. */
+
+.mn-mochi__bars i.is-after::after {
+  width: 4%;
+  background: var(--mochi-hill);
+}
+
+.mn-note {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  color: var(--mochi-faint);
+  font-size: 9.5px;
+}
+
+.mn--ordelis {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  align-items: center;
+  gap: 18px;
+  padding: 0 16px;
+  background: var(--ordelis-bg);
+  color: var(--ordelis-fg);
+}
+
+.mn-ord__links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mn-ord__col {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mn-ord__label {
+  color: var(--ordelis-fg-3);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.mn-ord__box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  padding: 6px 8px;
+  border: 1px solid var(--ordelis-line);
+  border-radius: 9px;
+  background: var(--ordelis-card);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.mn-ord__agent {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.mn-ord__name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mn-ord__name i {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: var(--ordelis-fg);
+  color: var(--ordelis-card);
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.mn-ord__agent.is-second .mn-ord__name i {
+  background: var(--ordelis-line-strong);
+  color: var(--ordelis-fg);
+}
+
+.mn-ord__run {
+  height: 2px;
+}
+
+.mn-ord__you {
+  border-color: var(--ordelis-line-strong);
+}
+
+.mn-ord__ok {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  margin-left: auto;
+  border-radius: 4px;
+  background: var(--ordelis-track);
+  color: var(--ordelis-ok);
+  font-size: 9px;
+}
+
+.mn--refrain {
+  background: var(--refrain-paper);
+  color: var(--refrain-ink);
+}
+
+.mn-rf__lines {
+  position: absolute;
+  top: 24px;
+  left: 18px;
+  width: 52%;
+  height: 40px;
+  overflow: visible;
+}
+
+.mn-rf__tag {
+  position: absolute;
+  bottom: 16px;
+  left: 18px;
+  width: 54%;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.mn-rf__sticker {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  right: 92px;
+  width: 46px;
+  transform: rotate(8deg);
+}
+
+.mn-rf__sticker::before {
+  content: "";
+  top: -6px;
+  left: 24%;
+  width: 52%;
+  height: 11px;
+}
+
+.mn-rf__disc {
+  inset: auto;
+  top: 50%;
+  right: -26px;
+  width: 150px;
+  height: 150px;
+  margin-top: -75px;
+  animation-duration: 14s;
+}
+
+.pj-tile:hover .mn-rf__disc,
+.pj-home-card:hover .mn-rf__disc,
+.pj-home-card:focus-visible .mn-rf__disc {
+  animation-duration: 2.4s;
+  animation-play-state: running;
+}
+
+.mn--orbit {
+  background: var(--orbit-bg);
+  color: var(--orbit-fg);
+}
+
+.mn-ob__system {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  width: 124px;
+  height: 124px;
+  margin-top: -62px;
+  container-type: inline-size;
+}
+
+.mn-ob__ring.is-outer {
+  width: 124px;
+  height: 124px;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--orbit-accent) 32%, transparent);
+}
+
+.mn-ob__ring.is-middle {
+  width: 84px;
+  height: 84px;
+  border-color: color-mix(in srgb, var(--orbit-accent) 45%, transparent);
+}
+
+.mn-ob__ring.is-inner {
+  width: 44px;
+  height: 44px;
+}
+
+.mn-ob__core {
+  width: 16px;
+  height: 16px;
+}
+
+.mn-ob__job.is-queued {
+  --r: 62px;
+  --speed: 18s;
+  --delay: -3s;
+  --angle: 60deg;
+}
+
+.mn-ob__job.is-running {
+  --r: 42px;
+  --speed: 11s;
+  --delay: -7s;
+  --angle: 229deg;
+}
+
+.mn-ob__job.is-done {
+  --r: 22px;
+  --speed: 8s;
+  --delay: -2s;
+  --angle: 90deg;
+}
+
+.mn-ob__job i {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border: 1.5px solid var(--orbit-accent);
+  border-radius: 50%;
+  transform: translateY(calc(-1 * var(--r)));
+}
+
+.mn-ob__job.is-running i {
+  background: var(--orbit-accent);
+}
+
+.mn-ob__job.is-done i {
+  border-color: var(--orbit-light);
+  background: var(--orbit-light);
+}
+
+.mn-ob__log {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  left: 162px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--orbit-fg-2);
+  font-size: 10px;
+  transform: translateY(-50%);
+}
+
+.mn-ob__log > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mn-ob__log b {
+  color: var(--orbit-fg);
+  font-weight: 500;
+}
+
+.mn-ob__log .is-hot {
+  color: var(--orbit-accent);
+}
+
+@keyframes pj-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .mn--ordelis {
+    gap: 12px;
+    padding: 0 10px;
+  }
+  .mn-ob__log {
+    left: 154px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk *,
+  .sk *::before,
+  .sk *::after,
+  .mn *,
+  .mn *::before,
+  .mn *::after {
+    animation: none !important;
+  }
+  .mo-track > span,
+  .mn-mochi__track > span {
+    left: calc(50% - 5px);
+  }
+  .ob-execution,
+  .mn-ob__job {
+    transform: rotate(var(--angle, 0deg));
+  }
+}
+
+/* The record (Disc in minis.tsx), small and large. */
+
+.sk-paper {
+  fill: var(--refrain-paper);
+}
+
+.sk-ink {
+  fill: var(--refrain-ink);
+}
+
+/*
+ * Loops play only while the visitor points at or focuses a card (WCAG 2.2.2:
+ * nothing moves on its own for more than five seconds). Paused, each loop
+ * rests on a complete frame: the negative delays above choose it.
+ */
+.pj-tile__art .mn *,
+.pj-tile__art .mn *::before,
+.pj-tile__art .mn *::after {
+  animation-play-state: paused;
+}
+
+.pj-tile:hover .pj-tile__art .mn *,
+.pj-tile:hover .pj-tile__art .mn *::before,
+.pj-tile:hover .pj-tile__art .mn *::after,
+.pj-tile:focus-within .pj-tile__art .mn *,
+.pj-tile:focus-within .pj-tile__art .mn *::before,
+.pj-tile:focus-within .pj-tile__art .mn *::after,
+.pj-home-card:hover .pj-tile__art .mn *,
+.pj-home-card:hover .pj-tile__art .mn *::before,
+.pj-home-card:hover .pj-tile__art .mn *::after,
+.pj-home-card:focus-visible .pj-tile__art .mn *,
+.pj-home-card:focus-visible .pj-tile__art .mn *::before,
+.pj-home-card:focus-visible .pj-tile__art .mn *::after {
+  animation-play-state: running;
+}
+
+/* The notes of the minis that only illustrate planned or simulated work. */
+.mn--ordelis .mn-note {
+  color: var(--ordelis-fg-3);
+}
+
+.mn--orbit .mn-note {
+  color: var(--orbit-fg-2);
+}

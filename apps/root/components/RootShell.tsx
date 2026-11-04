@@ -4,7 +4,12 @@ import { Shell, type NavItem } from "@raioviajante/design/components";
 import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
 import { SearchNavItem } from "@raioviajante/design/search";
 import { ptNavigation } from "../lib/pt";
-import { routeOfPath, routes, counterpartsOf } from "../lib/routes";
+import {
+  counterpartsOf,
+  navigationParent,
+  routeOfPath,
+  routes,
+} from "../lib/routes";
 
 const englishPages: NavItem[] = [
   { label: "index", href: "/" },
@@ -55,6 +60,9 @@ export function RootShell({
   const counterpart = route
     ? counterpartsOf(route.key, locale)[0]?.path
     : undefined;
+  // A page under another page's item keeps that item current in the sidebar.
+  const parent = route ? navigationParent[route.key] : undefined;
+  const section = parent ? routes[parent][locale] : undefined;
   return (
     <Shell
       site="root"
@@ -69,6 +77,7 @@ export function RootShell({
       linkComponent={Link}
       pages={pages}
       currentPage={current}
+      currentSection={section}
       pagesExtra={
         <SearchNavItem
           number={`${String(pages.length).padStart(2, "0")}.`}

@@ -61,12 +61,14 @@ test("Root offers no invented translations and links only active Portuguese host
   await expect(
     page.getByRole("heading", { name: "Projetos" }).first(),
   ).toBeVisible();
-  await expect(page.getByText("ferramenta / automação")).toBeVisible();
+  await expect(page.getByText("ferramentas de arquivo / web")).toBeVisible();
   await page.goto(`${base("root")}/pt`);
-  await expect(page.locator("#projects-heading")).toContainText("Projetos");
-  await expect(page.locator("#preview-sweep")).toContainText(
-    "Uma ferramenta em Python",
+  await expect(page.locator("#projects-heading")).toContainText(
+    "Meus projetos",
   );
+  await expect(
+    page.locator('a.pj-home-card[href="/pt/projects#orbit"]'),
+  ).toContainText("execuções de jobs e seus estados");
   await page.goto(`${base("root")}/pt/contact`);
   await expectLang(page, "pt-BR");
   await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/contact");

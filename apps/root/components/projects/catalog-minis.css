@@ -1,0 +1,555 @@
+/*
+ * The small sketches only the catalog shows: yanawa, Sweep, Hum and
+ * Morrowferry. Colors come from @raioviajante/design/project-art.css.
+ */
+
+.mn--yanawa {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 128px;
+  grid-template-rows: auto auto 1fr;
+  gap: 6px 12px;
+  padding: 12px 14px;
+  background: var(--yanawa-bg);
+  color: var(--yanawa-fg);
+  font-size: 11px;
+}
+
+@keyframes pj-type {
+  0% {
+    width: 0;
+  }
+  34%,
+  92% {
+    width: calc(var(--n) * 1ch);
+  }
+  100% {
+    width: 0;
+  }
+}
+
+.mn--yanawa .is-keyword {
+  color: var(--yanawa-keyword);
+}
+
+.mn--yanawa .is-type {
+  color: var(--yanawa-type);
+}
+
+.mn--yanawa .is-string {
+  color: var(--yanawa-string);
+}
+
+.mn--yanawa .is-punct {
+  color: var(--yanawa-muted);
+}
+
+@keyframes pj-token {
+  0%,
+  36% {
+    visibility: hidden;
+    transform: translateY(3px);
+  }
+  42%,
+  90% {
+    visibility: visible;
+    transform: none;
+  }
+  96%,
+  100% {
+    visibility: hidden;
+  }
+}
+
+@keyframes pj-branch {
+  0%,
+  56% {
+    stroke-dashoffset: 40;
+  }
+  66%,
+  90% {
+    stroke-dashoffset: 0;
+  }
+  96%,
+  100% {
+    stroke-dashoffset: 40;
+  }
+}
+
+@keyframes pj-node {
+  0%,
+  54% {
+    visibility: hidden;
+  }
+  62%,
+  90% {
+    visibility: visible;
+  }
+  96%,
+  100% {
+    visibility: hidden;
+  }
+}
+
+.mn--sweep {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px;
+  background: var(--sweep-bg);
+  color: var(--sweep-fg);
+  font-size: 10.5px;
+  line-height: 1.62;
+}
+
+@keyframes pj-row {
+  0% {
+    visibility: hidden;
+    transform: translateX(-6px);
+  }
+  6%,
+  88% {
+    visibility: visible;
+    transform: none;
+  }
+  96%,
+  100% {
+    visibility: hidden;
+  }
+}
+
+.mn--hum {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px;
+  background: var(--hum-bg);
+  color: var(--hum-fg);
+  font-size: 10.5px;
+}
+
+@keyframes pj-breathe {
+  50% {
+    transform: scale(0.75);
+  }
+}
+
+@keyframes pj-level {
+  from {
+    height: 14%;
+  }
+  to {
+    height: 100%;
+  }
+}
+
+@keyframes pj-progress {
+  to {
+    width: 100%;
+  }
+}
+
+.mn--morrowferry {
+  background: var(--ferry-night);
+}
+
+@keyframes pj-wave {
+  to {
+    transform: translateX(-9px);
+  }
+}
+
+@keyframes pj-bob {
+  50% {
+    transform: translateY(1px);
+  }
+}
+
+@keyframes pj-flicker {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  35% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes pj-twinkle {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.ya__note {
+  grid-column: 1 / -1;
+  color: var(--yanawa-muted);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+}
+
+.ya__code {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* 24 characters: let name: str = "Morgan" */
+
+.ya__typed {
+  --n: 24;
+  display: inline-block;
+  width: 0;
+  overflow: hidden;
+  vertical-align: bottom;
+  animation: pj-type 9s steps(var(--n)) -6.5s infinite;
+}
+
+.ya__cursor {
+  display: inline-block;
+  width: 6px;
+  height: 13px;
+  vertical-align: -2px;
+  background: var(--yanawa-keyword);
+  animation: pj-blink 1s steps(1) infinite;
+}
+
+.ya__label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--yanawa-muted);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ya__token-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+}
+
+.ya__token {
+  --i: 0;
+  padding: 0 5px;
+  border: 1px solid color-mix(in srgb, var(--yanawa-keyword) 35%, transparent);
+  border-radius: 5px;
+  font-size: 10px;
+  line-height: 17px;
+  visibility: hidden;
+  animation: pj-token 9s ease infinite;
+  animation-delay: calc(var(--i) * 0.12s - 6.5s);
+}
+
+.ya__token:nth-child(2) {
+  --i: 1;
+}
+
+.ya__token:nth-child(3) {
+  --i: 2;
+}
+
+.ya__token:nth-child(4) {
+  --i: 3;
+}
+
+.ya__token:nth-child(5) {
+  --i: 4;
+}
+
+.ya__token:nth-child(6) {
+  --i: 5;
+}
+
+.ya__tree {
+  position: relative;
+  min-height: 70px;
+}
+
+.ya__tree svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 128px;
+  height: 70px;
+  overflow: visible;
+}
+
+.ya__tree line {
+  stroke: color-mix(in srgb, var(--yanawa-keyword) 45%, transparent);
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: pj-branch 9s ease -6.5s infinite;
+}
+
+.ya__node {
+  position: absolute;
+  padding: 0 5px;
+  border: 1px solid color-mix(in srgb, var(--yanawa-keyword) 45%, transparent);
+  border-radius: 4px;
+  background: var(--yanawa-node);
+  font-size: 9.5px;
+  line-height: 15px;
+  white-space: nowrap;
+  visibility: hidden;
+  transform: translate(-50%, -50%);
+  animation: pj-node 9s ease infinite;
+  animation-delay: calc(var(--i) * 0.15s - 6.5s);
+}
+
+.ya__node.is-root {
+  --i: 0;
+  top: 24px;
+  left: 64px;
+}
+
+.ya__node.is-left {
+  --i: 1;
+  top: 54px;
+  left: 22px;
+}
+
+.ya__node.is-middle {
+  --i: 2;
+  top: 54px;
+  left: 64px;
+}
+
+.ya__node.is-right {
+  --i: 3;
+  top: 54px;
+  left: 106px;
+}
+
+.sw__path {
+  color: var(--sweep-muted);
+  font-size: 9.5px;
+  text-align: right;
+}
+
+.sw__prompt {
+  color: var(--sweep-ok);
+}
+
+.sw__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 14px minmax(0, 1fr) 12px;
+  gap: 6px;
+  white-space: nowrap;
+  visibility: hidden;
+  animation: pj-row 8s ease infinite;
+  animation-delay: calc(var(--i) * 0.55s - 5.5s);
+}
+
+/* Rows follow the path and the command line. */
+
+.sw__row:nth-child(3) {
+  --i: 0;
+}
+
+.sw__row:nth-child(4) {
+  --i: 1;
+}
+
+.sw__row:nth-child(5) {
+  --i: 2;
+}
+
+.sw__row:nth-child(6) {
+  --i: 3;
+}
+
+.sw__file {
+  overflow: hidden;
+  color: var(--sweep-file);
+  text-overflow: ellipsis;
+}
+
+.sw__arrow {
+  color: var(--sweep-muted);
+}
+
+.sw__dest {
+  overflow: hidden;
+  color: var(--sweep-ok);
+  text-overflow: ellipsis;
+}
+
+.sw__ok {
+  color: var(--sweep-ok);
+}
+
+.sw__done {
+  margin-top: auto;
+  color: var(--sweep-muted);
+  visibility: hidden;
+  animation: pj-row 8s ease infinite;
+  animation-delay: -3.1s;
+}
+
+.hu__box {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  height: 100%;
+  padding: 8px 10px 9px;
+  border: 1px solid var(--hum-line);
+  border-radius: 8px;
+}
+
+.hu__head,
+.hu__controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--hum-muted);
+  font-size: 9.5px;
+}
+
+.hu__now {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--hum-bright);
+}
+
+.hu__play {
+  color: var(--hum-accent);
+  animation: pj-breathe 1.6s ease-in-out infinite;
+}
+
+.hu__state {
+  margin-left: auto;
+  color: var(--hum-muted);
+  font-size: 9.5px;
+}
+
+.hu__bars {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: flex-end;
+  gap: 3px;
+  min-height: 0;
+}
+
+.hu__bars i {
+  flex: 1;
+  height: 30%;
+  border-radius: 1px 1px 0 0;
+  background: var(--hum-bar);
+  animation: pj-level 1s ease-in-out infinite alternate;
+}
+
+/* Staggered bars: six durations against four delays repeat only every 12. */
+
+.hu__bars i:nth-child(6n + 2) {
+  animation-duration: 0.9s;
+}
+
+.hu__bars i:nth-child(6n + 3) {
+  animation-duration: 1.2s;
+}
+
+.hu__bars i:nth-child(6n + 4) {
+  animation-duration: 0.8s;
+}
+
+.hu__bars i:nth-child(6n + 5) {
+  animation-duration: 1.3s;
+}
+
+.hu__bars i:nth-child(6n) {
+  animation-duration: 1.1s;
+}
+
+.hu__bars i:nth-child(4n + 2) {
+  animation-delay: -0.7s;
+}
+
+.hu__bars i:nth-child(4n + 3) {
+  animation-delay: -1.1s;
+}
+
+.hu__bars i:nth-child(4n) {
+  animation-delay: -0.4s;
+}
+
+.hu__controls {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.hu__progress {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--hum-line);
+}
+
+.hu__progress::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  background: var(--hum-accent);
+  animation: pj-progress 24s linear -9s infinite;
+}
+
+.mf__scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  shape-rendering: crispEdges;
+}
+
+.mf__water {
+  animation: pj-wave 3.2s steps(3) infinite;
+}
+
+.mf__boat {
+  animation: pj-bob 2.8s steps(1) infinite;
+}
+
+.mf__lamp {
+  animation: pj-flicker 2.2s ease-in-out infinite;
+}
+
+.mf__reflection {
+  animation: pj-blink 1.9s steps(2) infinite;
+}
+
+.mf__star {
+  animation: pj-twinkle 3.6s steps(2) infinite;
+}
+
+.mf__star.is-2 {
+  animation-delay: -1.2s;
+}
+
+.mf__star.is-3 {
+  animation-delay: -2.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ya__typed {
+    width: calc(var(--n) * 1ch);
+  }
+  .ya__tree line {
+    stroke-dashoffset: 0;
+  }
+  .hu__progress::after {
+    width: 38%;
+  }
+  .ya__token,
+  .ya__node,
+  .sw__row,
+  .sw__done {
+    visibility: visible;
+  }
+}

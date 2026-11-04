@@ -1,8 +1,8 @@
 # Architecture
 
 Root is a Next.js application deployed independently at `raioviajante.com`.
-It owns `/`, `/about`, `/projects`, `/contact`, `/gallery`, `/this-site`, `/setup`,
-`/search`, `/privacy`, and `/terms`. Dump, docs, and lab are separate apps at
+It owns `/`, `/about`, `/projects`, `/projects/all`, `/contact`, `/gallery`,
+`/this-site`, `/setup`, `/search`, `/privacy`, and `/terms`. Dump, docs, and lab are separate apps at
 their respective subdomains; root links to them by URL and does not import
 their source code.
 
@@ -28,9 +28,9 @@ Root publishes a partial Portuguese tree and participates in Portuguese through
 [docs/i18n.md](../../../docs/i18n.md).
 
 - **Route registry.** `lib/routes.ts` declares which pages exist in which
-  locale (every page: Home, About, Projects, Contact, Gallery, This Site, Setup,
-  Terms, Privacy and Search in Portuguese at `/pt`, `/pt/about`,
-  `/pt/projects`, `/pt/contact`, `/pt/gallery`, `/pt/this-site`, `/pt/setup`,
+  locale (every page: Home, About, Projects, All projects, Contact, Gallery,
+  This Site, Setup, Terms, Privacy and Search in Portuguese at `/pt`,
+  `/pt/about`, `/pt/projects`, `/pt/projects/all`, `/pt/contact`, `/pt/gallery`, `/pt/this-site`, `/pt/setup`,
   `/pt/terms`, `/pt/privacy`, `/pt/search`). Navigation, metadata,
   counterparts (`hreflang`), the sitemap, social cards and the search index all
   derive from it. `tests/routes.test.mjs` (`pnpm --filter @raioviajante/root

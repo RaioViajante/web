@@ -3,9 +3,10 @@ import { siteOrigins } from "../../../../../site/sites";
 import {
   ptNavigation,
   ptPageSeo,
-  ptProjects,
+  ptProjectsCopy,
   ptSearchDescriptions,
 } from "../../../lib/pt";
+import { projects } from "../../../lib/projects";
 import { routes } from "../../../lib/routes";
 
 export const dynamic = "force-static";
@@ -16,8 +17,13 @@ export const dynamic = "force-static";
  * Portuguese, so the shared search reads it.
  */
 export function GET() {
-  // Setup is linked from the home page rather than the navigation, as in English.
-  const pages = [...ptNavigation, { key: "setup" as const, label: "setup" }];
+  // Setup is linked from the home page rather than the navigation, as in
+  // English; All projects comes last so the numbers keep matching the sidebar.
+  const pages = [
+    ...ptNavigation,
+    { key: "setup" as const, label: "setup" },
+    { key: "projects-all" as const, label: "todos os projetos" },
+  ];
   const entries: SearchEntry[] = pages.map(({ key, label }, index) => ({
     site: "root",
     locale: "pt-BR",
@@ -26,12 +32,12 @@ export function GET() {
     description: ptSearchDescriptions[key] ?? "",
     number: `${String(index).padStart(2, "0")}.`,
   }));
-  const projectEntries: SearchEntry[] = ptProjects.map((project, index) => ({
+  const projectEntries: SearchEntry[] = projects.map((project, index) => ({
     site: "root",
     locale: "pt-BR",
     title: project.name,
-    href: siteOrigins.root + routes.projects["pt-BR"]!,
-    description: project.description,
+    href: `${siteOrigins.root}${routes[project.featured ? "projects" : "projects-all"]["pt-BR"]}#${project.id}`,
+    description: ptProjectsCopy.projects[project.id].description,
     number: `${String(index + 1).padStart(2, "0")}.`,
   }));
   return Response.json([...entries, ...projectEntries], {

@@ -9,9 +9,11 @@ This app serves raioviajante.com: the personal internet home and index of the
 RaioViajante ecosystem. It is not a portfolio, résumé, developer sales page, or
 SaaS landing page.
 
-Its routes are `/`, `/about`, `/projects`, `/contact`, `/gallery`,
-`/this-site`, `/setup`, `/search`, `/privacy`, and `/terms`, plus a partial
-Portuguese tree (`/pt`, `/pt/about`, `/pt/projects`, `/pt/contact`, `/pt/gallery`, `/pt/this-site`, `/pt/setup`, `/pt/terms`, `/pt/privacy`, `/pt/search`,
+Its routes are `/`, `/about`, `/projects`, `/projects/all`, `/contact`,
+`/gallery`, `/this-site`, `/setup`, `/search`, `/privacy`, and `/terms`, plus a
+partial Portuguese tree (`/pt`, `/pt/about`, `/pt/projects`,
+`/pt/projects/all`, `/pt/contact`, `/pt/gallery`, `/pt/this-site`, `/pt/setup`,
+`/pt/terms`, `/pt/privacy`, `/pt/search`,
 `/pt/search-index.json`)
 declared in `lib/routes.ts`; see `docs/architecture.md`. dump, docs, and lab are separate
 apps with their own domains; link to their full URLs and never implement them as

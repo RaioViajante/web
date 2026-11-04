@@ -41,8 +41,10 @@ Read `docs/design-system.md` and `docs/blocks.md` for the implemented contract.
   implementation in `packages/design`. Apps own routes, content and unique
   interactions. Play does not automatically inherit this system.
 - All four apps load `@raioviajante/design/styles.css`. Colors come from
-  `styles/tokens.css`; literals belong only there and in the tested Shiki mirror.
-  Page chrome is gray; color belongs inside code and lab output.
+  `styles/tokens.css`; literals belong only there, in the tested Shiki mirror
+  and in `styles/project-art.css` (Root's project-sketch palettes, loaded only
+  by the pages that show them).
+  Page chrome is gray; color belongs inside code, lab output and project sketches.
 - One typeface: self-hosted Noto Sans Mono, preloaded by each app. Social cards
   use the shared renderer and token colors. Never copy a renderer into an app.
 - Use words for status, warnings and controls. No decorative icons, gradients,
