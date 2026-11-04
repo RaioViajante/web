@@ -51,6 +51,21 @@ for (const width of [1440, 390, 360]) {
     await expect(target).toHaveAttribute("aria-pressed", "true");
     await expect(mochifile).toContainText("480 KB · under 500 KB");
     await expect(mochifile).toContainText("example values");
+    // The design's other two tabs: visual only, and said to be coming soon.
+    await expect(mochifile).not.toContainText("coming soon");
+    await mochifile.getByRole("button", { name: "Convert" }).click();
+    await mochifile.getByRole("button", { name: "PNG" }).click();
+    await expect(mochifile).toContainText("photo.png");
+    await expect(mochifile.locator(".mo-badge")).toHaveText("+105%");
+    await expect(mochifile).toContainText(
+      "coming soon to Mochifile · example values",
+    );
+    await mochifile.getByRole("button", { name: "Resize" }).click();
+    await mochifile.getByRole("button", { name: "1080" }).click();
+    await expect(mochifile).toContainText("410 KB · 1080 × 810");
+    await expect(mochifile.locator(".mo-frame")).toBeVisible();
+    await mochifile.getByRole("button", { name: "Compress" }).click();
+    await expect(mochifile).toContainText("480 KB · under 500 KB");
 
     // Ordelis: the planned review step answers both decisions.
     const ordelis = page.getByRole("group", { name: /^Ordelis sketch/ });

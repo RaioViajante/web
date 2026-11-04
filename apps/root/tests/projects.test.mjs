@@ -13,8 +13,12 @@ import {
 import {
   formatSize,
   isFinished,
+  mochifileConverted,
+  mochifileFormats,
+  mochifileResized,
   mochifileResult,
   mochifileTargets,
+  mochifileWidths,
   transition,
 } from "../lib/sketch-demos.ts";
 import { roughEllipse, roughLine } from "../lib/sketch.ts";
@@ -177,6 +181,21 @@ test("the Mochifile sketch always lands under the chosen target", () => {
     const result = mochifileResult(target);
     assert.ok(result.kb <= target, `${target}`);
     assert.ok(result.reduction > 0 && result.reduction < 100);
+  }
+  // Convert can grow a file (PNG) and the bars then scale to the larger size.
+  const png = mochifileConverted("png");
+  assert.ok(png.change > 0 && png.after === 100 && png.before < 100);
+  for (const format of mochifileFormats) {
+    const { before, after } = mochifileConverted(format);
+    assert.ok(Math.max(before, after) === 100, format);
+  }
+  // Resize keeps the 4:3 shape and gets smaller with the width.
+  let previous = Infinity;
+  for (const width of mochifileWidths) {
+    const result = mochifileResized(width);
+    assert.equal(result.height, (width * 3) / 4);
+    assert.ok(result.kb < previous && result.change < 0, `${width}`);
+    previous = result.kb;
   }
   assert.equal(formatSize(4800, "en-US"), "4.8 MB");
   assert.equal(formatSize(4800, "pt-BR"), "4,8 MB");

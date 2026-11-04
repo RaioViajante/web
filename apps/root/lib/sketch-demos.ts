@@ -21,6 +21,56 @@ export function mochifileResult(target: MochifileTarget) {
   };
 }
 
+/**
+ * The sketch's other two tabs, Convert and Resize. Mochifile does not offer
+ * them yet (its site lists them as coming soon), so the sketch labels them as
+ * such; the sizes are example values, as in the design.
+ */
+export const mochifileFormats = ["webp", "png", "avif"] as const;
+export type MochifileFormat = (typeof mochifileFormats)[number];
+const convertedKb: Record<MochifileFormat, number> = {
+  webp: 1126,
+  png: 9830,
+  avif: 740,
+};
+
+export const mochifileWidths = [2048, 1600, 1080] as const;
+export type MochifileWidth = (typeof mochifileWidths)[number];
+const resizedKb: Record<MochifileWidth, number> = {
+  2048: 1330,
+  1600: 820,
+  1080: 410,
+};
+
+/**
+ * A result of any tab: its size, its change against the original (negative
+ * when smaller) and both bars as shares of the larger of the two sizes.
+ */
+function outcome(kb: number) {
+  const larger = Math.max(kb, mochifileOriginal.kb);
+  const share = (value: number) =>
+    Math.max(2, Math.round((value / larger) * 100));
+  return {
+    kb,
+    change: Math.round((kb / mochifileOriginal.kb - 1) * 100),
+    before: share(mochifileOriginal.kb),
+    after: share(kb),
+  };
+}
+
+export const mochifileConverted = (format: MochifileFormat) =>
+  outcome(convertedKb[format]);
+
+export function mochifileResized(width: MochifileWidth) {
+  return {
+    ...outcome(resizedKb[width]),
+    width,
+    height: Math.round(
+      (width * mochifileOriginal.height) / mochifileOriginal.width,
+    ),
+  };
+}
+
 /** `4.8 MB`, `192 KB`, in the locale's number format. */
 export function formatSize(kb: number, intlLocale: string) {
   if (kb >= 1000)

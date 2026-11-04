@@ -63,8 +63,10 @@ word drawn inside the sketches. Components are in `components/projects/`.
   single link to its card on `/projects`, with a small CSS-only sketch, icon,
   short line and status, then "More projects and client work" to `/projects`.
 - **`/projects`.** "02. My projects": the same four with large sketches that
-  work as local demonstrations (Mochifile: choose a target size, example
-  values; Ordelis: approve or request changes in the planned review step;
+  work as local demonstrations (Mochifile: the design's Compress, Convert and
+  Resize tabs with example values; Compress picks a target size, as the real
+  tool does, and Convert and Resize, which Mochifile lists as coming soon,
+  say "coming soon to Mochifile" in their note; Ordelis: approve or request changes in the planned review step;
   Refrain: play or stop the record; Orbit: queue and cancel executions that
   follow Orbit's transition rules, simulated in the browser). Then "View all
   projects" and "02.1 Client work". `clientCases` is empty, so the section
@@ -92,7 +94,7 @@ word drawn inside the sketches. Components are in `components/projects/`.
 - **Delivery.** No server-rendered `style` attributes (the CSP blocks them):
   timings and positions are classes in `cards.css`, `pages.css`, `minis.css`,
   `catalog-minis.css` and `sketches.css`. Values known only in the browser
-  (the Mochifile bar width, the Orbit orbits) are set on the client through
+  (the Mochifile bar widths, the Orbit orbits) are set on the client through
   the CSSOM. The home page loads only the cards and the four small sketches;
   the catalog adds its own; the large sketches' CSS and client code load only
   on `/projects`.

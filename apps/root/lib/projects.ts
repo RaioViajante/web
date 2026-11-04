@@ -225,7 +225,15 @@ export interface ProjectArtCopy {
   example: string;
   simulated: string;
   mochifile: {
-    tool: string;
+    /** The tab group's name, and the three tabs. */
+    tools: string;
+    compress: string;
+    convert: string;
+    resize: string;
+    format: string;
+    width: string;
+    /** Added to the example note on the Convert and Resize tabs. */
+    soon: string;
     local: string;
     original: string;
     result: string;
@@ -471,7 +479,7 @@ export const projectsCopy: ProjectsCopy = {
   art: {
     label: {
       mochifile:
-        "Mochifile sketch: compressing a photo to a target size, with example values",
+        "Mochifile sketch: compressing, converting or resizing a photo, with example values",
       ordelis:
         "Ordelis sketch: the planned review step, where you approve the agents' work or send it back",
       refrain: "Refrain sketch: a hand-drawn music journal and a record",
@@ -487,7 +495,13 @@ export const projectsCopy: ProjectsCopy = {
     example: "example values",
     simulated: "simulated in your browser",
     mochifile: {
-      tool: "Compress an image",
+      tools: "Mochifile tools",
+      compress: "Compress",
+      convert: "Convert",
+      resize: "Resize",
+      format: "format",
+      width: "width",
+      soon: "coming soon to Mochifile",
       local: "in your browser",
       original: "original",
       result: "result",
