@@ -127,7 +127,8 @@
   width: 40%;
   height: 100%;
   background: var(--ordelis-fg-2);
-  animation: pj-work 2.8s ease-in-out infinite;
+  /* At rest the bar shows work in progress, not an empty track. */
+  animation: pj-work 2.8s ease-in-out -1.4s infinite;
 }
 
 .od-agent.is-second .od-progress > span,

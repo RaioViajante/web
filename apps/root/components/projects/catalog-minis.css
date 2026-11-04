@@ -202,7 +202,7 @@
   width: 0;
   overflow: hidden;
   vertical-align: bottom;
-  animation: pj-type 9s steps(var(--n)) -6s infinite;
+  animation: pj-type 9s steps(var(--n)) -6.5s infinite;
 }
 
 .ya__cursor {
@@ -239,7 +239,7 @@
   line-height: 17px;
   visibility: hidden;
   animation: pj-token 9s ease infinite;
-  animation-delay: calc(var(--i) * 0.12s - 6s);
+  animation-delay: calc(var(--i) * 0.12s - 6.5s);
 }
 
 .ya__token:nth-child(2) {
@@ -280,7 +280,7 @@
   stroke: color-mix(in srgb, var(--yanawa-keyword) 45%, transparent);
   stroke-dasharray: 40;
   stroke-dashoffset: 40;
-  animation: pj-branch 9s ease -7s infinite;
+  animation: pj-branch 9s ease -6.5s infinite;
 }
 
 .ya__node {

@@ -260,7 +260,7 @@ export function OrbitSketch({
           <button
             type="button"
             className="ob-button is-quiet"
-            data-sound="click"
+            data-sound={cancellable ? "click" : undefined}
             onClick={cancel}
             aria-disabled={!cancellable}
           >

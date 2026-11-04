@@ -1209,7 +1209,7 @@
   font-weight: 500;
 }
 
-.ob-button.is-quiet:hover {
+.ob-button.is-quiet:not([aria-disabled="true"]):hover {
   border-color: var(--orbit-accent);
 }
 
