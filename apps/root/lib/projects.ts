@@ -479,7 +479,7 @@ export const projectsCopy: ProjectsCopy = {
   art: {
     label: {
       mochifile:
-        "Mochifile sketch: compressing, converting or resizing a photo, with example values",
+        "Mochifile sketch: compressing a photo to a target size, with example values; converting and resizing are coming soon",
       ordelis:
         "Ordelis sketch: the planned review step, where you approve the agents' work or send it back",
       refrain: "Refrain sketch: a hand-drawn music journal and a record",

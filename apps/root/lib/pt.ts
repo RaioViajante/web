@@ -281,7 +281,7 @@ export const ptProjectsCopy: ProjectsCopy = {
   art: {
     label: {
       mochifile:
-        "Esboço do Mochifile: uma foto comprimida, convertida ou redimensionada, com valores de exemplo",
+        "Esboço do Mochifile: uma foto comprimida até um tamanho-alvo, com valores de exemplo; converter e redimensionar chegam em breve",
       ordelis:
         "Esboço do Ordelis: a etapa de revisão planejada, em que você aprova o trabalho dos agentes ou o devolve",
       refrain:

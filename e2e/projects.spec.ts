@@ -60,6 +60,9 @@ for (const width of [1440, 390, 360]) {
     await expect(mochifile).toContainText(
       "coming soon to Mochifile · example values",
     );
+    await expect(mochifile.locator(".mo-meta[aria-live]")).toContainText(
+      "coming soon to Mochifile",
+    );
     await mochifile.getByRole("button", { name: "Resize" }).click();
     await mochifile.getByRole("button", { name: "1080" }).click();
     await expect(mochifile).toContainText("410 KB · 1080 × 810");

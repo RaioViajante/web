@@ -227,8 +227,13 @@ export function MochifileSketch({
             <span className="mo-name">
               {text.file}.{extension}
             </span>
+            {/* On the tabs Mochifile does not offer yet, the announcement says
+                so too; sighted readers get the same words in the note below. */}
             <span className="mo-meta" aria-live="polite">
               {size(kb)} · {detail}
+              {tool === "compress" ? null : (
+                <span className="rv-sr-only"> · {text.soon}</span>
+              )}
             </span>
           </div>
         </div>
