@@ -9,6 +9,7 @@ import {
   base,
   isolate,
   searchPath,
+  settleMotion,
   sites,
   viewports,
   watchHealth,
@@ -89,6 +90,7 @@ for (const site of sites)
         await expect(page.locator(".rv-sound .rv-lang")).toContainText(
           faces[locale],
         );
+        await settleMotion(page);
         const result = await new AxeBuilder({ page })
           .options({
             rules: { "label-content-name-mismatch": { enabled: true } },
@@ -120,6 +122,7 @@ async function inside(page: Page, selector: string) {
 }
 
 async function axeClean(page: Page) {
+  await settleMotion(page);
   const result = await new AxeBuilder({ page }).include(".rv-sound").analyze();
   expect(
     result.violations.map((v) => `${v.id}: ${v.nodes[0]?.target.join(" ")}`),

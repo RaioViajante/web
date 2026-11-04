@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { base, isolate, viewports } from "./support";
+import { base, isolate, settleMotion, viewports } from "./support";
 
 test("Portuguese Lab lists every experiment with active LANG and count-aware filters", async ({
   page,
@@ -58,6 +58,7 @@ test("Portuguese Lab lists every experiment with active LANG and count-aware fil
       () => document.documentElement.scrollWidth > innerWidth,
     ),
   ).toBe(false);
+  await settleMotion(page);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
@@ -106,6 +107,7 @@ test("Portuguese classifier translates live output, preserves actual destination
     "href",
     "/experiments/filename-classifier/",
   );
+  await settleMotion(page);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
@@ -245,6 +247,7 @@ test("every Portuguese Lab suggestion leads to the experiment it names in both s
       await page.locator("[data-search-input]").fill("no-match-for-lab");
     }
   }
+  await settleMotion(page);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
@@ -277,6 +280,7 @@ test("Lab avatar keeps language-specific names with and without reduced motion",
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await expect(avatar).toHaveAttribute("aria-label", interactive);
     await expect(avatar).toBeEnabled();
+    await settleMotion(page);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   }
 });
@@ -330,6 +334,7 @@ test("Portuguese execution states bench words every outcome and behaves like the
         () => document.documentElement.scrollWidth > innerWidth,
       ),
     ).toBe(false);
+    await settleMotion(page);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   }
 });
@@ -365,6 +370,7 @@ test("Portuguese boot sector bench keeps the source exact and words the progress
       () => document.documentElement.scrollWidth > innerWidth,
     ),
   ).toBe(false);
+  await settleMotion(page);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
@@ -411,6 +417,7 @@ test("Portuguese Terms and Privacy are declared, linked from the footer without 
         () => document.documentElement.scrollWidth > innerWidth,
       ),
     ).toBe(false);
+    await settleMotion(page);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   }
   // The social card of each Portuguese page exists.
