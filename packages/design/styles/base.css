@@ -210,10 +210,12 @@ a:hover {
 }
 .rv-nav a:hover,
 .rv-nav a[aria-current="page"],
+.rv-nav a[aria-current="true"],
 .rv-nav a.is-current {
   color: var(--fg);
 }
 .rv-nav a[aria-current="page"],
+.rv-nav a[aria-current="true"],
 .rv-nav a.is-current {
   border-left-color: var(--fg-2);
 }
