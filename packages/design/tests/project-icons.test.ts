@@ -59,5 +59,7 @@ describe("project icons", () => {
         `${name}.webp is out of date: run pnpm --filter @raioviajante/design project-icons`,
       ).toBeLessThan(1);
     }
-  });
+    // Re-encoding eight WebPs takes about 3 s locally and more on CI runners,
+    // past Vitest's 5 s default; the comparison itself is unchanged.
+  }, 30_000);
 });
