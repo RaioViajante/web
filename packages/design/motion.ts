@@ -16,10 +16,10 @@
  *   keyframe by its own animation (`fill: "backwards"`), and a target below
  *   the fold waits under `data-motion-state="waiting"` (motion.css). Cancelling
  *   either one shows the element as its stylesheet says.
- * - Focus or a pointer press inside a pending target shows it at once; a route
- *   change, a click on a link to a fragment of this page, an anchor jump
- *   (`hashchange`), a hidden document, `pagehide` or reduced motion settle
- *   everything.
+ * - Focus inside a pending target, or a pointer press inside a waiting one,
+ *   shows it at once; a route change, a click on a link to a fragment of this
+ *   page, an anchor jump (`hashchange`), arriving at a fragment, a hidden
+ *   document, `pagehide`, printing or reduced motion settle everything.
  *
  * Targets come from a small selector list instead of per-app CSS:
  * `MOTION_ITEMS` always cascade on their own, `MOTION_GROUPS` are walked into,
@@ -217,7 +217,12 @@ function play(element: HTMLElement, delay: number, timing: MotionTiming) {
       bouncy
         ? springKeyframes(timing.bounceY, 0.95, 1.035)
         : springKeyframes(timing.riseY, 0.99, 1.01),
-      { ...shared, duration: bouncy ? timing.bounce : timing.rise },
+      // Added to the element's own transform (the 404 art floats), not replacing it.
+      {
+        ...shared,
+        duration: bouncy ? timing.bounce : timing.rise,
+        composite: "add",
+      },
     ),
   ];
 }
@@ -309,10 +314,13 @@ export function attachMotion() {
 
   const run = (main: HTMLElement | null, arrival: boolean) => {
     settleAll();
-    if (!main || reduce.matches || hiddenDocument()) return;
+    // Arriving at a fragment shows the destination as it is, like an anchor jump.
+    if (!main || reduce.matches || hiddenDocument() || window.location.hash)
+      return;
     const viewport = window.innerHeight;
     const active = document.activeElement;
     const now: Placed<HTMLElement>[] = [];
+    const later: HTMLElement[] = [];
     for (const element of selectTargets(main)) {
       // Never move what holds focus, and never delay a focus ring.
       if (active && active !== document.body && element.contains(active))
@@ -322,21 +330,29 @@ export function attachMotion() {
       if (rect.top < viewport) {
         if (arrival)
           now.push({ item: element, top: rect.top, left: rect.left });
-      } else {
-        waiting.add(element);
-        element.setAttribute(MOTION_STATE, "waiting");
-        observer.observe(element);
-      }
+      } else later.push(element);
+    }
+    // Write only after measuring every target: one style recalc, not one each.
+    for (const element of later) {
+      waiting.add(element);
+      element.setAttribute(MOTION_STATE, "waiting");
+      observer.observe(element);
     }
     cascade(now);
   };
 
-  const reveal = (event: Event) => {
+  const reveal = (event: Event, elements: HTMLElement[]) => {
     const target = event.target;
     if (!(target instanceof Node)) return;
-    for (const element of [...pending.keys(), ...waiting])
+    for (const element of elements)
       if (element.contains(target)) settle(element);
   };
+  // Focus shows a pending target at once. A press only shows a waiting one
+  // (opacity alone): snapping a moving target to rest between pointerdown and
+  // pointerup could move it away from the pointer and lose the click.
+  const onFocus = (event: Event) =>
+    reveal(event, [...pending.keys(), ...waiting]);
+  const onPress = (event: Event) => reveal(event, [...waiting]);
   // A link to a fragment of this page: settle before the browser scrolls, so
   // it lands on the resting position and not on a target still moving.
   const onClick = (event: MouseEvent) => {
@@ -382,13 +398,14 @@ export function attachMotion() {
   const listening = new AbortController();
   const capture = { capture: true, signal: listening.signal };
   const options = { signal: listening.signal };
-  document.addEventListener("focusin", reveal, capture);
-  document.addEventListener("pointerdown", reveal, capture);
+  document.addEventListener("focusin", onFocus, capture);
+  document.addEventListener("pointerdown", onPress, capture);
   document.addEventListener("click", onClick, capture);
   document.addEventListener("visibilitychange", onVisibility, options);
   // An anchor jump shows its destination as it is: nothing slides into place.
   window.addEventListener("hashchange", settleAll, options);
   window.addEventListener("pagehide", settleAll, options);
+  window.addEventListener("beforeprint", settleAll, options);
   reduce.addEventListener?.("change", onReduce, options);
 
   return () => {

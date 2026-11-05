@@ -444,6 +444,46 @@ describe("attachMotion", () => {
     expect(later.hasAttribute(MOTION_STATE)).toBe(false);
   });
 
+  it("a press never snaps a moving target, so the click stays under the pointer", () => {
+    stop = attachMotion();
+    const leader = document.querySelector<HTMLElement>(".rv-leader")!;
+    leader.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+    for (const animation of animations.filter((a) => a.element === leader))
+      expect(animation.cancel).not.toHaveBeenCalled();
+  });
+
+  it("adds the rise to an element's own transform instead of replacing it", () => {
+    stop = attachMotion();
+    const rises = animations.filter((a) =>
+      JSON.stringify(a.keyframes).includes("transform"),
+    );
+    expect(rises.length).toBeGreaterThan(0);
+    for (const animation of rises)
+      expect(animation.options.composite).toBe("add");
+  });
+
+  it("arriving at a fragment moves nothing and hides nothing", () => {
+    window.history.replaceState(null, "", "/#later");
+    stop = attachMotion();
+    expect(animations).toHaveLength(0);
+    expect(document.querySelector(`[${MOTION_STATE}]`)).toBeNull();
+  });
+
+  it("settles everything before printing", () => {
+    stop = attachMotion();
+    window.dispatchEvent(new Event("beforeprint"));
+    expect(document.querySelector(`[${MOTION_STATE}]`)).toBeNull();
+    expect(
+      animations.every((animation) => animation.cancel.mock.calls.length),
+    ).toBe(true);
+  });
+
+  it("shows waiting targets in print even without the script", () => {
+    expect(motionCss).toMatch(
+      /@media print, \(prefers-reduced-motion: reduce\)\s*{\s*\[data-motion-state="waiting"\]\s*{\s*opacity: 1;/,
+    );
+  });
+
   it("never moves the element that holds focus", () => {
     const leader = document.querySelector<HTMLElement>(".rv-leader")!;
     leader.setAttribute("href", "#");

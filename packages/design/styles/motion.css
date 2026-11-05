@@ -12,7 +12,7 @@
   opacity: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media print, (prefers-reduced-motion: reduce) {
   [data-motion-state="waiting"] {
     opacity: 1;
   }

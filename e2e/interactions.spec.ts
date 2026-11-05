@@ -409,6 +409,8 @@ test.describe("on this page (mobile)", () => {
       const summary = page.locator(`${tocNav} summary`);
 
       // The whole h1 is inside the first viewport, and the list is closed.
+      // Measured at rest: the entrance holds the h1 a little low at first.
+      await settleMotion(page);
       expect(await page.evaluate(() => scrollY)).toBe(0);
       const h1 = (await page.locator("h1").boundingBox())!;
       expect(h1.y + h1.height, `${path}: h1 bottom`).toBeLessThanOrEqual(
