@@ -61,7 +61,12 @@ export function LabIndex({ locale = "en" }: { locale?: LocaleId }) {
           data-filter-results={JSON.stringify(filterResults)}
         >
           {experiments.map((e) => (
-            <article key={e.id} className="lab-entry" data-status={e.status}>
+            <article
+              key={e.id}
+              className="lab-entry"
+              data-status={e.status}
+              data-motion=""
+            >
               <LeaderRow
                 href={experimentPath(e)}
                 label={

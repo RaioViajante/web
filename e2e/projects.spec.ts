@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { base, isolate, watchHealth } from "./support";
+import { base, isolate, settleMotion, watchHealth } from "./support";
 
 // Root's projects pages: the four interactive sketches on /projects, the
 // catalog filter on /projects/all, the home cards, and the rule that nothing
@@ -17,6 +17,7 @@ async function open(page: Page, path: string) {
 }
 
 async function axe(page: Page) {
+  await settleMotion(page);
   const { violations } = await new AxeBuilder({ page })
     .withRules(["label-content-name-mismatch"])
     .options({ rules: { "label-content-name-mismatch": { enabled: true } } })

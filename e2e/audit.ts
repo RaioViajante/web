@@ -6,6 +6,7 @@ import {
   expectedDocumentLocale,
   isMissingPath,
   isolate,
+  settleMotion,
   watchHealth,
   type Site,
 } from "./support";
@@ -40,6 +41,7 @@ export async function audit(
   // Accessibility first, before anything scrolls and triggers lazy third-party UI.
   // `label-content-name-mismatch` (WCAG 2.5.3) is experimental in axe, so it is
   // off by default; enable it so every page in both locales is checked.
+  await settleMotion(page);
   const axe = await new AxeBuilder({ page })
     .options({ rules: { "label-content-name-mismatch": { enabled: true } } })
     .analyze();

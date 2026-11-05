@@ -26,6 +26,7 @@ export function HomeProjectCard({
   return (
     <Link
       className="pj-home-card"
+      data-motion="card"
       href={href}
       prefetch={false}
       data-sound="nav"

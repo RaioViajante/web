@@ -25,7 +25,12 @@ export function FeaturedProject({
   const text = copy.projects[project.id];
   const heading = `pj-${project.id}`;
   return (
-    <article className="pj-card" id={project.id} aria-labelledby={heading}>
+    <article
+      className="pj-card"
+      id={project.id}
+      aria-labelledby={heading}
+      data-motion="card"
+    >
       <div className="pj-card__art">
         <span className="pj-card__number" aria-hidden="true">
           {pad(index + 1)} / {pad(total)}
@@ -73,7 +78,12 @@ export function ProjectTile({
   const text = copy.projects[project.id];
   const heading = `pt-${project.id}`;
   return (
-    <article className="pj-tile" id={project.id} aria-labelledby={heading}>
+    <article
+      className="pj-tile"
+      id={project.id}
+      aria-labelledby={heading}
+      data-motion="card"
+    >
       <div className="pj-tile__art">{sketch}</div>
       <div className="pj-tile__body">
         <p className="pj-tile__top">
@@ -111,7 +121,11 @@ export function ClientCaseCard({
   copy: ProjectsCopy;
 }) {
   return (
-    <article className="pj-card pj-case" aria-labelledby={`case-${item.id}`}>
+    <article
+      className="pj-card pj-case"
+      aria-labelledby={`case-${item.id}`}
+      data-motion="card"
+    >
       <div className="pj-case__art">
         <span className="pj-case__tab">
           {copy.page.caseLabel} {pad(index + 1)}

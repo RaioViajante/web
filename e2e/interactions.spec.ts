@@ -14,7 +14,7 @@ import {
 // keyboard (never element.focus()), on a desktop and a mobile viewport where it
 // matters. Axe covers semantics; these cover what only interaction shows.
 
-import { viewports } from "./support";
+import { settleMotion, viewports } from "./support";
 
 const desktop = viewports.desktop;
 
@@ -287,6 +287,7 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
     );
     await expect(page.locator(SCRIPT)).toHaveCount(0);
     expect(external).toEqual([]);
+    await settleMotion(page);
     const axe = await new AxeBuilder({ page }).analyze();
     expect(axe.violations.map((v) => v.id)).toEqual([]);
   });
@@ -362,6 +363,7 @@ test.describe("dump comments (our own placeholder, never the giscus frame)", () 
     const health = await open(page, "dump", `${path}?giscus=e2e-token`);
     await expect(page.locator(SCRIPT)).toHaveCount(1);
     expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    await settleMotion(page);
     const axe = await new AxeBuilder({ page }).analyze();
     expect(axe.violations.map((v) => v.id)).toEqual([]);
     expect(health, health.join("\n")).toEqual([]);
@@ -407,6 +409,8 @@ test.describe("on this page (mobile)", () => {
       const summary = page.locator(`${tocNav} summary`);
 
       // The whole h1 is inside the first viewport, and the list is closed.
+      // Measured at rest: the entrance holds the h1 a little low at first.
+      await settleMotion(page);
       expect(await page.evaluate(() => scrollY)).toBe(0);
       const h1 = (await page.locator("h1").boundingBox())!;
       expect(h1.y + h1.height, `${path}: h1 bottom`).toBeLessThanOrEqual(

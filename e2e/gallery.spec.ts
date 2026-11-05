@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { base, isolate, watchHealth } from "./support";
+import { base, isolate, settleMotion, watchHealth } from "./support";
 import { galleryZip } from "../apps/root/lib/gallery-download";
 
 /** The "View …" buttons of one collection category, found by its region name. */
@@ -134,6 +134,7 @@ for (const width of [1440, 390, 320]) {
         ),
       ).toBe(true);
     }
+    await settleMotion(page);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     await page.keyboard.press("Escape");
     await expect(dialog).toHaveCount(0);
@@ -618,6 +619,7 @@ for (const width of [1440, 390])
         ),
       ).toBe(true);
     }
+    await settleMotion(page);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     await page.keyboard.press("Escape");
     await expect(dialog).toHaveCount(0);

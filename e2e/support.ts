@@ -94,3 +94,47 @@ export function watchHealth(page: Page, expectedMissing?: string) {
   });
   return problems;
 }
+
+/**
+ * Page motion (`packages/design/motion.ts`) fades content in for up to about a
+ * second after a page appears, and keeps targets below the fold transparent
+ * until they scroll into view; axe skips transparent content and measures
+ * half-faded text. Switching reduced motion on settles every target at once (a
+ * product behavior covered by `packages/design/tests/motion.test.ts`), so audits
+ * and geometry checks see the page at rest with all of it visible. Emulation
+ * is then cleared; nothing re-animates until the next navigation. Clearing it
+ * restarts CSS animations that reduced motion had switched off (a dialog
+ * opening), so finite animations are awaited too; endless loops are left alone.
+ */
+export async function settleMotion(page: Page) {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.waitForFunction(
+    () =>
+      !document.querySelector("[data-motion-state]") &&
+      document
+        .getAnimations()
+        .every(
+          (animation) =>
+            animation instanceof CSSAnimation ||
+            animation instanceof CSSTransition ||
+            animation.playState !== "running",
+        ),
+  );
+  await page.emulateMedia({ reducedMotion: null });
+  await page.evaluate(async () => {
+    // Let the cleared emulation reach style first: that is when CSS
+    // animations restart.
+    for (let frame = 0; frame < 2; frame++)
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    await Promise.all(
+      document
+        .getAnimations()
+        .filter(
+          (animation) =>
+            animation.playState === "running" &&
+            animation.effect?.getComputedTiming().iterations !== Infinity,
+        )
+        .map((animation) => animation.finished.catch(() => undefined)),
+    );
+  });
+}

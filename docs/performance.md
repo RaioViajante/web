@@ -125,6 +125,27 @@ that is rare and was judged not worth the bytes. Other artwork is unchanged.
   chunks carry no project code. The sketch palettes live in
   `packages/design/styles/project-art.css`, loaded only by those pages, so no
   other page or site carries them.
+- **Docs and Lab script (November 2026).** The shared page entrance motion
+  (`packages/design/motion.ts`, design-system "Motion") ships in the shared
+  behavior chunk every page loads. Bundled, minified and gzipped alone
+  (esbuild, `gzip -9`), the behavior script measures 12,258 bytes with it and
+  10,483 without, so it adds about 1.8 KB to every page. Docs and Lab carry no
+  framework runtime, so their old script limits had little room: eight pages
+  would fail, by 507 to 1,676 bytes (docs home, reference and search at 13,212
+  bytes; lab home 17,753, boot sector 18,060, execution states 18,819,
+  filename classifier 18,661, search 14,843). Trimming the motion code was
+  tried first (one abort signal for its listeners, a single selector string)
+  and saved about 90 bytes, which review fixes then spent; fitting the old
+  limits would need the whole motion to cost under about 160 bytes on the
+  boot sector page, which no version of it does. Their `max.script` rose by
+  2 KiB (2,048 bytes), the motion's cost rounded up: 14,336 for the three
+  docs pages, 18,432 for lab home and boot sector, 19,456 for execution
+  states and filename classifier, 16,384 for lab search. Only that field of
+  those eight pages changed. The Lab scheduler simulator and pathfinding
+  pages pass with less headroom than before (317 and 670 bytes). Root and
+  Dump, whose script is mostly the framework, pass unchanged. The recorded
+  `baseline` values are older than these measurements and were left as they
+  are.
 - Budgets are never rewritten by a tool. `node perf/check.mjs --baseline` prints
   the measurements and writes `perf/.results/suggested.json`; change the file
   by hand in a reviewed commit and say why.

@@ -32,6 +32,14 @@ and local sockets. It runs nothing against public hosts.
   experiment reachable by Tab;
   and reduced motion (the avatar loop and every CSS animation stop; the home page
   is checked first to have motion to stop).
+- **Page motion.** Content fades in for up to about a second after a page
+  appears, and targets below the fold stay transparent until they scroll into
+  view (`docs/design-system.md`, "Motion"). Before each axe run the suite
+  calls `settleMotion` (`e2e/support.ts`): it switches reduced motion on,
+  which settles every target at once, clears the emulation and waits for
+  finite animations, so axe sees the whole page at rest and skips nothing as
+  transparent. The cascade itself is covered by
+  `packages/design/tests/motion.test.ts`.
 - **`e2e/harness.spec.ts`** injects a missing alt, an unnamed button, an
   overflowing element, a broken image, a console error and a page error into a
   real page and requires the audit to name each, so a green run means something.

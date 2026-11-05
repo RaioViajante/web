@@ -1,0 +1,19 @@
+/*
+ * Page motion: the entrance cascade (motion.ts). See docs/design-system.md,
+ * "Motion".
+ *
+ * There is deliberately no cross-document view transition opt-in: in
+ * Chromium the new page often skipped the transition and raised an unhandled
+ * "opt-in disabled" page error, so it is not used.
+ */
+
+/* A target below the fold, set by motion.ts only, until it scrolls into view. */
+[data-motion-state="waiting"] {
+  opacity: 0;
+}
+
+@media print, (prefers-reduced-motion: reduce) {
+  [data-motion-state="waiting"] {
+    opacity: 1;
+  }
+}
