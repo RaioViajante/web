@@ -115,10 +115,16 @@ function supportMedia() {
     get matches() {
       return reduced;
     },
-    addEventListener: (_: string, listener: () => void) =>
-      mediaListeners.add(listener),
-    removeEventListener: (_: string, listener: () => void) =>
-      mediaListeners.delete(listener),
+    addEventListener: (
+      _: string,
+      listener: () => void,
+      options?: AddEventListenerOptions,
+    ) => {
+      mediaListeners.add(listener);
+      options?.signal?.addEventListener("abort", () =>
+        mediaListeners.delete(listener),
+      );
+    },
   })) as unknown as typeof window.matchMedia;
 }
 
@@ -405,6 +411,25 @@ describe("attachMotion", () => {
         element.getAttribute("style"),
       ),
     ).toEqual(styles);
+  });
+
+  it("stop() removes its listeners", async () => {
+    stop = attachMotion();
+    expect(mediaListeners.size).toBe(1);
+    stop();
+    stop = undefined;
+    expect(mediaListeners.size).toBe(0);
+    // A later page change is no longer watched.
+    const count = animations.length;
+    window.history.replaceState(null, "", "/after-stop");
+    document
+      .getElementById("main")!
+      .replaceChildren(
+        Object.assign(document.createElement("p"), { textContent: "new" }),
+      );
+    window.dispatchEvent(new Event("hashchange"));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(animations.length).toBe(count);
   });
 
   it("focus or a press inside a pending target shows it at once", () => {

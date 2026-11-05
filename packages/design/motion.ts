@@ -33,16 +33,8 @@ export const MOTION_ITEMS =
   '.rv-leader, [data-motion]:not([data-motion="off"])';
 
 /** Walked into: their children cascade one by one; they never move as a whole. */
-export const MOTION_GROUPS = [
-  "section",
-  "article",
-  ".rv-header",
-  ".prose",
-  ".rv-section > ol",
-  ".rv-section > ul",
-  ".rv-section > dl",
-  "[data-motion-group]",
-].join(", ");
+export const MOTION_GROUPS =
+  "section, article, .rv-header, .prose, .rv-section > ol, .rv-section > ul, .rv-section > dl, [data-motion-group]";
 
 /** Neither animated nor walked into. */
 export const MOTION_OFF = '[data-motion="off"], script, style, template';
@@ -386,24 +378,22 @@ export function attachMotion() {
   });
   routes.observe(document.body, { childList: true, subtree: true });
 
-  document.addEventListener("focusin", reveal, true);
-  document.addEventListener("pointerdown", reveal, true);
-  document.addEventListener("click", onClick, true);
-  document.addEventListener("visibilitychange", onVisibility);
+  // One signal removes every listener below.
+  const listening = new AbortController();
+  const capture = { capture: true, signal: listening.signal };
+  const options = { signal: listening.signal };
+  document.addEventListener("focusin", reveal, capture);
+  document.addEventListener("pointerdown", reveal, capture);
+  document.addEventListener("click", onClick, capture);
+  document.addEventListener("visibilitychange", onVisibility, options);
   // An anchor jump shows its destination as it is: nothing slides into place.
-  window.addEventListener("hashchange", settleAll);
-  window.addEventListener("pagehide", settleAll);
-  reduce.addEventListener?.("change", onReduce);
+  window.addEventListener("hashchange", settleAll, options);
+  window.addEventListener("pagehide", settleAll, options);
+  reduce.addEventListener?.("change", onReduce, options);
 
   return () => {
     routes.disconnect();
-    document.removeEventListener("focusin", reveal, true);
-    document.removeEventListener("pointerdown", reveal, true);
-    document.removeEventListener("click", onClick, true);
-    document.removeEventListener("visibilitychange", onVisibility);
-    window.removeEventListener("hashchange", settleAll);
-    window.removeEventListener("pagehide", settleAll);
-    reduce.removeEventListener?.("change", onReduce);
+    listening.abort();
     settleAll();
     observer.disconnect();
   };
