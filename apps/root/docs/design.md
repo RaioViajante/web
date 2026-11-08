@@ -122,7 +122,7 @@ original reserved for the viewer and downloads); the avatar uses the existing sh
 and shows its ten frames. Personal artwork forms a responsive overlapping collage.
 The artwork model lives in `lib/gallery.ts`, the client interaction in
 `components/GalleryBoard.tsx`, and the route styles in `app/gallery/gallery.css`.
-Artwork stays in the shared design package; the twelve Personal images live there.
+Artwork stays in the shared design package; the sixteen Personal images live there.
 
 Selecting a piece opens a native modal dialog with title, category, supported usage
 metadata, unboxed ←/→ controls named Previous artwork / Next artwork, arrow-key navigation, Escape, and focus restoration.
