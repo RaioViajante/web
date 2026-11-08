@@ -25,4 +25,5 @@ listed below, which are excluded and carry their own licenses:
 
 - `apps/docs/src/content/docs/`
 - `apps/dump/content/posts/`
+- `apps/root/public/work/`
 - `packages/design/assets/`

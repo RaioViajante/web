@@ -7,15 +7,17 @@ the root `AGENTS.md`.
 
 This app serves raioviajante.com: the personal internet home and index of the
 RaioViajante ecosystem. It is not a portfolio, résumé, developer sales page, or
-SaaS landing page.
+SaaS landing page, but it does show the owner's work: personal projects and, as
+written-up cases, client work.
 
-Its routes are `/`, `/about`, `/projects`, `/projects/all`, `/contact`,
-`/gallery`, `/this-site`, `/setup`, `/search`, `/privacy`, and `/terms`, plus a
-partial Portuguese tree (`/pt`, `/pt/about`, `/pt/projects`,
-`/pt/projects/all`, `/pt/contact`, `/pt/gallery`, `/pt/this-site`, `/pt/setup`,
-`/pt/terms`, `/pt/privacy`, `/pt/search`,
-`/pt/search-index.json`)
-declared in `lib/routes.ts`; see `docs/architecture.md`. dump, docs, and lab are separate
+Its routes are `/`, `/about`, `/projects`, `/projects/all`, `/projects/stucco`,
+`/contact`, `/gallery`, `/this-site`, `/setup`, `/search`, `/privacy`, and
+`/terms`, plus a partial Portuguese tree (`/pt`, `/pt/about`, `/pt/projects`,
+`/pt/projects/all`, `/pt/projects/stucco`, `/pt/contact`, `/pt/gallery`,
+`/pt/this-site`, `/pt/setup`, `/pt/terms`, `/pt/privacy`, `/pt/search`,
+`/pt/search-index.json`) declared in `lib/routes.ts`, and the static demo
+`/work/stucco/` served from `public/` (noindex, outside the sitemap and search);
+see `docs/architecture.md`. dump, docs, and lab are separate
 apps with their own domains; link to their full URLs and never implement them as
 routes here.
 
@@ -39,7 +41,9 @@ routes here.
   It is an untracked historical reference; where a local copy exists, treat it
   as read-only and never build inside it.
 - Beyond the repository-wide design restraint, avoid skill bars, call-to-action
-  sections, language logos, fake terminal chrome, and large animations.
+  sections, language logos, fake terminal chrome, and large animations. Client
+  cases may frame their screenshots in browser and phone chrome and animate
+  their demo layer (see the repository-wide client-case exceptions).
 
 ## UI validation
 

@@ -15,6 +15,7 @@
 
 import { participates, type LocaleId } from "../../../site/locales.ts";
 import type { SiteId } from "../../../site/sites.ts";
+import type { RouteKey } from "./routes.ts";
 
 export type ProjectId =
   | "mochifile"
@@ -188,17 +189,28 @@ export function projectLink(project: Project, locale: LocaleId) {
   return { href: href.en, hrefLang: "en" as const };
 }
 
-/** Client work. Only real, published cases belong here; none exists yet. */
+export type ClientCaseId = "stucco";
+
+/** Client work. Only real, published cases belong here. */
 export interface ClientCase {
-  id: string;
+  id: ClientCaseId;
+  /** The name shown publicly; for Stucco. it is the demo's fictional brand. */
   client: string;
   year: string;
-  scope: string;
-  summary: string;
-  href?: string;
+  /** The page that tells the case. */
+  route: RouteKey;
 }
 
-export const clientCases: readonly ClientCase[] = [];
+export const clientCases: readonly ClientCase[] = [
+  { id: "stucco", client: "Stucco.", year: "2026", route: "projects-stucco" },
+];
+
+/** Every word a client case card shows. */
+export interface ClientCaseText {
+  scope: string;
+  summary: string;
+  action: string;
+}
 
 /** Every word a project card shows, per project. */
 export interface ProjectText {
@@ -313,6 +325,7 @@ export interface ProjectArtCopy {
 
 export interface ProjectsCopy {
   projects: Record<ProjectId, ProjectText>;
+  cases: Record<ClientCaseId, ClientCaseText>;
   categories: Record<ProjectCategory, string>;
   noLink: string;
   /** Appended to a link whose destination exists only in English. */
@@ -442,6 +455,14 @@ export const projectsCopy: ProjectsCopy = {
     systems: "systems",
     languages: "languages",
     games: "games",
+  },
+  cases: {
+    stucco: {
+      scope: "website + brand · concept demo",
+      summary:
+        "A site and brand for a plaster and drywall studio: hero slideshow, a filterable gallery of 47 projects, service pages, a quote form, business and review cards. The brand is fictional; the photos are the studio's real work.",
+      action: "Read the case",
+    },
   },
   noLink: "no public link yet",
   englishOnly: "",

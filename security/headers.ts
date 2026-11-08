@@ -15,10 +15,30 @@ const styleAttributes: Partial<Record<Site, string[]>> = {
   lab: ["display:contents"],
 };
 
+/**
+ * Exceptions to the no-framing default. Each one is granted to named paths
+ * only (`rootFraming`, `workHeaders`); everything else keeps `'none'`.
+ */
+export interface Framing {
+  /** The page may embed same-origin frames. */
+  frameSelf?: boolean;
+  /** The page may be embedded by a same-origin page. */
+  embeddableBySelf?: boolean;
+}
+
+/** Root's case pages, which show the demo under /work/ in an iframe. */
+export const demoHostPaths = ["/projects/stucco", "/pt/projects/stucco"];
+
+/** The framing a nonce-carrying Root page gets, by exact path. */
+export function rootFraming(pathname: string): Framing {
+  return demoHostPaths.includes(pathname) ? { frameSelf: true } : {};
+}
+
 export function contentSecurityPolicy(
   site: Site,
   nonce?: string,
   development = false,
+  framing: Framing = {},
 ) {
   if (nonce && !/^[A-Za-z0-9+/]+={0,2}$/.test(nonce))
     throw new Error("Invalid CSP nonce");
@@ -36,15 +56,20 @@ export function contentSecurityPolicy(
       .filter(([id]) => id !== site)
       .map(([, origin]) => origin)
       .join(" ")}`,
-    `frame-src ${site === "dump" ? "https://giscus.app" : "'none'"}`,
+    `frame-src ${site === "dump" ? "https://giscus.app" : framing.frameSelf ? "'self'" : "'none'"}`,
     "worker-src 'none'",
     "media-src 'none'",
     "manifest-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'none'",
-    ...(!development ? ["upgrade-insecure-requests"] : []),
+    `frame-ancestors ${framing.embeddableBySelf ? "'self'" : "'none'"}`,
+    // Upgrading would send a frame navigation on local http to https, which
+    // 'self' then refuses. These documents load only 'self' resources, so on
+    // the https production origin the directive has nothing to upgrade.
+    ...(!development && !framing.frameSelf && !framing.embeddableBySelf
+      ? ["upgrade-insecure-requests"]
+      : []),
   ].join("; ");
 }
 
@@ -70,5 +95,22 @@ export function staticHeaders(site: Site) {
   return [
     ...securityHeaders(site),
     { key: "Content-Security-Policy", value: contentSecurityPolicy(site) },
+  ];
+}
+
+/**
+ * Root's static demos under /work/: embeddable by Root's own pages, and kept
+ * out of search through this header. robots.txt must not disallow them, or
+ * crawlers would never read it.
+ */
+export function workHeaders() {
+  return [
+    {
+      key: "Content-Security-Policy",
+      value: contentSecurityPolicy("root", undefined, false, {
+        embeddableBySelf: true,
+      }),
+    },
+    { key: "X-Robots-Tag", value: "noindex, nofollow" },
   ];
 }

@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
-import { contentSecurityPolicy } from "../../security/headers";
+import { contentSecurityPolicy, rootFraming } from "../../security/headers";
 import { localeOfPath } from "../../site/locales";
 
 export function proxy(request: NextRequest) {
@@ -9,6 +9,7 @@ export function proxy(request: NextRequest) {
     "root",
     nonce,
     process.env.NODE_ENV === "development",
+    rootFraming(request.nextUrl.pathname),
   );
   const headers = new Headers(request.headers);
   headers.set("x-nonce", nonce);
@@ -24,8 +25,10 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Include HTML errors and RSC/prefetch requests; exclude only actual assets
-  // and metadata endpoints, which keep their existing caching behavior.
+  // and metadata endpoints, which keep their existing caching behavior. The
+  // static files of a demo under /work/ have no nonce to carry; they get the
+  // policy from next.config.ts.
   matcher: [
-    "/((?!_next/static|_next/image|favicon\\.ico$|icon\\.png$|apple-touch-icon\\.png$|apple-icon\\.png$|icon-192\\.png$|icon-maskable\\.png$|manifest\\.webmanifest$|robots\\.txt$|sitemap\\.xml$|search-index\\.json$|pt/search-index\\.json$).*)",
+    "/((?!_next/static|_next/image|favicon\\.ico$|icon\\.png$|apple-touch-icon\\.png$|apple-icon\\.png$|icon-192\\.png$|icon-maskable\\.png$|manifest\\.webmanifest$|robots\\.txt$|sitemap\\.xml$|search-index\\.json$|pt/search-index\\.json$|work/.+\\.[a-z0-9]+$).*)",
   ],
 };

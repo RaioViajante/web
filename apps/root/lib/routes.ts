@@ -12,6 +12,7 @@ export type RouteKey =
   | "about"
   | "projects"
   | "projects-all"
+  | "projects-stucco"
   | "contact"
   | "gallery"
   | "this-site"
@@ -27,6 +28,10 @@ export const routes: Record<RouteKey, RoutePaths> = {
   about: { en: "/about", "pt-BR": "/pt/about" },
   projects: { en: "/projects", "pt-BR": "/pt/projects" },
   "projects-all": { en: "/projects/all", "pt-BR": "/pt/projects/all" },
+  "projects-stucco": {
+    en: "/projects/stucco",
+    "pt-BR": "/pt/projects/stucco",
+  },
   contact: { en: "/contact", "pt-BR": "/pt/contact" },
   gallery: { en: "/gallery", "pt-BR": "/pt/gallery" },
   "this-site": { en: "/this-site", "pt-BR": "/pt/this-site" },
@@ -35,6 +40,12 @@ export const routes: Record<RouteKey, RoutePaths> = {
   privacy: { en: "/privacy", "pt-BR": "/pt/privacy" },
   search: { en: "/search", "pt-BR": "/pt/search" },
 };
+
+/**
+ * Static demos served from public/, one language each. They are not pages:
+ * they stay out of the sitemap and the search index, and answer with noindex.
+ */
+export const staticDemos = ["/work/stucco/"] as const;
 
 export const routeKeys = Object.keys(routes) as RouteKey[];
 
@@ -50,10 +61,11 @@ export function routeOfPath(
 
 /**
  * A page that lives under another page's navigation item: the catalog of all
- * projects keeps "projects" current in the sidebar.
+ * projects and the client cases keep "projects" current in the sidebar.
  */
 export const navigationParent: Partial<Record<RouteKey, RouteKey>> = {
   "projects-all": "projects",
+  "projects-stucco": "projects",
 };
 
 /** The real counterparts of a page: its other declared locales. Never inferred from a path. */

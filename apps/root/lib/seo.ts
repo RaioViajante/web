@@ -27,6 +27,11 @@ const english: Record<RouteKey, { title: string; description: string }> = {
     description:
       "Every RaioViajante project, from file tools and music to a programming language and a game, filtered by kind.",
   },
+  "projects-stucco": {
+    title: "Stucco. · client work",
+    description:
+      "Case study of a website and brand identity for a plaster and drywall studio, shown as a concept demo with a fictional brand.",
+  },
   contact: {
     title: "contact",
     description:

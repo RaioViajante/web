@@ -15,6 +15,7 @@ import {
   publishedLocales,
   routeOfPath,
   routes,
+  staticDemos,
 } from "../lib/routes.ts";
 import { affiliateDisclosure, gear } from "../lib/setup.ts";
 import {
@@ -86,6 +87,7 @@ test("English paths are unprefixed and unchanged", () => {
     about: "/about",
     projects: "/projects",
     "projects-all": "/projects/all",
+    "projects-stucco": "/projects/stucco",
     contact: "/contact",
     gallery: "/gallery",
     "this-site": "/this-site",
@@ -163,6 +165,7 @@ test("the shipped Portuguese pages include the translated This Site route", () =
       "/pt/privacy",
       "/pt/projects",
       "/pt/projects/all",
+      "/pt/projects/stucco",
       "/pt/search",
       "/pt/setup",
       "/pt/terms",
@@ -189,6 +192,7 @@ test("Root participation activates only its published Portuguese routes", () => 
     "about",
     "projects",
     "projects-all",
+    "projects-stucco",
     "contact",
     "gallery",
     "this-site",
@@ -219,6 +223,7 @@ test("rollback disables Root participation while its Portuguese routes stay publ
       "/pt/privacy",
       "/pt/projects",
       "/pt/projects/all",
+      "/pt/projects/stucco",
       "/pt/search",
       "/pt/setup",
       "/pt/terms",
@@ -338,6 +343,23 @@ test("Setup discloses affiliate links in both languages", () => {
   assert.match(ptSetup.disclosure, /links de afiliado/);
   assert.match(ptSetup.disclosure, /comissão/);
   assert.ok(gear.every((item) => !item.url || item.url.startsWith("https://")));
+});
+
+test("static demos are never declared as pages, so no index lists them", () => {
+  assert.deepEqual(staticDemos, ["/work/stucco/"]);
+  for (const { path } of declaredPages())
+    assert.equal(path.startsWith("/work"), false, path);
+});
+
+test("the Stucco. case is declared in both languages with reciprocal counterparts", () => {
+  assert.deepEqual(counterpartsOf("projects-stucco", "en"), [
+    { locale: "pt-BR", path: "/pt/projects/stucco" },
+  ]);
+  assert.deepEqual(counterpartsOf("projects-stucco", "pt-BR"), [
+    { locale: "en", path: "/projects/stucco" },
+  ]);
+  assert.ok(ptPageSeo["projects-stucco"]?.title);
+  assert.ok(ptSearchDescriptions["projects-stucco"]);
 });
 
 test("Portuguese projects pages have their own metadata and search copy", () => {

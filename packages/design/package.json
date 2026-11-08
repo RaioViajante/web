@@ -21,6 +21,7 @@
     "./clock": "./clock.ts",
     "./gallery": "./components/gallery.ts",
     "./projects": "./components/projects.ts",
+    "./stucco": "./components/stucco.ts",
     "./avatar": "./components/avatar.ts",
     "./theme-color": "./theme-color.ts",
     "./social-image": "./social-image.tsx",
@@ -66,7 +67,8 @@
     "playground": "vite playground --open",
     "icons": "node scripts/icons.mjs",
     "search-art": "node scripts/search-art.mjs",
-    "project-icons": "node scripts/project-icons.mjs"
+    "project-icons": "node scripts/project-icons.mjs",
+    "stucco-art": "node scripts/stucco-art.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0",
