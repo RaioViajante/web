@@ -1,12 +1,14 @@
 // /projects: the four featured projects with their interactive sketches, then
 // client work. The route in app/ only chooses the locale.
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Section } from "@raioviajante/design/components";
 import { projectArt } from "@raioviajante/design/projects";
 import { LOCALES, type LocaleId } from "../../../../site/locales";
 import {
   clientCases,
+  type ClientCaseId,
   featuredProjects,
   type ProjectId,
   type ProjectsCopy,
@@ -65,6 +67,9 @@ function Sketch({
   }
 }
 
+/** Each client case's card art; a new case without one is a type error. */
+const caseArt: Record<ClientCaseId, ReactNode> = { stucco: <StuccoArt /> };
+
 /** /projects: the four projects with their sketches, then client work. */
 export function ProjectsBody({ locale }: { locale: LocaleId }) {
   const copy = projectsCopyFor(locale);
@@ -113,7 +118,7 @@ export function ProjectsBody({ locale }: { locale: LocaleId }) {
                 index={index}
                 locale={locale}
                 copy={copy}
-                art={<StuccoArt />}
+                art={caseArt[item.id]}
               />
             ))}
             <div className="pj-empty">

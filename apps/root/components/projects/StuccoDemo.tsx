@@ -25,6 +25,9 @@ function inView(element: Element | null) {
 const flip = (from: DOMRect, to: DOMRect) =>
   `translate(${from.left - to.left}px,${from.top - to.top}px) scale(${from.width / to.width},${from.height / to.height})`;
 
+const demoControls =
+  'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
 const focusable = (root: ParentNode, selector: string) =>
   [...root.querySelectorAll<HTMLElement>(selector)].filter(
     (element) => element.offsetParent !== null,
@@ -61,6 +64,7 @@ export function StuccoDemo({
   const iframe = useRef<HTMLIFrameElement>(null);
   const origin = useRef<DOMRect | null>(null);
   const closing = useRef(false);
+  const enter = useRef<Animation | null>(null);
   const exit = useRef<Animation | null>(null);
 
   const show = useCallback(() => {
@@ -91,6 +95,8 @@ export function StuccoDemo({
   const close = useCallback(() => {
     if (closing.current) return;
     closing.current = true;
+    // Measures the frame at rest, even if it is still growing.
+    enter.current?.cancel();
     const element = frame.current;
     const from = origin.current;
     if (reducedMotion() || !element || !from || !element.animate)
@@ -121,12 +127,21 @@ export function StuccoDemo({
     const element = dialog.current;
     if (!open || !element || element.open) return;
     element.showModal();
+    // The dialog traps focus but document listeners still run; without this the
+    // site's search shortcuts would navigate away from behind the layer.
+    element.addEventListener("keydown", (event) => {
+      if (
+        event.key === "/" ||
+        (event.key === "k" && (event.metaKey || event.ctrlKey))
+      )
+        event.stopPropagation();
+    });
     document.documentElement.style.overflow = "hidden";
     closeButton.current?.focus({ preventScroll: true });
     const box = frame.current;
     const from = origin.current;
     if (reducedMotion() || !box || !from || !box.animate) return;
-    box.animate(
+    enter.current = box.animate(
       [
         {
           transformOrigin: "0 0",
@@ -160,7 +175,11 @@ export function StuccoDemo({
       document.activeElement === focusable(frame.current, "button, a[href]")[0]
     ) {
       event.preventDefault();
-      iframe.current?.focus();
+      const view = iframe.current?.contentWindow;
+      if (view && isSameOrigin(view)) {
+        view.focus();
+        focusable(view.document, demoControls).at(-1)?.focus();
+      } else iframe.current?.focus();
     }
   };
 
@@ -177,10 +196,7 @@ export function StuccoDemo({
         return menuOpen ? undefined : close();
       }
       if (event.key !== "Tab" || !frame.current) return;
-      const items = focusable(
-        view.document,
-        'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      );
+      const items = focusable(view.document, demoControls);
       const edge = event.shiftKey ? items[0] : items.at(-1);
       if (view.document.activeElement !== edge) return;
       event.preventDefault();

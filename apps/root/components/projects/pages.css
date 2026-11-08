@@ -230,13 +230,6 @@
   justify-content: flex-start;
 }
 
-.pj-case__art {
-  position: relative;
-  aspect-ratio: 16 / 10;
-  border-radius: 18px;
-  background: var(--block);
-}
-
 .pj-filters {
   display: flex;
   flex-wrap: wrap;

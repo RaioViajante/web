@@ -67,6 +67,9 @@ test("the tour wraps, follows the device and keeps its step in view", async ({
   await tour.getByRole("button", { name: "Previous" }).click();
   await expect(counter).toHaveText("11 / 11 · Contact");
   await expect(tour.locator(".sc-url")).toContainText("contact.html");
+  // The device already showing keeps its place.
+  await tour.getByRole("button", { name: "desktop" }).click();
+  await expect(counter).toHaveText("11 / 11 · Contact");
   await tour.getByRole("button", { name: "Next" }).click();
   await expect(counter).toHaveText("01 / 11 · Home");
   await tour.getByRole("button", { name: "mobile" }).click();
@@ -107,6 +110,10 @@ test("the demo layer traps focus, locks scrolling and restores the trigger", asy
   await expect(layer(page)).toHaveAttribute("aria-modal", "true");
   await expect(closeDemo(page)).toBeFocused();
   expect(await noScroll(page)).toBe("hidden");
+  // The site's search shortcut must not navigate away from behind the layer.
+  await page.keyboard.press("/");
+  await expect(layer(page)).toBeVisible();
+  await expect(page).toHaveURL(/\/projects\/stucco$/);
   const frame = await demoLoaded(page);
 
   await layer(page).getByRole("button", { name: "mobile" }).click();

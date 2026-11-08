@@ -74,6 +74,7 @@ export function StuccoTour({
               aria-pressed={device === value}
               data-sound="tab"
               onClick={() => {
+                if (value === device) return;
                 setDevice(value);
                 setStep(0);
               }}
