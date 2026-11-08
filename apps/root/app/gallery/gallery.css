@@ -373,20 +373,42 @@
   margin: -3% 0 0 2%;
   --rotation: 2deg;
 }
-.gallery-piece--candle {
-  width: 28%;
-  margin: -2% 0 0 -1%;
-  --rotation: -3deg;
-}
 .gallery-piece--ferry {
   width: 44%;
   margin: -3% -1% 0 0;
   --rotation: 1deg;
 }
-.gallery-piece--forest {
+.gallery-piece--long-way-home {
   width: 48%;
   margin: -2% 0 0 -1%;
   --rotation: -2deg;
+}
+.gallery-piece--songs-for-rain {
+  width: 48%;
+  margin: -3% 0 0 -1%;
+  --rotation: 2deg;
+}
+.gallery-piece--between-trees,
+.gallery-piece--stillness-below,
+.gallery-piece--midnight,
+.gallery-piece--quiet-bells {
+  width: 23%;
+}
+.gallery-piece--between-trees {
+  margin: -2% -1% 0 0;
+  --rotation: -3deg;
+}
+.gallery-piece--stillness-below {
+  margin: -1% -1% 0 0;
+  --rotation: 2deg;
+}
+.gallery-piece--midnight {
+  margin: -3% -1% 0 0;
+  --rotation: -2deg;
+}
+.gallery-piece--quiet-bells {
+  margin: -2% 0 0;
+  --rotation: 3deg;
 }
 .gallery-dialog {
   box-sizing: border-box;
@@ -665,7 +687,10 @@
   .gallery-piece--mirror {
     width: 58%;
   }
-  .gallery-piece--candle {
+  .gallery-piece--between-trees,
+  .gallery-piece--stillness-below,
+  .gallery-piece--midnight,
+  .gallery-piece--quiet-bells {
     width: 40%;
   }
   .gallery-view-stage {
