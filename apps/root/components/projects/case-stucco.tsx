@@ -1,7 +1,11 @@
 // The Stucco. case page. The route in app/ only chooses the locale.
 
 import Link from "next/link";
-import { stuccoBrand, type StuccoImage } from "@raioviajante/design/stucco";
+import {
+  stuccoBrand,
+  stuccoTour,
+  type StuccoImage,
+} from "@raioviajante/design/stucco";
 import type { LocaleId } from "../../../../site/locales";
 import { stuccoCopyFor } from "./copy";
 import { routes } from "../../lib/routes";
@@ -103,7 +107,7 @@ export function StuccoCase({ locale }: { locale: LocaleId }) {
           </div>
         ))}
       </dl>
-      <StuccoTour text={tour} />
+      <StuccoTour text={tour} tour={stuccoTour} />
       <Section id="sc-brief" number="02" heading={copy.brief.heading}>
         <p className="sc-p">{copy.brief.lead}</p>
         <ul className="sc-ul">

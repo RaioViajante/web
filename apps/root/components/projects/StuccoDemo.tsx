@@ -61,6 +61,7 @@ export function StuccoDemo({
   const iframe = useRef<HTMLIFrameElement>(null);
   const origin = useRef<DOMRect | null>(null);
   const closing = useRef(false);
+  const exit = useRef<Animation | null>(null);
 
   const show = useCallback(() => {
     const stage = document.querySelector(".sc-stage");
@@ -73,6 +74,8 @@ export function StuccoDemo({
 
   /** Leaves the open state; safe to reach twice (the dialog's own close event). */
   const finish = useCallback(() => {
+    exit.current?.cancel();
+    exit.current = null;
     if (dialog.current?.open) dialog.current.close();
     document.documentElement.style.overflow = "";
     setOpen(false);
@@ -96,7 +99,7 @@ export function StuccoDemo({
       duration: CLOSE_MS - 40,
       fill: "forwards",
     });
-    element.animate(
+    exit.current = element.animate(
       [
         { transformOrigin: "0 0", transform: "none", opacity: 1 },
         {
@@ -110,7 +113,8 @@ export function StuccoDemo({
         easing: "cubic-bezier(.5,0,.75,0)",
         fill: "forwards",
       },
-    ).onfinish = finish;
+    );
+    exit.current.onfinish = finish;
   }, [finish]);
 
   useLayoutEffect(() => {
@@ -165,8 +169,13 @@ export function StuccoDemo({
     const view = iframe.current?.contentWindow;
     // A failed load leaves a browser error page, which is cross-origin.
     if (!view || !isSameOrigin(view)) return;
-    view.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") return close();
+    // Capture runs before the demo's own handler, while its menu is still open:
+    // Esc then only closes that menu, as it does in a tab of its own.
+    const listener = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        const menuOpen = view.document.querySelector(".menu-open");
+        return menuOpen ? undefined : close();
+      }
       if (event.key !== "Tab" || !frame.current) return;
       const items = focusable(
         view.document,
@@ -177,7 +186,8 @@ export function StuccoDemo({
       event.preventDefault();
       if (event.shiftKey) closeButton.current?.focus();
       else focusable(frame.current, "button, a[href]")[0]?.focus();
-    });
+    };
+    view.addEventListener("keydown", listener, true);
   };
 
   return (

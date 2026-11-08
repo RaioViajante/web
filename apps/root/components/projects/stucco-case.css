@@ -188,6 +188,11 @@
   font-size: 12px;
   transition: transform 0.2s ease;
 }
+button.sc-demo {
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
 .sc-demo:hover .sc-ar {
   transform: rotate(45deg);
 }

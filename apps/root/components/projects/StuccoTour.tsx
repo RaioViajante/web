@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { stuccoTour } from "@raioviajante/design/stucco";
+import type { stuccoTour } from "@raioviajante/design/stucco";
 import type { StuccoCopy, StuccoDevice, StuccoGroup } from "../../lib/stucco";
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -12,11 +12,17 @@ const shotSizes: Record<StuccoDevice, string> = {
 };
 
 /** The guided tour: device toggle, one screenshot, caption and a thumbnail strip. */
-export function StuccoTour({ text }: { text: StuccoCopy["tour"] }) {
+export function StuccoTour({
+  text,
+  tour,
+}: {
+  text: StuccoCopy["tour"];
+  tour: typeof stuccoTour;
+}) {
   const [device, setDevice] = useState<StuccoDevice>("desktop");
   const [step, setStep] = useState(0);
   const strip = useRef<HTMLDivElement>(null);
-  const steps = stuccoTour[device];
+  const steps = tour[device];
   const current = steps[step]!;
   const caption = text.captions[device][current.key]!;
   const group = text.groups[current.group as StuccoGroup];

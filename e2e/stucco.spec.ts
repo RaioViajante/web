@@ -118,6 +118,13 @@ test("the demo layer traps focus, locks scrolling and restores the trigger", asy
     )
     .toBeLessThanOrEqual(420);
 
+  // Inside the demo, Esc closes the demo's own menu first.
+  await frame.locator(".burger").first().click();
+  await expect(frame.locator(".menu-open").first()).toBeAttached();
+  await frame.locator(".burger").first().press("Escape");
+  await expect(frame.locator(".menu-open")).toHaveCount(0);
+  await expect(layer(page)).toBeVisible();
+
   // Esc from inside the demo, which is a separate window.
   await frame.locator("body").click({ position: { x: 5, y: 300 } });
   await page.keyboard.press("Escape");
