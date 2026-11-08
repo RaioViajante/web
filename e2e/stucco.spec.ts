@@ -111,7 +111,8 @@ test("the demo layer traps focus, locks scrolling and restores the trigger", asy
   await expect(closeDemo(page)).toBeFocused();
   expect(await noScroll(page)).toBe("hidden");
   // The site's search shortcut must not navigate away from behind the layer.
-  await page.keyboard.press("/");
+  for (const shortcut of ["/", "Control+k", "Control+Shift+K"])
+    await page.keyboard.press(shortcut);
   await expect(layer(page)).toBeVisible();
   await expect(page).toHaveURL(/\/projects\/stucco$/);
   const frame = await demoLoaded(page);

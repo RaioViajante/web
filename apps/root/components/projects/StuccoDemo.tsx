@@ -132,7 +132,7 @@ export function StuccoDemo({
     element.addEventListener("keydown", (event) => {
       if (
         event.key === "/" ||
-        (event.key === "k" && (event.metaKey || event.ctrlKey))
+        (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey))
       )
         event.stopPropagation();
     });
