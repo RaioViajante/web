@@ -383,7 +383,10 @@
 }
 .st-art:hover .st-sl,
 .st-art:hover .st-cap span,
-.st-art:hover .st-dots i {
+.st-art:hover .st-dots i,
+.pj-case:focus-within .st-sl,
+.pj-case:focus-within .st-cap span,
+.pj-case:focus-within .st-dots i {
   animation-play-state: paused;
 }
 .st-wait .st-sl,

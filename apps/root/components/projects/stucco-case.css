@@ -445,11 +445,6 @@
   color: var(--bg);
   border-color: var(--fg);
 }
-.sc-arr:focus-visible,
-.sc-th:focus-visible {
-  outline: 1px solid var(--fg);
-  outline-offset: 3px;
-}
 .sc-steps {
   display: flex;
   gap: 6px;
@@ -650,10 +645,6 @@
 .bd-seg button[aria-pressed="true"] {
   background: var(--fg);
   color: var(--bg);
-}
-.bd-seg button:focus-visible {
-  outline: 1px solid var(--fg);
-  outline-offset: 2px;
 }
 @media (prefers-reduced-motion: reduce) {
   .bd-mock,
@@ -962,12 +953,6 @@
 }
 .dm-x:hover {
   background: var(--hover-inline);
-}
-.dm-seg button:focus-visible,
-.dm-btn:focus-visible,
-.dm-x:focus-visible {
-  outline: 1px solid var(--fg);
-  outline-offset: 2px;
 }
 .dm-view {
   position: relative;

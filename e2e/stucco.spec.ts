@@ -1,5 +1,6 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { base, isolate, watchHealth } from "./support";
+import { base, isolate, settleMotion, watchHealth } from "./support";
 
 // The Stucco. client case: the card's one link, the tour, the brand toggles
 // and the demo layer, whose iframe depends on the per-page framing rules.
@@ -198,4 +199,43 @@ test("the demo stays out of the indexes and is only framed by this site", async 
   expect(response.headers()["content-security-policy"]).toContain(
     "frame-ancestors 'self'",
   );
+});
+
+test("the states only interaction reaches pass axe and use the shared focus ring", async ({
+  page,
+}) => {
+  await open(page, "/projects/stucco");
+  await settleMotion(page);
+  for (const button of await page
+    .getByRole("button", { name: "art", exact: true })
+    .all())
+    await button.click();
+  // Measure the pressed colors at rest, not during their transition.
+  await settleMotion(page);
+  // The demo is checked as its own document; this covers the page around it.
+  const violations = async () =>
+    (await new AxeBuilder({ page }).exclude("iframe").analyze()).violations.map(
+      (violation) =>
+        `${violation.id}: ${violation.nodes.map((node) => node.target).join(", ")}`,
+    );
+  expect(await violations()).toEqual([]);
+
+  await demoButton(page).click();
+  await demoLoaded(page);
+  await settleMotion(page);
+  expect(await violations()).toEqual([]);
+  await page.keyboard.press("Shift+Tab");
+  await expect(page.locator(".dm-btn")).toBeFocused();
+  await expect(page.locator(".dm-btn")).toHaveCSS("outline-width", "2px");
+  await expect(page.locator(".dm-btn")).toHaveCSS("outline-style", "solid");
+});
+
+test("keyboard focus on the card pauses the slideshow", async ({ page }) => {
+  await open(page, "/projects");
+  const slide = page.locator("#stucco .st-win .st-sl.s1");
+  await slide.scrollIntoViewIfNeeded();
+  await expect(page.locator("#stucco .st-art")).not.toHaveClass(/st-wait/);
+  await expect(slide).toHaveCSS("animation-play-state", "running");
+  await page.locator("#stucco a").focus();
+  await expect(slide).toHaveCSS("animation-play-state", "paused");
 });
