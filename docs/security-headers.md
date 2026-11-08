@@ -108,6 +108,16 @@ No additional server runtime was introduced for Docs or Lab.
 | Dump | `style-src`   | `https://giscus.app`                                                                             | The actual client injects `/default.css` into the parent document |
 | Dump | `frame-src`   | `https://giscus.app`                                                                             | The comments widget                                               |
 
+Root's framing has two narrow exceptions, both same-origin and tested in
+`security/headers.test.mjs`: `frame-src 'self'` on exactly `/projects/stucco`
+and `/pt/projects/stucco`, and `frame-ancestors 'self'` on `/work/*`, which also
+answers `X-Robots-Tag: noindex, nofollow`. Everything else keeps `'none'`. The
+demo's static files use the static policy from `next.config.ts`; `proxy.ts`
+skips them because they carry no nonce. A CSP belongs to the document, so a link
+into a case page must be a full navigation. Documents with a framing exception omit
+`upgrade-insecure-requests`, which would otherwise break the frame on local http
+and has nothing to upgrade in production, since they load only `'self'`.
+
 There are no other non-self CSP origins. The Giscus iframe performs its own API
 and GitHub/avatar requests under its own policy: the parent does not need
 `github.com`, `api.github.com` or avatar origins in `connect-src` or `img-src`.

@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { contentSecurityPolicy, securityHeaders } from "./headers.ts";
+import {
+  contentSecurityPolicy,
+  demoHostPaths,
+  rootFraming,
+  securityHeaders,
+  workHeaders,
+} from "./headers.ts";
 import { isJsonLd, scriptOpenTags } from "./html-scripts.mjs";
 import { ports, startServers } from "./local-servers.mjs";
 import {
@@ -97,7 +103,15 @@ for (const [site, port] of Object.entries(ports)) {
       );
       await repeat.arrayBuffer();
     } else assert.equal(nonce, undefined);
-    assert.equal(csp, contentSecurityPolicy(site, nonce));
+    assert.equal(
+      csp,
+      contentSecurityPolicy(
+        site,
+        nonce,
+        false,
+        site === "root" ? rootFraming(path) : undefined,
+      ),
+    );
     for (const attributes of scriptOpenTags(html)) {
       // JSON-LD is data, not executed, so the CSP does not govern it.
       if (isJsonLd(attributes)) continue;
@@ -143,6 +157,36 @@ for (const [site, port] of Object.entries(ports)) {
       );
     await response.arrayBuffer();
     assets++;
+  }
+  if (site === "root") {
+    // The case pages may embed the demo, and only the demo may be embedded.
+    for (const path of demoHostPaths) assert.ok(paths.includes(path), path);
+    const [policy, robots] = workHeaders();
+    for (const path of [
+      "/work/stucco/index.html",
+      "/work/stucco/services.html",
+      "/work/stucco/assets/css/style.css",
+      "/work/stucco/assets/js/main.js",
+    ]) {
+      const response = await fetch(origin + path);
+      assert.equal(response.status, 200, path);
+      assert.equal(response.headers.get(policy.key), policy.value, path);
+      assert.equal(response.headers.get(robots.key), robots.value, path);
+      for (const { key, value } of securityHeaders(site))
+        assert.equal(response.headers.get(key), value, `${path} ${key}`);
+      await response.arrayBuffer();
+      assets++;
+    }
+    for (const path of ["/work/stucco", "/work/stucco/"]) {
+      const response = await fetch(origin + path);
+      assert.equal(response.status, 200, path);
+      assert.match(response.url, /\/work\/stucco\/index\.html$/, path);
+      await response.arrayBuffer();
+    }
+    const sitemapPaths = new Set(paths);
+    assert.ok(![...sitemapPaths].some((path) => path.startsWith("/work")));
+    const robotsTxt = await (await fetch(`${origin}/robots.txt`)).text();
+    assert.doesNotMatch(robotsTxt, /work/);
   }
   console.log(
     `${site}: ${paths.length} documents, ${resources.size} asset/metadata endpoints passed`,
