@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ptProjectsCopy } from "../lib/pt.ts";
+import { ptProjectsCopy, ptStuccoCopy } from "../lib/pt.ts";
 import {
   clientCases,
   countLabel,
@@ -21,6 +21,8 @@ import {
   mochifileWidths,
   transition,
 } from "../lib/sketch-demos.ts";
+import { routes, routeKeys } from "../lib/routes.ts";
+import { stuccoCopy } from "../lib/stucco.ts";
 import { roughEllipse, roughLine } from "../lib/sketch.ts";
 
 // The projects pages publish facts about real projects. These checks keep the
@@ -140,13 +142,59 @@ test("the sketch copy is fully translated, including the words inside the art", 
   assert.deepEqual(same, ["hum.volume", "mochifile.original", "yanawa.tokens"]);
 });
 
-test("nothing published is a placeholder or an invented client", () => {
-  assert.deepEqual(clientCases, []);
+test("the only published client case is Stucco., and its page exists", () => {
+  assert.deepEqual(
+    clientCases.map(({ id, client, year }) => [id, client, year]),
+    [["stucco", "Stucco.", "2026"]],
+  );
+  for (const { route } of clientCases) {
+    assert.ok(routeKeys.includes(route), route);
+    assert.ok(routes[route]["pt-BR"], route);
+  }
+});
+
+test("the Stucco. case has the same shape in both languages", () => {
+  const paths = (value, path = []) =>
+    Array.isArray(value)
+      ? [
+          `${path.join(".")}[${value.length}]`,
+          ...value.flatMap((item, index) => paths(item, [...path, index])),
+        ]
+      : typeof value === "object"
+        ? Object.entries(value).flatMap(([key, item]) =>
+            paths(item, [...path, key]),
+          )
+        : [path.join(".")];
+  assert.deepEqual(paths(ptStuccoCopy), paths(stuccoCopy));
+  assert.notEqual(ptStuccoCopy.intro, stuccoCopy.intro);
+});
+
+test("the Stucco. case states the owner's print sizes and that the brand is fictional", () => {
+  const text = (value) =>
+    typeof value === "string"
+      ? value
+      : typeof value === "object"
+        ? Object.values(value).map(text).join("\n")
+        : "";
+  for (const copy of [stuccoCopy, ptStuccoCopy]) {
+    assert.equal(copy.brand.pieces.car.spec.slice(0, 10), "20 × 28 cm");
+    assert.equal(copy.brand.pieces.business.spec.slice(0, 8), "9 × 5 cm");
+    assert.doesNotMatch(text(copy), /300 × 280/);
+    assert.match(copy.note, /fictional|fictícios/);
+  }
+});
+
+test("nothing published is a placeholder", () => {
   const strings = (value) =>
     typeof value === "string"
       ? [value]
       : Object.values(value).flatMap((item) => strings(item));
-  for (const text of strings([projectsCopy, ptProjectsCopy])) {
+  for (const text of strings([
+    projectsCopy,
+    ptProjectsCopy,
+    stuccoCopy,
+    ptStuccoCopy,
+  ])) {
     assert.doesNotMatch(text, /[[\]]/, text);
     assert.doesNotMatch(text, /\bTODO\b|lorem ipsum/, text);
   }

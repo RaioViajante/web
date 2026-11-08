@@ -10,7 +10,13 @@ app has its own purpose, framework, and production deployment.
 ## Applications
 
 - **`apps/root`** — the personal home of the ecosystem at `raioviajante.com`:
-  a small index of who, what is being built, and where the other sites are.
+  a small index of who, what is being built, and where the other sites are. Its
+  client case pages (`/projects/stucco`, `/pt/projects/stucco`) show a static
+  demo served from `public/` at `/work/stucco/`. Only those two pages may frame
+  it and only `/work/*` may be framed, both same-origin (`security/headers.ts`);
+  a link into a case page must be a full navigation, because the CSP belongs to
+  the document. `/work/*` answers `noindex` and stays out of the sitemap and
+  search.
 - **`apps/dump`** — personal technical writing: posts authored as MDX, with an
   archive, tags, RSS feed, and comments.
 - **`apps/docs`** — curated public technical documentation for projects and

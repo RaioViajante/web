@@ -1,0 +1,410 @@
+/* The code-drawn browser and phone on the Stucco. card. Colors are tokens in
+   project-art.css; Barlow is the demo's own file, used only inside this art. */
+:where(.st-art) span {
+  display: block;
+}
+@font-face {
+  font-family: "StuccoBarlow";
+  src: url("/work/stucco/assets/fonts/barlow-latin-900-normal.woff2")
+    format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+.st-art {
+  position: relative;
+  display: block;
+  aspect-ratio: 16/10;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--card);
+  isolation: isolate;
+  container-type: inline-size;
+}
+.st-win {
+  position: absolute;
+  left: 5%;
+  top: 8%;
+  width: 80%;
+  bottom: -3%;
+  border-radius: 9px 9px 0 0;
+  overflow: hidden;
+  background: var(--stucco-ink);
+  box-shadow: 0 18px 40px var(--stucco-shadow);
+}
+.st-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 7cqw;
+  max-height: 24px;
+  min-height: 15px;
+  background: var(--block-button);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+}
+.st-bar i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rule-note);
+  flex: 0 0 auto;
+}
+.st-url {
+  margin-left: 6px;
+  max-width: 62%;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: var(--block-terminal);
+  font-size: max(7px, 2cqw);
+  line-height: 1.6;
+  color: var(--fg-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.st-view {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: clamp(15px, 7cqw, 24px);
+  overflow: hidden;
+}
+.st-sl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  animation: stcyc 16s linear infinite;
+}
+.st-sl.s1 {
+  animation-delay: -1s;
+}
+.st-sl.s2 {
+  animation-delay: 3s;
+}
+.st-sl.s3 {
+  animation-delay: 7s;
+}
+.st-sl.s4 {
+  animation-delay: 11s;
+}
+@keyframes stcyc {
+  0% {
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 1;
+  }
+  31% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.st-sh {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    var(--stucco-scrim-top),
+    var(--stucco-scrim-mid) 32%,
+    var(--stucco-scrim-low)
+  );
+}
+.st-top {
+  position: absolute;
+  left: 4.5%;
+  right: 4.5%;
+  top: 6%;
+  display: flex;
+  align-items: center;
+}
+.st-top {
+  --t: max(9px, 2.6cqw);
+}
+:where(.st-art) .st-logo {
+  display: flex;
+  align-items: stretch;
+}
+.st-logo b {
+  width: var(--t);
+  height: var(--t);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--stucco-ink);
+  color: var(--stucco-white);
+  font-family: "StuccoBarlow", Arial, sans-serif;
+  font-weight: 900;
+  font-size: calc(var(--t) * 0.82);
+  line-height: 1;
+}
+.st-logo i {
+  width: calc(var(--t) * 0.34);
+  height: calc(var(--t) * 0.34);
+  margin-left: calc(var(--t) * 0.1);
+  align-self: flex-end;
+  background: var(--stucco-yellow);
+}
+:where(.st-art) .st-burg {
+  position: relative;
+  flex: none;
+  width: calc(var(--t) * 1.35);
+  height: calc(var(--t) * 1.35);
+  border: max(1px, 0.18cqw) solid var(--stucco-white);
+  margin-left: calc(var(--t) * 0.35);
+}
+.st-burg i {
+  position: absolute;
+  left: 25%;
+  width: 50%;
+  height: max(1px, 0.2cqw);
+  background: var(--stucco-white);
+}
+.st-burg i:nth-child(1) {
+  top: 31%;
+}
+.st-burg i:nth-child(2) {
+  top: 48%;
+}
+.st-burg i:nth-child(3) {
+  top: 65%;
+}
+.st-lbl {
+  margin-left: calc(var(--t) * 0.85);
+  font-family: "StuccoBarlow", Arial, sans-serif;
+  font-weight: 600;
+  font-size: calc(var(--t) * 0.5);
+  letter-spacing: 0.24em;
+  color: var(--stucco-label);
+}
+.st-q {
+  margin-left: auto;
+  background: var(--stucco-yellow);
+  color: var(--stucco-ink);
+  font-family: "StuccoBarlow", Arial, sans-serif;
+  font-weight: 900;
+  font-size: max(6px, 1.45cqw);
+  letter-spacing: 0.2em;
+  padding: 0.7em 1.1em;
+  white-space: nowrap;
+}
+.st-txt {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 13%;
+  color: var(--stucco-white);
+}
+.st-cap {
+  position: relative;
+  height: 1.5em;
+  font-family: "StuccoBarlow", Arial, sans-serif;
+  font-weight: 900;
+  font-size: max(6px, 1.35cqw);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+.st-cap span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  opacity: 0;
+  animation: stlab 16s linear infinite;
+}
+.st-cap .s1 {
+  animation-delay: -1s;
+}
+.st-cap .s2 {
+  animation-delay: 3s;
+}
+.st-cap .s3 {
+  animation-delay: 7s;
+}
+.st-cap .s4 {
+  animation-delay: 11s;
+}
+@keyframes stlab {
+  0%,
+  2.9% {
+    opacity: 0;
+  }
+  3%,
+  27.9% {
+    opacity: 1;
+  }
+  28%,
+  100% {
+    opacity: 0;
+  }
+}
+.st-h {
+  font-family: "StuccoBarlow", Arial, sans-serif;
+  font-weight: 900;
+  font-size: max(10px, 3.5cqw);
+  letter-spacing: 0.12em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  margin-top: 0.35em;
+}
+:where(.st-art) .st-dots {
+  display: flex;
+  gap: 0.9em;
+  margin-top: 1.1em;
+  font-size: max(6px, 1.3cqw);
+}
+.st-dots i {
+  width: 0.75em;
+  height: 0.75em;
+  background: var(--stucco-step);
+  animation: stdot 16s linear infinite;
+}
+.st-dots .s1 {
+  animation-delay: -1s;
+}
+.st-dots .s2 {
+  animation-delay: 3s;
+}
+.st-dots .s3 {
+  animation-delay: 7s;
+}
+.st-dots .s4 {
+  animation-delay: 11s;
+}
+@keyframes stdot {
+  0%,
+  2.9% {
+    background: var(--stucco-step);
+  }
+  3%,
+  27.9% {
+    background: var(--stucco-yellow);
+  }
+  28%,
+  100% {
+    background: var(--stucco-step);
+  }
+}
+.st-phone {
+  position: absolute;
+  right: 3.5%;
+  bottom: -7%;
+  width: 23%;
+  aspect-ratio: 640/1090;
+  border-radius: 12% / 7%;
+  background: var(--stucco-ink);
+  border: 3px solid var(--stucco-ink);
+  box-shadow: 0 14px 30px var(--stucco-shadow-strong);
+  overflow: hidden;
+  transition: transform 0.5s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+:where(.st-art) .st-phone {
+  container-type: inline-size;
+}
+.st-pv {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.st-pv .st-sl {
+  object-position: 50% 50%;
+}
+.st-pt {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 4.5%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  --t: 5.2cqw;
+}
+.st-pt .st-burg {
+  margin-left: 2.6cqw;
+  width: 12.5cqw;
+  height: 12.5cqw;
+  border-width: 1px;
+}
+/* A fixed gap, not percentages: at this size those land on fractions of a
+   pixel and the three lines merge. */
+.st-pt .st-burg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+}
+.st-pt .st-burg i {
+  position: static;
+  width: 52%;
+  height: 1px;
+}
+.st-pt .st-q {
+  font-size: 2.7cqw;
+  padding: 0.75em 0.8em;
+  letter-spacing: 0.12em;
+}
+.st-ptxt {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  bottom: 12%;
+  z-index: 2;
+  color: var(--stucco-white);
+}
+.st-ptxt .st-cap {
+  font-size: 2.9cqw;
+  letter-spacing: 0.2em;
+}
+.st-ptxt .st-h {
+  font-size: 7.2cqw;
+  letter-spacing: 0.08em;
+}
+.st-ptxt .st-dots {
+  font-size: 3.6cqw;
+}
+.st-art:hover .st-phone,
+.pj-case:hover .st-phone {
+  transform: translateY(-6px);
+}
+.st-art:hover .st-sl,
+.st-art:hover .st-cap span,
+.st-art:hover .st-dots i {
+  animation-play-state: paused;
+}
+.st-wait .st-sl,
+.st-wait .st-cap span,
+.st-wait .st-dots i {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-sl,
+  .st-cap span,
+  .st-dots i {
+    animation: none;
+  }
+  .st-sl.s1,
+  .st-cap .s1 {
+    opacity: 1;
+  }
+  .st-dots .s1 {
+    background: var(--stucco-yellow);
+  }
+  .st-phone {
+    transition: none;
+  }
+}

@@ -18,6 +18,7 @@ import { MochifileSketch } from "./MochifileSketch";
 import { OrbitSketch } from "./OrbitSketch";
 import { OrdelisSketch } from "./OrdelisSketch";
 import { RefrainSketch } from "./RefrainSketch";
+import { StuccoArt } from "./StuccoArt";
 import "@raioviajante/design/project-art.css";
 // The large sketches share rules and reduced-motion handling with the small ones.
 import "./minis.css";
@@ -110,9 +111,19 @@ export function ProjectsBody({ locale }: { locale: LocaleId }) {
                 key={item.id}
                 item={item}
                 index={index}
+                locale={locale}
                 copy={copy}
+                art={<StuccoArt />}
               />
             ))}
+            <div className="pj-empty">
+              <span className="pj-case__tab" aria-hidden="true">
+                {copy.page.caseLabel}{" "}
+                {String(clientCases.length + 1).padStart(2, "0")}
+              </span>
+              <p className="pj-empty__title">{copy.page.caseSoon}</p>
+              <p className="pj-empty__note">{copy.page.clientsEmptyNote}</p>
+            </div>
           </div>
         ) : (
           <div className="pj-empty">

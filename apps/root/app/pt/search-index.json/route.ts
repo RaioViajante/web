@@ -23,6 +23,7 @@ export function GET() {
     ...ptNavigation,
     { key: "setup" as const, label: "setup" },
     { key: "projects-all" as const, label: "todos os projetos" },
+    { key: "projects-stucco" as const, label: "case Stucco." },
   ];
   const entries: SearchEntry[] = pages.map(({ key, label }, index) => ({
     site: "root",

@@ -225,9 +225,11 @@
 
 @media (max-width: 760px) {
   .pj-grid,
-  .pj-home,
-  .pj-cases {
+  .pj-home {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .pj-case__pill {
+    display: none;
   }
   .pj-tile__art {
     height: 136px;

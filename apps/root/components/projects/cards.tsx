@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { LocaleId } from "../../../../site/locales";
 import { CONTACT } from "../../../../site/sites";
 import type { ClientCase, Project, ProjectsCopy } from "../../lib/projects";
+import { routes } from "../../lib/routes";
 import { pad, ProjectAction, ProjectIcon, StatusMark } from "./parts";
 import "./cards.css";
 import "./pages.css";
@@ -110,46 +111,58 @@ export function ProjectTile({
   );
 }
 
-/** A published client case. None exists yet; see `clientCases`. */
+/**
+ * A published client case. The link is a plain anchor on purpose: a client-side
+ * navigation would keep this page's CSP, whose `frame-src 'none'` would block
+ * the demo on the case page.
+ */
 export function ClientCaseCard({
   item,
   index,
+  locale,
   copy,
+  art,
 }: {
   item: ClientCase;
   index: number;
+  locale: LocaleId;
   copy: ProjectsCopy;
+  art: ReactNode;
 }) {
+  const text = copy.cases[item.id];
+  const heading = `case-${item.id}`;
   return (
     <article
       className="pj-card pj-case"
-      aria-labelledby={`case-${item.id}`}
+      id={item.id}
+      aria-labelledby={heading}
       data-motion="card"
     >
-      <div className="pj-case__art">
-        <span className="pj-case__tab">
-          {copy.page.caseLabel} {pad(index + 1)}
-        </span>
-      </div>
+      {art}
       <div className="pj-card__body">
-        <div className="pj-card__title">
-          <h3 id={`case-${item.id}`}>{item.client}</h3>
-          <span className="pj-card__meta">
-            {item.year} · {item.scope}
-          </span>
+        <div className="pj-card__head">
+          <div className="pj-card__title">
+            <h3 id={heading}>{item.client}</h3>
+            <span className="pj-card__meta">
+              {item.year} · {text.scope}
+            </span>
+          </div>
+          <StatusMark stage="usable" className="pj-status pj-case__pill">
+            {`${copy.page.caseLabel} ${pad(index + 1)}`}
+          </StatusMark>
         </div>
-        <p className="pj-card__description">{item.summary}</p>
+        <p className="pj-card__description">{text.summary}</p>
         <div className="pj-card__foot">
-          {item.href ? (
-            <a className="pj-action" href={item.href} data-sound="nav">
-              <span className="pj-action__text">{item.client}</span>
-              <span className="pj-action__arrow" aria-hidden="true">
-                ↗
-              </span>
-            </a>
-          ) : (
-            <span className="pj-action is-none">{copy.page.caseSoon}</span>
-          )}
+          <a
+            className="pj-action"
+            href={routes[item.route][locale]!}
+            data-sound="nav"
+          >
+            <span className="pj-action__text">{text.action}</span>
+            <span className="pj-action__arrow" aria-hidden="true">
+              →
+            </span>
+          </a>
         </div>
       </div>
     </article>

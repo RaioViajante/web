@@ -209,6 +209,19 @@
   gap: 22px;
 }
 
+.pj-cases > :nth-child(2) {
+  margin-top: 26px;
+}
+
+@media (max-width: 760px) {
+  .pj-cases {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pj-cases > :nth-child(2) {
+    margin-top: 0;
+  }
+}
+
 .pj-case .pj-card__body {
   grid-template-columns: 1fr;
 }

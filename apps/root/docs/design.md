@@ -23,7 +23,7 @@ for `next/font`.
 Artwork is not stored in the app: the avatar frames, the gallery images and the
 "work of art" sticker come from `packages/design/assets`. Gallery styles are scoped to its route; the shared shell keeps its existing geometry.
 
-Root has routes for home, about, projects, all projects, contact, gallery, this site, setup,
+Root has routes for home, about, projects, all projects, the Stucco. client case, contact, gallery, this site, setup,
 search, privacy, and terms of use, and a 404 page (`app/not-found.tsx`) built on
 the shared template. The primary navigation contains the local content
 routes except Setup,
@@ -69,9 +69,8 @@ word drawn inside the sketches. Components are in `components/projects/`.
   say "coming soon to Mochifile" in their note; Ordelis: approve or request changes in the planned review step;
   Refrain: play or stop the record; Orbit: queue and cancel executions that
   follow Orbit's transition rules, simulated in the browser). Then "View all
-  projects" and "02.1 Client work". `clientCases` is empty, so the section
-  shows a localized empty state and no link to a client catalog; the client
-  card component renders only real cases.
+  projects" and "02.1 Client work": the Stucco. case and the box for the next one. There is no
+  link to a client catalog; the client card component renders only real cases.
 - **`/projects/all`.** All eight projects as smaller tiles, filtered by kind
   (all, tools, music, systems, languages, games) with pressed-state buttons and
   a polite count. Without JavaScript every tile stays visible. The sidebar
@@ -103,6 +102,34 @@ word drawn inside the sketches. Components are in `components/projects/`.
   Refrain record keeps spinning. Orbit queues one execution the first time
   its sketch comes into view, and after that only when the visitor asks.
   Everything stops under reduced motion.
+
+### Client case: Stucco.
+
+`/projects/stucco` and its Portuguese counterpart tell the case, implementing
+the approved prototype (`reference/stucco-demo/`, local and untracked). The
+copy is in `lib/stucco.ts` and `ptStuccoCopy` (`lib/pt.ts`), where the owner's
+Portuguese is the original. Images are derived from the kit by
+`pnpm --filter @raioviajante/design stucco-art <kit>` into
+`packages/design/assets/projects/stucco/`, and imported from the generated
+`@raioviajante/design/stucco`, so other pages never bundle them.
+
+- **Card.** A code-drawn browser and phone repeat the demo's hero. The art is
+  decorative, keeps the demo's own English in both languages, and is the one
+  place Barlow appears on Root, loaded from the demo's file. It rests on photo
+  01 until 45% of it is in view, pauses on hover and stays still under reduced
+  motion. Its only link goes to the case, as a full navigation (see
+  `docs/architecture.md`).
+- **Demo layer.** A native modal dialog, portaled to the body so the page
+  motion's transforms cannot affect it. The frame grows from the tour or the
+  button by FLIP. Esc also works from inside the demo, since it is same-origin.
+- **`/work/stucco/`.** The demo is static and has no inline styles or scripts,
+  so it runs under the same CSP without a nonce; `next.config.ts` sends its
+  headers and `proxy.ts` skips its files. The bare path redirects to
+  `index.html` because the demo's relative paths need a URL inside its folder.
+- **Exceptions to the visual rules, from the approved design.** The frames of
+  the tour, the card art, the brand art and the demo layer have shadows, the
+  card art has a photo scrim that repeats the demo's, and the layer's backdrop
+  is blurred, as the gallery's is. They exist only inside this case.
 
 ### Gallery
 

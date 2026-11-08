@@ -37,7 +37,7 @@ for (const width of [1440, 390, 360]) {
   }) => {
     await page.setViewportSize({ width, height: 900 });
     const { health } = await open(page, "/projects");
-    await expect(page.locator("main article.pj-card")).toHaveCount(4);
+    await expect(page.locator("main .pj-list article.pj-card")).toHaveCount(4);
     for (const name of ["Mochifile", "Ordelis", "Refrain", "Orbit"])
       await expect(
         page.getByRole("heading", { level: 3, name, exact: true }),
@@ -112,10 +112,13 @@ for (const width of [1440, 390, 360]) {
     // Focus stays on Cancel even when nothing is left to cancel.
     await expect(cancel).toBeFocused();
 
-    // Client work: honest empty state, and no route that does not exist.
-    await expect(
-      page.getByText("No client cases published yet."),
-    ).toBeVisible();
+    // Client work: the published case, the next slot, and no route that does
+    // not exist. The demo itself is only reachable from the case page.
+    await expect(page.locator("#stucco h3")).toHaveText("Stucco.");
+    await expect(page.locator("main .pj-empty")).toContainText(
+      "Case coming soon",
+    );
+    await expect(page.locator('main a[href*="/work/"]')).toHaveCount(0);
     await expect(page.locator('a[href*="/projects/clients"]')).toHaveCount(0);
 
     expect(

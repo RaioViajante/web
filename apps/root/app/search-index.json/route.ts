@@ -18,6 +18,11 @@ export function GET() {
     ["setup", "/setup", "Tools and setup"],
     // Last, so the numbers above keep matching the sidebar.
     ["all projects", "/projects/all", "Every project, by kind"],
+    [
+      "Stucco. case",
+      "/projects/stucco",
+      "Client case: site and brand for a plaster studio",
+    ],
   ].map(([title, href, description], index) => ({
     site: "root",
     locale: DEFAULT_LOCALE,
