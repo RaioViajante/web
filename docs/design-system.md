@@ -78,7 +78,7 @@ All files are exports of the original artwork. The screenshot crops from the des
 4. **Whitespace organizes, not boxes.** Only code blocks and lab benches get a frame.
 5. **Soft blocks.** Everything that interrupts prose (code, terminals, notes, tables, lab benches) sits on one surface: `#212121`, 10px corners, no border, label above. Only warnings are outlined. Sections are never boxed.
 6. **Sound and character are identity.** Every site uses the root's sounds, the avatar and the sticker.
-7. **Never:** gradients, glow, shadows, bento grids, colored badges, emoji, a second typeface, an accent color for links. One exception: the root gallery's tiles keep their shadows (artwork pinned to a board). The pressed state of a leader row also keeps root's inset shadow. The Stucco. client case is the other exception, from its approved design and only inside it: framed screenshots and its demo layer have shadows, its card art repeats the demo's photo scrim and uses the demo's Barlow (`apps/root/docs/design.md`).
+7. **Never:** gradients, glow, shadows, bento grids, colored badges, emoji, a second typeface, an accent color for links. One exception: the root gallery's tiles keep their shadows (artwork pinned to a board). The pressed state of a leader row also keeps root's inset shadow. Root's client cases are the other exception, only inside each case's approved design: framed screenshots, printed pieces and the demo layer have shadows, and the card art repeats the demo's photo scrim and uses the client's typeface (`apps/root/docs/design.md`).
 
 ## 2. Tokens
 

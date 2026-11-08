@@ -128,10 +128,11 @@ Portuguese is the original. Images are derived from the kit by
   so it runs under the same CSP without a nonce; `next.config.ts` sends its
   headers and `proxy.ts` skips its files. The bare path redirects to
   `index.html` because the demo's relative paths need a URL inside its folder.
-- **Exceptions to the visual rules, from the approved design.** The frames of
-  the tour, the card art, the brand art and the demo layer have shadows, the
-  card art has a photo scrim that repeats the demo's, and the layer's backdrop
-  is blurred, as the gallery's is. They exist only inside this case.
+- **Exceptions to the visual rules.** They apply to every client case, only
+  inside its approved design. Here the frames of the tour, the card art, the
+  brand art and the demo layer have shadows, the card art has a photo scrim
+  that repeats the demo's, and the layer's backdrop is blurred, as the
+  gallery's is.
 
 ### Gallery
 
