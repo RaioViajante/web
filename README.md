@@ -18,6 +18,7 @@ four small sites, one design system.
 apps/              one folder per site
 packages/design/   shared visual language and behavior
 site/ seo/ security/   neutral config, SEO helpers, HTTP policy
+e2e/ perf/ links/ commits/   browser, speed, link and commit checks
 docs/              the long version of everything
 ```
 
@@ -32,8 +33,10 @@ pnpm validate
 #### read next
 
 <pre>
+<a href="docs/architecture.md">architecture.md</a> ·············· how the pieces fit
 <a href="docs/design-system.md">design-system.md</a> ············· how it looks and sounds
 <a href="docs/blocks.md">blocks.md</a> ···················· code and content blocks
+<a href="docs/i18n.md">i18n.md</a> ······················ english and portuguese
 <a href="docs/deployment.md">deployment.md</a> ················ how it ships
 <a href="docs/operations.md">operations.md</a> ··············· checks before and after a push
 <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> ·············· setup, checks, commits
@@ -48,6 +51,7 @@ code ························· <a href="LICENSE">MIT</a
 docs ························· <a href="apps/docs/src/content/docs/LICENSE">CC BY 4.0</a>
 posts ························ <a href="apps/dump/content/posts/LICENSE">all rights reserved</a>
 artwork + character ·········· <a href="packages/design/assets/LICENSE">all rights reserved</a>
+client demos ················· <a href="apps/root/public/work/LICENSE">all rights reserved</a>
 </pre>
 
 <p align="center"><sub>best viewed with the sound on · <a href="mailto:mail@raioviajante.com">mail@raioviajante.com</a></sub></p>

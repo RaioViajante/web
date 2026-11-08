@@ -1,6 +1,6 @@
 // Root's Portuguese (pt-BR) editorial copy. App-owned and manually authored:
 // the shared UI strings live in packages/design's catalog. Only pages that ship
-// in Portuguese appear here (Home, About, Projects, All projects, Contact,
+// in Portuguese appear here (Home, About, Projects, All projects, the Stucco. case, Contact,
 // Gallery, This site, Setup, Terms, Privacy, Search and the 404). The legal documents' bodies live
 // in their pages, beside the English originals. Names, handles, the email
 // address and tool names are not translated.

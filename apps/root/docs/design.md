@@ -116,8 +116,10 @@ Portuguese is the original. Images are derived from the kit by
 - **Card.** A code-drawn browser and phone repeat the demo's hero. The art is
   decorative, keeps the demo's own English in both languages, and is the one
   place Barlow appears on Root, loaded from the demo's file. It rests on photo
-  01 until 45% of it is in view, pauses on hover and stays still under reduced
-  motion. Its only link goes to the case, as a full navigation (see
+  01 until 45% of it is in view, pauses on hover or keyboard focus and stays
+  still under reduced motion. By the approved design it runs on its own once in
+  view, unlike the other cards' loops, which play only on hover or focus. Its
+  only link goes to the case, as a full navigation (see
   `docs/architecture.md`).
 - **Demo layer.** A native modal dialog, portaled to the body so the page
   motion's transforms cannot affect it. The frame grows from the tour or the
