@@ -52,6 +52,22 @@
   --orbit-cancelled: #a39a8a;
   --orbit-button-fg: #1a1209;
 
+  --stucco-ink: #0a0a0a;
+  --stucco-white: #ffffff;
+  --stucco-yellow: #f2bf27;
+  --stucco-paper: #e9e6e0;
+  --stucco-sand: #f2f0ec;
+  --stucco-muted: #5b5852;
+  --stucco-scrim-top: rgba(0, 0, 0, 0.4);
+  --stucco-scrim-mid: rgba(0, 0, 0, 0.05);
+  --stucco-scrim-low: rgba(0, 0, 0, 0.6);
+  --stucco-step: rgba(255, 255, 255, 0.5);
+  --stucco-label: rgba(255, 255, 255, 0.88);
+  --stucco-shadow: rgba(0, 0, 0, 0.45);
+  --stucco-shadow-strong: rgba(0, 0, 0, 0.6);
+  --stucco-shadow-print: rgba(0, 0, 0, 0.2);
+  --stucco-backdrop: rgba(12, 12, 12, 0.84);
+
   --yanawa-bg: #110c1a;
   --yanawa-node: #1a1226;
   --yanawa-fg: #e6dcef;
