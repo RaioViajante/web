@@ -18,6 +18,10 @@ test("social profiles use the raioviajando handle with platform-only labels", ()
     X: "https://x.com/raioviajando",
     YouTube: "https://www.youtube.com/@raioviajando",
     TikTok: "https://www.tiktok.com/@raioviajando",
+    Letterboxd: "https://letterboxd.com/raioviajando/",
+    Pinterest: "https://www.pinterest.com/RaioViajando/",
+    "Hugging Face": "https://huggingface.co/RaioViajando",
+    Kaggle: "https://www.kaggle.com/raioviajando",
   });
 });
 

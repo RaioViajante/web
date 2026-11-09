@@ -142,6 +142,22 @@ export const ptHome = {
       description:
         "Animações curtas e comentários rápidos sobre ideias de programação.",
     },
+    films: {
+      note: "filmes",
+      description: "Os filmes que vi e o que achei deles.",
+    },
+    references: {
+      note: "referências",
+      description: "Referências visuais que gosto de guardar.",
+    },
+    ai: {
+      note: "IA",
+      description: "Meu perfil para modelos e experimentos de IA.",
+    },
+    data: {
+      note: "dados",
+      description: "Meu perfil para datasets, notebooks e competições.",
+    },
     code: {
       note: "código",
       description: "Código, projetos e experimentos em andamento.",

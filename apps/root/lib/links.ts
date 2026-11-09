@@ -56,6 +56,34 @@ export const socialLinks: PrimaryLink[] = [
     category: "shorts",
     description: "Short animations and quick takes on programming ideas.",
   },
+  {
+    label: "Letterboxd",
+    href: "https://letterboxd.com/raioviajando/",
+    rel: "me",
+    category: "films",
+    description: "The films I've watched and what I thought of them.",
+  },
+  {
+    label: "Pinterest",
+    href: "https://www.pinterest.com/RaioViajando/",
+    rel: "me",
+    category: "references",
+    description: "Visual references I like to keep around.",
+  },
+  {
+    label: "Hugging Face",
+    href: "https://huggingface.co/RaioViajando",
+    rel: "me",
+    category: "ai",
+    description: "My profile for AI models and experiments.",
+  },
+  {
+    label: "Kaggle",
+    href: "https://www.kaggle.com/raioviajando",
+    rel: "me",
+    category: "data",
+    description: "My profile for datasets, notebooks and competitions.",
+  },
 ];
 
 export const profileLinks: PrimaryLink[] = [
