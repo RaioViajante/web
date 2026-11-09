@@ -84,6 +84,13 @@ export const socialLinks: PrimaryLink[] = [
     category: "data",
     description: "My profile for datasets, notebooks and competitions.",
   },
+  {
+    label: "Gist",
+    href: "https://gist.github.com/RaioViajante",
+    rel: "me",
+    category: "notes",
+    description: "Short notes and checklists from building things.",
+  },
 ];
 
 export const profileLinks: PrimaryLink[] = [
