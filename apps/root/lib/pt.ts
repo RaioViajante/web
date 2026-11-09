@@ -158,6 +158,10 @@ export const ptHome = {
       note: "dados",
       description: "Meu perfil para datasets, notebooks e competições.",
     },
+    notes: {
+      note: "notas",
+      description: "Notas curtas e checklists de quando construo coisas.",
+    },
     code: {
       note: "código",
       description: "Código, projetos e experimentos em andamento.",

@@ -12,7 +12,7 @@ import {
 const byLabel = (links) =>
   Object.fromEntries(links.map((l) => [l.label, l.href]));
 
-test("social profiles use the raioviajando handle with platform-only labels", () => {
+test("social profiles use the owner's handles with platform-only labels", () => {
   assert.deepEqual(byLabel(socialLinks), {
     Instagram: "https://www.instagram.com/raioviajando/",
     X: "https://x.com/raioviajando",
@@ -22,6 +22,7 @@ test("social profiles use the raioviajando handle with platform-only labels", ()
     Pinterest: "https://www.pinterest.com/RaioViajando/",
     "Hugging Face": "https://huggingface.co/RaioViajando",
     Kaggle: "https://www.kaggle.com/raioviajando",
+    Gist: "https://gist.github.com/RaioViajante",
   });
   for (const link of socialLinks) assert.equal(link.rel, "me");
 });
