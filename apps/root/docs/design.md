@@ -36,8 +36,9 @@ line shows the CNPJ supplied by the user. The footer links to the root site's
 privacy policy and terms of use.
 
 Typography is the shared token scale (Noto Sans Mono, 16.5px body, 1.82 line
-height, 740px column), taken from root's earlier values. Primary links currently
-contains the user's GitHub and public email. Setup has a real route and a typed
+height, 740px column), taken from root's earlier values. Primary links comes from
+`lib/links.ts`: the user's social and interest profiles, GitHub, the video-code
+organization and the public email. Setup has a real route and a typed
 gear list based on the user's supplied model names; no product links have been
 provided yet.
 The home page links to Setup under "Other links" after "Latest writing".

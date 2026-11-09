@@ -23,6 +23,7 @@ test("social profiles use the raioviajando handle with platform-only labels", ()
     "Hugging Face": "https://huggingface.co/RaioViajando",
     Kaggle: "https://www.kaggle.com/raioviajando",
   });
+  for (const link of socialLinks) assert.equal(link.rel, "me");
 });
 
 test("personal GitHub and the video-code organization stay distinct", () => {
