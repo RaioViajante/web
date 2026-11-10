@@ -159,6 +159,8 @@ Selecting a piece opens a native modal dialog with title, category, supported us
 metadata, unboxed ←/→ controls named Previous artwork / Next artwork, arrow-key navigation, Escape, and focus restoration.
 Navigation wraps within its category. The dialog keeps keyboard focus inside, makes
 the background inert, and locks page scrolling. Motion respects reduced-motion preferences.
+Profile pictures list the networks that use them: the more personal ones (Letterboxd,
+Spotify, Pinterest) use the hand-drawn picture, and `lib/links.ts` holds the split.
 Individual profile downloads use the supplied 1254px PNG originals; Personal downloads
 use the existing full-size WebPs. Stickers are viewed individually and downloaded as
 a sheet, matching the reference. Collection downloads select Branding (sticker and

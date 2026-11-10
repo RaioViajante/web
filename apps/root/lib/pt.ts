@@ -533,6 +533,8 @@ export const ptGalleryCopy: GalleryCopy = {
     "profile-laptop":
       "RaioViajante coçando a cabeça diante de um laptop, com dois pontos de interrogação ao lado",
     "profile-hmm": "RaioViajante com a mão no queixo, olhando para cima",
+    "profile-headphones":
+      "Desenho a traço de RaioViajante de cabelo cacheado e fones de ouvido, de olhos fechados",
     lab: "RaioViajante de jaleco segurando um frasco verde entre tanques luminosos etiquetados com linguagens",
     portrait:
       "Retrato pintado de RaioViajante com uma camiseta escura sobre fundo roxo",

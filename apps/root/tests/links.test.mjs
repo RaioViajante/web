@@ -3,6 +3,8 @@ import test from "node:test";
 import { identity } from "../../../seo/structured-data.ts";
 import { ptHome } from "../lib/pt.ts";
 import {
+  mainProfileLinks,
+  personalProfileLinks,
   primaryLinks,
   profileLinks,
   socialLinks,
@@ -52,6 +54,18 @@ test("home links and gallery profile links share the registry without duplicates
   assert.equal(
     new Set(primaryLinks.map((l) => l.category)).size,
     primaryLinks.length,
+  );
+});
+
+test("gallery pictures split the profiles: personal networks use the drawing", () => {
+  assert.deepEqual(personalProfileLinks.map((l) => l.label).sort(), [
+    "Letterboxd",
+    "Pinterest",
+    "Spotify",
+  ]);
+  assert.deepEqual(
+    [...mainProfileLinks, ...personalProfileLinks].map((l) => l.href).sort(),
+    profileLinks.map((l) => l.href).sort(),
   );
 });
 

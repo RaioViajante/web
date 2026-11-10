@@ -82,12 +82,12 @@ for (const width of [1440, 390, 320]) {
     ).toBeInViewport();
     await expect(
       collection.locator('button[aria-haspopup="dialog"]'),
-    ).toHaveCount(48);
+    ).toHaveCount(49);
     await expect(page.locator("main")).not.toContainText(
       /requiem|pale choir|concept art/i,
     );
     await expect(artworkButtons(page, "Branding")).toHaveCount(30);
-    await expect(artworkButtons(page, "Profiles")).toHaveCount(2);
+    await expect(artworkButtons(page, "Profiles")).toHaveCount(3);
     await expect(artworkButtons(page, "Personal")).toHaveCount(16);
     const sticker = page.getByRole("button", {
       name: "View Work of art",
@@ -192,7 +192,7 @@ for (const width of [1440, 390, 320]) {
     await dialog.getByRole("checkbox", { name: /Profiles/ }).check();
     const zipPromise = page.waitForEvent("download");
     await dialog
-      .getByRole("button", { name: "download .zip · 2 files" })
+      .getByRole("button", { name: "download .zip · 3 files" })
       .click();
     const zip = await zipPromise;
     expect(zip.suggestedFilename()).toBe("raioviajante-profiles.zip");
@@ -206,6 +206,7 @@ for (const width of [1440, 390, 320]) {
     expect(names).toEqual([
       "raioviajante-profiles-confused-at-the-laptop.png",
       "raioviajante-profiles-hmm.png",
+      "raioviajante-profiles-headphones-on.png",
     ]);
     if (width === 1440) {
       await dialog
@@ -213,7 +214,7 @@ for (const width of [1440, 390, 320]) {
         .click();
       const allPromise = page.waitForEvent("download");
       await dialog
-        .getByRole("button", { name: "download .zip · 20 files" })
+        .getByRole("button", { name: "download .zip · 21 files" })
         .click();
       const all = await allPromise;
       expect(all.suggestedFilename()).toBe("raioviajante-gallery.zip");
@@ -226,7 +227,7 @@ for (const width of [1440, 390, 320]) {
       })
         .trim()
         .split("\n");
-      expect(entries).toHaveLength(20);
+      expect(entries).toHaveLength(21);
       expect(new Set(entries.map((name) => name.split("/")[0]))).toEqual(
         new Set(["branding", "profiles", "personal"]),
       );
@@ -382,7 +383,7 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   });
   await expect(
     page.locator('#gallery-collection button[data-sound="gallery"]'),
-  ).toHaveCount(48);
+  ).toHaveCount(49);
   await sticker.hover();
   const beforeClick = await voices();
   await pressInPlace();
@@ -557,9 +558,9 @@ for (const width of [1440, 390])
     ).toBeInViewport();
     await expect(
       collection.locator('button[aria-haspopup="dialog"]'),
-    ).toHaveCount(48);
+    ).toHaveCount(49);
     await expect(artworkButtons(page, "Identidade visual")).toHaveCount(30);
-    await expect(artworkButtons(page, "Perfis")).toHaveCount(2);
+    await expect(artworkButtons(page, "Perfis")).toHaveCount(3);
     await expect(artworkButtons(page, "Pessoais")).toHaveCount(16);
     // Profile links keep their URLs; the video-source label is translated.
     const profileLinks = (path: string) =>
@@ -655,7 +656,7 @@ for (const width of [1440, 390])
     );
     const zipPromise = page.waitForEvent("download");
     await dialog
-      .getByRole("button", { name: "baixar .zip · 2 arquivos" })
+      .getByRole("button", { name: "baixar .zip · 3 arquivos" })
       .click();
     const zip = await zipPromise;
     expect(zip.suggestedFilename()).toBe("raioviajante-profiles.zip");
@@ -670,9 +671,10 @@ for (const width of [1440, 390])
     ).toEqual([
       "raioviajante-profiles-confused-at-the-laptop.png",
       "raioviajante-profiles-hmm.png",
+      "raioviajante-profiles-headphones-on.png",
     ]);
     await expect(dialog.getByRole("status")).toHaveText(
-      "raioviajante-profiles.zip salvo, 2 arquivos.",
+      "raioviajante-profiles.zip salvo, 3 arquivos.",
     );
     await dialog
       .getByRole("button", { name: "selecionar tudo", exact: true })
@@ -681,7 +683,7 @@ for (const width of [1440, 390])
       "Será salvo como raioviajante-gallery.zip, com uma pasta por categoria.",
     );
     await expect(
-      dialog.getByRole("button", { name: "baixar .zip · 20 arquivos" }),
+      dialog.getByRole("button", { name: "baixar .zip · 21 arquivos" }),
     ).toBeEnabled();
     await expect(
       dialog.getByRole("button", { name: "limpar seleção", exact: true }),

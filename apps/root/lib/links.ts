@@ -106,6 +106,17 @@ export const profileLinks: PrimaryLink[] = [
   videoSourceLink,
 ];
 
+const personalCategories = new Set(["films", "music", "references"]);
+
+/** The more personal networks, which use the hand-drawn picture in the gallery. */
+export const personalProfileLinks = profileLinks.filter((link) =>
+  personalCategories.has(link.category),
+);
+
+export const mainProfileLinks = profileLinks.filter(
+  (link) => !personalCategories.has(link.category),
+);
+
 export const primaryLinks: PrimaryLink[] = [
   ...socialLinks,
   github,
