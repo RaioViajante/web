@@ -27,6 +27,7 @@ import {
   type Category,
   type GalleryCopy,
 } from "../lib/gallery";
+import { attachPiecePop } from "../lib/gallery-pop";
 
 function Picture({
   artwork,
@@ -67,7 +68,7 @@ function Picture({
           ? "(max-width: 700px) 85vw, 900px"
           : artwork.category === "profiles"
             ? "112px"
-            : "(max-width: 760px) 55vw, 420px"
+            : "(max-width: 760px) 92vw, 620px"
       }
       loading={viewing ? "eager" : "lazy"}
     />
@@ -336,6 +337,11 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
   const [view, setView] = useState<Artwork | null>(null);
   const [downloadOpen, setDownloadOpen] = useState(false);
   const cover = useRef<HTMLButtonElement>(null);
+  const collage = useRef<HTMLDivElement>(null);
+  // Before paint, so the pieces never flash visible and then disappear.
+  useLayoutEffect(() => {
+    if (open && collage.current) return attachPiecePop(collage.current);
+  }, [open]);
   useLayoutEffect(() => {
     if (!open) return;
     // Keep the activated cover and the unfolding collection in view when the
@@ -482,6 +488,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
               </div>
             ) : (
               <div
+                ref={category.id === "personal" ? collage : undefined}
                 className={
                   category.id === "profiles"
                     ? "gallery-profiles"

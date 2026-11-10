@@ -150,7 +150,11 @@ Gallery artwork uses the shared `data-sound="gallery"` hover/click voice, includ
 the cover, with no additional manual sound dispatch. Thirty
 stickers share one transparent atlas (a 1080px AVIF preview, with the 2160px WebP
 original reserved for the viewer and downloads); the avatar uses the existing shared animation
-and shows its ten frames. Personal artwork forms a responsive overlapping collage.
+and shows its ten frames. Personal artwork forms a responsive overlapping collage on a
+12-column grid, placed in reading order so keyboard order follows the layout. Each piece
+pops in once as it scrolls into view, with the shared `gallery` voice (`lib/gallery-pop.ts`).
+Only that script hides a piece, so without JavaScript, in print and under reduced motion
+the artwork stays visible, and reduced motion also drops the sound.
 The artwork model lives in `lib/gallery.ts`, the client interaction in
 `components/GalleryBoard.tsx`, and the route styles in `app/gallery/gallery.css`.
 Artwork stays in the shared design package; the sixteen Personal images live there.

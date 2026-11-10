@@ -264,6 +264,74 @@ for (const width of [1440, 390, 320]) {
   });
 }
 
+async function openCollectionRecordingSounds(page: Page) {
+  await isolate(page, []);
+  await page.addInitScript(() => {
+    const sounds: unknown[] = [];
+    Object.assign(window, { sounds });
+    window.addEventListener("rv-sound", (event) =>
+      sounds.push((event as CustomEvent).detail),
+    );
+  });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(base("root") + "/gallery");
+  await page
+    .getByRole("button", { name: "Reveal the artwork collection" })
+    .click();
+  await expect(page.locator(".gallery-piece")).toHaveCount(16);
+}
+
+const recordedSounds = (page: Page) =>
+  page.evaluate(() => (window as unknown as { sounds: unknown[] }).sounds);
+
+async function scrollThroughCollage(page: Page) {
+  await page.mouse.move(800, 450);
+  const last = page.locator(".gallery-piece").last();
+  await expect(async () => {
+    await page.mouse.wheel(0, 500);
+    await expect(last).toBeInViewport({ ratio: 1, timeout: 200 });
+  }).toPass();
+}
+
+test("Personal artwork pops in once, with the gallery sound, on scroll", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  const pending = page.locator('.gallery-piece[data-pop="waiting"]');
+  await expect(pending).toHaveCount(16);
+  expect(await recordedSounds(page)).toEqual([]);
+  await scrollThroughCollage(page);
+  await expect(page.locator(".gallery-piece[data-pop]")).toHaveCount(0);
+  await expect(page.locator(".gallery-piece").last()).toHaveCSS("opacity", "1");
+  const sounds = await recordedSounds(page);
+  expect(sounds).toEqual(Array(16).fill("gallery"));
+  await page.mouse.wheel(0, -2000);
+  await page.mouse.wheel(0, 2000);
+  await page.waitForTimeout(300);
+  expect(await recordedSounds(page)).toEqual(sounds);
+});
+
+test("A focused piece appears at once, before it scrolls into view", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  const piece = page.locator(".gallery-piece").last();
+  await expect(piece).toHaveAttribute("data-pop", "waiting");
+  await piece.focus();
+  await expect(piece).not.toHaveAttribute("data-pop", "waiting");
+  await expect(piece).toHaveCSS("opacity", "1");
+});
+
+test("Under reduced motion the artwork never hides or pops", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openCollectionRecordingSounds(page);
+  await expect(page.locator(".gallery-piece[data-pop]")).toHaveCount(0);
+  await scrollThroughCollage(page);
+  expect(await recordedSounds(page)).toEqual([]);
+});
+
 test("Gallery reduced motion and failed collection download", async ({
   page,
 }) => {
