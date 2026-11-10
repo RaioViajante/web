@@ -46,7 +46,8 @@ routes here.
   their demo layer (see the repository-wide client-case exceptions). The
   gallery is the other owner-approved exception: its stickers burst out of the
   cover and gather back into it, and its Personal artwork pops in on scroll,
-  each with its own voice and nothing under reduced motion
+  each with its own voice; under reduced motion nothing animates and only the
+  cover's plain click plays
   ([docs/design.md](docs/design.md)). Do not extend these to other pages.
 
 ## UI validation

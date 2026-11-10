@@ -7,7 +7,7 @@ const IMAGE_WAIT_MS = 500;
 
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
-/** The one reduced-motion check of the gallery's motion and sound. */
+/** The gallery's reduced-motion check, shared by its motion and its sounds. */
 export const prefersReducedMotion = () =>
   window.matchMedia(REDUCED_MOTION).matches;
 
@@ -106,7 +106,8 @@ export function attachPiecePop(root: HTMLElement) {
     waiting.delete(piece);
     observer.unobserve(piece);
     void imageReady(piece).then(() => {
-      if (stopped) return;
+      // Focus may have revealed it while the image loaded: no late pop then.
+      if (stopped || piece.dataset.pop !== "waiting") return;
       piece.dataset.pop = "in";
       playSound("gallery");
     });
@@ -148,7 +149,8 @@ export function attachPiecePop(root: HTMLElement) {
     const piece = (event.target as Element).closest<HTMLElement>(
       ".gallery-piece",
     );
-    if (!piece || !waiting.has(piece)) return;
+    // Still hidden: queued, or popping but waiting for its image.
+    if (!piece || piece.dataset.pop !== "waiting") return;
     // Focus must land on something visible: no pop, no wait for the image.
     queue = queue.filter((item) => item !== piece);
     reveal(piece);

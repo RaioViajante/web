@@ -24,14 +24,20 @@ test("the collage spans used for image sizes match gallery.css", () => {
     ),
   );
   const fullWidth = phone.slice(0, phone.indexOf("grid-column: 1 / 13;"));
+  const phoneDefault = Number(
+    /\.gallery-collage \.gallery-piece \{\s*grid-column: span (\d+);/.exec(
+      phone,
+    )[1],
+  );
   for (const [id, [, span]] of Object.entries(collageSpans)) {
-    const expected =
-      fullWidth.includes(`.gallery-piece--${id},`) ||
-      fullWidth.includes(`.gallery-piece--${id} {`)
+    const own = new RegExp(
+      `\\.gallery-piece--${id} \\{\\s*grid-column: (\\d+) \\/ (\\d+);`,
+    ).exec(phone);
+    const expected = own
+      ? own[2] - own[1]
+      : fullWidth.includes(`.gallery-piece--${id},`)
         ? 12
-        : id === "portrait"
-          ? 8
-          : 6;
+        : phoneDefault;
     assert.equal(span, expected, id);
   }
 });

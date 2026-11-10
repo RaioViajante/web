@@ -149,8 +149,11 @@ flow. Reduced motion
 stops the float and reveals immediately; without JavaScript the server-rendered
 collection remains visible. The local export starts open and has no opening
 choreography; this entry interaction refines it without changing the final layout.
-Gallery artwork uses the shared `data-sound="gallery"` hover/click voice, including
-the cover; the Personal pop below is the only manual sound dispatch. Thirty
+Gallery artwork uses the shared `data-sound="gallery"` hover/click voice. The cover
+keeps the hover voice but is marked `data-sound-on="hover"`: `GalleryBoard` plays its
+one activation voice by hand (`gallery-spread`, `gallery-gather`, or the plain
+`gallery` click under reduced motion), and the Personal pop below is the only other
+manual sound dispatch. Thirty
 stickers, laid out as one sticker sheet with a perforated edge and a printed label
 (five across, three on narrow screens), share one transparent atlas (a 1080px AVIF preview, with the 2160px WebP
 original reserved for the viewer and downloads); the avatar uses the existing shared animation

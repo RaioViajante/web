@@ -389,7 +389,15 @@ test("While it gathers, nothing in the collection takes focus", async ({
     "inert",
     "",
   );
+  // Hold the gather, so the check below runs while it is still closing.
+  await page.evaluate(() => {
+    for (const animation of document.getAnimations()) animation.pause();
+  });
   await page.keyboard.press("Tab");
+  await expect(page.locator(".gallery-redesign")).toHaveAttribute(
+    "data-closing",
+    "true",
+  );
   expect(
     await page.evaluate(() =>
       Boolean(
@@ -399,6 +407,9 @@ test("While it gathers, nothing in the collection takes focus", async ({
       ),
     ),
   ).toBe(false);
+  await page.evaluate(() => {
+    for (const animation of document.getAnimations()) animation.play();
+  });
   await expect(page.locator("#gallery-collection")).toBeHidden();
 });
 
