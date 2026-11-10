@@ -139,16 +139,20 @@ Portuguese is the original. Images are derived from the kit by
 
 The gallery opens from an isolated, gently floating Work of Art cover, with a
 small muted hint below the sticker. Activating its keyboard-accessible button
-reveals or hides Branding, Profiles, and Personal, with a short unfolding motion
-and staggered sticker release. Focus
+reveals or hides Branding, Profiles, and Personal, with a short unfolding motion:
+the cover squashes and the stickers burst out of it to their places on the sheet,
+with the `gallery-spread` voice. Activating it again gathers the stickers back into
+the cover while the other sections fold away, with `gallery-gather`, and hides the
+collection once those animations end; reduced motion opens and closes at once. Focus
 stays on the cover, which scrolls into view as the collection enters normal document
 flow. Reduced motion
 stops the float and reveals immediately; without JavaScript the server-rendered
 collection remains visible. The local export starts open and has no opening
 choreography; this entry interaction refines it without changing the final layout.
 Gallery artwork uses the shared `data-sound="gallery"` hover/click voice, including
-the cover, with no additional manual sound dispatch. Thirty
-stickers share one transparent atlas (a 1080px AVIF preview, with the 2160px WebP
+the cover; the Personal pop below is the only manual sound dispatch. Thirty
+stickers, laid out as one sticker sheet with a perforated edge and a printed label
+(five across, three on narrow screens), share one transparent atlas (a 1080px AVIF preview, with the 2160px WebP
 original reserved for the viewer and downloads); the avatar uses the existing shared animation
 and shows its ten frames. Personal artwork forms a responsive overlapping collage on a
 12-column grid, placed in reading order so keyboard order follows the layout. Each piece

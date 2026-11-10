@@ -296,6 +296,8 @@ export type GalleryCopy = {
     avatarMeta: string;
     avatarFrames: string;
     avatarFrame: string;
+    sheetTitle: string;
+    sheetCount: string;
     view: string;
     profilesOf: string;
     close: string;
@@ -347,6 +349,8 @@ export const galleryCopy: GalleryCopy = {
     avatarMeta: "index pages · 10 frames",
     avatarFrames: "Avatar animation, ten frames",
     avatarFrame: "Avatar frame {n}",
+    sheetTitle: "RaioViajante stickers",
+    sheetCount: "{n} stickers",
     view: "View {title}",
     profilesOf: "{title} profiles",
     close: "close",

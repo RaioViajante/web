@@ -299,16 +299,92 @@ test("Personal artwork pops in once, with the gallery sound, on scroll", async (
   await openCollectionRecordingSounds(page);
   const pending = page.locator('.gallery-piece[data-pop="waiting"]');
   await expect(pending).toHaveCount(16);
-  expect(await recordedSounds(page)).toEqual([]);
+  expect(await recordedSounds(page)).toEqual(["gallery-spread"]);
   await scrollThroughCollage(page);
   await expect(page.locator(".gallery-piece[data-pop]")).toHaveCount(0);
   await expect(page.locator(".gallery-piece").last()).toHaveCSS("opacity", "1");
   const sounds = await recordedSounds(page);
-  expect(sounds).toEqual(Array(16).fill("gallery"));
+  expect(sounds).toEqual(["gallery-spread", ...Array(16).fill("gallery")]);
   await page.mouse.wheel(0, -2000);
   await page.mouse.wheel(0, 2000);
   await page.waitForTimeout(300);
   expect(await recordedSounds(page)).toEqual(sounds);
+});
+
+test("Opening the collection bursts the stickers out of the cover", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  const sticker = page.locator(".gallery-sticker").last();
+  await expect(sticker).toHaveCSS("animation-name", "gallery-sticker-burst");
+  const offsetY = await sticker.evaluate((element) =>
+    parseFloat(element.style.getPropertyValue("--burst-y")),
+  );
+  expect(offsetY).toBeLessThan(0);
+  await expect(page.locator("#gallery-collection")).not.toHaveAttribute(
+    "data-bursting",
+    "",
+  );
+  await expect(sticker).toHaveCSS("pointer-events", "auto");
+});
+
+test("Clicking the cover again gathers everything back into it", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  const cover = page.getByRole("button", {
+    name: "Reveal the artwork collection",
+  });
+  const collection = page.locator("#gallery-collection");
+  await expect(collection).not.toHaveAttribute("data-bursting", "");
+  await cover.click();
+  await expect(page.locator(".gallery-redesign")).toHaveAttribute(
+    "data-closing",
+    "true",
+  );
+  await expect(page.locator(".gallery-sticker").last()).toHaveCSS(
+    "animation-name",
+    "gallery-sticker-gather",
+  );
+  await expect(collection).toBeVisible();
+  await expect(collection).toBeHidden();
+  await expect(cover).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator(".gallery-redesign")).toHaveAttribute(
+    "data-closing",
+    "false",
+  );
+  expect(await recordedSounds(page)).toEqual([
+    "gallery-spread",
+    "gallery-gather",
+  ]);
+  // It opens again with a fresh burst.
+  await cover.click();
+  await expect(collection).toBeVisible();
+  await expect(page.locator(".gallery-sticker").last()).toHaveCSS(
+    "animation-name",
+    "gallery-sticker-burst",
+  );
+});
+
+test("Under reduced motion the collection opens and closes at once, silently", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openCollectionRecordingSounds(page);
+  await page
+    .getByRole("button", { name: "Reveal the artwork collection" })
+    .click();
+  await expect(page.locator("#gallery-collection")).toBeHidden();
+  expect(await recordedSounds(page)).toEqual([]);
+});
+
+test("Under reduced motion the stickers do not burst", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openCollectionRecordingSounds(page);
+  await expect(page.locator(".gallery-sticker").last()).toHaveCSS(
+    "animation-name",
+    "none",
+  );
 });
 
 test("A focused piece appears at once, before it scrolls into view", async ({
@@ -425,6 +501,16 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
     "aria-pressed",
     "true",
   );
+  // Opening also plays the dedicated spread voice; measure it once so the
+  // hover and click counts below stay about one voice per entry and activation.
+  const beforeSpread = await voices();
+  await page.evaluate(() =>
+    window.dispatchEvent(
+      new CustomEvent("rv-sound", { detail: "gallery-spread" }),
+    ),
+  );
+  const spread = (await voices()) - beforeSpread;
+  expect(spread).toBeGreaterThan(0);
   const beforeHover = await voices();
   await cover.hover();
   expect(await voices()).toBe(beforeHover + 1);
@@ -440,11 +526,11 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   );
   expect(await voices()).toBe(beforeHover + 1);
   await pressInPlace();
-  expect(await voices()).toBe(beforeHover + 2);
+  expect(await voices()).toBe(beforeHover + 2 + spread);
   // The reveal re-hit-tests the stationary pointer; no late duplicate hover
   // voice may arrive once the animations and scroll settle.
   await page.waitForTimeout(800);
-  expect(await voices()).toBe(beforeHover + 2);
+  expect(await voices()).toBe(beforeHover + 2 + spread);
   const sticker = page.getByRole("button", {
     name: "View Work of art",
     exact: true,

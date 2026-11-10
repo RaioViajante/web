@@ -589,6 +589,8 @@ export const ptGalleryCopy: GalleryCopy = {
     avatarMeta: "páginas iniciais · 10 quadros",
     avatarFrames: "Animação do avatar, dez quadros",
     avatarFrame: "Quadro {n} do avatar",
+    sheetTitle: "Adesivos do RaioViajante",
+    sheetCount: "{n} adesivos",
     view: "Ver {title}",
     profilesOf: "Perfis de {title}",
     close: "fechar",
