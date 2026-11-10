@@ -8,6 +8,8 @@ export interface PrimaryLink {
   description: string;
   /** `me` marks a profile of the site owner. */
   rel?: string;
+  /** The more personal networks use the hand-drawn gallery picture. */
+  picture?: "drawing";
 }
 
 const github: PrimaryLink = {
@@ -61,6 +63,7 @@ export const socialLinks: PrimaryLink[] = [
     href: "https://letterboxd.com/raioviajando/",
     rel: "me",
     category: "films",
+    picture: "drawing",
     description: "The films I've watched and what I thought of them.",
   },
   {
@@ -68,6 +71,7 @@ export const socialLinks: PrimaryLink[] = [
     href: "https://open.spotify.com/user/31mwvlvvkdfertthfcpk7zcfis7e",
     rel: "me",
     category: "music",
+    picture: "drawing",
     description: "The music I keep coming back to.",
   },
   {
@@ -75,6 +79,7 @@ export const socialLinks: PrimaryLink[] = [
     href: "https://www.pinterest.com/RaioViajando/",
     rel: "me",
     category: "references",
+    picture: "drawing",
     description: "Visual references I like to keep around.",
   },
   {
@@ -106,15 +111,13 @@ export const profileLinks: PrimaryLink[] = [
   videoSourceLink,
 ];
 
-const personalCategories = new Set(["films", "music", "references"]);
-
 /** The more personal networks, which use the hand-drawn picture in the gallery. */
-export const personalProfileLinks = profileLinks.filter((link) =>
-  personalCategories.has(link.category),
+export const personalProfileLinks = profileLinks.filter(
+  (link) => link.picture === "drawing",
 );
 
 export const mainProfileLinks = profileLinks.filter(
-  (link) => !personalCategories.has(link.category),
+  (link) => link.picture !== "drawing",
 );
 
 export const primaryLinks: PrimaryLink[] = [

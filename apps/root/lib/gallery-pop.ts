@@ -5,6 +5,12 @@ const POP_STEP_MS = 110;
 /** How long a piece waits for its image before it pops anyway. */
 const IMAGE_WAIT_MS = 500;
 
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+
+/** The one reduced-motion check of the gallery's motion and sound. */
+export const prefersReducedMotion = () =>
+  window.matchMedia(REDUCED_MOTION).matches;
+
 function center(element: Element) {
   const box = element.getBoundingClientRect();
   return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
@@ -77,7 +83,7 @@ function imageReady(piece: HTMLElement) {
  * under reduced motion the artwork simply stays visible. Returns a stop function.
  */
 export function attachPiecePop(root: HTMLElement) {
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const reduced = window.matchMedia(REDUCED_MOTION);
   if (reduced.matches) return () => undefined;
 
   const pieces = Array.from(
@@ -143,8 +149,9 @@ export function attachPiecePop(root: HTMLElement) {
       ".gallery-piece",
     );
     if (!piece || !waiting.has(piece)) return;
+    // Focus must land on something visible: no pop, no wait for the image.
     queue = queue.filter((item) => item !== piece);
-    pop(piece);
+    reveal(piece);
   }
 
   function onAnimationEnd(event: AnimationEvent) {

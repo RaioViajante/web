@@ -366,7 +366,7 @@ test("Clicking the cover again gathers everything back into it", async ({
   );
 });
 
-test("Under reduced motion the collection opens and closes at once, silently", async ({
+test("Under reduced motion the collection opens and closes at once, with the plain click", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -375,7 +375,31 @@ test("Under reduced motion the collection opens and closes at once, silently", a
     .getByRole("button", { name: "Reveal the artwork collection" })
     .click();
   await expect(page.locator("#gallery-collection")).toBeHidden();
-  expect(await recordedSounds(page)).toEqual([]);
+  expect(await recordedSounds(page)).toEqual(["gallery", "gallery"]);
+});
+
+test("While it gathers, nothing in the collection takes focus", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  await page
+    .getByRole("button", { name: "Reveal the artwork collection" })
+    .click();
+  await expect(page.locator("#gallery-collection")).toHaveAttribute(
+    "inert",
+    "",
+  );
+  await page.keyboard.press("Tab");
+  expect(
+    await page.evaluate(() =>
+      Boolean(
+        document.activeElement?.closest(
+          "#gallery-collection, .gallery-jumps, .gallery-section-heading",
+        ),
+      ),
+    ),
+  ).toBe(false);
+  await expect(page.locator("#gallery-collection")).toBeHidden();
 });
 
 test("Under reduced motion the stickers do not burst", async ({ page }) => {
@@ -405,7 +429,8 @@ test("Under reduced motion the artwork never hides or pops", async ({
   await openCollectionRecordingSounds(page);
   await expect(page.locator(".gallery-piece[data-pop]")).toHaveCount(0);
   await scrollThroughCollage(page);
-  expect(await recordedSounds(page)).toEqual([]);
+  // Only the cover's own click: nothing pops, so nothing else plays.
+  expect(await recordedSounds(page)).toEqual(["gallery"]);
 });
 
 test("Gallery reduced motion and failed collection download", async ({
@@ -501,8 +526,8 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
     "aria-pressed",
     "true",
   );
-  // Opening also plays the dedicated spread voice; measure it once so the
-  // hover and click counts below stay about one voice per entry and activation.
+  // Activating the cover plays the dedicated spread voice instead of the
+  // click voice; measure it once so the counts below stay one per activation.
   const beforeSpread = await voices();
   await page.evaluate(() =>
     window.dispatchEvent(
@@ -526,11 +551,11 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   );
   expect(await voices()).toBe(beforeHover + 1);
   await pressInPlace();
-  expect(await voices()).toBe(beforeHover + 2 + spread);
+  expect(await voices()).toBe(beforeHover + 1 + spread);
   // The reveal re-hit-tests the stationary pointer; no late duplicate hover
   // voice may arrive once the animations and scroll settle.
   await page.waitForTimeout(800);
-  expect(await voices()).toBe(beforeHover + 2 + spread);
+  expect(await voices()).toBe(beforeHover + 1 + spread);
   const sticker = page.getByRole("button", {
     name: "View Work of art",
     exact: true,

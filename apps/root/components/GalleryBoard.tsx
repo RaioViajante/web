@@ -33,7 +33,9 @@ import {
   aimStickers,
   animationsSettle,
   attachPiecePop,
+  prefersReducedMotion,
 } from "../lib/gallery-pop";
+import { collageSizes } from "../lib/gallery-layout";
 
 /** The animations gallery.css runs while the collection is gathered back. */
 const GATHER_ANIMATIONS = [
@@ -43,9 +45,6 @@ const GATHER_ANIMATIONS = [
   "gallery-sheet-out",
   "gallery-fade-out",
 ];
-
-const reducedMotion = () =>
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function Picture({
   artwork,
@@ -86,7 +85,7 @@ function Picture({
           ? "(max-width: 700px) 85vw, 900px"
           : artwork.category === "profiles"
             ? "112px"
-            : "(max-width: 760px) 92vw, 620px"
+            : collageSizes(artwork.id)
       }
       loading={viewing ? "eager" : "lazy"}
     />
@@ -155,10 +154,7 @@ function GalleryDialog({
   function close() {
     if (closing) return;
     setClosing(true);
-    timer.current = setTimeout(
-      onDismiss,
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 160,
-    );
+    timer.current = setTimeout(onDismiss, prefersReducedMotion() ? 0 : 160);
   }
   return (
     <dialog
@@ -358,16 +354,21 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
   const board = useRef<HTMLDivElement>(null);
   const cover = useRef<HTMLButtonElement>(null);
   const collage = useRef<HTMLDivElement>(null);
+  const stickers = items.filter((item) => item.category === "branding");
+  // The cover plays one voice per activation: its own animation's voice, or
+  // the plain gallery click when nothing animates (`data-sound-on="hover"`).
   function toggleCollection() {
+    const reduced = prefersReducedMotion();
     if (!open) {
       setOpen(true);
-      if (!reducedMotion()) playSound("gallery-spread");
+      playSound(reduced ? "gallery" : "gallery-spread");
       return;
     }
     if (closing) return;
     const collection = document.getElementById("gallery-collection");
-    if (reducedMotion() || !cover.current || !collection) {
+    if (reduced || !cover.current || !collection) {
       setOpen(false);
+      playSound("gallery");
       return;
     }
     aimStickers(cover.current, collection);
@@ -393,7 +394,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
   }, [open]);
   useLayoutEffect(() => {
     const collection = document.getElementById("gallery-collection");
-    if (open && cover.current && collection)
+    if (open && cover.current && collection && !prefersReducedMotion())
       aimStickerBurst(cover.current, collection);
   }, [open]);
   useLayoutEffect(() => {
@@ -402,17 +403,13 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
     // section navigation returns above them, especially on narrow screens.
     cover.current?.scrollIntoView({
       block: "start",
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
+      behavior: prefersReducedMotion() ? "instant" : "smooth",
     });
   }, [open]);
   function go(id: string) {
     const target = document.getElementById(id);
     target?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
+      behavior: prefersReducedMotion() ? "instant" : "smooth",
     });
     target?.focus({ preventScroll: true });
   }
@@ -423,7 +420,12 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
       data-open={open}
       data-closing={closing}
     >
-      <nav className="gallery-jumps" aria-label={ui.sections} hidden={!open}>
+      <nav
+        className="gallery-jumps"
+        aria-label={ui.sections}
+        hidden={!open}
+        inert={closing}
+      >
         {categories.map((category, index) => (
           <a
             key={category.id}
@@ -439,7 +441,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
         ))}
       </nav>
       <section className="gallery-collection-intro">
-        <div className="gallery-section-heading" hidden={!open}>
+        <div className="gallery-section-heading" hidden={!open} inert={closing}>
           <SectionHeading number="04." title={ui.collection} />
           <button
             type="button"
@@ -458,6 +460,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
             aria-controls="gallery-collection"
             aria-label={ui.reveal}
             data-sound="gallery"
+            data-sound-on="hover"
             onClick={toggleCollection}
           >
             <Image
@@ -472,7 +475,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
           </span>
         </div>
       </section>
-      <div id="gallery-collection" hidden={!open}>
+      <div id="gallery-collection" hidden={!open} inert={closing}>
         {categories.map((category, index) => (
           <section
             className={`gallery-section gallery-section--${category.id}`}
@@ -526,33 +529,26 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                 <div className="gallery-sheet">
                   <div className="gallery-sheet-label">
                     <span>{ui.sheetTitle}</span>
-                    <span>
-                      {fill(ui.sheetCount, {
-                        n: items.filter((item) => item.category === "branding")
-                          .length,
-                      })}
-                    </span>
+                    <span>{fill(ui.sheetCount, { n: stickers.length })}</span>
                   </div>
                   <div className="gallery-stickers">
-                    {items
-                      .filter((item) => item.category === "branding")
-                      .map((item) => (
-                        <button
-                          key={item.id}
-                          type="button"
-                          className="gallery-sticker"
-                          onClick={() => setView(item)}
-                          data-sound="gallery"
-                          aria-label={fill(ui.view, { title: item.title })}
-                          aria-haspopup="dialog"
-                        >
-                          <Picture artwork={item} />
-                          <span className="gallery-caption">
-                            {item.title}
-                            {item.use && <small>{item.use}</small>}
-                          </span>
-                        </button>
-                      ))}
+                    {stickers.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className="gallery-sticker"
+                        onClick={() => setView(item)}
+                        data-sound="gallery"
+                        aria-label={fill(ui.view, { title: item.title })}
+                        aria-haspopup="dialog"
+                      >
+                        <Picture artwork={item} />
+                        <span className="gallery-caption">
+                          {item.title}
+                          {item.use && <small>{item.use}</small>}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>

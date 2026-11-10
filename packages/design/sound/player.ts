@@ -91,7 +91,9 @@ export function attachSoundEvents(play: Play) {
     if (!(target instanceof Element)) return;
     const control = target.closest("a, button");
     const element = control?.closest<HTMLElement>("[data-sound]");
-    if (element) play(element.dataset.sound ?? "nav", "click");
+    // `data-sound-on="hover"`: the control plays its own voice when activated.
+    if (element && element.dataset.soundOn !== "hover")
+      play(element.dataset.sound ?? "nav", "click");
   }
 
   function onInput(event: Event) {

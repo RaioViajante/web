@@ -229,6 +229,15 @@ describe("delegated sound events", () => {
     detach();
   });
 
+  it("leaves the click to a control marked to play its own voice", () => {
+    const { plays, detach, cover } = fixture();
+    cover.dataset.soundOn = "hover";
+    fire("pointerover", cover);
+    fire("click", cover);
+    expect(plays).toEqual([["gallery", undefined]]);
+    detach();
+  });
+
   it("detaches every listener", () => {
     const { plays, detach, cover } = fixture();
     detach();
