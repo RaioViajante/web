@@ -1,5 +1,9 @@
 import { gallery, galleryBranding } from "@raioviajante/design/gallery";
-import { profileLinks, type PrimaryLink } from "./links";
+import {
+  mainProfileLinks,
+  personalProfileLinks,
+  type PrimaryLink,
+} from "./links";
 
 export const categories = [
   {
@@ -120,7 +124,7 @@ export const artworks: readonly Artwork[] = [
     galleryBranding.profileLaptop,
     "RaioViajante scratching his head at a laptop, two question marks beside him",
     undefined,
-    profileLinks,
+    mainProfileLinks,
   ),
   piece(
     "profile-hmm",
@@ -128,6 +132,15 @@ export const artworks: readonly Artwork[] = [
     "profiles",
     galleryBranding.profileHmm,
     "RaioViajante with his hand on his chin, looking up",
+  ),
+  piece(
+    "profile-headphones",
+    "Headphones on",
+    "profiles",
+    galleryBranding.profileHeadphones,
+    "Line drawing of RaioViajante with curly hair and headphones, eyes closed",
+    undefined,
+    personalProfileLinks,
   ),
   piece(
     "lab",
@@ -283,6 +296,8 @@ export type GalleryCopy = {
     avatarMeta: string;
     avatarFrames: string;
     avatarFrame: string;
+    sheetTitle: string;
+    sheetCount: string;
     view: string;
     profilesOf: string;
     close: string;
@@ -334,6 +349,8 @@ export const galleryCopy: GalleryCopy = {
     avatarMeta: "index pages · 10 frames",
     avatarFrames: "Avatar animation, ten frames",
     avatarFrame: "Avatar frame {n}",
+    sheetTitle: "RaioViajante stickers",
+    sheetCount: "{n} stickers",
     view: "View {title}",
     profilesOf: "{title} profiles",
     close: "close",

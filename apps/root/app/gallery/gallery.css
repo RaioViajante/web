@@ -108,9 +108,7 @@
   font-size: 14px;
 }
 .gallery-branding {
-  background: var(--block);
-  border-radius: var(--radius);
-  padding: 32px 24px 36px;
+  padding-top: 16px;
 }
 .gallery-avatar {
   display: flex;
@@ -167,20 +165,34 @@
   color: var(--fg-2);
   margin-top: 4px;
 }
-.gallery-stickers {
+/* One sticker sheet: a perforated edge, a printed label and an even grid. */
+.gallery-sheet {
+  padding: 8px 20px 32px;
+  border: 1px dashed var(--dots);
+  border-radius: 14px;
+  background: var(--block);
+}
+.gallery-sheet-label {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 8px 2px;
-  padding: 8px 0 24px;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--touch);
+  margin-bottom: 12px;
+  color: var(--fg-2);
+  font-size: 12px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+.gallery-stickers {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px 6px;
 }
 .gallery-sticker {
   position: relative;
-  width: calc(var(--sticker-size) * 0.9);
-  flex: 0 0 auto;
+  min-width: 0;
   padding: 0;
-  margin: 0 calc(var(--sticker-size) * -0.054);
   border: 0;
   background: none;
   color: var(--fg);
@@ -294,16 +306,17 @@
 .gallery-profile-links a:focus-visible {
   color: var(--fg);
 }
+/* Placed in reading order, so keyboard order follows what the eye sees. */
 .gallery-collage {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   align-items: center;
-  justify-content: center;
   padding: 32px 8px 16px;
   isolation: isolate;
 }
 .gallery-piece {
   position: relative;
+  justify-self: stretch;
   border: 0;
   background: none;
   padding: 0;
@@ -329,86 +342,123 @@
   filter: brightness(1.08);
 }
 .gallery-piece--lab {
-  width: 52%;
-  margin: 0 -2% 0 0;
+  grid-column: 1 / 9;
   --rotation: -2deg;
 }
 .gallery-piece--portrait {
-  width: 24%;
-  margin: 0 0 0 -1%;
+  grid-column: 9 / 13;
+  grid-row: span 2;
+  margin-left: -12%;
   --rotation: 3deg;
 }
 .gallery-piece--castle {
-  width: 48%;
-  margin: -3% -1% 0 0;
+  grid-column: 1 / 9;
+  margin: -2% 2% 0 4%;
   --rotation: 2deg;
 }
 .gallery-piece--cow {
-  width: 40%;
-  margin: -1% 0 0 -1%;
+  grid-column: 1 / 6;
+  margin-top: 2%;
   --rotation: -3deg;
 }
 .gallery-piece--cats {
-  width: 42%;
-  margin: -3% -2% 0 0;
+  grid-column: 6 / 13;
+  margin: -1% 0 0 -3%;
   --rotation: 2deg;
 }
 .gallery-piece--sunset {
-  width: 50%;
-  margin: -2% 0 0 -1%;
-  --rotation: -2deg;
+  grid-column: 2 / 12;
+  margin-top: -3%;
+  --rotation: -1deg;
 }
 .gallery-piece--calves {
-  width: 40%;
-  margin: -3% -1% 0 0;
+  grid-column: 1 / 7;
+  margin-top: -3%;
   --rotation: 3deg;
 }
 .gallery-piece--hospital {
-  width: 50%;
-  margin: -2% 0 0 -1%;
+  grid-column: 7 / 13;
+  margin: -1% 0 0 -3%;
   --rotation: -1deg;
 }
 .gallery-piece--mirror {
-  width: 44%;
-  margin: -3% 0 0 2%;
+  grid-column: 1 / 8;
+  margin-top: -1%;
   --rotation: 2deg;
 }
 .gallery-piece--ferry {
-  width: 44%;
-  margin: -3% -1% 0 0;
-  --rotation: 1deg;
+  grid-column: 8 / 13;
+  margin: 2% 0 0 -3%;
+  --rotation: -2deg;
 }
 .gallery-piece--long-way-home {
-  width: 48%;
-  margin: -2% 0 0 -1%;
+  grid-column: 2 / 12;
+  margin-top: -3%;
   --rotation: -2deg;
 }
 .gallery-piece--songs-for-rain {
-  width: 48%;
-  margin: -3% 0 0 -1%;
+  grid-column: 1 / 9;
+  margin-top: -3%;
   --rotation: 2deg;
 }
-.gallery-piece--between-trees,
-.gallery-piece--stillness-below,
-.gallery-piece--midnight,
-.gallery-piece--quiet-bells {
-  width: 23%;
-}
 .gallery-piece--between-trees {
-  margin: -2% -1% 0 0;
+  grid-column: 9 / 13;
+  margin: -2% 0 0 -8%;
   --rotation: -3deg;
 }
 .gallery-piece--stillness-below {
-  margin: -1% -1% 0 0;
+  grid-column: 1 / 5;
+  margin-top: -2%;
   --rotation: 2deg;
 }
 .gallery-piece--midnight {
-  margin: -3% -1% 0 0;
+  grid-column: 5 / 9;
+  margin-top: -6%;
   --rotation: -2deg;
 }
 .gallery-piece--quiet-bells {
-  margin: -2% 0 0;
+  grid-column: 9 / 13;
+  margin-top: -2%;
   --rotation: 3deg;
+}
+/* Set by lib/gallery-pop.ts only, until the piece scrolls into view. */
+.gallery-piece[data-pop="waiting"] {
+  opacity: 0;
+  pointer-events: none;
+}
+.gallery-piece[data-pop="in"] {
+  animation: gallery-piece-pop 520ms ease-out backwards;
+}
+@keyframes gallery-piece-pop {
+  0% {
+    opacity: 0;
+    scale: 0.5;
+    translate: 0 28px;
+    rotate: calc(var(--rotation) * 3);
+  }
+  45% {
+    opacity: 1;
+    scale: 1.08;
+    translate: 0 -6px;
+    rotate: calc(var(--rotation) * -1);
+  }
+  72% {
+    scale: 0.97;
+    translate: 0 2px;
+    rotate: calc(var(--rotation) * 0.4);
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+}
+@media print, (prefers-reduced-motion: reduce) {
+  .gallery-piece[data-pop="waiting"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 .gallery-dialog {
   box-sizing: border-box;
@@ -637,9 +687,6 @@
     gap: 0 12px;
     margin-bottom: 48px;
   }
-  .gallery-branding {
-    padding-inline: 16px;
-  }
   .gallery-avatar .rv-avatar {
     width: 150px;
     height: 150px;
@@ -662,9 +709,6 @@
   .gallery-avatar-sequence .gallery-meta > :last-child {
     font-size: 11px;
   }
-  .gallery-sticker {
-    width: calc(var(--sticker-size) * 0.92);
-  }
   .gallery-profile {
     gap: 14px;
   }
@@ -678,20 +722,25 @@
   .gallery-collage {
     padding-inline: 4px;
   }
-  .gallery-piece--lab {
-    width: 58%;
+  /* One large piece, then a pair: the art stays big on a phone. */
+  .gallery-collage .gallery-piece {
+    grid-column: span 6;
+    margin: 0;
   }
-  .gallery-piece--portrait {
-    width: 36%;
+  .gallery-collage .gallery-piece--lab,
+  .gallery-collage .gallery-piece--castle,
+  .gallery-collage .gallery-piece--sunset,
+  .gallery-collage .gallery-piece--mirror,
+  .gallery-collage .gallery-piece--ferry,
+  .gallery-collage .gallery-piece--long-way-home,
+  .gallery-collage .gallery-piece--songs-for-rain {
+    grid-column: 1 / 13;
+    margin-block: -1%;
   }
-  .gallery-piece--mirror {
-    width: 58%;
-  }
-  .gallery-piece--between-trees,
-  .gallery-piece--stillness-below,
-  .gallery-piece--midnight,
-  .gallery-piece--quiet-bells {
-    width: 40%;
+  .gallery-collage .gallery-piece--portrait {
+    grid-column: 3 / 11;
+    grid-row: auto;
+    margin-block: -1%;
   }
   .gallery-view-stage {
     height: min(52vh, 460px);
@@ -718,12 +767,6 @@
   }
 }
 @media (max-width: 350px) {
-  .gallery-sticker {
-    width: calc(var(--sticker-size) * 0.8);
-  }
-  .gallery-branding {
-    padding-inline: 12px;
-  }
   .gallery-avatar-sequence .gallery-meta {
     flex-wrap: wrap;
   }
@@ -761,44 +804,34 @@
 
 /* Atlas cells are fixed by the supplied six-column, five-row artwork. */
 .gallery-sticker:nth-child(10n + 1) {
-  --sticker-size: 150px;
-  --rotation: -4deg;
-}
-.gallery-sticker:nth-child(10n + 2) {
-  --sticker-size: 110px;
-  --rotation: 3deg;
-}
-.gallery-sticker:nth-child(10n + 3) {
-  --sticker-size: 115px;
   --rotation: -2deg;
 }
-.gallery-sticker:nth-child(10n + 4) {
-  --sticker-size: 120px;
-  --rotation: 5deg;
+.gallery-sticker:nth-child(10n + 2) {
+  --rotation: 1.5deg;
 }
-.gallery-sticker:nth-child(10n + 5) {
-  --sticker-size: 135px;
-  --rotation: -6deg;
-}
-.gallery-sticker:nth-child(10n + 6) {
-  --sticker-size: 125px;
-  --rotation: 2deg;
-}
-.gallery-sticker:nth-child(10n + 7) {
-  --sticker-size: 130px;
-  --rotation: -3deg;
-}
-.gallery-sticker:nth-child(10n + 8) {
-  --sticker-size: 120px;
-  --rotation: 4deg;
-}
-.gallery-sticker:nth-child(10n + 9) {
-  --sticker-size: 140px;
+.gallery-sticker:nth-child(10n + 3) {
   --rotation: -1deg;
 }
+.gallery-sticker:nth-child(10n + 4) {
+  --rotation: 2.5deg;
+}
+.gallery-sticker:nth-child(10n + 5) {
+  --rotation: -3deg;
+}
+.gallery-sticker:nth-child(10n + 6) {
+  --rotation: 1deg;
+}
+.gallery-sticker:nth-child(10n + 7) {
+  --rotation: -1.5deg;
+}
+.gallery-sticker:nth-child(10n + 8) {
+  --rotation: 2deg;
+}
+.gallery-sticker:nth-child(10n + 9) {
+  --rotation: -0.5deg;
+}
 .gallery-sticker:nth-child(10n + 10) {
-  --sticker-size: 145px;
-  --rotation: 6deg;
+  --rotation: 3deg;
 }
 .gallery-sprite[data-cell="0"] img,
 .gallery-sprite[data-cell="6"] img,
@@ -883,17 +916,26 @@
   top: -400%;
 }
 
-/* Narrow compositions retain pairs of stickers and a readable frame sequence. */
+/* Three across still divides the thirty evenly; edge captions stay on screen. */
+@media (max-width: 600px) {
+  .gallery-sheet {
+    padding: 4px 12px 24px;
+  }
+  .gallery-stickers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .gallery-sticker:nth-child(3n + 1) .gallery-caption {
+    left: 0;
+    transform: none;
+  }
+  .gallery-sticker:nth-child(3n) .gallery-caption {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+}
+/* Narrow compositions keep a readable frame sequence. */
 @media (max-width: 480px) {
-  .gallery-sticker {
-    flex: 0 0 calc(50% - 2px);
-    width: auto;
-    margin: 0;
-  }
-  .gallery-sticker .gallery-sprite {
-    width: min(100%, var(--sticker-size));
-    margin-inline: auto;
-  }
   .gallery-frames img {
     width: 44px;
     height: 44px;
@@ -950,9 +992,60 @@
   animation: gallery-unfold 560ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
   animation-delay: calc(var(--reveal-order, 0) * 90ms);
 }
+/* The stickers fly out of the cover, so their section must not fade them. */
+.gallery-redesign[data-open="true"] .gallery-section--branding {
+  animation: none;
+}
+.gallery-redesign[data-open="true"] .gallery-section--branding > h2,
+.gallery-redesign[data-open="true"] .gallery-section--branding > p,
+.gallery-redesign[data-open="true"] .gallery-avatar,
+.gallery-redesign[data-open="true"] .gallery-sheet-label {
+  animation: gallery-fade 420ms ease 120ms backwards;
+}
+.gallery-redesign[data-open="true"] .gallery-sheet {
+  animation: gallery-sheet-in 420ms ease 120ms backwards;
+}
+.gallery-redesign[data-open="true"] .gallery-cover img {
+  animation: gallery-cover-burst 520ms ease-out;
+}
+/* --burst-x, --burst-y and --burst-order come from lib/gallery-pop.ts. */
 .gallery-redesign[data-open="true"] .gallery-sticker {
-  animation: gallery-release 420ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-  animation-delay: calc(80ms + var(--sticker-order, 0) * 45ms);
+  animation: gallery-sticker-burst 640ms backwards;
+  animation-delay: calc(160ms + var(--burst-order, 0) * 22ms);
+}
+#gallery-collection[data-bursting] .gallery-sticker {
+  pointer-events: none;
+}
+/*
+ * Clicking the cover again gathers everything back into it. GalleryBoard waits
+ * for these animations (GATHER_ANIMATIONS) before it hides the collection.
+ */
+.gallery-redesign[data-closing="true"] #gallery-collection,
+.gallery-redesign[data-closing="true"] .gallery-section-heading,
+.gallery-redesign[data-closing="true"] .gallery-jumps {
+  pointer-events: none;
+}
+.gallery-redesign[data-closing="true"]
+  .gallery-section:not(.gallery-section--branding),
+.gallery-redesign[data-closing="true"] .gallery-section-heading,
+.gallery-redesign[data-closing="true"] .gallery-jumps {
+  animation: gallery-fold 360ms ease-in forwards;
+}
+.gallery-redesign[data-closing="true"] .gallery-section--branding > h2,
+.gallery-redesign[data-closing="true"] .gallery-section--branding > p,
+.gallery-redesign[data-closing="true"] .gallery-avatar,
+.gallery-redesign[data-closing="true"] .gallery-sheet-label {
+  animation: gallery-fade-out 300ms ease-in forwards;
+}
+.gallery-redesign[data-closing="true"] .gallery-sheet {
+  animation: gallery-sheet-out 360ms ease-in 520ms forwards;
+}
+.gallery-redesign[data-closing="true"] .gallery-sticker {
+  animation: gallery-sticker-gather 480ms forwards;
+  animation-delay: calc(var(--burst-order, 0) * 16ms);
+}
+.gallery-redesign[data-closing="true"] .gallery-cover img {
+  animation: gallery-cover-gulp 1050ms ease-out;
 }
 @keyframes gallery-cover-float {
   0%,
@@ -975,16 +1068,115 @@
     transform: none;
   }
 }
-@keyframes gallery-release {
+@keyframes gallery-sheet-in {
   from {
-    opacity: 0;
-    translate: 0 12px;
-    scale: 0.96;
+    background-color: transparent;
+    border-color: transparent;
   }
+}
+@keyframes gallery-sheet-out {
   to {
+    background-color: transparent;
+    border-color: transparent;
+  }
+}
+@keyframes gallery-fold {
+  to {
+    opacity: 0;
+    transform: perspective(900px) translateY(12px) rotateX(3deg) scale(0.985);
+  }
+}
+@keyframes gallery-cover-gulp {
+  0%,
+  80% {
+    scale: 1;
+    rotate: 0deg;
+  }
+  89% {
+    scale: 1.15;
+    rotate: -4deg;
+  }
+  95% {
+    scale: 0.96;
+    rotate: 2deg;
+  }
+  100% {
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+@keyframes gallery-sticker-gather {
+  0% {
+    translate: 0 0;
+    scale: 1;
+    rotate: 0deg;
+    animation-timing-function: ease-out;
+  }
+  22% {
+    translate: 0 -10px;
+    scale: 1.1;
+    rotate: calc(var(--rotation) * -1);
+    animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.45);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: var(--burst-x, 0) var(--burst-y, 0);
+    scale: 0.2;
+    rotate: calc(var(--rotation) * -60);
+  }
+}
+@keyframes gallery-cover-burst {
+  0% {
+    scale: 1;
+    rotate: 0deg;
+  }
+  28% {
+    scale: 0.82;
+    rotate: -6deg;
+  }
+  58% {
+    scale: 1.16;
+    rotate: 5deg;
+  }
+  82% {
+    scale: 0.97;
+    rotate: -1deg;
+  }
+  100% {
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+@keyframes gallery-sticker-burst {
+  0% {
+    opacity: 0;
+    translate: var(--burst-x, 0) var(--burst-y, 0);
+    scale: 0.25;
+    rotate: calc(var(--rotation) * 60);
+    animation-timing-function: var(--ease-motion);
+  }
+  14% {
+    opacity: 1;
+  }
+  68% {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1.14;
+    rotate: calc(var(--rotation) * -1);
+    animation-timing-function: ease-in-out;
+  }
+  86% {
+    scale: 0.95;
+    rotate: calc(var(--rotation) * 0.4);
+  }
+  100% {
     opacity: 1;
     translate: 0 0;
     scale: 1;
+    rotate: 0deg;
   }
 }
 .gallery-view-navigation .gallery-arrow {
@@ -1006,18 +1198,6 @@
 }
 .gallery-section:nth-child(3) {
   --reveal-order: 2;
-}
-.gallery-sticker:nth-child(5n + 2) {
-  --sticker-order: 1;
-}
-.gallery-sticker:nth-child(5n + 3) {
-  --sticker-order: 2;
-}
-.gallery-sticker:nth-child(5n + 4) {
-  --sticker-order: 3;
-}
-.gallery-sticker:nth-child(5n + 5) {
-  --sticker-order: 4;
 }
 @media (scripting: none) {
   .gallery-redesign #gallery-collection[hidden] {

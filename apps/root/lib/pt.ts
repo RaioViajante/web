@@ -146,6 +146,10 @@ export const ptHome = {
       note: "filmes",
       description: "Os filmes que vi e o que achei deles.",
     },
+    music: {
+      note: "música",
+      description: "As músicas às quais sempre volto.",
+    },
     references: {
       note: "referências",
       description: "Referências visuais que gosto de guardar.",
@@ -529,6 +533,8 @@ export const ptGalleryCopy: GalleryCopy = {
     "profile-laptop":
       "RaioViajante coçando a cabeça diante de um laptop, com dois pontos de interrogação ao lado",
     "profile-hmm": "RaioViajante com a mão no queixo, olhando para cima",
+    "profile-headphones":
+      "Desenho a traço de RaioViajante de cabelo cacheado e fones de ouvido, de olhos fechados",
     lab: "RaioViajante de jaleco segurando um frasco verde entre tanques luminosos etiquetados com linguagens",
     portrait:
       "Retrato pintado de RaioViajante com uma camiseta escura sobre fundo roxo",
@@ -583,6 +589,8 @@ export const ptGalleryCopy: GalleryCopy = {
     avatarMeta: "páginas iniciais · 10 quadros",
     avatarFrames: "Animação do avatar, dez quadros",
     avatarFrame: "Quadro {n} do avatar",
+    sheetTitle: "Adesivos do RaioViajante",
+    sheetCount: "{n} adesivos",
     view: "Ver {title}",
     profilesOf: "Perfis de {title}",
     close: "fechar",

@@ -139,18 +139,29 @@ Portuguese is the original. Images are derived from the kit by
 
 The gallery opens from an isolated, gently floating Work of Art cover, with a
 small muted hint below the sticker. Activating its keyboard-accessible button
-reveals or hides Branding, Profiles, and Personal, with a short unfolding motion
-and staggered sticker release. Focus
+reveals or hides Branding, Profiles, and Personal, with a short unfolding motion:
+the cover squashes and the stickers burst out of it to their places on the sheet,
+with the `gallery-spread` voice. Activating it again gathers the stickers back into
+the cover while the other sections fold away, with `gallery-gather`, and hides the
+collection once those animations end; reduced motion opens and closes at once. Focus
 stays on the cover, which scrolls into view as the collection enters normal document
 flow. Reduced motion
 stops the float and reveals immediately; without JavaScript the server-rendered
 collection remains visible. The local export starts open and has no opening
 choreography; this entry interaction refines it without changing the final layout.
-Gallery artwork uses the shared `data-sound="gallery"` hover/click voice, including
-the cover, with no additional manual sound dispatch. Thirty
-stickers share one transparent atlas (a 1080px AVIF preview, with the 2160px WebP
+Gallery artwork uses the shared `data-sound="gallery"` hover/click voice. The cover
+keeps the hover voice but is marked `data-sound-on="hover"`: `GalleryBoard` plays its
+one activation voice by hand (`gallery-spread`, `gallery-gather`, or the plain
+`gallery` click under reduced motion), and the Personal pop below is the only other
+manual sound dispatch. Thirty
+stickers, laid out as one sticker sheet with a perforated edge and a printed label
+(five across, three on narrow screens), share one transparent atlas (a 1080px AVIF preview, with the 2160px WebP
 original reserved for the viewer and downloads); the avatar uses the existing shared animation
-and shows its ten frames. Personal artwork forms a responsive overlapping collage.
+and shows its ten frames. Personal artwork forms a responsive overlapping collage on a
+12-column grid, placed in reading order so keyboard order follows the layout. Each piece
+pops in once as it scrolls into view, with the shared `gallery` voice (`lib/gallery-pop.ts`).
+Only that script hides a piece, so without JavaScript, in print and under reduced motion
+the artwork stays visible, and reduced motion also drops the sound.
 The artwork model lives in `lib/gallery.ts`, the client interaction in
 `components/GalleryBoard.tsx`, and the route styles in `app/gallery/gallery.css`.
 Artwork stays in the shared design package; the sixteen Personal images live there.
@@ -159,6 +170,8 @@ Selecting a piece opens a native modal dialog with title, category, supported us
 metadata, unboxed ←/→ controls named Previous artwork / Next artwork, arrow-key navigation, Escape, and focus restoration.
 Navigation wraps within its category. The dialog keeps keyboard focus inside, makes
 the background inert, and locks page scrolling. Motion respects reduced-motion preferences.
+Profile pictures list the networks that use them: the more personal ones (Letterboxd,
+Spotify, Pinterest) use the hand-drawn picture, and `lib/links.ts` holds the split.
 Individual profile downloads use the supplied 1254px PNG originals; Personal downloads
 use the existing full-size WebPs. Stickers are viewed individually and downloaded as
 a sheet, matching the reference. Collection downloads select Branding (sticker and

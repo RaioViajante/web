@@ -27,6 +27,12 @@ export function attachSoundEvents(play: Play) {
   // any pointer movement. Remember a real leave and suppress that one synthetic
   // re-entry; any actual pointer move clears it, so genuine re-entries play.
   let left: { element: HTMLElement; x: number; y: number } | null = null;
+  // Where the pointer last really moved. Scrolling, or content moving under a
+  // resting pointer, makes the browser fire pointerover at exactly that spot
+  // without a move (WebKit adds a pointermove there too). A real entry always
+  // arrives at new coordinates before its pointermove, so an entry at the
+  // resting spot is the page moving, not the visitor, and plays nothing.
+  let rest: { x: number; y: number } | null = null;
 
   function hoverControl(target: EventTarget | null) {
     if (!(target instanceof Element)) return null;
@@ -50,6 +56,7 @@ export function attachSoundEvents(play: Play) {
         element.contains(event.relatedTarget))
     )
       return;
+    if (rest && rest.x === event.clientX && rest.y === event.clientY) return;
     if (
       left &&
       left.element === element &&
@@ -74,8 +81,9 @@ export function attachSoundEvents(play: Play) {
     left = { element, x: event.clientX, y: event.clientY };
   }
 
-  function onMove() {
+  function onMove(event: PointerEvent) {
     left = null;
+    rest = { x: event.clientX, y: event.clientY };
   }
 
   function onClick(event: MouseEvent) {
@@ -83,7 +91,9 @@ export function attachSoundEvents(play: Play) {
     if (!(target instanceof Element)) return;
     const control = target.closest("a, button");
     const element = control?.closest<HTMLElement>("[data-sound]");
-    if (element) play(element.dataset.sound ?? "nav", "click");
+    // `data-sound-on="hover"`: the control plays its own voice when activated.
+    if (element && element.dataset.soundOn !== "hover")
+      play(element.dataset.sound ?? "nav", "click");
   }
 
   function onInput(event: Event) {

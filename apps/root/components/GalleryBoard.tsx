@@ -27,6 +27,24 @@ import {
   type Category,
   type GalleryCopy,
 } from "../lib/gallery";
+import { playSound } from "@raioviajante/design/sound";
+import {
+  aimStickerBurst,
+  aimStickers,
+  animationsSettle,
+  attachPiecePop,
+  prefersReducedMotion,
+} from "../lib/gallery-pop";
+import { collageSizes } from "../lib/gallery-layout";
+
+/** The animations gallery.css runs while the collection is gathered back. */
+const GATHER_ANIMATIONS = [
+  "gallery-sticker-gather",
+  "gallery-cover-gulp",
+  "gallery-fold",
+  "gallery-sheet-out",
+  "gallery-fade-out",
+];
 
 function Picture({
   artwork,
@@ -67,7 +85,7 @@ function Picture({
           ? "(max-width: 700px) 85vw, 900px"
           : artwork.category === "profiles"
             ? "112px"
-            : "(max-width: 760px) 55vw, 420px"
+            : collageSizes(artwork.id)
       }
       loading={viewing ? "eager" : "lazy"}
     />
@@ -136,10 +154,7 @@ function GalleryDialog({
   function close() {
     if (closing) return;
     setClosing(true);
-    timer.current = setTimeout(
-      onDismiss,
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 160,
-    );
+    timer.current = setTimeout(onDismiss, prefersReducedMotion() ? 0 : 160);
   }
   return (
     <dialog
@@ -333,32 +348,84 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
   const step = (item: Artwork, direction: number) =>
     localizeArtwork(stepArtwork(item, direction), copy);
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [view, setView] = useState<Artwork | null>(null);
   const [downloadOpen, setDownloadOpen] = useState(false);
+  const board = useRef<HTMLDivElement>(null);
   const cover = useRef<HTMLButtonElement>(null);
+  const collage = useRef<HTMLDivElement>(null);
+  const stickers = items.filter((item) => item.category === "branding");
+  // The cover plays one voice per activation: its own animation's voice, or
+  // the plain gallery click when nothing animates (`data-sound-on="hover"`).
+  function toggleCollection() {
+    const reduced = prefersReducedMotion();
+    if (!open) {
+      setOpen(true);
+      playSound(reduced ? "gallery" : "gallery-spread");
+      return;
+    }
+    if (closing) return;
+    const collection = document.getElementById("gallery-collection");
+    if (reduced || !cover.current || !collection) {
+      setOpen(false);
+      playSound("gallery");
+      return;
+    }
+    aimStickers(cover.current, collection);
+    setClosing(true);
+    playSound("gallery-gather");
+  }
+  // Hide the collection only once everything has been gathered into the cover.
+  useLayoutEffect(() => {
+    if (!closing || !board.current) return;
+    let current = true;
+    void animationsSettle(board.current, GATHER_ANIMATIONS).then(() => {
+      if (!current) return;
+      setOpen(false);
+      setClosing(false);
+    });
+    return () => {
+      current = false;
+    };
+  }, [closing]);
+  // Before paint, so the pieces never flash visible and then disappear.
+  useLayoutEffect(() => {
+    if (open && collage.current) return attachPiecePop(collage.current);
+  }, [open]);
+  useLayoutEffect(() => {
+    const collection = document.getElementById("gallery-collection");
+    if (open && cover.current && collection && !prefersReducedMotion())
+      aimStickerBurst(cover.current, collection);
+  }, [open]);
   useLayoutEffect(() => {
     if (!open) return;
     // Keep the activated cover and the unfolding collection in view when the
     // section navigation returns above them, especially on narrow screens.
     cover.current?.scrollIntoView({
       block: "start",
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
+      behavior: prefersReducedMotion() ? "instant" : "smooth",
     });
   }, [open]);
   function go(id: string) {
     const target = document.getElementById(id);
     target?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
+      behavior: prefersReducedMotion() ? "instant" : "smooth",
     });
     target?.focus({ preventScroll: true });
   }
   return (
-    <div className="gallery-redesign" data-open={open}>
-      <nav className="gallery-jumps" aria-label={ui.sections} hidden={!open}>
+    <div
+      className="gallery-redesign"
+      ref={board}
+      data-open={open}
+      data-closing={closing}
+    >
+      <nav
+        className="gallery-jumps"
+        aria-label={ui.sections}
+        hidden={!open}
+        inert={closing}
+      >
         {categories.map((category, index) => (
           <a
             key={category.id}
@@ -374,7 +441,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
         ))}
       </nav>
       <section className="gallery-collection-intro">
-        <div className="gallery-section-heading" hidden={!open}>
+        <div className="gallery-section-heading" hidden={!open} inert={closing}>
           <SectionHeading number="04." title={ui.collection} />
           <button
             type="button"
@@ -393,7 +460,8 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
             aria-controls="gallery-collection"
             aria-label={ui.reveal}
             data-sound="gallery"
-            onClick={() => setOpen((value) => !value)}
+            data-sound-on="hover"
+            onClick={toggleCollection}
           >
             <Image
               {...art.workOfArt}
@@ -407,7 +475,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
           </span>
         </div>
       </section>
-      <div id="gallery-collection" hidden={!open}>
+      <div id="gallery-collection" hidden={!open} inert={closing}>
         {categories.map((category, index) => (
           <section
             className={`gallery-section gallery-section--${category.id}`}
@@ -458,10 +526,13 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                     </div>
                   </div>
                 </div>
-                <div className="gallery-stickers">
-                  {items
-                    .filter((item) => item.category === "branding")
-                    .map((item) => (
+                <div className="gallery-sheet">
+                  <div className="gallery-sheet-label">
+                    <span>{ui.sheetTitle}</span>
+                    <span>{fill(ui.sheetCount, { n: stickers.length })}</span>
+                  </div>
+                  <div className="gallery-stickers">
+                    {stickers.map((item) => (
                       <button
                         key={item.id}
                         type="button"
@@ -478,10 +549,12 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                         </span>
                       </button>
                     ))}
+                  </div>
                 </div>
               </div>
             ) : (
               <div
+                ref={category.id === "personal" ? collage : undefined}
                 className={
                   category.id === "profiles"
                     ? "gallery-profiles"

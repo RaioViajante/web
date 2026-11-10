@@ -307,6 +307,7 @@ test("Portuguese Gallery has route, SEO, search, page and widget copy", () => {
       "midnight",
       "mirror",
       "portrait",
+      "profile-headphones",
       "profile-hmm",
       "profile-laptop",
       "quiet-bells",

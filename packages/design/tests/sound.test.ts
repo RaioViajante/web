@@ -213,6 +213,31 @@ describe("delegated sound events", () => {
     detach();
   });
 
+  it("plays nothing when the page scrolls a control under a resting pointer", () => {
+    const { plays, detach, cover } = fixture();
+    // Chromium: the scroll re-hit-tests the pointer where it last moved.
+    fire("pointermove", document, null, 100, 200);
+    fire("pointerover", cover, null, 100, 200);
+    // WebKit also repeats the pointermove at the same spot.
+    fire("pointermove", document, null, 100, 200);
+    fire("pointerover", cover, null, 100, 200);
+    expect(plays).toEqual([]);
+    // A real entry reaches new coordinates before its pointermove.
+    fire("pointerover", cover, null, 130, 200);
+    fire("pointermove", document, null, 130, 200);
+    expect(plays).toEqual([["gallery", undefined]]);
+    detach();
+  });
+
+  it("leaves the click to a control marked to play its own voice", () => {
+    const { plays, detach, cover } = fixture();
+    cover.dataset.soundOn = "hover";
+    fire("pointerover", cover);
+    fire("click", cover);
+    expect(plays).toEqual([["gallery", undefined]]);
+    detach();
+  });
+
   it("detaches every listener", () => {
     const { plays, detach, cover } = fixture();
     detach();

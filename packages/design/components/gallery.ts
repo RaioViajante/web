@@ -20,6 +20,7 @@ import quietBells from "../assets/gallery/when-the-bells-go-quiet.webp";
 import stickerPreview from "../assets/gallery/branding-stickers-preview.avif";
 import brandingStickers from "../assets/gallery/branding-stickers.webp";
 import frameSheet from "../assets/gallery/avatar-frames.webp";
+import profileHeadphones from "../assets/gallery/profile-headphones.png";
 import profileHmm from "../assets/gallery/profile-hmm.png";
 import profileLaptop from "../assets/gallery/profile-laptop.png";
 
@@ -57,6 +58,7 @@ export const galleryBranding = {
   stickers: image(brandingStickers, 2160, 1800),
   stickerPreview: image(stickerPreview, 1080, 900),
   frames: image(frameSheet, 2400, 240),
+  profileHeadphones: image(profileHeadphones, 1254, 1254),
   profileHmm: image(profileHmm, 1254, 1254),
   profileLaptop: image(profileLaptop, 1254, 1254),
 } as const;

@@ -112,6 +112,28 @@ const voices: Record<SoundKind, Voice> = {
     tap(0, action === "click" ? 0.009 : 0.005);
     pulse(0, action === "click" ? 600 : 480, 0.045, 0.006);
   },
+  // Timed to the Root gallery's sticker burst (apps/root/app/gallery/gallery.css):
+  // a rising whoosh as the cover springs open, then a patter, one step for
+  // every second sticker landing on the sheet (from 0.6s, 44ms apart).
+  "gallery-spread": ({ pulse, tap }) => {
+    pulse(0.12, 460, 0.1, 0.01, 1.45);
+    for (let step = 0; step < 15; step++) {
+      const at = 0.6 + step * 0.044;
+      tap(at, 0.0035);
+      pulse(at, 700 + ((step * 3) % 7) * 55, 0.03, 0.0045, 0.8);
+    }
+  },
+  // The reverse: a falling patter as the stickers are drawn in, then one soft
+  // gulp when the last one disappears into the cover (at 0.93s).
+  "gallery-gather": ({ pulse, tap }) => {
+    for (let step = 0; step < 15; step++) {
+      const at = 0.43 + step * 0.032;
+      tap(at, 0.003);
+      pulse(at, 1000 - step * 26, 0.028, 0.004, 0.9);
+    }
+    tap(0.93, 0.008);
+    pulse(0.93, 420, 0.13, 0.014, 0.55);
+  },
 };
 
 export function createSynth() {

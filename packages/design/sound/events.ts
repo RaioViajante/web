@@ -18,7 +18,10 @@ export type SoundKind =
   | "flip"
   | "gallery"
   | "gallery-reveal"
-  | "typing";
+  | "typing"
+  // root gallery: the stickers leave the cover, and are gathered back into it
+  | "gallery-spread"
+  | "gallery-gather";
 
 /** `hover` is very soft: at most one per 80ms. `tick` is the quietest. */
 export const HOVER_THROTTLE_MS = 80;

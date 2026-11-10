@@ -82,12 +82,12 @@ for (const width of [1440, 390, 320]) {
     ).toBeInViewport();
     await expect(
       collection.locator('button[aria-haspopup="dialog"]'),
-    ).toHaveCount(48);
+    ).toHaveCount(49);
     await expect(page.locator("main")).not.toContainText(
       /requiem|pale choir|concept art/i,
     );
     await expect(artworkButtons(page, "Branding")).toHaveCount(30);
-    await expect(artworkButtons(page, "Profiles")).toHaveCount(2);
+    await expect(artworkButtons(page, "Profiles")).toHaveCount(3);
     await expect(artworkButtons(page, "Personal")).toHaveCount(16);
     const sticker = page.getByRole("button", {
       name: "View Work of art",
@@ -192,7 +192,7 @@ for (const width of [1440, 390, 320]) {
     await dialog.getByRole("checkbox", { name: /Profiles/ }).check();
     const zipPromise = page.waitForEvent("download");
     await dialog
-      .getByRole("button", { name: "download .zip · 2 files" })
+      .getByRole("button", { name: "download .zip · 3 files" })
       .click();
     const zip = await zipPromise;
     expect(zip.suggestedFilename()).toBe("raioviajante-profiles.zip");
@@ -206,6 +206,7 @@ for (const width of [1440, 390, 320]) {
     expect(names).toEqual([
       "raioviajante-profiles-confused-at-the-laptop.png",
       "raioviajante-profiles-hmm.png",
+      "raioviajante-profiles-headphones-on.png",
     ]);
     if (width === 1440) {
       await dialog
@@ -213,7 +214,7 @@ for (const width of [1440, 390, 320]) {
         .click();
       const allPromise = page.waitForEvent("download");
       await dialog
-        .getByRole("button", { name: "download .zip · 20 files" })
+        .getByRole("button", { name: "download .zip · 21 files" })
         .click();
       const all = await allPromise;
       expect(all.suggestedFilename()).toBe("raioviajante-gallery.zip");
@@ -226,7 +227,7 @@ for (const width of [1440, 390, 320]) {
       })
         .trim()
         .split("\n");
-      expect(entries).toHaveLength(20);
+      expect(entries).toHaveLength(21);
       expect(new Set(entries.map((name) => name.split("/")[0]))).toEqual(
         new Set(["branding", "profiles", "personal"]),
       );
@@ -262,6 +263,186 @@ for (const width of [1440, 390, 320]) {
     expect(health).toEqual([]);
   });
 }
+
+async function openCollectionRecordingSounds(page: Page) {
+  await isolate(page, []);
+  await page.addInitScript(() => {
+    const sounds: unknown[] = [];
+    Object.assign(window, { sounds });
+    window.addEventListener("rv-sound", (event) =>
+      sounds.push((event as CustomEvent).detail),
+    );
+  });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(base("root") + "/gallery");
+  await page
+    .getByRole("button", { name: "Reveal the artwork collection" })
+    .click();
+  await expect(page.locator(".gallery-piece")).toHaveCount(16);
+}
+
+const recordedSounds = (page: Page) =>
+  page.evaluate(() => (window as unknown as { sounds: unknown[] }).sounds);
+
+async function scrollThroughCollage(page: Page) {
+  await page.mouse.move(800, 450);
+  const last = page.locator(".gallery-piece").last();
+  await expect(async () => {
+    await page.mouse.wheel(0, 500);
+    await expect(last).toBeInViewport({ ratio: 1, timeout: 200 });
+  }).toPass();
+}
+
+test("Personal artwork pops in once, with the gallery sound, on scroll", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  const pending = page.locator('.gallery-piece[data-pop="waiting"]');
+  await expect(pending).toHaveCount(16);
+  expect(await recordedSounds(page)).toEqual(["gallery-spread"]);
+  await scrollThroughCollage(page);
+  await expect(page.locator(".gallery-piece[data-pop]")).toHaveCount(0);
+  await expect(page.locator(".gallery-piece").last()).toHaveCSS("opacity", "1");
+  const sounds = await recordedSounds(page);
+  expect(sounds).toEqual(["gallery-spread", ...Array(16).fill("gallery")]);
+  await page.mouse.wheel(0, -2000);
+  await page.mouse.wheel(0, 2000);
+  await page.waitForTimeout(300);
+  expect(await recordedSounds(page)).toEqual(sounds);
+});
+
+test("Opening the collection bursts the stickers out of the cover", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  const sticker = page.locator(".gallery-sticker").last();
+  await expect(sticker).toHaveCSS("animation-name", "gallery-sticker-burst");
+  const offsetY = await sticker.evaluate((element) =>
+    parseFloat(element.style.getPropertyValue("--burst-y")),
+  );
+  expect(offsetY).toBeLessThan(0);
+  await expect(page.locator("#gallery-collection")).not.toHaveAttribute(
+    "data-bursting",
+    "",
+  );
+  await expect(sticker).toHaveCSS("pointer-events", "auto");
+});
+
+test("Clicking the cover again gathers everything back into it", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  const cover = page.getByRole("button", {
+    name: "Reveal the artwork collection",
+  });
+  const collection = page.locator("#gallery-collection");
+  await expect(collection).not.toHaveAttribute("data-bursting", "");
+  await cover.click();
+  await expect(page.locator(".gallery-redesign")).toHaveAttribute(
+    "data-closing",
+    "true",
+  );
+  await expect(page.locator(".gallery-sticker").last()).toHaveCSS(
+    "animation-name",
+    "gallery-sticker-gather",
+  );
+  await expect(collection).toBeVisible();
+  await expect(collection).toBeHidden();
+  await expect(cover).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator(".gallery-redesign")).toHaveAttribute(
+    "data-closing",
+    "false",
+  );
+  expect(await recordedSounds(page)).toEqual([
+    "gallery-spread",
+    "gallery-gather",
+  ]);
+  // It opens again with a fresh burst.
+  await cover.click();
+  await expect(collection).toBeVisible();
+  await expect(page.locator(".gallery-sticker").last()).toHaveCSS(
+    "animation-name",
+    "gallery-sticker-burst",
+  );
+});
+
+test("Under reduced motion the collection opens and closes at once, with the plain click", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openCollectionRecordingSounds(page);
+  await page
+    .getByRole("button", { name: "Reveal the artwork collection" })
+    .click();
+  await expect(page.locator("#gallery-collection")).toBeHidden();
+  expect(await recordedSounds(page)).toEqual(["gallery", "gallery"]);
+});
+
+test("While it gathers, nothing in the collection takes focus", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  await page
+    .getByRole("button", { name: "Reveal the artwork collection" })
+    .click();
+  await expect(page.locator("#gallery-collection")).toHaveAttribute(
+    "inert",
+    "",
+  );
+  // Hold the gather, so the check below runs while it is still closing.
+  await page.evaluate(() => {
+    for (const animation of document.getAnimations()) animation.pause();
+  });
+  await page.keyboard.press("Tab");
+  await expect(page.locator(".gallery-redesign")).toHaveAttribute(
+    "data-closing",
+    "true",
+  );
+  expect(
+    await page.evaluate(() =>
+      Boolean(
+        document.activeElement?.closest(
+          "#gallery-collection, .gallery-jumps, .gallery-section-heading",
+        ),
+      ),
+    ),
+  ).toBe(false);
+  await page.evaluate(() => {
+    for (const animation of document.getAnimations()) animation.play();
+  });
+  await expect(page.locator("#gallery-collection")).toBeHidden();
+});
+
+test("Under reduced motion the stickers do not burst", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openCollectionRecordingSounds(page);
+  await expect(page.locator(".gallery-sticker").last()).toHaveCSS(
+    "animation-name",
+    "none",
+  );
+});
+
+test("A focused piece appears at once, before it scrolls into view", async ({
+  page,
+}) => {
+  await openCollectionRecordingSounds(page);
+  const piece = page.locator(".gallery-piece").last();
+  await expect(piece).toHaveAttribute("data-pop", "waiting");
+  await piece.focus();
+  await expect(piece).not.toHaveAttribute("data-pop", "waiting");
+  await expect(piece).toHaveCSS("opacity", "1");
+});
+
+test("Under reduced motion the artwork never hides or pops", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openCollectionRecordingSounds(page);
+  await expect(page.locator(".gallery-piece[data-pop]")).toHaveCount(0);
+  await scrollThroughCollage(page);
+  // Only the cover's own click: nothing pops, so nothing else plays.
+  expect(await recordedSounds(page)).toEqual(["gallery"]);
+});
 
 test("Gallery reduced motion and failed collection download", async ({
   page,
@@ -356,6 +537,16 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
     "aria-pressed",
     "true",
   );
+  // Activating the cover plays the dedicated spread voice instead of the
+  // click voice; measure it once so the counts below stay one per activation.
+  const beforeSpread = await voices();
+  await page.evaluate(() =>
+    window.dispatchEvent(
+      new CustomEvent("rv-sound", { detail: "gallery-spread" }),
+    ),
+  );
+  const spread = (await voices()) - beforeSpread;
+  expect(spread).toBeGreaterThan(0);
   const beforeHover = await voices();
   await cover.hover();
   expect(await voices()).toBe(beforeHover + 1);
@@ -371,18 +562,18 @@ test("Gallery uses one shared sound voice per entry and activation, gated by the
   );
   expect(await voices()).toBe(beforeHover + 1);
   await pressInPlace();
-  expect(await voices()).toBe(beforeHover + 2);
+  expect(await voices()).toBe(beforeHover + 1 + spread);
   // The reveal re-hit-tests the stationary pointer; no late duplicate hover
   // voice may arrive once the animations and scroll settle.
   await page.waitForTimeout(800);
-  expect(await voices()).toBe(beforeHover + 2);
+  expect(await voices()).toBe(beforeHover + 1 + spread);
   const sticker = page.getByRole("button", {
     name: "View Work of art",
     exact: true,
   });
   await expect(
     page.locator('#gallery-collection button[data-sound="gallery"]'),
-  ).toHaveCount(48);
+  ).toHaveCount(49);
   await sticker.hover();
   const beforeClick = await voices();
   await pressInPlace();
@@ -557,9 +748,9 @@ for (const width of [1440, 390])
     ).toBeInViewport();
     await expect(
       collection.locator('button[aria-haspopup="dialog"]'),
-    ).toHaveCount(48);
+    ).toHaveCount(49);
     await expect(artworkButtons(page, "Identidade visual")).toHaveCount(30);
-    await expect(artworkButtons(page, "Perfis")).toHaveCount(2);
+    await expect(artworkButtons(page, "Perfis")).toHaveCount(3);
     await expect(artworkButtons(page, "Pessoais")).toHaveCount(16);
     // Profile links keep their URLs; the video-source label is translated.
     const profileLinks = (path: string) =>
@@ -655,7 +846,7 @@ for (const width of [1440, 390])
     );
     const zipPromise = page.waitForEvent("download");
     await dialog
-      .getByRole("button", { name: "baixar .zip · 2 arquivos" })
+      .getByRole("button", { name: "baixar .zip · 3 arquivos" })
       .click();
     const zip = await zipPromise;
     expect(zip.suggestedFilename()).toBe("raioviajante-profiles.zip");
@@ -670,9 +861,10 @@ for (const width of [1440, 390])
     ).toEqual([
       "raioviajante-profiles-confused-at-the-laptop.png",
       "raioviajante-profiles-hmm.png",
+      "raioviajante-profiles-headphones-on.png",
     ]);
     await expect(dialog.getByRole("status")).toHaveText(
-      "raioviajante-profiles.zip salvo, 2 arquivos.",
+      "raioviajante-profiles.zip salvo, 3 arquivos.",
     );
     await dialog
       .getByRole("button", { name: "selecionar tudo", exact: true })
@@ -681,7 +873,7 @@ for (const width of [1440, 390])
       "Será salvo como raioviajante-gallery.zip, com uma pasta por categoria.",
     );
     await expect(
-      dialog.getByRole("button", { name: "baixar .zip · 20 arquivos" }),
+      dialog.getByRole("button", { name: "baixar .zip · 21 arquivos" }),
     ).toBeEnabled();
     await expect(
       dialog.getByRole("button", { name: "limpar seleção", exact: true }),
