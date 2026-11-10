@@ -64,6 +64,13 @@ export const socialLinks: PrimaryLink[] = [
     description: "The films I've watched and what I thought of them.",
   },
   {
+    label: "Spotify",
+    href: "https://open.spotify.com/user/31mwvlvvkdfertthfcpk7zcfis7e",
+    rel: "me",
+    category: "music",
+    description: "The music I keep coming back to.",
+  },
+  {
     label: "Pinterest",
     href: "https://www.pinterest.com/RaioViajando/",
     rel: "me",

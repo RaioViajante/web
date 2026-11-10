@@ -146,6 +146,10 @@ export const ptHome = {
       note: "filmes",
       description: "Os filmes que vi e o que achei deles.",
     },
+    music: {
+      note: "música",
+      description: "As músicas às quais sempre volto.",
+    },
     references: {
       note: "referências",
       description: "Referências visuais que gosto de guardar.",

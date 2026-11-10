@@ -19,6 +19,7 @@ test("social profiles use the owner's handles with platform-only labels", () => 
     YouTube: "https://www.youtube.com/@raioviajando",
     TikTok: "https://www.tiktok.com/@raioviajando",
     Letterboxd: "https://letterboxd.com/raioviajando/",
+    Spotify: "https://open.spotify.com/user/31mwvlvvkdfertthfcpk7zcfis7e",
     Pinterest: "https://www.pinterest.com/RaioViajando/",
     "Hugging Face": "https://huggingface.co/RaioViajando",
     Kaggle: "https://www.kaggle.com/raioviajando",
