@@ -191,6 +191,14 @@ describe("links that leave the four sites", () => {
     expect(link("https://meli.la/x", "pt-BR")).toBe(
       '<a href="https://meli.la/x" target="_blank" rel="sponsored noopener">shop<span class="rv-sr-only"> (abre em nova aba)</span></a>',
     );
+    // rel tokens are not repeated.
+    expect(
+      renderToStaticMarkup(
+        <SiteLink href="https://x.com" rel="noopener noreferrer" newTab="en">
+          x
+        </SiteLink>,
+      ),
+    ).toContain('rel="noopener noreferrer"');
     expect(link("https://meli.la/x")).toBe(
       '<a href="https://meli.la/x" rel="sponsored">shop</a>',
     );

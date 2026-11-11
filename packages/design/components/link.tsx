@@ -1,6 +1,6 @@
 import type { AnchorHTMLAttributes, ComponentType } from "react";
 import type { LocaleId } from "../../../site/locales";
-import { SITES, siteOrigins } from "../../../site/sites";
+import { HOST_ALIASES, SITES, siteOrigins } from "../../../site/sites";
 import { catalogFor } from "../catalog";
 
 /**
@@ -16,10 +16,10 @@ export function isInternal(href: string) {
   return href.startsWith("/") && !href.startsWith("//");
 }
 
-/** The four sites' hostnames, with the one `www` alias that exists (Root's). */
+/** The four sites' hostnames and their aliases (`site/sites.ts`). */
 const ecosystemHosts = new Set([
   ...SITES.map((site) => new URL(site.href).hostname),
-  `www.${new URL(siteOrigins.root).hostname}`,
+  ...HOST_ALIASES,
 ]);
 
 /**
@@ -63,7 +63,9 @@ export function SiteLink({
         href={href}
         {...rest}
         target="_blank"
-        rel={[rel, "noopener"].filter(Boolean).join(" ")}
+        rel={[...new Set([...(rel ?? "").split(/\s+/), "noopener"])]
+          .filter(Boolean)
+          .join(" ")}
       >
         {children}
         <span className="rv-sr-only">

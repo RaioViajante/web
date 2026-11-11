@@ -47,7 +47,9 @@ rows on the home page reveal their descriptions after 400 ms of pointer hover,
 or immediately on keyboard focus. On every page, in both languages, a link
 that leaves the four sites (profiles, Setup's affiliate links, project
 actions, GitHub, the ANPD guide) opens in a new tab and says so to assistive
-technology; the email and every RaioViajante destination stay in the tab. The avatar flips on click
+technology; the email and every RaioViajante destination stay in the tab.
+The one exception is the client case's demo layer, whose "New tab" button opens
+the static demo at `/work/stucco/` in a new tab by design, and says so. The avatar flips on click
 with a separate two-part flip sound.
 Its ten-frame illustration loops every three seconds after the frames have
 loaded. Reduced motion keeps the centered portrait still and disables the flip.

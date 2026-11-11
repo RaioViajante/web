@@ -36,6 +36,9 @@ export const CONTACT = {
  */
 export const ABOUT_SITES_PATH = "/this-site";
 
+/** Other hostnames that serve one of the four sites (Root's `www` redirect). */
+export const HOST_ALIASES: readonly string[] = ["www.raioviajante.com"];
+
 export function siteById(id: SiteId) {
   return SITES.find((site) => site.id === id)!;
 }
