@@ -1,7 +1,9 @@
 import { metadataFor } from "../../lib/seo";
 import Link from "next/link";
 import { PageHeader, Section } from "@raioviajante/design/components";
+import { OtherSites } from "../../components/OtherSites";
 import { RootShell } from "../../components/RootShell";
+import { otherSites } from "../../lib/this-site";
 
 export const metadata = metadataFor("/this-site");
 
@@ -18,7 +20,8 @@ export default function ThisSite() {
           This is the starting point for the RaioViajante sites. It brings my
           projects, recent writing, artwork and contact information into one
           place. The writing lives on Dump, the documentation on Docs, and the
-          experiments on Lab. Each has its own site and purpose.
+          experiments on Lab. Each has its own site and purpose, and all four
+          share one design, one typeface and the same optional sound.
         </p>
       </Section>
       <Section number="05.1" title="How it is built" id="built-heading">
@@ -32,7 +35,12 @@ export default function ThisSite() {
           <li>Optional sound, with its preference saved in your browser</li>
         </ul>
       </Section>
-      <Section number="05.2" title="Repository" id="repository-heading">
+      <OtherSites sites={otherSites} />
+      <Section
+        number={`05.${otherSites.length + 2}`}
+        title="Repository"
+        id="repository-heading"
+      >
         <p>
           The code for this site and the other RaioViajante web apps is on{" "}
           <a href="https://github.com/RaioViajante/web" data-sound="nav">

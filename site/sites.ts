@@ -30,6 +30,12 @@ export const CONTACT = {
   cnpj: "53.021.377/0001-93",
 } as const;
 
+/**
+ * Root's locale-neutral page about all four sites. The other sites' footers
+ * link it; Root's own route table must keep this path (a Root test checks).
+ */
+export const ABOUT_SITES_PATH = "/this-site";
+
 export function siteById(id: SiteId) {
   return SITES.find((site) => site.id === id)!;
 }

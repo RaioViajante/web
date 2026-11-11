@@ -2,8 +2,9 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { PageHeader, Section } from "@raioviajante/design/components";
 import { jsonLdScript } from "../../../../../seo/structured-data";
+import { OtherSites } from "../../../components/OtherSites";
 import { RootShell } from "../../../components/RootShell";
-import { ptThisSite } from "../../../lib/pt";
+import { ptAbout, ptThisSite } from "../../../lib/pt";
 import { metadataFor } from "../../../lib/seo";
 import { routes } from "../../../lib/routes";
 import { webPageJsonLd } from "../../../lib/structured-data";
@@ -37,8 +38,12 @@ export default async function ThisSitePt() {
           ))}
         </ul>
       </Section>
+      <OtherSites
+        sites={ptThisSite.otherSites}
+        englishNote={ptAbout.englishNote}
+      />
       <Section
-        number="05.2"
+        number={`05.${ptThisSite.otherSites.length + 2}`}
         title={ptThisSite.repositoryTitle}
         id="repository-heading"
       >

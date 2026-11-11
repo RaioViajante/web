@@ -8,6 +8,7 @@
 import type { GalleryCopy } from "./gallery.ts";
 import type { ProjectsCopy } from "./projects.ts";
 import type { StuccoCopy } from "./stucco.ts";
+import type { OtherSite } from "./this-site.ts";
 import type { RouteKey } from "./routes.ts";
 import { localizedPath, participates } from "../../../site/locales.ts";
 import { siteOrigins, type SiteId } from "../../../site/sites.ts";
@@ -622,7 +623,7 @@ export const ptThisSite = {
   title: "raioviajante.com",
   line: "Um pequeno espaço para meus projetos, textos e experimentos.",
   siteTitle: "O site",
-  site: "Este é o ponto de partida para os sites do RaioViajante. Ele reúne meus projetos, textos recentes, ilustrações e informações de contato em um só lugar. Os textos ficam no Dump, a documentação no Docs e os experimentos no Lab. Cada um tem seu próprio site e propósito.",
+  site: "Este é o ponto de partida para os sites do RaioViajante. Ele reúne meus projetos, textos recentes, ilustrações e informações de contato em um só lugar. Os textos ficam no Dump, a documentação no Docs e os experimentos no Lab. Cada um tem seu próprio site e propósito, e os quatro compartilham o mesmo design, a mesma fonte e o mesmo som opcional.",
   builtTitle: "Como é construído",
   builtItems: [
     "Next.js, React e TypeScript no próprio site",
@@ -631,6 +632,43 @@ export const ptThisSite = {
     "O feed RSS público do Dump para mostrar os últimos textos na página inicial",
     "Som opcional, com a preferência salva no seu navegador",
   ],
+  /** Dump, Docs and Lab, in the English page's order. */
+  otherSites: [
+    {
+      id: "dump",
+      title: "Dump",
+      link: ptDumpHome,
+      holds: "reúne meus textos, em inglês e português.",
+      built: [
+        "Next.js, React e TypeScript, como este site",
+        "Posts escritos como arquivos MDX no repositório",
+        "Arquivo, tags e feed RSS em cada idioma",
+        "Comentários pelo giscus, que os guarda no GitHub Discussions",
+      ],
+    },
+    {
+      id: "docs",
+      title: "Docs",
+      link: ptDocsHome,
+      holds: "reúne a documentação técnica dos meus projetos.",
+      built: [
+        "Astro, que transforma os componentes compartilhados em páginas estáticas",
+        "Páginas de projeto escritas a partir do código-fonte de cada projeto, não do README",
+        "Duas páginas sobre estes próprios sites: a linguagem de design e as convenções do repositório",
+      ],
+    },
+    {
+      id: "lab",
+      title: "Lab",
+      link: ptLabHome,
+      holds: "reúne experimentos interativos e curiosidades técnicas.",
+      built: [
+        "Astro, com pequenos scripts em TypeScript para cada experimento",
+        "Cada experimento indica o projeto e a revisão de onde vem, ou avisa que foi escrito para o Lab como modelo didático",
+        "Um rótulo diz se ele roda no seu navegador, se é simulado ou se mostra só o código-fonte",
+      ],
+    },
+  ] satisfies readonly OtherSite[],
   repositoryTitle: "Repositório",
   repositoryBefore:
     "O código deste site e dos outros apps web do RaioViajante está no ",

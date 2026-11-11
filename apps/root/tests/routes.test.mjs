@@ -275,8 +275,13 @@ test("Portuguese This Site has route, SEO, search and page copy", () => {
     "Como este site é construído",
   );
   assert.equal(ptThisSite.builtItems.length, 5);
-  for (const value of Object.values(ptThisSite).flat())
-    assert.ok(typeof value === "string" && value.length > 0);
+  // Every leaf is a non-empty string; a missing or non-string value fails.
+  const strings = (value) => {
+    if (typeof value === "string") return [value];
+    assert.ok(value && typeof value === "object", `not copy: ${value}`);
+    return Object.values(value).flatMap(strings);
+  };
+  for (const value of strings(ptThisSite)) assert.ok(value.length > 0);
 });
 
 test("Portuguese Gallery has route, SEO, search, page and widget copy", () => {

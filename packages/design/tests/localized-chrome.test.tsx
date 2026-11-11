@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Footer, Shell, SoundToggle } from "../components/Shell";
+import {
+  Footer,
+  footerDestination,
+  Shell,
+  SoundToggle,
+} from "../components/Shell";
 import { Pager } from "../components/page";
 import { NotFoundPage } from "../components/templates";
 import { SearchPage } from "../components/search";
@@ -470,6 +475,64 @@ describe("footer cross-site destinations", () => {
       ["https://dump.raioviajante.com", "en", "dump (em inglês)"],
       ["https://docs.raioviajante.com/pt/", "pt-BR", "docs"],
       ["https://lab.raioviajante.com", "en", "lab (em inglês)"],
+    ]);
+  });
+
+  const aboutOf = (
+    site: "root" | "dump" | "docs" | "lab",
+    locale: "en" | "pt-BR",
+    participating?: (site: string, locale: string) => boolean,
+  ) => {
+    const body = html(
+      <Footer
+        site={site}
+        locale={locale}
+        isParticipating={participating as never}
+      />,
+    );
+    return [...body.querySelectorAll("footer > div a")]
+      .filter((a) => !a.getAttribute("href")!.startsWith("mailto:"))
+      .map((a) => [
+        a.getAttribute("href"),
+        a.getAttribute("hreflang"),
+        a.textContent,
+      ]);
+  };
+
+  it("links Root's page about the sites from Dump, Docs and Lab, not from Root", () => {
+    for (const site of ["dump", "docs", "lab"] as const) {
+      expect(aboutOf(site, "en")).toEqual([
+        ["https://raioviajante.com/this-site", null, "About these sites"],
+      ]);
+      expect(aboutOf(site, "pt-BR")).toEqual([
+        ["https://raioviajante.com/pt/this-site", "pt-BR", "Sobre estes sites"],
+      ]);
+    }
+    expect(aboutOf("root", "en")).toEqual([]);
+    expect(aboutOf("root", "pt-BR")).toEqual([]);
+  });
+
+  it("checks a footer path the same way in both locales", () => {
+    const root = {
+      id: "root",
+      label: "raioviajante.com",
+      href: "https://raioviajante.com",
+    } as const;
+    for (const locale of ["en", "pt-BR"] as const)
+      for (const path of ["/pt/x", "this-site"])
+        expect(() =>
+          footerDestination("lab", root, locale, () => true, path),
+        ).toThrow(RangeError);
+  });
+
+  it("falls back to Root's English page, labelled, while the rendering app does not participate", () => {
+    const none = (_site: string, locale: string) => locale === "en";
+    expect(aboutOf("lab", "pt-BR", none)).toEqual([
+      [
+        "https://raioviajante.com/this-site",
+        "en",
+        "Sobre estes sites (em inglês)",
+      ],
     ]);
   });
 
