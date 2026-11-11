@@ -8,15 +8,22 @@ internet. It is not intended to be a portfolio, résumé, or sales landing page.
 Internal routes:
 
 - `/` — home
-- `/setup` — personal gear
 - `/about` — personal introduction
 - `/projects` — projects
+- `/projects/all` — every project, by kind
+- `/projects/stucco` — a written-up client case
 - `/contact` — contact email and message guidance
 - `/gallery` — animated collection of original character art
-- `/this-site` — notes on the site and its source code
+- `/this-site` — notes on the four sites and their source code
+- `/setup` — personal gear, with affiliate links where supplied
 - `/search` — search across this site and the other RaioViajante sites
 - `/privacy` — privacy information for the root site
 - `/terms` — terms of use for the root site
+
+Each route above also ships in Brazilian Portuguese under `/pt` (`/pt`,
+`/pt/about`, `/pt/projects` and so on), declared in `lib/routes.ts`. The client
+case's static demo is served from `public/` at `/work/stucco/`, outside the
+sitemap and search.
 
 Related independent websites:
 

@@ -14,6 +14,12 @@ export const gear: GearItem[] = [
     url: "https://meli.la/2R6XZ9W",
   },
   {
+    name: "Apple iPad Air M4 · 11-inch",
+    category: "tablet",
+    url: "https://meli.la/23raMwp",
+  },
+  { name: "Apple Pencil Pro", category: "stylus" },
+  {
     name: "LG UltraGear 34-inch · 160 Hz",
     category: "monitor",
     url: "https://meli.la/14oybLi",
