@@ -738,15 +738,17 @@ export interface JsonLdContext {
   rss?: RssItem[];
 }
 
-/** What each page class publishes; other pages need none. */
+/**
+ * What each page class publishes. Every other page publishes none, so a node
+ * that appears on only one language's version of a page fails the check.
+ */
 export function expectedTypes(site: Site, path: string): string[] | undefined {
   const neutral = stripLocalePrefix(path);
-  // A localized home may carry the full WebSite/Blog node or reference the
-  // English one by @id (docs/i18n.md, "Structured data"); the app slice that
-  // ships the locale chooses, so the node set is not fixed here. The language
-  // of whatever it emits is still checked.
+  // A localized home repeats the host's full nodes (Dump, Docs, Lab) or, on
+  // Root, whose full Person belongs on the English home only, references the
+  // WebSite by @id from a WebPage (docs/i18n.md, "Structured data").
   if (neutral === "/" && localeOfPath(path) !== DEFAULT_LOCALE)
-    return undefined;
+    return site === "root" ? ["WebPage"] : expectedTypes(site, "/");
   if (neutral === "/")
     return {
       root: ["Person", "WebSite"],
@@ -760,7 +762,7 @@ export function expectedTypes(site: Site, path: string): string[] | undefined {
     !["/search/", "/terms/", "/privacy/"].includes(neutral)
   )
     return ["TechArticle", "BreadcrumbList"];
-  return undefined;
+  return [];
 }
 
 const urlKeys = new Set(["@id", "url", "item", "image", "sameAs"]);
@@ -815,13 +817,24 @@ function checkNodeLanguages(
 
 /**
  * One `@id` never carries contradictory languages across the pages of an app:
- * every page that emits a full host-level node states the same shipped set.
+ * every page that emits a full host-level node states the same shipped set,
+ * and a full `WebSite` or `Blog` node is the same, field for field, on every
+ * page that repeats it (one entity, one description, in every language).
  */
 export function checkEntityLanguages(
   pages: Array<{ site: Site; path: string; html: string }>,
 ): Problems {
   const p: Problems = [];
   const seen = new Map<string, { at: string; value: string }>();
+  const full = new Map<string, { at: string; value: string }>();
+  const canonical = (value: unknown): string =>
+    JSON.stringify(value, (_key, v) =>
+      v && typeof v === "object" && !Array.isArray(v)
+        ? Object.fromEntries(
+            Object.entries(v).sort(([a], [b]) => a.localeCompare(b)),
+          )
+        : v,
+    );
   const published = JSON.stringify(
     [
       ...new Set(
@@ -838,6 +851,14 @@ export function checkEntityLanguages(
           if (stated !== published)
             p.push(
               `${where(page.site, page.path)}: ${node["@type"]} inLanguage is ${stated ?? "missing"}, expected published sitemap languages ${published}`,
+            );
+          const id = node["@id"] ?? node["@type"];
+          const value = canonical(node);
+          const first = full.get(id);
+          if (!first) full.set(id, { at: where(page.site, page.path), value });
+          else if (first.value !== value)
+            p.push(
+              `${where(page.site, page.path)}: ${node["@type"]} ${id} differs from the same node on ${first.at}`,
             );
         }
         if (!node["@id"] || !languages) continue;
@@ -873,7 +894,8 @@ export function checkJsonLd(ctx: JsonLdContext) {
       return void p.push(`${at}: JSON-LD has no @graph array`);
     nodes.push(...block.json["@graph"]);
   });
-  if (expected) {
+  // `[]` is a real expectation: the page publishes no JSON-LD at all.
+  if (expected !== undefined) {
     const types = nodes.map((n) => n["@type"]);
     if (
       JSON.stringify([...types].sort()) !== JSON.stringify([...expected].sort())
