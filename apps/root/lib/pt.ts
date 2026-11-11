@@ -8,6 +8,7 @@
 import type { GalleryCopy } from "./gallery.ts";
 import type { ProjectsCopy } from "./projects.ts";
 import type { StuccoCopy } from "./stucco.ts";
+import type { OtherSite } from "./this-site.ts";
 import type { RouteKey } from "./routes.ts";
 import { localizedPath, participates } from "../../../site/locales.ts";
 import { siteOrigins, type SiteId } from "../../../site/sites.ts";
@@ -652,8 +653,8 @@ export const ptThisSite = {
       holds: "reúne a documentação técnica dos meus projetos.",
       built: [
         "Astro, que transforma os componentes compartilhados em páginas estáticas",
-        "Páginas escritas a partir do código-fonte de cada projeto, não do README",
-        "Cada página diz o que está implementado, parcial ou planejado",
+        "Páginas de projeto escritas a partir do código-fonte de cada projeto, não do README",
+        "Duas páginas sobre estes próprios sites: a linguagem de design e as convenções do repositório",
       ],
     },
     {
@@ -667,7 +668,7 @@ export const ptThisSite = {
         "Um rótulo diz se ele roda no seu navegador, se é simulado ou se mostra só o código-fonte",
       ],
     },
-  ],
+  ] satisfies readonly OtherSite[],
   repositoryTitle: "Repositório",
   repositoryBefore:
     "O código deste site e dos outros apps web do RaioViajante está no ",

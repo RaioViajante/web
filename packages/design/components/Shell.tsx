@@ -184,13 +184,15 @@ export function footerDestination(
     isParticipating(currentSite, locale) &&
     isParticipating(target.id, locale);
   const destination: LocaleId = localized ? locale : DEFAULT_LOCALE;
+  // English homes keep the bare origin; every other path goes through the
+  // same checks in both locales.
   return {
     locale: destination,
-    href: localized
-      ? new URL(localizedPath(target.id, destination, path), target.href).href
-      : path === "/"
+    href:
+      !localized && path === "/"
         ? target.href
-        : new URL(path, target.href).href,
+        : new URL(localizedPath(target.id, destination, path), target.href)
+            .href,
   };
 }
 

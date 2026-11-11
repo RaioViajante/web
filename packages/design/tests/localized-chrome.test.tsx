@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Footer, Shell, SoundToggle } from "../components/Shell";
+import {
+  Footer,
+  footerDestination,
+  Shell,
+  SoundToggle,
+} from "../components/Shell";
 import { Pager } from "../components/page";
 import { NotFoundPage } from "../components/templates";
 import { SearchPage } from "../components/search";
@@ -505,6 +510,19 @@ describe("footer cross-site destinations", () => {
     }
     expect(aboutOf("root", "en")).toEqual([]);
     expect(aboutOf("root", "pt-BR")).toEqual([]);
+  });
+
+  it("checks a footer path the same way in both locales", () => {
+    const root = {
+      id: "root",
+      label: "raioviajante.com",
+      href: "https://raioviajante.com",
+    } as const;
+    for (const locale of ["en", "pt-BR"] as const)
+      for (const path of ["/pt/x", "this-site"])
+        expect(() =>
+          footerDestination("lab", root, locale, () => true, path),
+        ).toThrow(RangeError);
   });
 
   it("falls back to Root's English page, labelled, while the rendering app does not participate", () => {

@@ -5,6 +5,7 @@ import { localizedPath } from "../../../site/locales.ts";
 import { ABOUT_SITES_PATH } from "../../../site/sites.ts";
 import { ptPageSeo, ptThisSite } from "../lib/pt.ts";
 import { counterpartsOf, declaredPages, routes } from "../lib/routes.ts";
+import { otherSites } from "../lib/this-site.ts";
 
 const origin = "https://raioviajante.com";
 
@@ -60,9 +61,15 @@ test("the Portuguese page describes Dump, Docs and Lab, each with its own link",
     ptThisSite.otherSites.map(({ id }) => id),
     ["dump", "docs", "lab"],
   );
-  for (const site of ptThisSite.otherSites) {
+  for (const [index, site] of ptThisSite.otherSites.entries()) {
     assert.ok(new URL(site.link.href).host.startsWith(`${site.id}.`));
-    assert.ok(site.built.length > 0);
+    // The English page lists the same sites, in order, item for item.
+    assert.equal(otherSites[index].id, site.id);
+    assert.equal(otherSites[index].built.length, site.built.length);
+    assert.equal(
+      new URL(otherSites[index].link.href).host,
+      new URL(site.link.href).host,
+    );
   }
 });
 

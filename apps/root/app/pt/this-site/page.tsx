@@ -2,8 +2,9 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { PageHeader, Section } from "@raioviajante/design/components";
 import { jsonLdScript } from "../../../../../seo/structured-data";
+import { OtherSites } from "../../../components/OtherSites";
 import { RootShell } from "../../../components/RootShell";
-import { ptThisSite } from "../../../lib/pt";
+import { ptAbout, ptThisSite } from "../../../lib/pt";
 import { metadataFor } from "../../../lib/seo";
 import { routes } from "../../../lib/routes";
 import { webPageJsonLd } from "../../../lib/structured-data";
@@ -37,30 +38,10 @@ export default async function ThisSitePt() {
           ))}
         </ul>
       </Section>
-      {ptThisSite.otherSites.map((site, index) => (
-        <Section
-          key={site.id}
-          number={`05.${index + 2}`}
-          title={site.title}
-          id={`${site.id}-heading`}
-        >
-          <p>
-            <a
-              href={site.link.href}
-              hrefLang={site.link.hrefLang}
-              data-sound="nav"
-            >
-              {new URL(site.link.href).host}
-            </a>{" "}
-            {site.holds}
-          </p>
-          <ul className="rv-dash-list">
-            {site.built.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </Section>
-      ))}
+      <OtherSites
+        sites={ptThisSite.otherSites}
+        englishNote={ptAbout.englishNote}
+      />
       <Section
         number={`05.${ptThisSite.otherSites.length + 2}`}
         title={ptThisSite.repositoryTitle}

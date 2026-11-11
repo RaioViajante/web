@@ -715,7 +715,8 @@ kbd {
   color: var(--fg-3);
 }
 
-/* ---------- footer (identical on all four sites) ---------- */
+/* ---------- footer (one design on all four sites; the first line after the
+   sites gets the gap: Root's email, the others' "About these sites") ---------- */
 .rv-footer {
   display: flex;
   flex-direction: column;
