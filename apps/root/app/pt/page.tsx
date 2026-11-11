@@ -49,6 +49,7 @@ export default async function HomePt() {
               label={copy.label ?? link.label}
               href={link.href}
               rel={link.rel}
+              locale="pt-BR"
               note={copy.note}
               description={copy.description}
             />

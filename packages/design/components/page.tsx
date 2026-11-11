@@ -137,6 +137,7 @@ export function LeaderRow({
   linkComponent,
   rel,
   hrefLang,
+  newTab,
 }: {
   label: ReactNode;
   value?: ReactNode;
@@ -151,10 +152,22 @@ export function LeaderRow({
   rel?: string;
   /** Language of a deliberate cross-language destination. */
   hrefLang?: string;
+  /**
+   * Opens the link in a new tab and says so to assistive technology, in this
+   * locale (the page's). For links that leave the four sites.
+   */
+  newTab?: LocaleId;
 }) {
   const content = (
     <>
-      <span>{label}</span>
+      <span>
+        {label}
+        {newTab ? (
+          <span className="rv-sr-only">
+            {` (${catalogFor(newTab).links.newTab})`}
+          </span>
+        ) : null}
+      </span>
       <span className="rv-leader__dots" aria-hidden="true" />
       {value !== undefined ? (
         <span
@@ -176,8 +189,9 @@ export function LeaderRow({
       href={href}
       data-sound={sound}
       aria-describedby={describedBy}
-      rel={rel}
+      rel={newTab ? [rel, "noopener"].filter(Boolean).join(" ") : rel}
       hrefLang={hrefLang}
+      target={newTab ? "_blank" : undefined}
     >
       {content}
     </SiteLink>

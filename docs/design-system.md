@@ -132,7 +132,7 @@ its name (`--hover-label`), brightens and scales its value by 1.8%
 - **Sidebar** — caps group labels; items numbered `00.`, `01.`; the current item has a 1px `--fg-2` rule on its left. Groups: PAGES, ON THIS PAGE where useful, EXPERIMENTS on lab. **No SITES group** — the footer links the sites. Search is the last item of PAGES, numbered after the site's last top-level page: `NN. search ····· (avatar) ⌘K`.
 - **Page header** — centered: caps label (or breadcrumb in caps on docs), title, one line, meta row separated by middots. The first meta item is the status word in `--fg`.
 - **Numbered sections** — `01.`, `01.1`, `01.2`. The same numbers appear in "on this page".
-- **Dotted leader** — `name ····· value` for lists, metadata, statuses, tags, related links.
+- **Dotted leader** — `name ····· value` for lists, metadata, statuses, tags, related links. `newTab` (the page's locale) opens a link in a new tab with `rel="noopener"` added and a visually hidden "(opens in a new tab)" / "(abre em nova aba)" read after the label; nothing visible changes. Use it only for links that leave the four sites (`leavesEcosystem` in `site/sites.ts`): the sites, paths and `mailto:` stay in the tab.
 - **Soft blocks** — callouts NOTE / IMPORTANT on `#212121`; WARNING outlined 1px `--fg-2`; DEPRECATED dotted. Quotes keep a 2px left rule.
 - **Related rows** — `title ····· site ↗`, linking to pages about the same thing on the other sites. Today every experiment lists its related posts and docs; a post links its Lab experiment where one exists ("try it"); the Sweep guide links its experiment and posts from its own "try it and read more" section. Not every post or docs page has such links.
 - **Prev / next** — caps label above title, no box.

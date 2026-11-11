@@ -36,6 +36,31 @@ export const CONTACT = {
  */
 export const ABOUT_SITES_PATH = "/this-site";
 
+/** The hostnames of the four sites, with the `www` alias Root redirects. */
+const ecosystemHosts = new Set(
+  SITES.flatMap((site) => {
+    const host = new URL(site.href).hostname;
+    return [host, `www.${host}`];
+  }),
+);
+
+/**
+ * Whether a link takes the visitor out of the RaioViajante sites: an http(s)
+ * URL on any other host. Paths, fragments, `mailto:` and the four sites stay.
+ */
+export function leavesEcosystem(href: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(href);
+  } catch {
+    return false;
+  }
+  return (
+    (url.protocol === "https:" || url.protocol === "http:") &&
+    !ecosystemHosts.has(url.hostname)
+  );
+}
+
 export function siteById(id: SiteId) {
   return SITES.find((site) => site.id === id)!;
 }

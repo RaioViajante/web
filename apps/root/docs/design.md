@@ -44,7 +44,10 @@ provided yet.
 The home page links to Setup under "Other links" after "Latest writing".
 Linked rows are clickable across their full width. Primary links and project
 rows on the home page reveal their descriptions after 400 ms of pointer hover,
-or immediately on keyboard focus. The avatar flips on click
+or immediately on keyboard focus. On the home page, in both languages, a
+primary link that leaves the four sites opens in a new tab and says so to
+assistive technology; the email and every RaioViajante destination stay in the
+tab. The avatar flips on click
 with a separate two-part flip sound.
 Its ten-frame illustration loops every three seconds after the frames have
 loaded. Reduced motion keeps the centered portrait still and disables the flip.

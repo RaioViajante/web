@@ -54,6 +54,7 @@ export default async function Home() {
             label={link.label}
             href={link.href}
             rel={link.rel}
+            locale="en"
             note={link.category}
             description={link.description}
           />

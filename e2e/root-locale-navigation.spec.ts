@@ -182,6 +182,50 @@ test("Root publishes the Portuguese This Site counterpart across navigation, SEO
   );
 });
 
+test("Root's home opens only links that leave the four sites in a new tab", async ({
+  page,
+}) => {
+  await isolate(page, []);
+  const root = base("root");
+  for (const [path, notice] of [
+    ["/", "(opens in a new tab)"],
+    ["/pt", "(abre em nova aba)"],
+  ] as const) {
+    await page.goto(`${root}${path}`);
+    const rows = page
+      .locator("section", { has: page.locator("#links-heading") })
+      .locator("a.rv-leader");
+    const links = await rows.evaluateAll((nodes) =>
+      nodes.map((a) => ({
+        href: a.getAttribute("href")!,
+        target: a.getAttribute("target"),
+        rel: a.getAttribute("rel") ?? "",
+        hidden: a.querySelector(".rv-sr-only")?.textContent?.trim() ?? null,
+      })),
+    );
+    expect(links.length).toBeGreaterThan(10);
+    for (const link of links) {
+      const external =
+        /^https?:\/\//.test(link.href) &&
+        !/^https:\/\/(www\.)?((dump|docs|lab)\.)?raioviajante\.com(\/|$)/.test(
+          link.href,
+        );
+      expect(link.target, link.href).toBe(external ? "_blank" : null);
+      expect(link.hidden, link.href).toBe(external ? notice : null);
+      if (external)
+        expect(link.rel.split(" "), link.href).toContain("noopener");
+    }
+    // Mail and the ecosystem stay in this tab.
+    expect(links.some((l) => l.href.startsWith("mailto:") && !l.target)).toBe(
+      true,
+    );
+    for (const a of await page
+      .locator('a[href*="dump.raioviajante.com"]')
+      .all())
+      expect(await a.getAttribute("target")).toBeNull();
+  }
+});
+
 test("Root publishes the Portuguese Setup counterpart with its gear links intact", async ({
   page,
   request,
