@@ -742,6 +742,7 @@ test("person identity and page classes", () => {
     ]),
     /JSON-LD types are \[WebPage\], expected \[\]/,
   );
+  assert.doesNotMatch(root("/pt/about", []), /JSON-LD/);
 });
 function personJsonLdNode() {
   return { ...personRef(), sameAs: [identity.github] };

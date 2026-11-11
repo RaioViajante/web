@@ -44,9 +44,12 @@ is not a software product or a creative work in any sense the data states), and
 any page-level type for search, legal and archive pages. Every page outside
 this table publishes no JSON-LD, in any language, and the checks enforce it
 (`expectedTypes` in `seo/metadata-policy.ts`). The Portuguese homes of Dump,
-Docs and Lab repeat their host's full nodes; Root's references its `WebSite` by
-`@id` from a `WebPage` (`docs/i18n.md`, "Structured data"); the checks verify
-their language, not their node layout.
+Docs and Lab repeat their host's full nodes unchanged (English description,
+shipped-language set); Root's references its `WebSite` by `@id` from a
+`WebPage`, since the full `Person` belongs on the English home only
+(`docs/i18n.md`, "Structured data"). The checks pin each home's node set, and
+`checkEntityLanguages` fails when a full `WebSite` or `Blog` node differs
+between two pages of its host.
 
 - `BlogPosting.datePublished` is the post's frontmatter date, which is the
   only date posts have. A publication date is not a modification date, so

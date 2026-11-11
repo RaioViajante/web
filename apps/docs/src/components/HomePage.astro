@@ -73,7 +73,7 @@ const counterparts = LOCALE_IDS.filter((id) => id !== locale).map((id) => ({ loc
 	locale={locale}
 	counterparts={counterparts}
 	fullTitle
-	jsonLd={homeJsonLd(locale)}
+	jsonLd={homeJsonLd()}
 >
 	<DocsIndexHeader line={copy.home.line} locale={locale} />
 

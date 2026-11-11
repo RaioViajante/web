@@ -1,5 +1,6 @@
 import { inLanguageOf, websiteId } from "../../../seo/structured-data";
 import type { LocaleId } from "../../../site/locales";
+import { routes } from "./routes";
 import { origin } from "./seo";
 
 /**
@@ -8,7 +9,8 @@ import { origin } from "./seo";
  * stays on the English home). Other Root pages publish no JSON-LD
  * (docs/seo.md, "Structured data").
  */
-export function webPageJsonLd(path: string, locale: LocaleId) {
+export function localizedHomeJsonLd(locale: Exclude<LocaleId, "en">) {
+  const path = routes.home[locale]!;
   return {
     "@type": "WebPage" as const,
     "@id": new URL(path, origin).href,
