@@ -714,13 +714,34 @@ test("person identity and page classes", () => {
   assert.deepEqual(expectedTypes("dump", "/"), ["WebSite", "Blog"]);
   assert.deepEqual(expectedTypes("docs", "/"), ["WebSite"]);
   assert.deepEqual(expectedTypes("lab", "/"), ["WebSite"]);
+  // Every other page publishes no JSON-LD, in either language.
   for (const [site, path] of [
     ["root", "/about"],
+    ["root", "/pt/about"],
+    ["root", "/pt/terms"],
     ["dump", "/archive"],
     ["docs", "/search/"],
     ["lab", "/experiments/x/"],
   ])
-    assert.equal(expectedTypes(site, path), undefined, `${site} ${path}`);
+    assert.deepEqual(expectedTypes(site, path), [], `${site} ${path}`);
+  const root = (path, ld) =>
+    checkJsonLd({
+      site: "root",
+      path,
+      loc: `https://raioviajante.com${path}`,
+      sitemapLocs: [],
+      html: html({ canonical: `https://raioviajante.com${path}`, ld }),
+    }).join("\n");
+  assert.match(
+    root("/pt/about", [
+      {
+        "@type": "WebPage",
+        "@id": "https://raioviajante.com/pt/about",
+        inLanguage: "pt-BR",
+      },
+    ]),
+    /JSON-LD types are \[WebPage\], expected \[\]/,
+  );
 });
 function personJsonLdNode() {
   return { ...personRef(), sameAs: [identity.github] };

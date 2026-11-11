@@ -3,9 +3,10 @@ import type { LocaleId } from "../../../site/locales";
 import { origin } from "./seo";
 
 /**
- * The `WebPage` of a localized Root page: its language is the rendered
+ * The `WebPage` of Root's localized home: its language is the rendered
  * locale, and it belongs to Root's one WebSite by `@id` (the full WebSite node
- * stays on the English home).
+ * stays on the English home). Other Root pages publish no JSON-LD
+ * (docs/seo.md, "Structured data").
  */
 export function webPageJsonLd(path: string, locale: LocaleId) {
   return {

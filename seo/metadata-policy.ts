@@ -738,7 +738,10 @@ export interface JsonLdContext {
   rss?: RssItem[];
 }
 
-/** What each page class publishes; other pages need none. */
+/**
+ * What each page class publishes. Every other page publishes none, so a node
+ * that appears on only one language's version of a page fails the check.
+ */
 export function expectedTypes(site: Site, path: string): string[] | undefined {
   const neutral = stripLocalePrefix(path);
   // A localized home may carry the full WebSite/Blog node or reference the
@@ -760,7 +763,7 @@ export function expectedTypes(site: Site, path: string): string[] | undefined {
     !["/search/", "/terms/", "/privacy/"].includes(neutral)
   )
     return ["TechArticle", "BreadcrumbList"];
-  return undefined;
+  return [];
 }
 
 const urlKeys = new Set(["@id", "url", "item", "image", "sameAs"]);

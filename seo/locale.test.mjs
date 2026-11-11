@@ -915,7 +915,7 @@ test("structured data: localized homes are not forced into one node layout", () 
     "TechArticle",
     "BreadcrumbList",
   ]);
-  assert.equal(expectedTypes("docs", "/pt/search/"), undefined);
+  assert.deepEqual(expectedTypes("docs", "/pt/search/"), []);
   assert.deepEqual(expectedTypes("dump", "/pt/posts/ola"), ["BlogPosting"]);
 });
 
