@@ -1,4 +1,5 @@
 import { projectIcons } from "@raioviajante/design/projects";
+import { SiteLink } from "@raioviajante/design/components";
 import type { LocaleId } from "../../../../site/locales";
 import {
   projectLink,
@@ -86,11 +87,12 @@ export function ProjectAction({
     return <span className={`${className} is-none`}>{copy.noLink}</span>;
   const english = link.hrefLang !== locale;
   return (
-    <a
+    <SiteLink
       className={className}
       href={link.href}
       hrefLang={link.hrefLang}
       data-sound="nav"
+      newTab={locale}
     >
       <span className="pj-action__text">
         {label}
@@ -100,7 +102,7 @@ export function ProjectAction({
       <span className="pj-action__arrow" aria-hidden="true">
         ↗
       </span>
-    </a>
+    </SiteLink>
   );
 }
 

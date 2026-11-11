@@ -17,7 +17,7 @@ export default function GalleryPt() {
         title={ptGallery.title}
         line={ptGallery.line}
       />
-      <GalleryBoard copy={ptGalleryCopy} />
+      <GalleryBoard copy={ptGalleryCopy} locale="pt-BR" />
     </RootShell>
   );
 }

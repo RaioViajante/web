@@ -1,5 +1,5 @@
 import { metadataFor } from "../../lib/seo";
-import { LegalPage } from "@raioviajante/design/components";
+import { LegalPage, SiteLink } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
 
 export const metadata = metadataFor("/privacy");
@@ -76,9 +76,12 @@ export default function Privacy() {
                 email, or to request access, correction or deletion where
                 applicable. The Brazilian data protection authority explains the
                 rights available under the LGPD in its{" "}
-                <a href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares">
+                <SiteLink
+                  href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares"
+                  newTab="en"
+                >
                   guide for data subjects
-                </a>
+                </SiteLink>
                 .
               </p>
             ),

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { leavesEcosystem } from "../packages/design/components/link";
 import { base, isolate } from "./support";
 
 const expectLang = async (page: Page, lang: string) =>
@@ -182,6 +183,68 @@ test("Root publishes the Portuguese This Site counterpart across navigation, SEO
   );
 });
 
+test("Root opens exactly the links that leave the four sites in a new tab", async ({
+  page,
+  request,
+}) => {
+  await isolate(page, []);
+  const root = base("root");
+  // Every page Root publishes, in both languages, so a new external link on
+  // any page is held to the rule.
+  const sitemap = await (await request.get(`${root}/sitemap.xml`)).text();
+  const paths = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+    ([, loc]) => new URL(loc).pathname,
+  );
+  expect(paths.length).toBeGreaterThan(20);
+  const opened = new Map<string, number>();
+  for (const path of paths) {
+    await page.goto(`${root}${path}`);
+    const notice =
+      path === "/pt" || path.startsWith("/pt/")
+        ? "(abre em nova aba)"
+        : "(opens in a new tab)";
+    // The gallery shows its profile links once the collection is open.
+    if (/\/gallery$/.test(path))
+      await page.locator('button[aria-controls="gallery-collection"]').click();
+    const links = await page.locator("main a[href]").evaluateAll((nodes) =>
+      nodes.map((a) => ({
+        href: a.getAttribute("href")!,
+        target: a.getAttribute("target"),
+        rel: a.getAttribute("rel") ?? "",
+        hidden:
+          [...a.querySelectorAll(".rv-sr-only")]
+            .map((s) => s.textContent!.trim())
+            .find((t) => t.startsWith("(")) ?? null,
+      })),
+    );
+    for (const link of links) {
+      const external = leavesEcosystem(link.href);
+      const at = `${path} ${link.href}`;
+      expect(link.target, at).toBe(external ? "_blank" : null);
+      expect(link.hidden, at).toBe(external ? notice : null);
+      if (external) {
+        expect(link.rel.split(" "), at).toContain("noopener");
+        opened.set(path, (opened.get(path) ?? 0) + 1);
+      }
+    }
+  }
+  // Each page that links out today does so through the rule, in both
+  // languages; content can change without touching this list.
+  for (const path of [
+    "",
+    "/gallery",
+    "/setup",
+    "/projects",
+    "/projects/all",
+    "/this-site",
+    "/privacy",
+  ])
+    for (const prefix of ["", "/pt"]) {
+      const where = `${prefix}${path}` || "/";
+      expect(opened.get(where) ?? 0, where).toBeGreaterThan(0);
+    }
+});
+
 test("Root publishes the Portuguese Setup counterpart with its gear links intact", async ({
   page,
   request,
@@ -239,7 +302,8 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
     ),
   ).toEqual(english);
   expect(english.length).toBe(9);
-  for (const [, rel] of english) expect(rel).toBe("sponsored");
+  // Affiliate links are sponsored and, leaving the four sites, open a new tab.
+  for (const [, rel] of english) expect(rel).toBe("sponsored noopener");
   await expect(page.getByText("Nenhum link confiável disponível.")).toHaveCount(
     7,
   );

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PageHeader, Section } from "@raioviajante/design/components";
+import { PageHeader, Section, SiteLink } from "@raioviajante/design/components";
 import { OtherSites } from "../../../components/OtherSites";
 import { RootShell } from "../../../components/RootShell";
 import { ptAbout, ptThisSite } from "../../../lib/pt";
@@ -38,9 +38,13 @@ export default function ThisSitePt() {
       >
         <p>
           {ptThisSite.repositoryBefore}
-          <a href="https://github.com/RaioViajante/web" data-sound="nav">
+          <SiteLink
+            href="https://github.com/RaioViajante/web"
+            data-sound="nav"
+            newTab="pt-BR"
+          >
             GitHub
-          </a>
+          </SiteLink>
           {ptThisSite.repositoryAfter}
           <Link href={routes.terms["pt-BR"]!} data-sound="nav">
             {ptThisSite.terms}

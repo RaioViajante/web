@@ -2,6 +2,7 @@ import {
   LeaderRow,
   PageHeader,
   Section,
+  SiteLink,
 } from "@raioviajante/design/components";
 import { RootShell } from "../../../components/RootShell";
 import { ptGearCategories, ptSetup } from "../../../lib/pt";
@@ -39,9 +40,9 @@ export default function SetupPt() {
                 {item.url ? (
                   <>
                     <strong>{ptSetup.link}</strong>{" "}
-                    <a href={item.url} rel="sponsored">
+                    <SiteLink href={item.url} rel="sponsored" newTab="pt-BR">
                       {item.url.replace(/^https:\/\//, "")}
-                    </a>
+                    </SiteLink>
                   </>
                 ) : (
                   ptSetup.noLink

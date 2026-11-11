@@ -33,6 +33,10 @@ export interface SharedCatalog {
     /** Qualifier for a link whose destination is in another language. */
     inLanguage: (language: string) => string;
   };
+  links: {
+    /** Read after a link that opens in a new tab; not shown. */
+    newTab: string;
+  };
   sound: {
     label: string;
     on: string;
@@ -157,6 +161,7 @@ export const catalogs = {
       aboutSites: "About these sites",
       inLanguage: (language) => `in ${language}`,
     },
+    links: { newTab: "opens in a new tab" },
     sound: {
       label: "SOUND",
       on: "ON",
@@ -270,6 +275,7 @@ export const catalogs = {
       aboutSites: "Sobre estes sites",
       inLanguage: (language) => `em ${language}`,
     },
+    links: { newTab: "abre em nova aba" },
     sound: {
       label: "SOM",
       on: "LIGADO",

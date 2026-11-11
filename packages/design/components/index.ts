@@ -44,5 +44,10 @@ export {
   type LegalSection,
   type TryInstead,
 } from "./templates";
-export { SiteLink, isInternal, type LinkComponent } from "./link";
+export {
+  SiteLink,
+  isInternal,
+  leavesEcosystem,
+  type LinkComponent,
+} from "./link";
 export { AvatarCoin } from "./avatar-coin";

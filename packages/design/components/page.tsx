@@ -137,6 +137,7 @@ export function LeaderRow({
   linkComponent,
   rel,
   hrefLang,
+  newTab,
 }: {
   label: ReactNode;
   value?: ReactNode;
@@ -151,6 +152,12 @@ export function LeaderRow({
   rel?: string;
   /** Language of a deliberate cross-language destination. */
   hrefLang?: string;
+  /**
+   * The page's locale, to open the link in a new tab and say so to assistive
+   * technology in that language. Applies only when `href` leaves the four
+   * sites (`leavesEcosystem`); any other link stays in the tab.
+   */
+  newTab?: LocaleId;
 }) {
   const content = (
     <>
@@ -178,6 +185,7 @@ export function LeaderRow({
       aria-describedby={describedBy}
       rel={rel}
       hrefLang={hrefLang}
+      newTab={newTab}
     >
       {content}
     </SiteLink>
