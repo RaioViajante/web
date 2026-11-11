@@ -9,7 +9,13 @@ import {
   participates,
   type LocaleId,
 } from "../../../site/locales";
-import { CONTACT, SITES, type SiteId } from "../../../site/sites";
+import {
+  ABOUT_SITES_PATH,
+  CONTACT,
+  SITES,
+  siteById,
+  type SiteId,
+} from "../../../site/sites";
 import { ownerLocation } from "../../../site/owner-location";
 
 export interface NavItem {
@@ -160,16 +166,18 @@ export interface FooterProps {
 }
 
 /**
- * Where a footer link to another RaioViajante host goes. A localized
- * destination needs the rollout to permit it: the rendered app AND the target
- * host both participate in the locale (publish before advertise). Otherwise it
- * is the English public destination. Nothing is probed.
+ * Where a footer link to another RaioViajante host goes: its home, or the
+ * locale-neutral `path` there. A localized destination needs the rollout to
+ * permit it: the rendered app AND the target host both participate in the
+ * locale (publish before advertise). Otherwise it is the English public
+ * destination. Nothing is probed.
  */
 export function footerDestination(
   currentSite: SiteId,
   target: (typeof SITES)[number],
   locale: LocaleId,
   isParticipating: (site: SiteId, locale: LocaleId) => boolean = participates,
+  path = "/",
 ): { locale: LocaleId; href: string } {
   const localized =
     locale !== DEFAULT_LOCALE &&
@@ -179,8 +187,10 @@ export function footerDestination(
   return {
     locale: destination,
     href: localized
-      ? new URL(localizedPath(target.id, destination, "/"), target.href).href
-      : target.href,
+      ? new URL(localizedPath(target.id, destination, path), target.href).href
+      : path === "/"
+        ? target.href
+        : new URL(path, target.href).href,
   };
 }
 
@@ -212,6 +222,17 @@ export function Footer({
         : ""}
     </SiteLink>
   );
+  // Root's page about the four sites; Root lists it in its own PAGES.
+  const about =
+    site === "root"
+      ? null
+      : footerDestination(
+          site,
+          siteById("root"),
+          locale,
+          isParticipating,
+          ABOUT_SITES_PATH,
+        );
   return (
     <footer className="rv-footer">
       <nav aria-label={footer.sitesAria}>
@@ -236,6 +257,22 @@ export function Footer({
           );
         })}
       </nav>
+      {about ? (
+        <div>
+          <a
+            href={about.href}
+            data-sound="nav"
+            {...(locale !== DEFAULT_LOCALE
+              ? { hrefLang: LOCALES[about.locale].hreflang }
+              : {})}
+          >
+            {footer.aboutSites}
+            {about.locale !== locale
+              ? ` (${footer.inLanguage(lang.names[about.locale])})`
+              : ""}
+          </a>
+        </div>
+      ) : null}
       <div>
         <a href={`mailto:${CONTACT.email}`} data-sound="nav">
           {CONTACT.email}

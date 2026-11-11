@@ -473,6 +473,51 @@ describe("footer cross-site destinations", () => {
     ]);
   });
 
+  const aboutOf = (
+    site: "root" | "dump" | "docs" | "lab",
+    locale: "en" | "pt-BR",
+    participating?: (site: string, locale: string) => boolean,
+  ) => {
+    const body = html(
+      <Footer
+        site={site}
+        locale={locale}
+        isParticipating={participating as never}
+      />,
+    );
+    return [...body.querySelectorAll("footer > div a")]
+      .filter((a) => !a.getAttribute("href")!.startsWith("mailto:"))
+      .map((a) => [
+        a.getAttribute("href"),
+        a.getAttribute("hreflang"),
+        a.textContent,
+      ]);
+  };
+
+  it("links Root's page about the sites from Dump, Docs and Lab, not from Root", () => {
+    for (const site of ["dump", "docs", "lab"] as const) {
+      expect(aboutOf(site, "en")).toEqual([
+        ["https://raioviajante.com/this-site", null, "About these sites"],
+      ]);
+      expect(aboutOf(site, "pt-BR")).toEqual([
+        ["https://raioviajante.com/pt/this-site", "pt-BR", "Sobre estes sites"],
+      ]);
+    }
+    expect(aboutOf("root", "en")).toEqual([]);
+    expect(aboutOf("root", "pt-BR")).toEqual([]);
+  });
+
+  it("falls back to Root's English page, labelled, while the rendering app does not participate", () => {
+    const none = (_site: string, locale: string) => locale === "en";
+    expect(aboutOf("lab", "pt-BR", none)).toEqual([
+      [
+        "https://raioviajante.com/this-site",
+        "en",
+        "Sobre estes sites (em inglês)",
+      ],
+    ]);
+  });
+
   it("uses the registry: every Portuguese footer links all four localized homes", () => {
     for (const site of ["root", "dump", "docs", "lab"] as const) {
       const active = html(<Footer site={site} locale="pt-BR" />);

@@ -28,6 +28,8 @@ export interface SharedCatalog {
     legalAria: string;
     terms: string;
     privacy: string;
+    /** The link to Root's page about the four sites, shown on the others. */
+    aboutSites: string;
     /** Qualifier for a link whose destination is in another language. */
     inLanguage: (language: string) => string;
   };
@@ -152,6 +154,7 @@ export const catalogs = {
       legalAria: "Legal",
       terms: "Terms of Use",
       privacy: "Privacy Policy",
+      aboutSites: "About these sites",
       inLanguage: (language) => `in ${language}`,
     },
     sound: {
@@ -264,6 +267,7 @@ export const catalogs = {
       legalAria: "Informações legais",
       terms: "Termos de Uso",
       privacy: "Política de Privacidade",
+      aboutSites: "Sobre estes sites",
       inLanguage: (language) => `em ${language}`,
     },
     sound: {
