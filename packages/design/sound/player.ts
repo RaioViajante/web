@@ -9,12 +9,9 @@
 import { SOUND_EVENT, HOVER_KINDS, type SoundAction } from "./events";
 import { readPreference, writePreference } from "./preference";
 import { createSynth } from "./synth";
+import { prefersReducedMotion } from "../reduced-motion";
 
 type Play = (kind: string, action?: SoundAction) => void;
-
-function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 function isIncidental(kind: string, action: SoundAction) {
   return action === "hover" || kind === "tick" || kind === "typing";

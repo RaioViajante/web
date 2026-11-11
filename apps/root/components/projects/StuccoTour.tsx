@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { prefersReducedMotion } from "@raioviajante/design/reduced-motion";
 import type { stuccoTour } from "@raioviajante/design/stucco";
 import type { StuccoCopy, StuccoDevice, StuccoGroup } from "../../lib/stucco";
 
@@ -35,9 +36,7 @@ export function StuccoTour({
     if (!row || !thumb || row.scrollWidth <= row.clientWidth) return;
     row.scrollTo({
       left: thumb.offsetLeft - row.clientWidth / 2 + thumb.offsetWidth / 2,
-      behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "auto"
-        : "smooth",
+      behavior: prefersReducedMotion() ? "auto" : "smooth",
     });
   }, [device, step]);
 
