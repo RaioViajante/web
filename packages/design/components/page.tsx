@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 import { Art } from "./art";
-import { SiteLink, type LinkComponent } from "./link";
+import { SiteLink, leavesEcosystem, type LinkComponent } from "./link";
 import type { LocaleId } from "../../../site/locales";
 import { siteById, type SiteId } from "../../../site/sites";
 import { catalogFor } from "../catalog";
@@ -153,18 +153,20 @@ export function LeaderRow({
   /** Language of a deliberate cross-language destination. */
   hrefLang?: string;
   /**
-   * Opens the link in a new tab and says so to assistive technology, in this
-   * locale (the page's). For links that leave the four sites.
+   * The page's locale, to open the link in a new tab and say so to assistive
+   * technology in that language. Applies only when `href` leaves the four
+   * sites (`leavesEcosystem`); any other link stays in the tab.
    */
   newTab?: LocaleId;
 }) {
+  const opens = href && newTab && leavesEcosystem(href) ? newTab : undefined;
   const content = (
     <>
       <span>
         {label}
-        {newTab ? (
+        {opens ? (
           <span className="rv-sr-only">
-            {` (${catalogFor(newTab).links.newTab})`}
+            {` (${catalogFor(opens).links.newTab})`}
           </span>
         ) : null}
       </span>
@@ -189,9 +191,9 @@ export function LeaderRow({
       href={href}
       data-sound={sound}
       aria-describedby={describedBy}
-      rel={newTab ? [rel, "noopener"].filter(Boolean).join(" ") : rel}
+      rel={opens ? [rel, "noopener"].filter(Boolean).join(" ") : rel}
       hrefLang={hrefLang}
-      target={newTab ? "_blank" : undefined}
+      target={opens ? "_blank" : undefined}
     >
       {content}
     </SiteLink>

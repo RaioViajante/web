@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes, ComponentType } from "react";
+import { SITES, siteOrigins } from "../../../site/sites";
 
 /**
  * What an app hands the shared components to render its internal links:
@@ -11,6 +12,30 @@ export type LinkComponent = ComponentType<
 /** A path on this site, as opposed to another site or a `mailto:`. */
 export function isInternal(href: string) {
   return href.startsWith("/") && !href.startsWith("//");
+}
+
+/** The four sites' hostnames, with the one `www` alias that exists (Root's). */
+const ecosystemHosts = new Set([
+  ...SITES.map((site) => new URL(site.href).hostname),
+  `www.${new URL(siteOrigins.root).hostname}`,
+]);
+
+/**
+ * Whether a link takes the visitor out of the RaioViajante sites: an http(s)
+ * destination, protocol-relative ones included, on any other host. Paths,
+ * fragments, `mailto:` and the four sites stay.
+ */
+export function leavesEcosystem(href: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(href, siteOrigins.root);
+  } catch {
+    return false;
+  }
+  return (
+    (url.protocol === "https:" || url.protocol === "http:") &&
+    !ecosystemHosts.has(url.hostname.replace(/\.$/, ""))
+  );
 }
 
 /**

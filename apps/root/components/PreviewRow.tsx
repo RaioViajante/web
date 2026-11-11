@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { LeaderRow } from "@raioviajante/design/components";
 import type { LocaleId } from "../../../site/locales";
-import { leavesEcosystem } from "../../../site/sites";
 
 /**
  * A leader row that shows a short description on hover or focus. A link that
@@ -36,7 +35,7 @@ export function PreviewRow({
         describedBy={id}
         linkComponent={Link}
         rel={rel}
-        newTab={leavesEcosystem(href) ? locale : undefined}
+        newTab={locale}
       />
       <div className="row-preview" id={id} role="tooltip">
         <p>{description}</p>

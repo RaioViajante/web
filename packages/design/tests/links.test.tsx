@@ -1,9 +1,9 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { leavesEcosystem } from "../../../site/sites";
 import {
   Footer,
   LeaderRow,
+  leavesEcosystem,
   NotFoundPage,
   Pager,
   Shell,
@@ -118,6 +118,7 @@ describe("links that leave the four sites", () => {
     for (const href of [
       "https://raioviajante.com/about",
       "https://www.raioviajante.com/",
+      "https://raioviajante.com./about",
       "https://dump.raioviajante.com/posts/x",
       "https://docs.raioviajante.com/",
       "https://lab.raioviajante.com/pt/",
@@ -131,6 +132,8 @@ describe("links that leave the four sites", () => {
       "https://open.spotify.com/user/x",
       "http://example.com/",
       "https://raioviajante.com.evil.example/",
+      "//github.com/RaioViajante",
+      "https://www.dump.raioviajante.com/",
     ])
       expect(leavesEcosystem(href), href).toBe(true);
   });
@@ -156,6 +159,16 @@ describe("links that leave the four sites", () => {
       '<span class="rv-sr-only"> (abre em nova aba)</span>',
     );
     expect(row("pt-BR")).toContain('rel="noopener"');
+    // The rule is the component's: an ecosystem link never opens a new tab.
+    const dump = renderToStaticMarkup(
+      <LeaderRow
+        label="dump"
+        href="https://dump.raioviajante.com"
+        newTab="en"
+      />,
+    );
+    expect(dump).not.toContain("target=");
+    expect(dump).not.toContain("rv-sr-only");
     const same = row(undefined, "me");
     expect(same).not.toContain("target=");
     expect(same).not.toContain("rv-sr-only");

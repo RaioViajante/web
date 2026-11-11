@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { leavesEcosystem } from "../packages/design/components/link";
 import { base, isolate } from "./support";
 
 const expectLang = async (page: Page, lang: string) =>
@@ -205,11 +206,7 @@ test("Root's home opens only links that leave the four sites in a new tab", asyn
     );
     expect(links.length).toBeGreaterThan(10);
     for (const link of links) {
-      const external =
-        /^https?:\/\//.test(link.href) &&
-        !/^https:\/\/(www\.)?((dump|docs|lab)\.)?raioviajante\.com(\/|$)/.test(
-          link.href,
-        );
+      const external = leavesEcosystem(link.href);
       expect(link.target, link.href).toBe(external ? "_blank" : null);
       expect(link.hidden, link.href).toBe(external ? notice : null);
       if (external)
