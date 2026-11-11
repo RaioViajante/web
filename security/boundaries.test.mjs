@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { join, relative, resolve, sep } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { CONTACT, SITES, siteById, siteOrigins } from "../site/sites.ts";
@@ -141,20 +141,28 @@ test("shared code does not hardcode a production origin outside site/", () => {
 });
 
 test("scripts read reduced motion through packages/design/reduced-motion.ts only", () => {
-  // CSS keeps its own @media rules; every script asks the one shared module,
-  // so motion and sound always agree on the visitor's preference.
-  const query = /prefers-reduced-motion/;
+  // Every matchMedia call that asks for reduced motion lives in the one shared
+  // module, so motion and sound agree. CSS keeps its own @media rules; prose
+  // and comments may name the query. Static client demos under an app's
+  // public/ keep their own code (the /work/ exception, apps/root/docs/design.md).
   const owner = "packages/design/reduced-motion.ts";
+  const scripts = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|astro)$/;
+  const call = /matchMedia\s*\(([^)]*)\)/g;
+  const walk = (dir) =>
+    readdirSync(dir).flatMap((name) => {
+      if (skip.has(name) || name === "public") return [];
+      const path = join(dir, name);
+      return statSync(path).isDirectory() ? walk(path) : scripts.test(name) ? [path] : [];
+    });
   const bad = [];
   for (const dir of ["apps", "packages"]) {
-    for (const path of files(join(root, dir))) {
-      const rel = relative(root, path);
-      if (rel === owner || rel.includes("/tests/")) continue;
-      // Astro files may hold @media rules in a <style> block; check scripts only.
-      const text = readFileSync(path, "utf8").replace(/<style[\s\S]*?<\/style>/g, "");
-      text.split("\n").forEach((line, i) => {
-        if (query.test(line) && !/^\s*(\*|\/\/)/.test(line)) bad.push(`${rel}:${i + 1}`);
-      });
+    for (const path of walk(join(root, dir))) {
+      const rel = relative(root, path).split(sep).join("/");
+      if (rel === owner || rel.includes("/tests/") || /\.test\./.test(rel)) continue;
+      const text = readFileSync(path, "utf8");
+      for (const match of text.matchAll(call))
+        if (/reduced-motion|REDUCED_MOTION/i.test(match[1]))
+          bad.push(`${rel}:${text.slice(0, match.index).split("\n").length}`);
     }
   }
   assert.deepEqual(bad, []);

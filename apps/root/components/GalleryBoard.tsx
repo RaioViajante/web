@@ -14,6 +14,8 @@ import { galleryBranding } from "@raioviajante/design/gallery";
 import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { avatarFrames } from "@raioviajante/design/avatar";
 import { SectionHeading } from "@raioviajante/design/components";
+import { prefersReducedMotion } from "@raioviajante/design/reduced-motion";
+import { playSound } from "@raioviajante/design/sound";
 import {
   artworks,
   categories,
@@ -27,8 +29,6 @@ import {
   type Category,
   type GalleryCopy,
 } from "../lib/gallery";
-import { prefersReducedMotion } from "@raioviajante/design/reduced-motion";
-import { playSound } from "@raioviajante/design/sound";
 import {
   aimStickerBurst,
   aimStickers,
