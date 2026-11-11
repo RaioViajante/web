@@ -1,3 +1,5 @@
+import { reducedMotionQuery } from "./reduced-motion";
+
 /**
  * Runs the index-header avatar (`[data-avatar-coin]`): a ten-frame loop that
  * starts once every frame has loaded, and a flip on click. With reduced
@@ -10,7 +12,7 @@ function setUp(button: HTMLButtonElement) {
   const frames = JSON.parse(button.dataset.frames ?? "[]") as string[];
   const durations = (button.dataset.durations ?? "").split(",").map(Number);
   const rest = Number(button.dataset.rest ?? 0);
-  const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const motion = reducedMotionQuery();
   let timer: number | undefined;
   let generation = 0;
   let preload: Promise<void> | undefined;

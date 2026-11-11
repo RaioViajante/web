@@ -27,13 +27,13 @@ import {
   type Category,
   type GalleryCopy,
 } from "../lib/gallery";
+import { prefersReducedMotion } from "@raioviajante/design/reduced-motion";
 import { playSound } from "@raioviajante/design/sound";
 import {
   aimStickerBurst,
   aimStickers,
   animationsSettle,
   attachPiecePop,
-  prefersReducedMotion,
 } from "../lib/gallery-pop";
 import { collageSizes } from "../lib/gallery-layout";
 

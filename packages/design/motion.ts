@@ -1,3 +1,5 @@
+import { reducedMotionQuery } from "./reduced-motion";
+
 /**
  * Page entrance motion, shared by every page of the four sites.
  *
@@ -261,7 +263,7 @@ function hiddenDocument() {
 export function attachMotion() {
   if (!supported()) return () => {};
 
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const reduce = reducedMotionQuery();
   const timing = readTiming();
   const pending = new Map<HTMLElement, Animation[]>();
   const waiting = new Set<HTMLElement>();

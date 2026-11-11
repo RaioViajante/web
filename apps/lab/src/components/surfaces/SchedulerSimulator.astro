@@ -29,6 +29,7 @@ const text = schedulerCopy[locale];
   // Imported by the script, not the frontmatter: the stylesheet then ships with
   // this experiment's script and only its page links it.
   import "../../styles/scheduler.css";
+  import { reducedMotionQuery } from "@raioviajante/design/reduced-motion";
   import {
     LIMITS,
     cancel,
@@ -87,7 +88,7 @@ const text = schedulerCopy[locale];
     const speedText = $("[data-speed-text]");
     const hint = $("[data-preset-hint]");
     const reducedNote = $("[data-reduced]");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reduced = reducedMotionQuery();
     const RATES = [1, 2, 4, 8, 16];
 
     let sim: SimState | null = null;

@@ -27,6 +27,7 @@ const text = pathfindingCopy[locale];
   ))}
 </ul>
 <script>
+  import { reducedMotionQuery } from "@raioviajante/design/reduced-motion";
   import {
     WALL,
     GROUND,
@@ -81,7 +82,7 @@ const text = pathfindingCopy[locale];
     const speedText = $("[data-speed-text]");
     const reducedNote = $("[data-reduced]");
     const compareOut = $("[data-compare-out]");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reduced = reducedMotionQuery();
     const RATES = [2, 6, 15, 30, 60];
 
     let grid: Grid = createGrid("medium");

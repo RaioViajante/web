@@ -139,3 +139,23 @@ test("shared code does not hardcode a production origin outside site/", () => {
   }
   assert.deepEqual(bad, []);
 });
+
+test("scripts read reduced motion through packages/design/reduced-motion.ts only", () => {
+  // CSS keeps its own @media rules; every script asks the one shared module,
+  // so motion and sound always agree on the visitor's preference.
+  const query = /prefers-reduced-motion/;
+  const owner = "packages/design/reduced-motion.ts";
+  const bad = [];
+  for (const dir of ["apps", "packages"]) {
+    for (const path of files(join(root, dir))) {
+      const rel = relative(root, path);
+      if (rel === owner || rel.includes("/tests/")) continue;
+      // Astro files may hold @media rules in a <style> block; check scripts only.
+      const text = readFileSync(path, "utf8").replace(/<style[\s\S]*?<\/style>/g, "");
+      text.split("\n").forEach((line, i) => {
+        if (query.test(line) && !/^\s*(\*|\/\/)/.test(line)) bad.push(`${rel}:${i + 1}`);
+      });
+    }
+  }
+  assert.deepEqual(bad, []);
+});
