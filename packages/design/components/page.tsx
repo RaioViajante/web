@@ -1,6 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 import { Art } from "./art";
-import { SiteLink, leavesEcosystem, type LinkComponent } from "./link";
+import { SiteLink, type LinkComponent } from "./link";
 import type { LocaleId } from "../../../site/locales";
 import { siteById, type SiteId } from "../../../site/sites";
 import { catalogFor } from "../catalog";
@@ -159,17 +159,9 @@ export function LeaderRow({
    */
   newTab?: LocaleId;
 }) {
-  const opens = href && newTab && leavesEcosystem(href) ? newTab : undefined;
   const content = (
     <>
-      <span>
-        {label}
-        {opens ? (
-          <span className="rv-sr-only">
-            {` (${catalogFor(opens).links.newTab})`}
-          </span>
-        ) : null}
-      </span>
+      <span>{label}</span>
       <span className="rv-leader__dots" aria-hidden="true" />
       {value !== undefined ? (
         <span
@@ -191,9 +183,9 @@ export function LeaderRow({
       href={href}
       data-sound={sound}
       aria-describedby={describedBy}
-      rel={opens ? [rel, "noopener"].filter(Boolean).join(" ") : rel}
+      rel={rel}
       hrefLang={hrefLang}
-      target={opens ? "_blank" : undefined}
+      newTab={newTab}
     >
       {content}
     </SiteLink>

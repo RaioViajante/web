@@ -15,7 +15,7 @@ export default function Gallery() {
         title="A visual puzzle"
         line="Illustrations, characters and scenes from RaioViajante's world, arranged like a board."
       />
-      <GalleryBoard copy={galleryCopy} />
+      <GalleryBoard copy={galleryCopy} locale="en" />
     </RootShell>
   );
 }

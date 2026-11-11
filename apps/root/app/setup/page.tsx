@@ -3,6 +3,7 @@ import {
   LeaderRow,
   PageHeader,
   Section,
+  SiteLink,
 } from "@raioviajante/design/components";
 import { RootShell } from "../../components/RootShell";
 import { affiliateDisclosure, gear } from "../../lib/setup";
@@ -34,9 +35,9 @@ export default function Setup() {
                 {item.url ? (
                   <>
                     <strong>Link:</strong>{" "}
-                    <a href={item.url} rel="sponsored">
+                    <SiteLink href={item.url} rel="sponsored" newTab="en">
                       {item.url.replace(/^https:\/\//, "")}
-                    </a>
+                    </SiteLink>
                   </>
                 ) : (
                   "No trusted link available."

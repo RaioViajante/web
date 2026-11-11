@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { LegalPage } from "@raioviajante/design/components";
+import { LegalPage, SiteLink } from "@raioviajante/design/components";
 import { jsonLdScript } from "../../../../../seo/structured-data";
 import { RootShell } from "../../../components/RootShell";
 import { metadataFor } from "../../../lib/seo";
@@ -96,9 +96,12 @@ export default async function PrivacyPt() {
                 fornecidos por e-mail ou para solicitar acesso, correção ou
                 exclusão, quando aplicável. A autoridade brasileira de proteção
                 de dados explica os direitos previstos na LGPD em seu{" "}
-                <a href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares">
+                <SiteLink
+                  href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados-1/direito-dos-titulares"
+                  newTab="pt-BR"
+                >
                   guia para titulares de dados
-                </a>
+                </SiteLink>
                 .
               </p>
             ),

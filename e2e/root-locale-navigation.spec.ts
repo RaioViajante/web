@@ -183,44 +183,61 @@ test("Root publishes the Portuguese This Site counterpart across navigation, SEO
   );
 });
 
-test("Root's home opens only links that leave the four sites in a new tab", async ({
+test("Root opens exactly the links that leave the four sites in a new tab", async ({
   page,
 }) => {
   await isolate(page, []);
   const root = base("root");
-  for (const [path, notice] of [
-    ["/", "(opens in a new tab)"],
+  const pages = [
+    "/",
+    "/projects",
+    "/projects/all",
+    "/setup",
+    "/this-site",
+    "/privacy",
+    "/gallery",
+  ];
+  let opened = 0;
+  for (const [prefix, notice] of [
+    ["", "(opens in a new tab)"],
     ["/pt", "(abre em nova aba)"],
   ] as const) {
-    await page.goto(`${root}${path}`);
-    const rows = page
-      .locator("section", { has: page.locator("#links-heading") })
-      .locator("a.rv-leader");
-    const links = await rows.evaluateAll((nodes) =>
-      nodes.map((a) => ({
-        href: a.getAttribute("href")!,
-        target: a.getAttribute("target"),
-        rel: a.getAttribute("rel") ?? "",
-        hidden: a.querySelector(".rv-sr-only")?.textContent?.trim() ?? null,
-      })),
-    );
-    expect(links.length).toBeGreaterThan(10);
-    for (const link of links) {
-      const external = leavesEcosystem(link.href);
-      expect(link.target, link.href).toBe(external ? "_blank" : null);
-      expect(link.hidden, link.href).toBe(external ? notice : null);
-      if (external)
-        expect(link.rel.split(" "), link.href).toContain("noopener");
+    for (const path of pages) {
+      const where = path === "/" ? prefix || "/" : `${prefix}${path}`;
+      await page.goto(`${root}${where}`);
+      // The gallery shows its profile links once the collection is open.
+      if (path === "/gallery")
+        await page
+          .locator('button[aria-controls="gallery-collection"]')
+          .click();
+      const links = await page.locator("main a[href]").evaluateAll((nodes) =>
+        nodes.map((a) => ({
+          href: a.getAttribute("href")!,
+          target: a.getAttribute("target"),
+          rel: a.getAttribute("rel") ?? "",
+          hidden:
+            [...a.querySelectorAll(".rv-sr-only")]
+              .map((s) => s.textContent!.trim())
+              .find((t) => t.startsWith("(")) ?? null,
+        })),
+      );
+      for (const link of links) {
+        const external = leavesEcosystem(link.href);
+        const at = `${where} ${link.href}`;
+        expect(link.target, at).toBe(external ? "_blank" : null);
+        expect(link.hidden, at).toBe(external ? notice : null);
+        if (external) {
+          opened++;
+          expect(link.rel.split(" "), at).toContain("noopener");
+        }
+      }
     }
-    // Mail and the ecosystem stay in this tab.
-    expect(links.some((l) => l.href.startsWith("mailto:") && !l.target)).toBe(
-      true,
-    );
-    for (const a of await page
-      .locator('a[href*="dump.raioviajante.com"]')
-      .all())
-      expect(await a.getAttribute("target")).toBeNull();
   }
+  // Profiles, gallery links, affiliate links, projects, GitHub and the ANPD
+  // guide, in both languages: the walk must have met them.
+  // 74 when this test was written (37 per language); a section that stops
+  // opening its external links in a new tab drops below the floor.
+  expect(opened).toBeGreaterThanOrEqual(70);
 });
 
 test("Root publishes the Portuguese Setup counterpart with its gear links intact", async ({
@@ -280,7 +297,8 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
     ),
   ).toEqual(english);
   expect(english.length).toBe(8);
-  for (const [, rel] of english) expect(rel).toBe("sponsored");
+  // Affiliate links are sponsored and, leaving the four sites, open a new tab.
+  for (const [, rel] of english) expect(rel).toBe("sponsored noopener");
   await expect(page.getByText("Nenhum link confiável disponível.")).toHaveCount(
     6,
   );

@@ -1,6 +1,6 @@
 import { metadataFor } from "../../lib/seo";
 import Link from "next/link";
-import { PageHeader, Section } from "@raioviajante/design/components";
+import { PageHeader, Section, SiteLink } from "@raioviajante/design/components";
 import { OtherSites } from "../../components/OtherSites";
 import { RootShell } from "../../components/RootShell";
 import { otherSites } from "../../lib/this-site";
@@ -43,9 +43,13 @@ export default function ThisSite() {
       >
         <p>
           The code for this site and the other RaioViajante web apps is on{" "}
-          <a href="https://github.com/RaioViajante/web" data-sound="nav">
+          <SiteLink
+            href="https://github.com/RaioViajante/web"
+            data-sound="nav"
+            newTab="en"
+          >
             GitHub
-          </a>
+          </SiteLink>
           . For information about using the site&apos;s text or artwork, see the{" "}
           <Link href="/terms" data-sound="nav">
             Terms of Use

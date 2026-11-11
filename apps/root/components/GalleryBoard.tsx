@@ -13,7 +13,8 @@ import { art } from "@raioviajante/design/art";
 import { galleryBranding } from "@raioviajante/design/gallery";
 import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { avatarFrames } from "@raioviajante/design/avatar";
-import { SectionHeading } from "@raioviajante/design/components";
+import { SectionHeading, SiteLink } from "@raioviajante/design/components";
+import type { LocaleId } from "../../../site/locales";
 import {
   artworks,
   categories,
@@ -95,9 +96,11 @@ function Picture({
 function ProfileLinks({
   artwork,
   copy,
+  locale,
 }: {
   artwork: Artwork;
   copy: GalleryCopy;
+  locale: LocaleId;
 }) {
   if (!artwork.links) return null;
   return (
@@ -108,9 +111,14 @@ function ProfileLinks({
       {artwork.links.map((link, index) => (
         <span key={link.href}>
           {index > 0 && <span aria-hidden="true"> · </span>}
-          <a href={link.href} rel={link.rel} data-sound="nav">
+          <SiteLink
+            href={link.href}
+            rel={link.rel}
+            data-sound="nav"
+            newTab={locale}
+          >
             {link.label}
-          </a>
+          </SiteLink>
         </span>
       ))}
     </nav>
@@ -342,7 +350,14 @@ function CollectionDownload({
   );
 }
 
-export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
+export function GalleryBoard({
+  copy,
+  locale,
+}: {
+  copy: GalleryCopy;
+  /** The page's language, for links that open in a new tab. */
+  locale: LocaleId;
+}) {
   const { ui } = copy;
   const items = artworks.map((item) => localizeArtwork(item, copy));
   const step = (item: Artwork, direction: number) =>
@@ -578,7 +593,11 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                         <div>
                           {item.title}
                           {item.use && <small>{item.use}</small>}
-                          <ProfileLinks artwork={item} copy={copy} />
+                          <ProfileLinks
+                            artwork={item}
+                            copy={copy}
+                            locale={locale}
+                          />
                         </div>
                       </div>
                     ) : (
@@ -663,7 +682,7 @@ export function GalleryBoard({ copy }: { copy: GalleryCopy }) {
                   <span>{view.use}</span>
                 </div>
               )}
-              <ProfileLinks artwork={view} copy={copy} />
+              <ProfileLinks artwork={view} copy={copy} locale={locale} />
             </div>
             {view.download && (
               <a

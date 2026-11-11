@@ -1,5 +1,7 @@
 import type { AnchorHTMLAttributes, ComponentType } from "react";
+import type { LocaleId } from "../../../site/locales";
 import { SITES, siteOrigins } from "../../../site/sites";
+import { catalogFor } from "../catalog";
 
 /**
  * What an app hands the shared components to render its internal links:
@@ -40,16 +42,36 @@ export function leavesEcosystem(href: string): boolean {
 
 /**
  * An anchor that uses the app's link component for internal paths and a plain
- * anchor for everything else.
+ * anchor for everything else. With `newTab` (the page's locale), a link that
+ * leaves the four sites opens in a new tab, adds `noopener` to `rel` and says
+ * so to assistive technology in that language; any other link ignores it.
  */
 export function SiteLink({
   linkComponent: Link,
   href,
+  newTab,
   ...props
 }: AnchorHTMLAttributes<HTMLAnchorElement> & {
   href: string;
   linkComponent?: LinkComponent;
+  newTab?: LocaleId;
 }) {
+  if (newTab && leavesEcosystem(href)) {
+    const { rel, children, ...rest } = props;
+    return (
+      <a
+        href={href}
+        {...rest}
+        target="_blank"
+        rel={[rel, "noopener"].filter(Boolean).join(" ")}
+      >
+        {children}
+        <span className="rv-sr-only">
+          {` (${catalogFor(newTab).links.newTab})`}
+        </span>
+      </a>
+    );
+  }
   return Link && isInternal(href) ? (
     <Link href={href} prefetch={false} {...props} />
   ) : (

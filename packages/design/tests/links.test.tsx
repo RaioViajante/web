@@ -4,6 +4,7 @@ import {
   Footer,
   LeaderRow,
   leavesEcosystem,
+  SiteLink,
   NotFoundPage,
   Pager,
   Shell,
@@ -152,8 +153,8 @@ describe("links that leave the four sites", () => {
     const en = row("en", "me");
     expect(en).toContain('target="_blank"');
     expect(en).toContain('rel="me noopener"');
-    expect(en).toContain(
-      '<span>GitHub<span class="rv-sr-only"> (opens in a new tab)</span></span>',
+    expect(en).toMatch(
+      /<span>GitHub<\/span>.*<span class="rv-sr-only"> \(opens in a new tab\)<\/span><\/a>$/,
     );
     expect(row("pt-BR")).toContain(
       '<span class="rv-sr-only"> (abre em nova aba)</span>',
@@ -173,5 +174,29 @@ describe("links that leave the four sites", () => {
     expect(same).not.toContain("target=");
     expect(same).not.toContain("rv-sr-only");
     expect(same).toContain('rel="me"');
+  });
+
+  it("SiteLink applies the same rule to any link, inline prose included", () => {
+    const link = (href: string, newTab?: "en" | "pt-BR") =>
+      renderToStaticMarkup(
+        <SiteLink
+          href={href}
+          rel="sponsored"
+          newTab={newTab}
+          linkComponent={Link}
+        >
+          shop
+        </SiteLink>,
+      );
+    expect(link("https://meli.la/x", "pt-BR")).toBe(
+      '<a href="https://meli.la/x" target="_blank" rel="sponsored noopener">shop<span class="rv-sr-only"> (abre em nova aba)</span></a>',
+    );
+    expect(link("https://meli.la/x")).toBe(
+      '<a href="https://meli.la/x" rel="sponsored">shop</a>',
+    );
+    // Internal paths keep the app's link component and the tab.
+    expect(link("/setup", "en")).toBe(
+      '<a href="/setup" data-app-link="" rel="sponsored">shop</a>',
+    );
   });
 });
