@@ -680,6 +680,8 @@ export const ptThisSite = {
 /** Portuguese names of the English gear categories; product names stay as supplied. */
 export const ptGearCategories: Record<string, string> = {
   laptop: "notebook",
+  tablet: "tablet",
+  stylus: "caneta",
   monitor: "monitor",
   keyboard: "teclado",
   mouse: "mouse",

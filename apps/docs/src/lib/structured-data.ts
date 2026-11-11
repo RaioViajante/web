@@ -1,5 +1,4 @@
 import { socialUrl } from "../../../../seo/metadata";
-import type { LocaleId } from "../../../../site/locales";
 import {
 	breadcrumbJsonLd,
 	inLanguageOf,
@@ -15,17 +14,14 @@ import { copyFor } from "./copy";
 export const docsDescription = copyFor("en").description;
 
 /**
- * The home page: the site identity, which every page's `isPartOf` points at.
+ * The home pages: the site identity, which every page's `isPartOf` points at.
+ * One stable WebSite node per host, the same in every language: the English
+ * description and the shipped-language set (docs/i18n.md, "Structured data").
  * No author: nothing the docs publish says who writes them (the content
  * LICENSE names a copyright holder, which is not the same claim).
  */
-export const homeJsonLd = (locale: LocaleId = "en") => [
-	websiteJsonLd(
-		origin,
-		"docs",
-		copyFor(locale).description,
-		{ languages: ["en", "pt-BR"] },
-	),
+export const homeJsonLd = () => [
+	websiteJsonLd(origin, "docs", docsDescription, { languages: ["en", "pt-BR"] }),
 ];
 
 /**

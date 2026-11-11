@@ -1,15 +1,10 @@
+import { reducedMotionQuery } from "@raioviajante/design/reduced-motion";
 import { playSound } from "@raioviajante/design/sound";
 
 /** Pause between two pieces, so a row lands like popcorn and not all at once. */
 const POP_STEP_MS = 110;
 /** How long a piece waits for its image before it pops anyway. */
 const IMAGE_WAIT_MS = 500;
-
-const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
-
-/** The gallery's reduced-motion check, shared by its motion and its sounds. */
-export const prefersReducedMotion = () =>
-  window.matchMedia(REDUCED_MOTION).matches;
 
 function center(element: Element) {
   const box = element.getBoundingClientRect();
@@ -83,7 +78,7 @@ function imageReady(piece: HTMLElement) {
  * under reduced motion the artwork simply stays visible. Returns a stop function.
  */
 export function attachPiecePop(root: HTMLElement) {
-  const reduced = window.matchMedia(REDUCED_MOTION);
+  const reduced = reducedMotionQuery();
   if (reduced.matches) return () => undefined;
 
   const pieces = Array.from(

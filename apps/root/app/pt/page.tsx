@@ -12,7 +12,7 @@ import { HomeProjects } from "../../components/projects/home";
 import { RootShell } from "../../components/RootShell";
 import { primaryLinks } from "../../lib/links";
 import { ptHome } from "../../lib/pt";
-import { webPageJsonLd } from "../../lib/structured-data";
+import { localizedHomeJsonLd } from "../../lib/structured-data";
 import { metadataFor } from "../../lib/seo";
 import { routes } from "../../lib/routes";
 import { getLatestWriting } from "../../lib/writing";
@@ -29,7 +29,7 @@ export default async function HomePt() {
         nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: jsonLdScript(webPageJsonLd(routes.home["pt-BR"]!, "pt-BR")),
+          __html: jsonLdScript(localizedHomeJsonLd("pt-BR")),
         }}
       />
       <IndexHeader

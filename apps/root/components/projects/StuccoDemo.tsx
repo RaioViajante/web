@@ -8,13 +8,12 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { prefersReducedMotion } from "@raioviajante/design/reduced-motion";
 import type { StuccoCopy, StuccoDevice } from "../../lib/stucco";
 
 const DEMO = "/work/stucco/";
 const OPEN_MS = 620;
 const CLOSE_MS = 420;
-const reducedMotion = () =>
-  matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function inView(element: Element | null) {
   if (!element) return false;
@@ -99,7 +98,7 @@ export function StuccoDemo({
     enter.current?.cancel();
     const element = frame.current;
     const from = origin.current;
-    if (reducedMotion() || !element || !from || !element.animate)
+    if (prefersReducedMotion() || !element || !from || !element.animate)
       return finish();
     backdrop.current?.animate([{ opacity: 1 }, { opacity: 0 }], {
       duration: CLOSE_MS - 40,
@@ -140,7 +139,7 @@ export function StuccoDemo({
     closeButton.current?.focus({ preventScroll: true });
     const box = frame.current;
     const from = origin.current;
-    if (reducedMotion() || !box || !from || !box.animate) return;
+    if (prefersReducedMotion() || !box || !from || !box.animate) return;
     enter.current = box.animate(
       [
         {

@@ -1,28 +1,17 @@
-import { headers } from "next/headers";
 import Link from "next/link";
 import { PageHeader, Section, SiteLink } from "@raioviajante/design/components";
-import { jsonLdScript } from "../../../../../seo/structured-data";
 import { OtherSites } from "../../../components/OtherSites";
 import { RootShell } from "../../../components/RootShell";
 import { ptAbout, ptThisSite } from "../../../lib/pt";
 import { metadataFor } from "../../../lib/seo";
 import { routes } from "../../../lib/routes";
-import { webPageJsonLd } from "../../../lib/structured-data";
 
 const path = routes["this-site"]["pt-BR"]!;
 export const metadata = metadataFor(path);
 
-export default async function ThisSitePt() {
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+export default function ThisSitePt() {
   return (
     <RootShell current={path} locale="pt-BR">
-      <script
-        nonce={nonce}
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: jsonLdScript(webPageJsonLd(path, "pt-BR")),
-        }}
-      />
       <PageHeader
         label={ptThisSite.label}
         title={ptThisSite.title}

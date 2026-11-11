@@ -1,28 +1,17 @@
-import { headers } from "next/headers";
 import Link from "next/link";
 import { LegalPage } from "@raioviajante/design/components";
-import { jsonLdScript } from "../../../../../seo/structured-data";
 import { RootShell } from "../../../components/RootShell";
 import { metadataFor } from "../../../lib/seo";
 import { routes } from "../../../lib/routes";
-import { webPageJsonLd } from "../../../lib/structured-data";
 
 const path = routes.terms["pt-BR"]!;
 export const metadata = metadataFor(path);
 
 // Portuguese rendering of app/terms/page.tsx: same sections, same facts, same
 // last-updated date. It adds and removes no clause.
-export default async function TermsPt() {
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+export default function TermsPt() {
   return (
     <RootShell current={path} locale="pt-BR">
-      <script
-        nonce={nonce}
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: jsonLdScript(webPageJsonLd(path, "pt-BR")),
-        }}
-      />
       <LegalPage
         site="root"
         locale="pt-BR"

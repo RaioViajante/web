@@ -908,14 +908,18 @@ test("structured data: a host-level entity states the shipped set, stable across
   );
 });
 
-test("structured data: localized homes are not forced into one node layout", () => {
+test("structured data: localized homes publish their host's documented nodes", () => {
   assert.deepEqual(expectedTypes("docs", "/"), ["WebSite"]);
-  assert.equal(expectedTypes("docs", "/pt/"), undefined);
+  assert.deepEqual(expectedTypes("docs", "/pt/"), ["WebSite"]);
+  assert.deepEqual(expectedTypes("lab", "/pt/"), ["WebSite"]);
+  assert.deepEqual(expectedTypes("dump", "/pt"), ["WebSite", "Blog"]);
+  // Root's full Person stays on the English home; /pt references the WebSite.
+  assert.deepEqual(expectedTypes("root", "/pt"), ["WebPage"]);
   assert.deepEqual(expectedTypes("docs", "/pt/guide/"), [
     "TechArticle",
     "BreadcrumbList",
   ]);
-  assert.equal(expectedTypes("docs", "/pt/search/"), undefined);
+  assert.deepEqual(expectedTypes("docs", "/pt/search/"), []);
   assert.deepEqual(expectedTypes("dump", "/pt/posts/ola"), ["BlogPosting"]);
 });
 
@@ -1054,6 +1058,16 @@ test("structured data: host language declarations match sitemap coverage", async
       page("/guide/", node(["en", "pt-BR"])),
     ]).join(),
     /states inLanguage/,
+  );
+  // One entity, one node: a translated description on the same @id fails.
+  const described = (description) =>
+    websiteJsonLd(DOCS, "docs", description, { languages: ["en", "pt-BR"] });
+  assert.match(
+    checkEntityLanguages([
+      page("/", described("Public technical documentation")),
+      page("/pt/", described("Documentação técnica pública")),
+    ]).join(),
+    /WebSite .* differs from the same node on/,
   );
 });
 

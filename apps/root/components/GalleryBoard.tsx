@@ -14,6 +14,8 @@ import { galleryBranding } from "@raioviajante/design/gallery";
 import { AvatarCoin } from "@raioviajante/design/avatar-coin";
 import { avatarFrames } from "@raioviajante/design/avatar";
 import { SectionHeading, SiteLink } from "@raioviajante/design/components";
+import { prefersReducedMotion } from "@raioviajante/design/reduced-motion";
+import { playSound } from "@raioviajante/design/sound";
 import type { LocaleId } from "../../../site/locales";
 import {
   artworks,
@@ -28,13 +30,11 @@ import {
   type Category,
   type GalleryCopy,
 } from "../lib/gallery";
-import { playSound } from "@raioviajante/design/sound";
 import {
   aimStickerBurst,
   aimStickers,
   animationsSettle,
   attachPiecePop,
-  prefersReducedMotion,
 } from "../lib/gallery-pop";
 import { collageSizes } from "../lib/gallery-layout";
 

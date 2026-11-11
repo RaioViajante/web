@@ -28,19 +28,28 @@ Both GitHub profile links carry `rel="me"`.
 
 ## Structured data
 
-| App  | Page                | Nodes                           |
-| ---- | ------------------- | ------------------------------- |
-| root | `/`                 | `Person`, `WebSite`             |
-| dump | `/`                 | `WebSite`, `Blog`               |
-| dump | `/posts/<slug>`     | `BlogPosting`                   |
-| docs | `/`                 | `WebSite`                       |
-| docs | documentation pages | `TechArticle`, `BreadcrumbList` |
-| lab  | `/`                 | `WebSite`                       |
+| App  | Page                | Nodes                            |
+| ---- | ------------------- | -------------------------------- |
+| root | `/`                 | `Person`, `WebSite`              |
+| root | `/pt`               | `WebPage` (references `WebSite`) |
+| dump | `/`                 | `WebSite`, `Blog`                |
+| dump | `/posts/<slug>`     | `BlogPosting`                    |
+| docs | `/`                 | `WebSite`                        |
+| docs | documentation pages | `TechArticle`, `BreadcrumbList`  |
+| lab  | `/`                 | `WebSite`                        |
 
 Not published: `SearchAction` (search is not a URL-template query endpoint),
 publisher/logo, `dateModified` on posts, per-experiment types (an experiment
 is not a software product or a creative work in any sense the data states), and
-any page-level type for search, legal and archive pages.
+any page-level type for search, legal and archive pages. Every page outside
+this table publishes no JSON-LD, in any language, and the checks enforce it
+(`expectedTypes` in `seo/metadata-policy.ts`). The Portuguese homes of Dump,
+Docs and Lab repeat their host's full nodes unchanged (English description,
+shipped-language set); Root's references its `WebSite` by `@id` from a
+`WebPage`, since the full `Person` belongs on the English home only
+(`docs/i18n.md`, "Structured data"). The checks pin each home's node set, and
+`checkEntityLanguages` fails when a full `WebSite` or `Blog` node differs
+between two pages of its host.
 
 - `BlogPosting.datePublished` is the post's frontmatter date, which is the
   only date posts have. A publication date is not a modification date, so

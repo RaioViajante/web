@@ -1,11 +1,8 @@
-import { headers } from "next/headers";
 import { PageHeader, Section } from "@raioviajante/design/components";
-import { jsonLdScript } from "../../../../../seo/structured-data";
 import { RootShell } from "../../../components/RootShell";
 import { ptAbout, ptDocsHome, ptDumpHome, ptLabHome } from "../../../lib/pt";
 import { metadataFor } from "../../../lib/seo";
 import { routes } from "../../../lib/routes";
-import { webPageJsonLd } from "../../../lib/structured-data";
 import "../../about/about.css";
 
 const path = routes.about["pt-BR"]!;
@@ -31,17 +28,9 @@ function Destination({
   );
 }
 
-export default async function AboutPt() {
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+export default function AboutPt() {
   return (
     <RootShell current={path} locale="pt-BR">
-      <script
-        nonce={nonce}
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: jsonLdScript(webPageJsonLd(path, "pt-BR")),
-        }}
-      />
       <PageHeader
         label={ptAbout.label}
         title={ptAbout.title}

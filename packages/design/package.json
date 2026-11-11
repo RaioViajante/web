@@ -19,6 +19,7 @@
     "./behavior": "./behavior.ts",
     "./behavior-react": "./behavior-react.tsx",
     "./clock": "./clock.ts",
+    "./reduced-motion": "./reduced-motion.ts",
     "./gallery": "./components/gallery.ts",
     "./projects": "./components/projects.ts",
     "./stucco": "./components/stucco.ts",

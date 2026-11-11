@@ -258,7 +258,7 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
   await expect(page.locator("#gear-heading")).toContainText(
     "Lista de equipamentos",
   );
-  await expect(page.locator(".setup-gear")).toHaveCount(14);
+  await expect(page.locator(".setup-gear")).toHaveCount(16);
   const disclosure = page.locator("#affiliate-disclosure");
   await expect(disclosure).toBeVisible();
   await expect(disclosure).toContainText("links de afiliado");
@@ -301,11 +301,11 @@ test("Root publishes the Portuguese Setup counterpart with its gear links intact
       ]),
     ),
   ).toEqual(english);
-  expect(english.length).toBe(8);
+  expect(english.length).toBe(9);
   // Affiliate links are sponsored and, leaving the four sites, open a new tab.
   for (const [, rel] of english) expect(rel).toBe("sponsored noopener");
   await expect(page.getByText("Nenhum link confiável disponível.")).toHaveCount(
-    6,
+    7,
   );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
