@@ -37,8 +37,32 @@ export default async function ThisSitePt() {
           ))}
         </ul>
       </Section>
+      {ptThisSite.otherSites.map((site, index) => (
+        <Section
+          key={site.id}
+          number={`05.${index + 2}`}
+          title={site.title}
+          id={`${site.id}-heading`}
+        >
+          <p>
+            <a
+              href={site.link.href}
+              hrefLang={site.link.hrefLang}
+              data-sound="nav"
+            >
+              {new URL(site.link.href).host}
+            </a>{" "}
+            {site.holds}
+          </p>
+          <ul className="rv-dash-list">
+            {site.built.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </Section>
+      ))}
       <Section
-        number="05.2"
+        number={`05.${ptThisSite.otherSites.length + 2}`}
         title={ptThisSite.repositoryTitle}
         id="repository-heading"
       >

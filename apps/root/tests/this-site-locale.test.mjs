@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { pageMetadata } from "../../../seo/metadata.ts";
-import { ptPageSeo } from "../lib/pt.ts";
-import { counterpartsOf, declaredPages } from "../lib/routes.ts";
+import { localizedPath } from "../../../site/locales.ts";
+import { ABOUT_SITES_PATH } from "../../../site/sites.ts";
+import { ptPageSeo, ptThisSite } from "../lib/pt.ts";
+import { counterpartsOf, declaredPages, routes } from "../lib/routes.ts";
 
 const origin = "https://raioviajante.com";
 
@@ -43,6 +45,25 @@ test("This Site metadata forms a reciprocal English and Portuguese cluster", () 
     portuguese.openGraph.images[0].url,
     `${origin}/og/pt/this-site.png`,
   );
+});
+
+test("the other sites' footer link reaches this page in both languages", () => {
+  assert.equal(routes["this-site"].en, ABOUT_SITES_PATH);
+  assert.equal(
+    routes["this-site"]["pt-BR"],
+    localizedPath("root", "pt-BR", ABOUT_SITES_PATH),
+  );
+});
+
+test("the Portuguese page describes Dump, Docs and Lab, each with its own link", () => {
+  assert.deepEqual(
+    ptThisSite.otherSites.map(({ id }) => id),
+    ["dump", "docs", "lab"],
+  );
+  for (const site of ptThisSite.otherSites) {
+    assert.ok(new URL(site.link.href).host.startsWith(`${site.id}.`));
+    assert.ok(site.built.length > 0);
+  }
 });
 
 test("the localized This Site page is part of the indexable page inventory", () => {
