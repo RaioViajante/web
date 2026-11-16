@@ -495,7 +495,7 @@ export const ptContact: ContactCopy = {
     write: "Escrever um e-mail",
     copy: "Copiar endereço",
     copied: "Copiado",
-    copyFailed: "Não deu para copiar. O endereço é mail@raioviajante.com.",
+    copyFailed: "Não deu para copiar. O endereço é {email}.",
     question: "Sobre o que você quer falar?",
     hint: "Escolhe um assunto, ou só escreve direto.",
     subjects: [

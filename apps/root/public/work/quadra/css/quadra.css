@@ -66,7 +66,7 @@ input, select, textarea { font: inherit; color: inherit; }
 .inp:focus { outline: none; border-color: var(--court); box-shadow: 0 0 0 4px var(--court-soft); }
 .inp[aria-invalid="true"] { border-color: var(--danger); box-shadow: 0 0 0 4px var(--danger-soft); }
 textarea.inp { min-height: 84px; resize: vertical; }
-select.inp { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2375746D' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+select.inp { appearance: none; background-image: url('../chevron.svg'); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
 .chk { display: inline-flex; align-items: center; gap: 10px; min-height: 32px; cursor: pointer; font-size: 13.5px; }
 .chk input { width: 18px; height: 18px; accent-color: var(--ink); }
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; background: var(--sand); color: var(--ink-2); white-space: nowrap; }

@@ -703,7 +703,7 @@
   });
   document.addEventListener('keydown', (ev) => {
     // A handled Esc is marked, so the case page's demo layer leaves it alone.
-    if (ev.key === 'Escape') { if ($('.modal') || (S.v.us && S.v.us.sel)) { ev.preventDefault(); if (S.v.us) S.v.us.sel = null; window.QV.ACT.mclose(null, CTX); } else if (S.cal.open) { ev.preventDefault(); S.cal.open = null; render(); } else if (S.pop) { ev.preventDefault(); S.pop = null; render(); } else if (S.nav) { ev.preventDefault(); S.nav = false; render(); } }
+    if (ev.key === 'Escape') { if ($('.modal') || (S.v.us && S.v.us.sel)) { ev.preventDefault(); if (S.v.us) S.v.us.sel = null; window.QV.ACT.mclose(null, CTX); } else if (S.cal.open) { ev.preventDefault(); S.cal.open = null; render(); } else if (S.pop) { ev.preventDefault(); S.pop = null; render(); } else if (S.q) { ev.preventDefault(); S.q = ''; const q = $('#q'); if (q) q.value = ''; searchResults(); } else if (S.nav) { ev.preventDefault(); S.nav = false; render(); } }
     if (ev.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { const q = $('#q'); if (q) { ev.preventDefault(); q.focus(); } }
     if (ev.key === 'Backspace' && ev.target.dataset && ev.target.dataset.otp != null && !ev.target.value) { const i = Number(ev.target.dataset.otp); if (i > 0) { const p = $('[data-otp="' + (i - 1) + '"]'); if (p) p.focus(); } }
   });

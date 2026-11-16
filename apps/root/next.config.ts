@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
-import { staticHeaders, workHeaders } from "../../security/headers";
+import {
+  demosWithStyleAttributes,
+  staticHeaders,
+  workHeaders,
+} from "../../security/headers";
 
 const nextConfig: NextConfig = {
   // Preserve the repository's hand-maintained agent instructions.
@@ -9,11 +13,11 @@ const nextConfig: NextConfig = {
       { source: "/(.*)", headers: staticHeaders("root") },
       // Later entries override the same header key.
       { source: "/work/:path*", headers: workHeaders() },
-      // Quadra's templates write style attributes (security/headers.ts).
-      {
-        source: "/work/quadra/:path*",
+      // Demos whose templates write style attributes (security/headers.ts).
+      ...demosWithStyleAttributes.map((demo) => ({
+        source: `${demo}:path*`,
         headers: workHeaders({ styleAttributes: true }),
-      },
+      })),
     ];
   },
   async redirects() {

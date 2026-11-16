@@ -154,8 +154,20 @@ test("only /work/ may be framed, by the same origin, and it is noindexed", () =>
   assert.equal(directive(everywhere, "frame-src"), "frame-src 'none'");
 });
 
-test("only the Quadra demo may use style attributes, and its scripts stay strict", () => {
+test("only the Quadra demo may use style attributes, and its scripts stay strict", async () => {
   assert.deepEqual(demosWithStyleAttributes, ["/work/quadra/"]);
+  // Root's config applies the exception from this list, to nothing else.
+  const config = await readFile(
+    new URL("../apps/root/next.config.ts", import.meta.url),
+    "utf8",
+  );
+  const headersBlock = config.slice(
+    config.indexOf("async headers()"),
+    config.indexOf("async redirects()"),
+  );
+  assert.match(headersBlock, /demosWithStyleAttributes\.map\(/);
+  assert.equal(headersBlock.match(/styleAttributes: true/g)?.length, 1);
+  assert.doesNotMatch(headersBlock, /source: "\/work\/[a-z]/);
   const [policy, robots] = workHeaders({ styleAttributes: true });
   assert.equal(
     directive(policy.value, "style-src-attr"),
@@ -258,5 +270,9 @@ test("the Quadra demo loads nothing from elsewhere and runs no inline script", a
     new URL("../apps/root/public/work/quadra/css/quadra.css", import.meta.url),
     "utf8",
   );
-  assert.doesNotMatch(css, /@import|url\(["']?https?:/, "external CSS");
+  assert.doesNotMatch(
+    css,
+    /@import|url\(["']?(?:https?|data):/,
+    "external or data: URL in CSS (img-src is 'self')",
+  );
 });

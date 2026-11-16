@@ -52,7 +52,7 @@ export function ContactMail({
       }, 2400);
     } catch {
       setCopied(false);
-      setAnnounce(copy.copyFailed);
+      setAnnounce(copy.copyFailed.replace("{email}", CONTACT.email));
     }
   };
 

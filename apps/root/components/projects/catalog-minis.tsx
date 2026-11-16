@@ -278,21 +278,20 @@ function MorrowferrySketch() {
 const featured = new Set<ProjectId>(["mochifile", "ordelis", "orbit"]);
 
 /**
- * Any project's art, by id: on a catalog tile, or on a card of /projects
- * (Refrain's is the only one that differs between the two).
+ * Any project's small art, by id: the catalog's tiles, and the cards of
+ * /projects that are not featured. Featured cards draw theirs in
+ * project-cards.tsx, Refrain's at card size.
  */
 export function MiniSketch({
   id,
   copy,
   intlLocale,
-  size = "tile",
 }: {
   id: ProjectId;
   copy: ProjectArtCopy;
   intlLocale: string;
-  size?: "card" | "tile";
 }) {
-  if (id === "refrain") return <RefrainArt copy={copy.refrain} size={size} />;
+  if (id === "refrain") return <RefrainArt copy={copy.refrain} size="tile" />;
   if (featured.has(id))
     return (
       <FeaturedMini id={id as FeaturedId} copy={copy} intlLocale={intlLocale} />

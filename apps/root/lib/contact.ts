@@ -14,7 +14,7 @@ export interface ContactCopy {
     write: string;
     copy: string;
     copied: string;
-    /** Said, not shown, when the browser refuses to copy. */
+    /** Said, not shown, when the browser refuses to copy; takes {email}. */
     copyFailed: string;
     question: string;
     /** Shown until a subject is picked. */
@@ -65,7 +65,7 @@ export const contactCopy: ContactCopy = {
     write: "Write an email",
     copy: "Copy address",
     copied: "Copied",
-    copyFailed: "Could not copy. The address is mail@raioviajante.com.",
+    copyFailed: "Could not copy. The address is {email}.",
     question: "What do you want to talk about?",
     hint: "Pick a subject, or just write.",
     subjects: [

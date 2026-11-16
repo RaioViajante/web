@@ -60,10 +60,15 @@
   margin-inline: auto;
 }
 
-/* The title types itself once, on a first look; never under reduced motion. */
+/* The title types itself once, on a first look; never under reduced motion.
+   One step per character of the monospace title in each language. */
 @media (prefers-reduced-motion: no-preference) {
   .ct-title {
     animation: ct-type 700ms steps(15) 200ms both;
+  }
+  .ct-title:lang(pt) {
+    animation-duration: 880ms;
+    animation-timing-function: steps(19);
   }
 }
 
@@ -214,7 +219,7 @@
 }
 
 .ct-chip {
-  min-height: 36px;
+  min-height: var(--touch);
   padding: 0 14px;
   border: 1px dashed var(--rule-note);
   border-radius: 999px;
@@ -513,9 +518,6 @@
     right: 10px;
     width: 52px;
     height: 52px;
-  }
-  .ct-chip {
-    min-height: var(--touch);
   }
   .ct-offers,
   .ct-list,

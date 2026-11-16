@@ -182,13 +182,13 @@ derived from the handoff by
 - **`/work/quadra/`.** The demo is the handoff's front-end build, about 20
   screens, unchanged except where the site's rules require: its two
   typefaces (Schibsted Grotesk and Geist Mono, OFL) are served from its own
-  folder instead of Google Fonts, its icon is a file instead of a `data:`
-  URL, and its state lives in the page's memory instead of `localStorage`,
+  folder instead of Google Fonts, its icon and its selects' arrow are files
+  instead of `data:` URLs (`img-src 'self'`), and its state lives in the page's memory instead of `localStorage`,
   so a reload starts over and nothing is stored (the case and the demo say
   so). Its templates write `style` attributes, so `/work/quadra/*` alone has
   `style-src-attr 'unsafe-inline'`; its scripts stay as strict as everywhere
   else (`docs/security-headers.md`). When the demo uses Esc itself (a dialog,
-  a drawer, a popover, its menu) it marks the key handled, and the demo
+  a drawer, a popover, its search results, its menu) it marks the key handled, and the demo
   layer stays open.
 
 ### Gallery
