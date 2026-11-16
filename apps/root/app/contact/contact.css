@@ -55,32 +55,6 @@
   translate: 0 -4px;
 }
 
-.rv-header h1.ct-title {
-  width: fit-content;
-  margin-inline: auto;
-}
-
-/* The title types itself once, on a first look; never under reduced motion.
-   One step per character of the monospace title in each language. */
-@media (prefers-reduced-motion: no-preference) {
-  .ct-title {
-    animation: ct-type 700ms steps(15) 200ms both;
-  }
-  .ct-title:lang(pt) {
-    animation-duration: 880ms;
-    animation-timing-function: steps(19);
-  }
-}
-
-@keyframes ct-type {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-
 .rv-header p.ct-intro {
   max-width: 56ch;
   margin: 6px auto 0;

@@ -257,8 +257,7 @@ copy in `lib/about.ts`, `lib/contact.ts` and `ptAbout` / `ptContact`.
   link to Setup and life away from the screen. It ends with the one
   invitation card on Root, to Contact. On phones each leader row becomes
   name over note.
-- **Contact** (`components/ContactPage.tsx`, `ContactMail.tsx`) opens with a
-  self-typing title (never under reduced motion), the "Hi!" sticker and
+- **Contact** (`components/ContactPage.tsx`, `ContactMail.tsx`) opens with its title (typed like every page title, `docs/design-system.md`), the "Hi!" sticker and
   "Open to new projects" as a word with a gray mark. The email card writes
   an email, copies the address (Root allows clipboard-write for this; the
   result is announced, and a failure says the address instead) and offers

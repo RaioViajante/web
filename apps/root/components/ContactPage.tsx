@@ -1,7 +1,11 @@
 // The Contact page in either language. The routes in app/ only choose the
 // locale.
 
-import { LeaderRow, Section } from "@raioviajante/design/components";
+import {
+  LeaderRow,
+  Section,
+  TypedTitle,
+} from "@raioviajante/design/components";
 import { galleryBranding } from "@raioviajante/design/gallery";
 import {
   DEFAULT_LOCALE,
@@ -80,7 +84,7 @@ export function ContactPage({ locale }: { locale: LocaleId }) {
       <header className="rv-header ct-head">
         <Sticker className="ct-sticker--hi" />
         <div className="rv-label">{copy.label}</div>
-        <h1 className="ct-title">{copy.title}</h1>
+        <TypedTitle text={copy.title} className="ct-title" />
         <p className="ct-intro">{copy.intro}</p>
         <span className="ct-status">
           <span className="ct-status__mark" aria-hidden="true" />

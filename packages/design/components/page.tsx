@@ -4,6 +4,7 @@ import { SiteLink, type LinkComponent } from "./link";
 import type { LocaleId } from "../../../site/locales";
 import { siteById, type SiteId } from "../../../site/sites";
 import { catalogFor } from "../catalog";
+import { TypedTitle } from "./typed-title";
 
 /** Index header: avatar, site name, one line. */
 export function IndexHeader({
@@ -30,7 +31,7 @@ export function IndexHeader({
           priority
         />
       )}
-      <h1>{name}</h1>
+      <TypedTitle text={name} />
       <p>{line}</p>
       {meta}
     </header>
@@ -56,7 +57,7 @@ export function PageHeader({
     <header className="rv-header">
       {children}
       {label ? <div className="rv-label">{label}</div> : null}
-      <h1>{title}</h1>
+      <TypedTitle text={title} />
       {line ? <p>{line}</p> : null}
       {meta?.length ? (
         <div className="rv-meta">

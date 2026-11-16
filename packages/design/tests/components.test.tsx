@@ -17,7 +17,7 @@ import {
   StateMark,
 } from "../components";
 
-const css = ["tokens", "base", "blocks"]
+const css = ["tokens", "base", "blocks", "typed"]
   .map((name) =>
     readFileSync(new URL(`../styles/${name}.css`, import.meta.url), "utf8"),
   )
@@ -269,7 +269,10 @@ describe("templates", () => {
         tryInstead={[{ label: "docs home", value: "start over", href: "/" }]}
       />,
     );
-    expect(html).toContain("I looked everywhere.");
+    // The title types itself, a character per span (typed-title.tsx).
+    expect(html.replace(/<\/?span[^>]*>/g, "")).toContain(
+      "I looked everywhere.",
+    );
     expect(html).toContain("data-requested-path");
     expect(html).toContain("Try instead");
     expect(html).toContain('width="300"');

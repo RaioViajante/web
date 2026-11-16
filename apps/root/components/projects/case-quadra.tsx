@@ -1,7 +1,7 @@
 // The Quadra case page. The route in app/ only chooses the locale.
 
 import Link from "next/link";
-import { SiteLink } from "@raioviajante/design/components";
+import { SiteLink, TypedTitle } from "@raioviajante/design/components";
 import {
   quadraBrand,
   quadraTour,
@@ -79,7 +79,7 @@ export function QuadraCase({ locale }: { locale: LocaleId }) {
       <AllProjectsBack locale={locale} />
       <header className="sc-head">
         <div className="sc-kick">{copy.kicker}</div>
-        <h1 className="sc-h1">{copy.title}</h1>
+        <TypedTitle text={copy.title} className="sc-h1" />
         <p className="sc-sub">{copy.intro}</p>
         <p className="sc-credit">
           {copy.credit.with}{" "}

@@ -1,0 +1,319 @@
+/*
+ * Page titles type themselves once when a page appears (TypedTitle in
+ * components/typed-title.tsx): each character fades in after the one
+ * before, at a pace that keeps every title near one second, then a block
+ * caret blinks and goes. Only opacity changes, so nothing moves or reflows;
+ * the caret takes no room. Under reduced motion, and in print, the title is
+ * simply there.
+ */
+
+.rv-typed {
+  --rv-type-step: 45ms;
+}
+
+.rv-typed[data-pace="medium"] {
+  --rv-type-step: 28ms;
+}
+
+.rv-typed[data-pace="long"] {
+  --rv-type-step: 15ms;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rv-typed > [class^="rv-c"] {
+    animation: rv-type 1ms steps(1) both;
+    animation-delay: calc(120ms + var(--rv-i) * var(--rv-type-step));
+  }
+
+  .rv-typed::after {
+    display: inline-block;
+    width: 0.42em;
+    height: 0.86em;
+    margin: 0 -0.5em 0 0.08em;
+    vertical-align: -0.06em;
+    background: currentColor;
+    opacity: 0;
+    content: "";
+    animation: rv-caret 1.9s linear 120ms both;
+  }
+}
+
+@keyframes rv-type {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rv-caret {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  30%,
+  50%,
+  70% {
+    opacity: 1;
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    opacity: 0;
+  }
+}
+
+@media print {
+  .rv-typed > [class^="rv-c"] {
+    opacity: 1;
+    animation: none;
+  }
+  .rv-typed::after {
+    display: none;
+  }
+}
+
+/* Each character's place in the title. */
+.rv-c0 {
+  --rv-i: 0;
+}
+.rv-c1 {
+  --rv-i: 1;
+}
+.rv-c2 {
+  --rv-i: 2;
+}
+.rv-c3 {
+  --rv-i: 3;
+}
+.rv-c4 {
+  --rv-i: 4;
+}
+.rv-c5 {
+  --rv-i: 5;
+}
+.rv-c6 {
+  --rv-i: 6;
+}
+.rv-c7 {
+  --rv-i: 7;
+}
+.rv-c8 {
+  --rv-i: 8;
+}
+.rv-c9 {
+  --rv-i: 9;
+}
+.rv-c10 {
+  --rv-i: 10;
+}
+.rv-c11 {
+  --rv-i: 11;
+}
+.rv-c12 {
+  --rv-i: 12;
+}
+.rv-c13 {
+  --rv-i: 13;
+}
+.rv-c14 {
+  --rv-i: 14;
+}
+.rv-c15 {
+  --rv-i: 15;
+}
+.rv-c16 {
+  --rv-i: 16;
+}
+.rv-c17 {
+  --rv-i: 17;
+}
+.rv-c18 {
+  --rv-i: 18;
+}
+.rv-c19 {
+  --rv-i: 19;
+}
+.rv-c20 {
+  --rv-i: 20;
+}
+.rv-c21 {
+  --rv-i: 21;
+}
+.rv-c22 {
+  --rv-i: 22;
+}
+.rv-c23 {
+  --rv-i: 23;
+}
+.rv-c24 {
+  --rv-i: 24;
+}
+.rv-c25 {
+  --rv-i: 25;
+}
+.rv-c26 {
+  --rv-i: 26;
+}
+.rv-c27 {
+  --rv-i: 27;
+}
+.rv-c28 {
+  --rv-i: 28;
+}
+.rv-c29 {
+  --rv-i: 29;
+}
+.rv-c30 {
+  --rv-i: 30;
+}
+.rv-c31 {
+  --rv-i: 31;
+}
+.rv-c32 {
+  --rv-i: 32;
+}
+.rv-c33 {
+  --rv-i: 33;
+}
+.rv-c34 {
+  --rv-i: 34;
+}
+.rv-c35 {
+  --rv-i: 35;
+}
+.rv-c36 {
+  --rv-i: 36;
+}
+.rv-c37 {
+  --rv-i: 37;
+}
+.rv-c38 {
+  --rv-i: 38;
+}
+.rv-c39 {
+  --rv-i: 39;
+}
+.rv-c40 {
+  --rv-i: 40;
+}
+.rv-c41 {
+  --rv-i: 41;
+}
+.rv-c42 {
+  --rv-i: 42;
+}
+.rv-c43 {
+  --rv-i: 43;
+}
+.rv-c44 {
+  --rv-i: 44;
+}
+.rv-c45 {
+  --rv-i: 45;
+}
+.rv-c46 {
+  --rv-i: 46;
+}
+.rv-c47 {
+  --rv-i: 47;
+}
+.rv-c48 {
+  --rv-i: 48;
+}
+.rv-c49 {
+  --rv-i: 49;
+}
+.rv-c50 {
+  --rv-i: 50;
+}
+.rv-c51 {
+  --rv-i: 51;
+}
+.rv-c52 {
+  --rv-i: 52;
+}
+.rv-c53 {
+  --rv-i: 53;
+}
+.rv-c54 {
+  --rv-i: 54;
+}
+.rv-c55 {
+  --rv-i: 55;
+}
+.rv-c56 {
+  --rv-i: 56;
+}
+.rv-c57 {
+  --rv-i: 57;
+}
+.rv-c58 {
+  --rv-i: 58;
+}
+.rv-c59 {
+  --rv-i: 59;
+}
+.rv-c60 {
+  --rv-i: 60;
+}
+.rv-c61 {
+  --rv-i: 61;
+}
+.rv-c62 {
+  --rv-i: 62;
+}
+.rv-c63 {
+  --rv-i: 63;
+}
+.rv-c64 {
+  --rv-i: 64;
+}
+.rv-c65 {
+  --rv-i: 65;
+}
+.rv-c66 {
+  --rv-i: 66;
+}
+.rv-c67 {
+  --rv-i: 67;
+}
+.rv-c68 {
+  --rv-i: 68;
+}
+.rv-c69 {
+  --rv-i: 69;
+}
+.rv-c70 {
+  --rv-i: 70;
+}
+.rv-c71 {
+  --rv-i: 71;
+}
+.rv-c72 {
+  --rv-i: 72;
+}
+.rv-c73 {
+  --rv-i: 73;
+}
+.rv-c74 {
+  --rv-i: 74;
+}
+.rv-c75 {
+  --rv-i: 75;
+}
+.rv-c76 {
+  --rv-i: 76;
+}
+.rv-c77 {
+  --rv-i: 77;
+}
+.rv-c78 {
+  --rv-i: 78;
+}
+.rv-c79 {
+  --rv-i: 79;
+}

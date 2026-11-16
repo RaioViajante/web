@@ -266,19 +266,6 @@ test("Portuguese cross-site links use every active Portuguese homepage", () => {
   );
 });
 
-test("Contact's typed title takes one step per character in each language", async () => {
-  const { readFile } = await import("node:fs/promises");
-  const css = await readFile(
-    new URL("../app/contact/contact.css", import.meta.url),
-    "utf8",
-  );
-  const steps = [...css.matchAll(/steps\((\d+)\)/g)].map(([, n]) => Number(n));
-  assert.deepEqual(steps, [
-    [...contactCopy.title].length,
-    [...ptContact.title].length,
-  ]);
-});
-
 test("Portuguese Contact and About have the English pages' shape, fully written", () => {
   assert.equal(ptPageSeo.contact?.title, "contato");
   assert.equal(ptSearchDescriptions.contact, "Formas de entrar em contato");

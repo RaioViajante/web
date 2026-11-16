@@ -1,6 +1,7 @@
 // The Stucco. case page. The route in app/ only chooses the locale.
 
 import Link from "next/link";
+import { TypedTitle } from "@raioviajante/design/components";
 import {
   stuccoBrand,
   stuccoTour,
@@ -87,7 +88,7 @@ export function StuccoCase({ locale }: { locale: LocaleId }) {
       <AllProjectsBack locale={locale} />
       <header className="sc-head">
         <div className="sc-kick">{copy.kicker}</div>
-        <h1 className="sc-h1">{copy.title}</h1>
+        <TypedTitle text={copy.title} className="sc-h1" />
         <p className="sc-sub">{copy.intro}</p>
         <p className="sc-note-top">{copy.note}</p>
         <div className="sc-act">

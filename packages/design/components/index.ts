@@ -1,4 +1,5 @@
 export { Art, art, type ArtName } from "./art";
+export { TypedTitle, TYPED_MAX, typedPace } from "./typed-title";
 export { SearchNavItem, SearchPage, type SearchEntry } from "./search";
 export {
   Footer,
