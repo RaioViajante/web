@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
       { source: "/(.*)", headers: staticHeaders("root") },
       // Later entries override the same header key.
       { source: "/work/:path*", headers: workHeaders() },
+      // Quadra's templates write style attributes (security/headers.ts).
+      {
+        source: "/work/quadra/:path*",
+        headers: workHeaders({ styleAttributes: true }),
+      },
     ];
   },
   async redirects() {
@@ -18,6 +23,11 @@ const nextConfig: NextConfig = {
       {
         source: "/work/stucco",
         destination: "/work/stucco/index.html",
+        permanent: false,
+      },
+      {
+        source: "/work/quadra",
+        destination: "/work/quadra/index.html",
         permanent: false,
       },
     ];

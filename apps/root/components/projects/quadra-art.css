@@ -1,0 +1,20 @@
+/* The Quadra card: Stucco.'s browser and phone (stucco-art.css) on the
+   brand's court-blue background, showing the demo's own screens. */
+.st-art.qd {
+  background: var(--quadra-blue);
+}
+.qd-bg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.qd .st-view,
+.qd .st-pv {
+  background: var(--quadra-chalk);
+}
+.qd .st-win .st-sl {
+  object-position: 0 0;
+}

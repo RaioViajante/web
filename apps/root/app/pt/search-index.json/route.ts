@@ -24,6 +24,7 @@ export function GET() {
     { key: "setup" as const, label: "setup" },
     { key: "projects-all" as const, label: "todos os projetos" },
     { key: "projects-stucco" as const, label: "case Stucco." },
+    { key: "projects-quadra" as const, label: "case Quadra" },
   ];
   const entries: SearchEntry[] = pages.map(({ key, label }, index) => ({
     site: "root",

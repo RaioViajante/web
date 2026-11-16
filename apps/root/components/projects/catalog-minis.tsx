@@ -1,10 +1,11 @@
-// The small sketches of the projects only the catalog shows (yanawa, Sweep,
-// Hum, Morrowferry), and the dispatcher for all eight. Server-rendered,
-// decorative, animated only by CSS (no inline styles: Root's CSP blocks
-// them), and still under reduced motion.
+// The small sketches of yanawa, Sweep, Hum and Morrowferry, and the
+// dispatcher for all eight projects' art. Server-rendered, decorative,
+// animated only by CSS (no inline styles: Root's CSP blocks them), and still
+// under reduced motion.
 
 import type { ProjectArtCopy, ProjectId } from "../../lib/projects";
 import { FeaturedMini, type FeaturedId } from "./minis";
+import { RefrainArt } from "./RefrainArt";
 import "./catalog-minis.css";
 
 const yanawaTokens = [
@@ -274,23 +275,24 @@ function MorrowferrySketch() {
   );
 }
 
-const featured = new Set<ProjectId>([
-  "mochifile",
-  "ordelis",
-  "refrain",
-  "orbit",
-]);
+const featured = new Set<ProjectId>(["mochifile", "ordelis", "orbit"]);
 
-/** The small sketch of any project, by id. */
+/**
+ * Any project's art, by id: on a card (home and /projects) or on a catalog
+ * tile. Only Refrain's differs between the two.
+ */
 export function MiniSketch({
   id,
   copy,
   intlLocale,
+  size = "tile",
 }: {
   id: ProjectId;
   copy: ProjectArtCopy;
   intlLocale: string;
+  size?: "card" | "tile";
 }) {
+  if (id === "refrain") return <RefrainArt copy={copy.refrain} size={size} />;
   if (featured.has(id))
     return (
       <FeaturedMini id={id as FeaturedId} copy={copy} intlLocale={intlLocale} />

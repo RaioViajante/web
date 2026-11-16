@@ -88,6 +88,7 @@ test("English paths are unprefixed and unchanged", () => {
     projects: "/projects",
     "projects-all": "/projects/all",
     "projects-stucco": "/projects/stucco",
+    "projects-quadra": "/projects/quadra",
     contact: "/contact",
     gallery: "/gallery",
     "this-site": "/this-site",
@@ -165,6 +166,7 @@ test("the shipped Portuguese pages include the translated This Site route", () =
       "/pt/privacy",
       "/pt/projects",
       "/pt/projects/all",
+      "/pt/projects/quadra",
       "/pt/projects/stucco",
       "/pt/search",
       "/pt/setup",
@@ -193,6 +195,7 @@ test("Root participation activates only its published Portuguese routes", () => 
     "projects",
     "projects-all",
     "projects-stucco",
+    "projects-quadra",
     "contact",
     "gallery",
     "this-site",
@@ -223,6 +226,7 @@ test("rollback disables Root participation while its Portuguese routes stay publ
       "/pt/privacy",
       "/pt/projects",
       "/pt/projects/all",
+      "/pt/projects/quadra",
       "/pt/projects/stucco",
       "/pt/search",
       "/pt/setup",
@@ -352,7 +356,7 @@ test("Setup discloses affiliate links in both languages", () => {
 });
 
 test("static demos are never declared as pages, so no index lists them", () => {
-  assert.deepEqual(staticDemos, ["/work/stucco/"]);
+  assert.deepEqual(staticDemos, ["/work/stucco/", "/work/quadra/"]);
   for (const { path } of declaredPages())
     assert.equal(path.startsWith("/work"), false, path);
 });
@@ -366,6 +370,17 @@ test("the Stucco. case is declared in both languages with reciprocal counterpart
   ]);
   assert.ok(ptPageSeo["projects-stucco"]?.title);
   assert.ok(ptSearchDescriptions["projects-stucco"]);
+});
+
+test("the Quadra case is declared in both languages with reciprocal counterparts", () => {
+  assert.deepEqual(counterpartsOf("projects-quadra", "en"), [
+    { locale: "pt-BR", path: "/pt/projects/quadra" },
+  ]);
+  assert.deepEqual(counterpartsOf("projects-quadra", "pt-BR"), [
+    { locale: "en", path: "/projects/quadra" },
+  ]);
+  assert.ok(ptPageSeo["projects-quadra"]?.title);
+  assert.ok(ptSearchDescriptions["projects-quadra"]);
 });
 
 test("Portuguese projects pages have their own metadata and search copy", () => {

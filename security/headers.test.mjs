@@ -5,6 +5,7 @@ import test from "node:test";
 import {
   contentSecurityPolicy,
   demoHostPaths,
+  demosWithStyleAttributes,
   rootFraming,
   staticHeaders,
   workHeaders,
@@ -93,8 +94,13 @@ const nonce = "abcdefghijklmnopqrstuv==";
 const directive = (csp, name) =>
   csp.split("; ").find((item) => item.startsWith(`${name} `));
 
-test("only the Stucco case pages may embed a same-origin frame", () => {
-  assert.deepEqual(demoHostPaths, ["/projects/stucco", "/pt/projects/stucco"]);
+test("only the case pages may embed a same-origin frame", () => {
+  assert.deepEqual(demoHostPaths, [
+    "/projects/stucco",
+    "/pt/projects/stucco",
+    "/projects/quadra",
+    "/pt/projects/quadra",
+  ]);
   for (const path of demoHostPaths) {
     const csp = contentSecurityPolicy("root", nonce, false, rootFraming(path));
     assert.equal(directive(csp, "frame-src"), "frame-src 'self'", path);
@@ -112,6 +118,7 @@ test("only the Stucco case pages may embed a same-origin frame", () => {
     "/projects/stucco/more",
     "/pt/projects",
     "/work/stucco",
+    "/work/quadra",
   ]) {
     const csp = contentSecurityPolicy("root", nonce, false, rootFraming(path));
     assert.equal(directive(csp, "frame-src"), "frame-src 'none'", path);
@@ -145,6 +152,33 @@ test("only /work/ may be framed, by the same origin, and it is noindexed", () =>
     "frame-ancestors 'none'",
   );
   assert.equal(directive(everywhere, "frame-src"), "frame-src 'none'");
+});
+
+test("only the Quadra demo may use style attributes, and its scripts stay strict", () => {
+  assert.deepEqual(demosWithStyleAttributes, ["/work/quadra/"]);
+  const [policy, robots] = workHeaders({ styleAttributes: true });
+  assert.equal(
+    directive(policy.value, "style-src-attr"),
+    "style-src-attr 'unsafe-inline'",
+  );
+  assert.equal(directive(policy.value, "script-src"), "script-src 'self'");
+  assert.equal(
+    directive(policy.value, "script-src-attr"),
+    "script-src-attr 'none'",
+  );
+  assert.equal(directive(policy.value, "style-src"), "style-src 'self'");
+  assert.equal(
+    directive(policy.value, "frame-ancestors"),
+    "frame-ancestors 'self'",
+  );
+  assert.doesNotMatch(policy.value, /'nonce-|unsafe-eval/);
+  assert.equal(robots.value, "noindex, nofollow");
+  for (const site of ["root", "dump", "docs", "lab"])
+    assert.match(
+      contentSecurityPolicy(site, nonce),
+      /style-src-attr (?!'unsafe-inline')/,
+      site,
+    );
 });
 
 test("only documents with a framing exception omit the https upgrade", () => {
@@ -198,4 +232,31 @@ test("the Stucco demo works under the site CSP without exceptions", async () => 
     assert.doesNotMatch(html, /(?:src|href)="https?:/, `${file}: external`);
   }
   assert.equal(pages, 5);
+});
+
+test("the Quadra demo loads nothing from elsewhere and runs no inline script", async () => {
+  let pages = 0;
+  for await (const file of htmlFiles(
+    new URL("../apps/root/public/work/quadra/", import.meta.url),
+  )) {
+    const html = await readFile(file, "utf8");
+    pages++;
+    for (const attributes of scriptOpenTags(html))
+      assert.match(attributes, /\bsrc="js\/[^" ]+\.js"/, file.href);
+    for (const { body } of scriptElements(html))
+      assert.equal(body.trim(), "", `${file}: inline script`);
+    assert.doesNotMatch(
+      html,
+      /<style\b|\sstyle=|\son\w+=|http-equiv="content-security-policy"/i,
+      file.href,
+    );
+    assert.match(html, /name="robots"[^>]*noindex/, `${file}: noindex`);
+    assert.doesNotMatch(html, /(?:src|href)="(?:https?:|data:)/, `${file}: external`);
+  }
+  assert.equal(pages, 1);
+  const css = await readFile(
+    new URL("../apps/root/public/work/quadra/css/quadra.css", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(css, /@import|url\(["']?https?:/, "external CSS");
 });

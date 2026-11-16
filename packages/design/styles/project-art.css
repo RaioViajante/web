@@ -37,10 +37,24 @@
   --ordelis-removed: #e99a8c;
   --ordelis-note: #e6c07b;
 
-  --refrain-paper: #fbfaf7;
-  --refrain-ink: #111111;
-  --refrain-ink-2: #4a4a4a;
-  --refrain-tape: #e3dccf;
+  /* Refrain: the app's own paper, wine, pen blue and navy (refrain-art.css) */
+  --refrain-paper: #ece9e3;
+  --refrain-sleeve: #f6f4ef;
+  --refrain-ink: #141311;
+  --refrain-muted: #5f5b55;
+  --refrain-wine: #8c2a22;
+  --refrain-pen: #2b45c4;
+  --refrain-label: #f2e9df;
+  --refrain-navy: #1e2840;
+  --refrain-vinyl: #0e0e0e;
+  --refrain-groove: #1b1b1b;
+  --refrain-groove-2: #101010;
+  --refrain-shine: rgba(255, 255, 255, 0.16);
+  --refrain-shine-2: rgba(255, 255, 255, 0.11);
+  --refrain-clear: rgba(255, 255, 255, 0);
+  --refrain-shadow: rgba(0, 0, 0, 0.5);
+  --refrain-shadow-2: rgba(0, 0, 0, 0.45);
+  --refrain-crease: rgba(0, 0, 0, 0.05);
 
   --orbit-bg: #120e0a;
   --orbit-fg: #f2dcb6;
@@ -67,6 +81,10 @@
   --stucco-shadow-strong: rgba(0, 0, 0, 0.6);
   --stucco-shadow-print: rgba(0, 0, 0, 0.2);
   --stucco-backdrop: rgba(12, 12, 12, 0.84);
+
+  /* Quadra: the demo's court blue and chalk, behind its card and brand boards */
+  --quadra-blue: #2f4fe0;
+  --quadra-chalk: #f2f1ec;
 
   --yanawa-bg: #110c1a;
   --yanawa-node: #1a1226;

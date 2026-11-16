@@ -1,12 +1,14 @@
 // Root's Portuguese (pt-BR) editorial copy. App-owned and manually authored:
 // the shared UI strings live in packages/design's catalog. Only pages that ship
-// in Portuguese appear here (Home, About, Projects, All projects, the Stucco. case, Contact,
+// in Portuguese appear here (Home, About, Projects, All projects, the Stucco.
+// and Quadra cases, Contact,
 // Gallery, This site, Setup, Terms, Privacy, Search and the 404). The legal documents' bodies live
 // in their pages, beside the English originals. Names, handles, the email
 // address and tool names are not translated.
 
 import type { GalleryCopy } from "./gallery.ts";
 import type { ProjectsCopy } from "./projects.ts";
+import type { QuadraCopy } from "./quadra.ts";
 import type { StuccoCopy } from "./stucco.ts";
 import type { OtherSite } from "./this-site.ts";
 import type { RouteKey } from "./routes.ts";
@@ -43,12 +45,17 @@ export const ptPageSeo: Partial<
   projects: {
     title: "projetos",
     description:
-      "O que o RaioViajante constrói: Mochifile, Ordelis, Refrain e Orbit, cada um com um pequeno esboço para testar, e um espaço para trabalhos com clientes.",
+      "O que o RaioViajante constrói: Mochifile, Ordelis, Refrain, Orbit e mais quatro projetos, e os cases de trabalhos para clientes e acadêmicos.",
   },
   "projects-stucco": {
     title: "Stucco. · para clientes",
     description:
       "Case de site e identidade visual para um estúdio de gesso e drywall, mostrado como demo conceitual com marca fictícia.",
+  },
+  "projects-quadra": {
+    title: "Quadra · projeto acadêmico",
+    description:
+      "Case de um sistema de eventos e reserva de espaços para uma faculdade, feito por duas pessoas como projeto acadêmico e reimaginado como produto fictício, com uma demo de front-end.",
   },
   "projects-all": {
     title: "todos os projetos",
@@ -98,6 +105,7 @@ export const ptSearchDescriptions: Partial<Record<RouteKey, string>> = {
   projects: "Projetos e trabalhos",
   "projects-all": "Todos os projetos, por tipo",
   "projects-stucco": "Case: site e marca para um estúdio de gesso",
+  "projects-quadra": "Case: sistema de eventos e reservas para uma faculdade",
   contact: "Formas de entrar em contato",
   gallery: "Arte e imagens",
   "this-site": "Como este site é construído",
@@ -188,7 +196,6 @@ export const ptProjectsCopy: ProjectsCopy = {
   projects: {
     mochifile: {
       meta: "ferramentas de arquivo / web",
-      tagline: "ferramentas de arquivo no navegador",
       description:
         "Ferramentas de arquivo para tarefas do dia a dia, para quem só quer resolver o problema. Os arquivos são processados no seu navegador, sem envio. Hoje há uma ferramenta, que comprime uma imagem até um tamanho-alvo; outras estão planejadas.",
       summary:
@@ -199,7 +206,6 @@ export const ptProjectsCopy: ProjectsCopy = {
     },
     ordelis: {
       meta: "agentes de código / orquestração",
-      tagline: "um espaço de trabalho para agentes de código",
       description:
         "Um espaço de trabalho local para desktop que coordena agentes de programação com IA: planejar uma tarefa, deixar os agentes trabalharem nela, revisar as evidências e decidir o que entra. Ainda é cedo: o desktop mostra dados de exemplo, e o runtime de agentes em que ele se apoia só roda pela linha de comando.",
       summary:
@@ -210,7 +216,6 @@ export const ptProjectsCopy: ProjectsCopy = {
     },
     refrain: {
       meta: "diário musical / pessoal",
-      tagline: "um diário musical pessoal",
       description:
         "Meu diário musical pessoal: avaliações, reflexões e memórias sobre álbuns, músicas, artistas e bandas. Começou como um trabalho de Engenharia de Software na faculdade. Uma parte já funciona no meu computador; ainda não está online.",
       summary:
@@ -221,7 +226,6 @@ export const ptProjectsCopy: ProjectsCopy = {
     },
     orbit: {
       meta: "back-end / execuções de jobs",
-      tagline: "execuções de jobs e seus estados",
       description:
         "Um agendador de jobs self-hosted em fase inicial. Hoje ele guarda jobs, registra execuções e aplica as transições válidas entre os estados delas: na fila, executando, concluída, falhou e cancelada. O agendamento e a execução dos jobs ainda estão planejados.",
       summary:
@@ -232,37 +236,36 @@ export const ptProjectsCopy: ProjectsCopy = {
     },
     yanawa: {
       meta: "linguagem de programação",
-      tagline: "uma linguagem de programação, no papel",
       description:
         "Uma linguagem experimental, com tipagem forte, para construir aplicações. Ela existe como documentos de design; ainda não há compilador.",
       summary:
         "Minha linguagem autoral, com tipagem forte e foco em aplicações. Ainda em design: não há compilador.",
       status: "em design",
+      action: "Ler a documentação",
       actionShort: "a documentação",
     },
     sweep: {
       meta: "CLI / Python",
-      tagline: "um organizador de arquivos para o terminal",
       description:
         "Uma ferramenta de linha de comando em Python que organiza os arquivos de uma pasta em diretórios por categoria, de acordo com a extensão.",
       summary:
         "Organiza os arquivos de uma pasta em diretórios por categoria. O preview mostra o plano sem mover nada.",
       status: "ativo",
+      action: "Ler a documentação",
       actionShort: "a documentação",
     },
     hum: {
       meta: "música / terminal",
-      tagline: "um player de música para terminal",
       description:
         "Um player de música local para o terminal, em Rust. Ele está sendo planejado e especificado; o player em si ainda não foi construído.",
       summary:
         "Um player de música local para o terminal, em Rust. Ainda em planejamento: o player não foi construído.",
       status: "em planejamento",
+      action: "Abrir o repositório",
       actionShort: "repositório",
     },
     morrowferry: {
       meta: "jogo / narrativa",
-      tagline: "um jogo narrativo em pixel art",
       description:
         "Um jogo narrativo curto em pixel art sobre um velho barqueiro e um menino que procura alguém.",
       summary:
@@ -284,6 +287,12 @@ export const ptProjectsCopy: ProjectsCopy = {
         "Site e marca para um estúdio de gesso e drywall: slideshow na abertura, galeria filtrável com 47 projetos, páginas de serviço, formulário de orçamento, cartões de visita e de avaliação. A marca é fictícia; as fotos são trabalhos reais do estúdio.",
       action: "Ler o case",
     },
+    quadra: {
+      scope: "projeto acadêmico · produto + UI · demo conceitual",
+      summary:
+        "Um sistema de eventos e reserva de espaços para uma faculdade, feito com o Rafael como projeto acadêmico e reimaginado como a Quadra, uma marca fictícia: calendário por períodos, pedidos com aprovação, check-in, análises e agenda pública.",
+      action: "Ler o case",
+    },
   },
   noLink: "sem link público ainda",
   englishOnly: " (em inglês)",
@@ -292,15 +301,14 @@ export const ptProjectsCopy: ProjectsCopy = {
     title: "Projetos",
     line: "O que eu construo para mim, e o que construo com clientes.",
     mine: "Meus projetos",
-    lead: "Quatro coisas que estou construindo agora. Cada card tem um pequeno esboço que roda no seu navegador: ele mostra a ideia, não o projeto de verdade.",
+    lead: "O que estou construindo agora. Quatro aqui na frente, o resto a um clique.",
+    more: "Ver mais {n} projetos",
+    less: "Ver menos projetos",
     viewAll: "Ver todos os projetos",
-    clients: "Para clientes",
-    clientsLead:
-      "Trabalhos feitos com e para clientes. Os cases aparecem aqui quando estiverem escritos e liberados para publicação.",
-    clientsEmpty: "Nenhum case de cliente publicado ainda.",
-    clientsEmptyNote: "Cada um vai contar o que foi pedido e o que foi feito.",
+    cases: "Cases",
+    casesLead:
+      "Trabalhos para clientes e projetos acadêmicos, cada um contado como um case.",
     caseLabel: "case",
-    caseSoon: "Case em breve",
     cta: "Tem um projeto em mente? Escreva para",
   },
   all: {
@@ -316,95 +324,27 @@ export const ptProjectsCopy: ProjectsCopy = {
   },
   home: {
     heading: "Meus projetos",
-    more: "Mais projetos e trabalhos para clientes",
+    more: "Todos os projetos, inclusive para clientes",
   },
   art: {
-    label: {
-      mochifile:
-        "Esboço do Mochifile: uma foto comprimida até um tamanho-alvo, com valores de exemplo; converter e redimensionar chegam em breve",
-      ordelis:
-        "Esboço do Ordelis: a etapa de revisão planejada, em que você aprova o trabalho dos agentes ou o devolve",
-      refrain:
-        "Esboço do Refrain: um diário musical desenhado à mão e um disco",
-      orbit:
-        "Esboço do Orbit: execuções passando de um estado a outro, simuladas no seu navegador",
-      yanawa:
-        "Esboço do yanawa: uma linha de sintaxe de design dividida em tokens e em uma árvore sintática",
-      sweep:
-        "Esboço do Sweep: um exemplo de execução organizando quatro arquivos em pastas",
-      hum: "Esboço do Hum: o player planejado, com um visualizador em movimento",
-      morrowferry:
-        "Esboço do Morrowferry: um barqueiro e um menino em um barco iluminado por uma lanterna, à noite",
-    },
     example: "valores de exemplo",
     simulated: "simulado no seu navegador",
-    mochifile: {
-      tools: "Ferramentas do Mochifile",
-      compress: "Comprimir",
-      convert: "Converter",
-      resize: "Redimensionar",
-      format: "formato",
-      width: "largura",
-      soon: "em breve no Mochifile",
-      local: "no seu navegador",
-      original: "original",
-      result: "resultado",
-      file: "foto",
-      target: "tamanho-alvo",
-      under: "abaixo de {size}",
-      before: "antes",
-      after: "depois",
-    },
+    mochifile: { file: "foto" },
     ordelis: {
       note: "fluxo planejado · esboço",
       task: "tarefa",
-      agents: "agentes",
-      review: "revisão",
-      taskTitle: "Adicionar busca na página de configurações",
-      plan: "planejar",
-      implement: "implementar",
-      test: "testar",
-      implementing: "implementando · 3 de 4",
-      writingTests: "escrevendo testes",
-      revising: "revisando com as suas notas",
-      done: "pronto",
-      another: "outro agente",
-      anotherNote: "entra quando precisar",
-      files: "6 arquivos",
-      testsPassing: "testes passando",
-      lintClean: "lint sem erros",
-      openComment: "1 comentário aberto",
       you: "você",
-      waiting: "Esperando a sua revisão.",
-      approved: "Aprovado por você. Pronto para o merge.",
-      returned: "Devolvido com as suas notas.",
       approve: "Aprovar",
-      requestChanges: "Pedir mudanças",
     },
     refrain: {
-      albums: "álbuns",
-      artists: "artistas",
-      memories: "memórias",
-      title: "faixa a faixa",
+      kicker: "UM DIÁRIO MUSICAL · FEITO À MÃO",
       tagline: "algumas músicas levam a gente de volta.",
-      play: "tocar",
-      stop: "parar",
-      record: "o disco",
+      note: "( lado A: as que ficam )",
     },
     orbit: {
-      header: "orbit · estados de execução",
       queued: "na fila",
       running: "executando",
       succeeded: "concluída",
-      failed: "falhou",
-      cancelled: "cancelada",
-      finished: "fim",
-      queue: "Enfileirar um job",
-      cancel: "Cancelar",
-      idle: "Nada na fila. Enfileire um job.",
-      full: "Seis execuções ao mesmo tempo é o limite aqui.",
-      log: "Mudanças de estado",
-      counts: "Execuções por estado",
     },
     yanawa: {
       note: "sintaxe de design · nada executa isso ainda",
@@ -1073,6 +1013,360 @@ export const ptStuccoCopy: StuccoCopy = {
       "páginas pensadas para aparecer nas buscas de cada cidade da região;",
       "um caminho de dois toques até o orçamento no WhatsApp;",
       "um fluxo de avaliações que começa num cartão ou no carro da equipe e termina no Google.",
+    ],
+  },
+  cta: "Tem um projeto assim? Escreva para",
+  backAll: "Voltar para projetos",
+};
+
+/** The Quadra case page. */
+export const ptQuadraCopy: QuadraCopy = {
+  kicker: "PROJETO ACADÊMICO · CASE 02",
+  title: "Quadra",
+  intro:
+    "Um sistema de eventos e reserva de espaços para uma faculdade, feito por duas pessoas como projeto acadêmico e reimaginado aqui como um produto fictício. Os grupos pedem um espaço por data e período, a equipe de eventos aprova ou recusa, e tudo aparece num calendário só.",
+  credit: { with: "Feito com", profile: "LinkedIn" },
+  note: "Quadra e Valemont Institute são fictícios. A instituição do projeto original não é citada, e todas as pessoas, grupos e números da demo são inventados. O que vai além do sistema original aparece como conceito.",
+  demo: {
+    open: "Abrir a demo",
+    hint: "Abre sobre esta página · cerca de 20 telas · Esc para fechar",
+    label: "Demo Quadra",
+    newTab: "Nova aba",
+    close: "Fechar a demo",
+    loading: "Carregando a demo…",
+  },
+  facts: [
+    { term: "Ano", value: "2025", wide: false },
+    { term: "Tipo", value: "Projeto acadêmico, duas pessoas", wide: false },
+    {
+      term: "Meu papel",
+      value: "UI/UX design, front-end e desenvolvimento full-stack",
+      wide: true,
+    },
+    {
+      term: "Com",
+      value: "Rafael: back-end, qualidade de software e integração contínua",
+      wide: true,
+    },
+    {
+      term: "Demo",
+      value:
+        "Cerca de 20 telas, só front-end. Os dados são fictícios e ficam no seu navegador.",
+      wide: true,
+    },
+  ],
+  tour: {
+    heading: "O tour",
+    device: "Tamanho da tela",
+    steps: "Etapas do tour",
+    desktop: "desktop",
+    mobile: "celular",
+    previous: "Anterior",
+    next: "Próximo",
+    shotAlt: "Quadra · {title} · {device}",
+    groups: {
+      access: "Acesso",
+      overview: "Visão geral",
+      calendar: "Calendário",
+      reservations: "Reservas",
+      requests: "Solicitações",
+      events: "Eventos",
+      spaces: "Espaços",
+      people: "Pessoas",
+      analytics: "Análises",
+      admin: "Admin",
+      public: "Público",
+    },
+    captions: {
+      desktop: {
+        login: {
+          title: "Entrar",
+          caption:
+            "Uma conta de demonstração preenche o formulário. As linhas de quadra ao lado são a arte da marca, e o cartão mostra a semana da Quadra A.",
+        },
+        dashboard: {
+          title: "Visão geral",
+          caption:
+            "O que precisa de decisão, quanto cada espaço está ocupado na semana e os períodos de hoje, numa tela só.",
+        },
+        calendar: {
+          title: "Calendário",
+          caption:
+            "Todos os eventos numa grade de seis períodos por dia. Pedidos ainda em análise aparecem hachurados, e as aulas podem ser escondidas.",
+        },
+        drawer: {
+          title: "Detalhes do evento",
+          caption:
+            "O evento abre ao lado do calendário, com horário, espaço, organizador e vagas.",
+        },
+        reserve: {
+          title: "Pedindo um espaço",
+          caption:
+            "Escolha períodos livres na semana de um espaço e o formulário abre ao lado da grade.",
+        },
+        sent: {
+          title: "Pedido enviado",
+          caption:
+            "O pedido mostra as etapas e fica marcado como seu na grade até alguém decidir.",
+        },
+        requests: {
+          title: "Dois pedidos, um período",
+          caption:
+            "Quando dois grupos pedem o mesmo período, os pedidos aparecem lado a lado. Aprovar um recusa o outro, com uma nota explicando o motivo.",
+        },
+        event: {
+          title: "Página do evento",
+          caption:
+            "A reserva, o histórico de aprovação, quem se inscreveu e os detalhes, numa página só.",
+        },
+        new: {
+          title: "Novo evento",
+          caption:
+            "Seis passos curtos. Só dá para escolher espaços livres em todos os períodos marcados.",
+        },
+        spaces: {
+          title: "Espaços",
+          caption:
+            "Cada espaço com a capacidade, a ocupação da semana e o que vem a seguir.",
+        },
+        space: {
+          title: "A semana de um espaço",
+          caption: "Clicar num período leva direto para a reserva.",
+        },
+        checkin: {
+          title: "Check-in",
+          caption:
+            "A presença é marcada pela lista ou por uma leitura de ingresso simulada. Nenhuma câmera é usada.",
+        },
+        analytics: {
+          title: "Análises",
+          caption:
+            "Quando os espaços ficam mais cheios, inscritos contra presentes e quais grupos usam quais espaços. Todos os números são da demo.",
+        },
+        users: {
+          title: "Usuários e papéis",
+          caption:
+            "O que a pessoa é e o que ela pode fazer ficam separados. Ninguém muda o próprio papel.",
+        },
+        notes: {
+          title: "Notificações",
+          caption:
+            "Pedidos, decisões e mudanças, agrupados por dia, cada um levando ao que se refere.",
+        },
+        agenda: {
+          title: "Agenda pública",
+          caption:
+            "O que os visitantes veem sem entrar: um evento em destaque, filtros e uma lista por dia.",
+        },
+        pubevent: {
+          title: "Página pública do evento",
+          caption: "A inscrição é simulada e só muda esta página.",
+        },
+      },
+      mobile: {
+        login: {
+          title: "Entrar",
+          caption: "No celular, a arte da quadra vira um cabeçalho curto.",
+        },
+        dashboard: {
+          title: "Visão geral",
+          caption:
+            "Os cartões empilham, e as duas ações principais ficam no topo.",
+        },
+        calendar: {
+          title: "Calendário",
+          caption: "A semana vira uma lista por dia.",
+        },
+        reserve: {
+          title: "Reservas",
+          caption: "Um dia por vez, com uma faixa de dias para trocar.",
+        },
+        requests: {
+          title: "Solicitações",
+          caption:
+            "O pedido concorrente fica logo abaixo do que está sendo lido.",
+        },
+        checkin: {
+          title: "Check-in",
+          caption: "Linhas grandes e um botão por pessoa.",
+        },
+        analytics: {
+          title: "Análises",
+          caption: "Os gráficos viram uma coluna só.",
+        },
+        agenda: {
+          title: "Agenda pública",
+          caption: "A agenda mantém a tipografia grande no celular.",
+        },
+        pubevent: {
+          title: "Evento público",
+          caption:
+            "Data, horário, local e o botão de inscrição, na ordem de leitura.",
+        },
+      },
+    },
+  },
+  brief: {
+    heading: "O desafio",
+    lead: "Uma faculdade precisava de um lugar só para os seus eventos e para os espaços compartilhados onde eles acontecem. Cursos, grupos e atléticas reservam as mesmas quadras e salas, muitas vezes para a mesma noite. O sistema precisava:",
+    items: [
+      "deixar um grupo pedir um espaço numa data e período;",
+      "dar à equipe de eventos um jeito claro de aprovar ou recusar cada pedido;",
+      "mostrar todas as reservas num calendário só, sem reserva dupla;",
+      "separar quem a pessoa é do que ela tem permissão para fazer.",
+    ],
+    note: "A instituição real não é citada neste case. Nomes, grupos, espaços e números da demo foram inventados para ele.",
+  },
+  goals: {
+    heading: "Decisões de design",
+    items: [
+      "Uma grade de horários em todo lugar: seis períodos fixos por dia, iguais em todos os espaços, para que as reservas nunca se sobreponham por alguns minutos.",
+      "Toda reserva é um pedido, e todo pedido termina numa resposta que quem pediu consegue ler.",
+      "Mostrar o conflito antes da decisão, não depois.",
+      "Separar tipo e papel: um aluno pode ser administrador e um professor pode ser usuário comum.",
+      "Dar aos visitantes uma página própria. A agenda pública não pede conta.",
+    ],
+  },
+  done: {
+    heading: "Meu papel",
+    lead: "O projeto foi feito em equipe, com front-end, back-end e qualidade divididos entre nós dois.",
+    groups: [
+      {
+        title: "Eu · UI/UX design e desenvolvimento full-stack",
+        items: [
+          "Levantamento e interpretação dos requisitos.",
+          "Prototipagem e planejamento das interfaces.",
+          "Design de UI/UX e a experiência do usuário.",
+          "Responsabilidade principal pelo desenvolvimento do front-end.",
+          "Funcionalidades e regras de negócio no back-end.",
+          "Integração com o banco de dados.",
+          "Integração entre front-end e back-end.",
+          "Testes, depuração e correção de bugs.",
+          "Participação na arquitetura e na evolução do sistema.",
+        ],
+      },
+      {
+        title: "Rafael · desenvolvimento back-end e qualidade de software",
+        items: [
+          "Responsabilidade principal pelo back-end.",
+          "Funcionalidades e regras de negócio.",
+          "Integração com o banco de dados.",
+          "Desenvolvimento e execução de testes, QA e validação das funcionalidades.",
+          "Investigação e correção de bugs.",
+          "Workflows no GitHub Actions, automação de testes e integração contínua.",
+          "Colaboração na integração entre front-end e back-end.",
+        ],
+      },
+      {
+        title: "Juntos",
+        items: [
+          "Nós dois participamos do planejamento, das decisões técnicas, das funcionalidades, das regras de negócio, do banco de dados e da resolução de problemas.",
+          "A divisão mostra onde cada um teve mais responsabilidade, não quem fez algo sozinho.",
+        ],
+      },
+    ],
+  },
+  brand: {
+    heading: "A identidade",
+    lead: "Quadra é uma marca criada para este case. O nome vem da quadra esportiva, e a identidade sai de duas coisas em que o sistema se apoia: a quadra e a grade do calendário.",
+    cover:
+      "O símbolo é uma semana em quatro células: três reservadas, uma livre. Azul quadra, preto e lima sobre giz, com Schibsted Grotesk e Geist Mono.",
+    coverAlt:
+      "Identidade Quadra: o símbolo 2×2, o logotipo, quatro cores, a tipografia e os cinco estados da célula",
+    boards: {
+      slots: {
+        title: "A célula",
+        spec: "Uma célula pequena leva o estado de cada período por todas as telas",
+      },
+      spaces: {
+        title: "Plantas dos espaços",
+        spec: "Cada espaço é desenhado como uma planta em linha, no lugar de uma foto",
+      },
+      covers: {
+        title: "Capas por categoria",
+        spec: "Um padrão para cada tipo de evento",
+      },
+    },
+  },
+  tech: {
+    heading: "Engenharia",
+    lead: "As cinco primeiras linhas são do sistema original. A demo deste case é uma versão separada, só de front-end, feita para o portfólio, sem servidor e sem contas reais.",
+    rows: [
+      {
+        term: "Sistema original",
+        value:
+          "PHP 8.3, Laravel 11, TypeScript, React e Tailwind CSS · API REST · MVC",
+      },
+      {
+        term: "Banco de dados",
+        value: "MySQL 8.4, Eloquent ORM, migrations, seeders e transactions",
+      },
+      {
+        term: "Testes e CI",
+        value:
+          "Pest, PHPUnit, Playwright, PHPStan, Laravel Pint, GitHub Actions e Docker",
+      },
+      {
+        term: "Segurança e autenticação",
+        value:
+          "Laravel Sanctum, controle de acesso por papel (RBAC), verificação em duas etapas (2FA), proteção contra CSRF, rate limiting e hash de senhas",
+      },
+      {
+        term: "Deploy e infraestrutura",
+        value:
+          "Docker, Docker Compose, Nginx, GitHub Actions (CI/CD), AWS EC2, AWS RDS (MySQL), Amazon S3, Cloudflare (DNS/CDN) e HTTPS/TLS",
+      },
+      {
+        term: "Demo",
+        value: "HTML, CSS e JavaScript, sem build e sem dependências",
+      },
+      {
+        term: "Dados da demo",
+        value:
+          "Gerados a partir de uma semente fixa, então toda visita abre na mesma semana",
+      },
+      {
+        term: "Estado da demo",
+        value:
+          "Cada ação fica numa lista curta na página aberta e é refeita sobre os dados fixos. Recarregar ou um botão recomeça; nada fica guardado no navegador.",
+      },
+      {
+        term: "Tipografia e ícones",
+        value: "Schibsted Grotesk, Geist Mono e Tabler Icons",
+      },
+    ],
+  },
+  reimagined: {
+    heading: "Reimaginação",
+    lead: "A Quadra mantém o núcleo do sistema original e acrescenta ideias que viriam a seguir. Neste case, as duas coisas ficam separadas:",
+    original: {
+      title: "Do sistema original",
+      items: [
+        "eventos e os espaços que eles usam;",
+        "reserva por data e período, incluindo os períodos da noite;",
+        "pedidos que aguardam aprovação;",
+        "tipos de usuário e papéis.",
+      ],
+    },
+    concepts: {
+      title: "Conceitos para o portfólio",
+      items: [
+        "a identidade Quadra e o design de todas as telas;",
+        "a visão lado a lado de pedidos concorrentes;",
+        "check-in com leitura de ingresso simulada;",
+        "análises feitas com dados da demo;",
+        "inscrição e lista de espera na agenda pública.",
+      ],
+    },
+  },
+  result: {
+    heading: "O que a demo mostra",
+    lead: "O case acompanha o sistema pelos dois lados: quem pede um espaço e quem decide. Na demo dá para:",
+    items: [
+      "pedir um período e acompanhar até a decisão;",
+      "aprovar um de dois pedidos concorrentes e ver o calendário atualizar;",
+      "criar um evento em seis passos;",
+      "navegar pela agenda pública e se inscrever num evento.",
     ],
   },
   cta: "Tem um projeto assim? Escreva para",

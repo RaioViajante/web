@@ -3,7 +3,7 @@ import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 // @ts-expect-error -- plain ESM build script, no type declarations
 import * as script from "../scripts/project-icons.mjs";
-import { projectArt, projectIcons } from "../components/projects";
+import { projectIcons } from "../components/projects";
 
 const { all, derive, derivatives, sourceOf, targetOf } = script as {
   all: string[];
@@ -21,11 +21,10 @@ const pixels = async (input: string | Buffer) =>
 
 describe("project icons", () => {
   it("declare the committed derivatives' real dimensions", async () => {
-    const declared = {
-      ...projectIcons,
-      "refrain-sticker": projectArt.refrainSticker,
-      "mochifile-wordmark": projectArt.mochifileWordmark,
-    } as Record<string, { width: number; height: number }>;
+    const declared = projectIcons as Record<
+      string,
+      { width: number; height: number }
+    >;
     expect(Object.keys(declared).sort()).toEqual([...all].sort());
     for (const name of all) {
       const meta = await sharp(targetOf(name)).metadata();

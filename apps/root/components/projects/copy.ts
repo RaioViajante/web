@@ -1,6 +1,7 @@
 import { DEFAULT_LOCALE, type LocaleId } from "../../../../site/locales";
-import { ptProjectsCopy, ptStuccoCopy } from "../../lib/pt";
+import { ptProjectsCopy, ptQuadraCopy, ptStuccoCopy } from "../../lib/pt";
 import { projectsCopy, type ProjectsCopy } from "../../lib/projects";
+import { quadraCopy, type QuadraCopy } from "../../lib/quadra";
 import { stuccoCopy, type StuccoCopy } from "../../lib/stucco";
 
 /** The projects copy of a locale: English from lib/projects.ts, Portuguese from lib/pt.ts. */
@@ -11,4 +12,9 @@ export function projectsCopyFor(locale: LocaleId): ProjectsCopy {
 /** The Stucco. case page's copy in a locale. */
 export function stuccoCopyFor(locale: LocaleId): StuccoCopy {
   return locale === DEFAULT_LOCALE ? stuccoCopy : ptStuccoCopy;
+}
+
+/** The Quadra case page's copy in a locale. */
+export function quadraCopyFor(locale: LocaleId): QuadraCopy {
+  return locale === DEFAULT_LOCALE ? quadraCopy : ptQuadraCopy;
 }

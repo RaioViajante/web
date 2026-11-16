@@ -12,9 +12,9 @@ import { routes } from "../../lib/routes";
 import type { StuccoCopy, StuccoPiece } from "../../lib/stucco";
 import { AllProjectsBack } from "./catalog";
 import { Email } from "./cards";
+import { CaseDemo } from "./CaseDemo";
+import { CaseTour } from "./CaseTour";
 import { StuccoBrandPiece } from "./StuccoBrandPiece";
-import { StuccoDemo } from "./StuccoDemo";
-import { StuccoTour } from "./StuccoTour";
 import "@raioviajante/design/project-art.css";
 import "./pages.css";
 import "./stucco-case.css";
@@ -91,10 +91,12 @@ export function StuccoCase({ locale }: { locale: LocaleId }) {
         <p className="sc-sub">{copy.intro}</p>
         <p className="sc-note-top">{copy.note}</p>
         <div className="sc-act">
-          <StuccoDemo
+          <CaseDemo
             text={copy.demo}
+            demo="/work/stucco/"
             devices={{ desktop: tour.desktop, mobile: tour.mobile }}
             deviceLabel={tour.device}
+            escapeGuard=".menu-open"
           />
           <span className="sc-note">{copy.demo.hint}</span>
         </div>
@@ -107,7 +109,7 @@ export function StuccoCase({ locale }: { locale: LocaleId }) {
           </div>
         ))}
       </dl>
-      <StuccoTour text={tour} tour={stuccoTour} />
+      <CaseTour text={tour} tour={stuccoTour} demo="/work/stucco/" />
       <Section id="sc-brief" number="02" heading={copy.brief.heading}>
         <p className="sc-p">{copy.brief.lead}</p>
         <ul className="sc-ul">
