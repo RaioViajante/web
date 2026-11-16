@@ -8,7 +8,7 @@ for (const site of ["root", "dump"] as const) {
   test(`${site} keeps a monospace fallback when the font cannot load`, async ({
     page,
   }) => {
-    await page.route(/\.woff2(\?|$)/, (route) => route.abort());
+    await page.route(/\.woff2?(\?|$)/, (route) => route.abort());
     await page.goto(base(site) + "/");
     const widths = await page.evaluate(() => {
       const probe = (text: string) => {

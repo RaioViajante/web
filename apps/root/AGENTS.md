@@ -8,15 +8,16 @@ the root `AGENTS.md`.
 This app serves raioviajante.com: the personal internet home and index of the
 RaioViajante ecosystem. It is not a portfolio, résumé, developer sales page, or
 SaaS landing page, but it does show the owner's work: personal projects and, as
-written-up cases, client work.
+written-up cases, client work and academic projects.
 
 Its routes are `/`, `/about`, `/projects`, `/projects/all`, `/projects/stucco`,
-`/contact`, `/gallery`, `/this-site`, `/setup`, `/search`, `/privacy`, and
-`/terms`, plus a partial Portuguese tree (`/pt`, `/pt/about`, `/pt/projects`,
-`/pt/projects/all`, `/pt/projects/stucco`, `/pt/contact`, `/pt/gallery`,
-`/pt/this-site`, `/pt/setup`, `/pt/terms`, `/pt/privacy`, `/pt/search`,
-`/pt/search-index.json`) declared in `lib/routes.ts`, and the static demo
-`/work/stucco/` served from `public/` (noindex, outside the sitemap and search);
+`/projects/quadra`, `/contact`, `/gallery`, `/this-site`, `/setup`, `/search`,
+`/privacy`, and `/terms`, plus a partial Portuguese tree (`/pt`, `/pt/about`,
+`/pt/projects`, `/pt/projects/all`, `/pt/projects/stucco`,
+`/pt/projects/quadra`, `/pt/contact`, `/pt/gallery`, `/pt/this-site`,
+`/pt/setup`, `/pt/terms`, `/pt/privacy`, `/pt/search`, `/pt/search-index.json`)
+declared in `lib/routes.ts`, and the static demos `/work/stucco/` and
+`/work/quadra/` served from `public/` (noindex, outside the sitemap and search);
 see `docs/architecture.md`. dump, docs, and lab are separate
 apps with their own domains; link to their full URLs and never implement them as
 routes here.
@@ -41,9 +42,11 @@ routes here.
   It is an untracked historical reference; where a local copy exists, treat it
   as read-only and never build inside it.
 - Beyond the repository-wide design restraint, avoid skill bars, call-to-action
-  sections, language logos, fake terminal chrome, and large animations. Client
-  cases may frame their screenshots in browser and phone chrome and animate
-  their demo layer (see the repository-wide client-case exceptions). The
+  sections, language logos, fake terminal chrome, and large animations. The
+  About page's closing invitation to Contact is the one approved
+  call-to-action card. Cases may frame their screenshots in browser and phone
+  chrome and animate their demo layer (see the repository-wide case
+  exceptions). The
   gallery is the other owner-approved exception: its stickers burst out of the
   cover and gather back into it, and its Personal artwork pops in on scroll,
   each with its own voice; under reduced motion nothing animates and only the

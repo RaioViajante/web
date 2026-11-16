@@ -278,8 +278,8 @@ function MorrowferrySketch() {
 const featured = new Set<ProjectId>(["mochifile", "ordelis", "orbit"]);
 
 /**
- * Any project's art, by id: on a card (home and /projects) or on a catalog
- * tile. Only Refrain's differs between the two.
+ * Any project's art, by id: on a catalog tile, or on a card of /projects
+ * (Refrain's is the only one that differs between the two).
  */
 export function MiniSketch({
   id,

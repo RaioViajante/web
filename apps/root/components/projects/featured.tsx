@@ -15,6 +15,7 @@ import {
 import { routes } from "../../lib/routes";
 import { CaseCard, Email } from "./cards";
 import { projectsCopyFor } from "./copy";
+import { MiniSketch } from "./catalog-minis";
 import { MoreProjects } from "./MoreProjects";
 import { projectCards } from "./project-cards";
 import { QuadraArt } from "./QuadraArt";
@@ -37,7 +38,9 @@ export function ProjectsBody({ locale }: { locale: LocaleId }) {
         <p className="pj-lead">{copy.page.lead}</p>
         <MoreProjects
           first={projectCards(locale, featuredProjects)}
-          rest={projectCards(locale, others)}
+          rest={projectCards(locale, others, (project, art, intlLocale) => (
+            <MiniSketch id={project.id} copy={art} intlLocale={intlLocale} />
+          ))}
           more={copy.page.more.replace("{n}", String(others.length))}
           less={copy.page.less}
         />

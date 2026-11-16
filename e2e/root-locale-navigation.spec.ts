@@ -67,26 +67,34 @@ test("Root offers no invented translations and links only active Portuguese host
   await expect(page.locator("#projects-heading")).toContainText(
     "Meus projetos",
   );
+  await expect(page.locator("#orbit")).toContainText(
+    "back-end / execuções de jobs",
+  );
   await expect(
-    page.locator('a.pj-home-card[href="/pt/projects#orbit"]'),
-  ).toContainText("execuções de jobs e seus estados");
+    page.locator("#orbit").getByRole("link", { name: /Testar o experimento/ }),
+  ).toHaveAttribute(
+    "href",
+    "https://lab.raioviajante.com/pt/experiments/estados-de-execucao/",
+  );
   await page.goto(`${base("root")}/pt/contact`);
   await expectLang(page, "pt-BR");
   await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/contact");
   await expect(
-    page.getByRole("heading", { name: "Vamos conversar" }),
+    page.getByRole("heading", { level: 1, name: "Oi, aqui é o Bryan." }),
   ).toBeVisible();
   await page.goto(`${base("root")}/pt/about`);
   await expect(page.locator(".rv-lang a")).toHaveAttribute("href", "/about");
-  await expect(
-    page.locator('main a[href="https://dump.raioviajante.com/pt"]'),
-  ).toHaveAttribute("hreflang", "pt-BR");
-  await expect(
-    page.locator('main a[href="https://docs.raioviajante.com/pt/"]'),
-  ).toHaveAttribute("hreflang", "pt-BR");
-  await expect(
-    page.locator('main a[href="https://lab.raioviajante.com/pt/"]'),
-  ).toHaveAttribute("hreflang", "pt-BR");
+  // About links each sister home more than once (a row and a place).
+  for (const home of [
+    "https://dump.raioviajante.com/pt",
+    "https://docs.raioviajante.com/pt/",
+    "https://lab.raioviajante.com/pt/",
+  ]) {
+    const links = page.locator(`main a[href="${home}"]`);
+    await expect(links.first()).toBeAttached();
+    for (const link of await links.all())
+      await expect(link).toHaveAttribute("hreflang", "pt-BR");
+  }
   const footer = page.locator("footer nav:first-of-type a");
   await expect(footer.nth(0)).toHaveAttribute(
     "href",

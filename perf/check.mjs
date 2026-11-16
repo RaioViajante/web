@@ -42,11 +42,18 @@ for (const page of pages) {
     problems.push(`${at}: request to a non-local origin: ${url}`);
   for (const f of w.failures)
     problems.push(`${at}: failed first-party request ${f}`);
-  const fontFiles = new Set(w.fonts);
-  if (w.fonts.length !== fontFiles.size)
+  if (w.fonts.length !== new Set(w.fonts).size)
     problems.push(
       `${at}: a font file was downloaded more than once: ${w.fonts.join(", ")}`,
     );
+  // Typefaces drawn only inside a project's art (budgets.artFonts) load with
+  // that art, unpreloaded; they still count toward the font weight. The one
+  // interface font is the rest.
+  const artFont = (file) =>
+    (budgets.artFonts ?? []).some((stem) =>
+      file.split("/").at(-1).startsWith(`${stem}.`),
+    );
+  const fontFiles = new Set(w.fonts.filter((file) => !artFont(file)));
   if (fontFiles.size !== 1)
     problems.push(
       `${at}: expected one self-hosted font file, found ${fontFiles.size} (${[...fontFiles].join(", ")})`,
