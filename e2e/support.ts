@@ -105,12 +105,16 @@ export function watchHealth(page: Page, expectedMissing?: string) {
  * is then cleared; nothing re-animates until the next navigation. Clearing it
  * restarts CSS animations that reduced motion had switched off (a dialog
  * opening), so finite animations are awaited too; endless loops are left alone.
+ * Typed titles do not restart: reduced motion marks them done.
  */
 export async function settleMotion(page: Page) {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.waitForFunction(
     () =>
       !document.querySelector("[data-motion-state]") &&
+      // Typed titles are done once reduced motion is on (typed.ts), so
+      // clearing the emulation below does not type them again.
+      !document.querySelector(".rv-typed:not([data-typed])") &&
       document
         .getAnimations()
         .every(

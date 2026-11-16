@@ -33,6 +33,12 @@
       rv-caret 1.9s linear both;
     animation-delay: calc(120ms + var(--rv-i) * var(--rv-type-step));
   }
+
+  /* A title types once (typed.ts marks it done): restyling, or switching
+     reduced motion off again, never replays it. */
+  .rv-typed[data-typed="done"] > [class^="rv-c"] {
+    animation: none;
+  }
 }
 
 @keyframes rv-type {
