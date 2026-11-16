@@ -1,17 +1,16 @@
-// The small sketches of the four featured projects (home page and catalog).
-// Server-rendered and decorative (each card names and describes its project
-// in text). Animated only by CSS, only while the card is hovered or focused,
-// and still under reduced motion. No inline styles: Root's CSP blocks style
-// attributes, so positions and timings live in minis.css.
+// The small sketches of Mochifile, Ordelis and Orbit (home, /projects and the
+// catalog); Refrain draws its own art (RefrainArt.tsx). Server-rendered and
+// decorative (each card names and describes its project in text). Animated
+// only by CSS, only while the card is hovered or focused, and still under
+// reduced motion. No inline styles: Root's CSP blocks style attributes, so
+// positions and timings live in minis.css.
 
-import { projectIcons } from "@raioviajante/design/projects";
 import type { ProjectArtCopy } from "../../lib/projects";
 import {
   formatSize,
   mochifileOriginal,
   mochifileResult,
 } from "../../lib/sketch-demos";
-import { hatchCircle, roughEllipse, roughLine } from "../../lib/sketch";
 import "@raioviajante/design/project-art.css";
 import "./minis.css";
 
@@ -109,50 +108,6 @@ function OrdelisMini({ copy }: { copy: ProjectArtCopy }) {
   );
 }
 
-/** The record: rough grooves around a hatched label. */
-export function Disc({ className }: { className: string }) {
-  return (
-    <svg className={className} viewBox="-112 -112 224 224" aria-hidden="true">
-      <circle className="sk-paper" r="106" />
-      <path d={roughEllipse(0, 0, 104, 104, 11, 0.012)} />
-      <path className="is-thin" d={roughEllipse(0, 0, 84, 84, 12, 0.015)} />
-      <path className="is-thin" d={roughEllipse(0, 0, 66, 66, 13, 0.02)} />
-      <path d={roughEllipse(0, 0, 44, 44, 14, 0.03)} />
-      <path className="is-thin" d={hatchCircle(42, 6, 15)} />
-      <circle className="sk-ink" r="3" />
-    </svg>
-  );
-}
-
-function RefrainMini({ copy }: { copy: ProjectArtCopy }) {
-  return (
-    <>
-      <svg
-        className="mn-rf__lines"
-        viewBox="0 0 300 40"
-        preserveAspectRatio="none"
-      >
-        <path d={roughLine(0, 4, 296, 3, 21, 1.6)} />
-        <path d={roughLine(0, 18, 220, 19, 22, 1.4)} />
-        <path d={roughLine(0, 32, 260, 31, 23, 1.6)} />
-      </svg>
-      <span className="mn-rf__tag">{copy.refrain.tagline}</span>
-      <span className="mn-rf__sticker">
-        {/* eslint-disable-next-line @next/next/no-img-element -- fixed derivative */}
-        <img
-          src={projectIcons.refrain.src}
-          alt=""
-          width={46}
-          height={46}
-          loading="lazy"
-          decoding="async"
-        />
-      </span>
-      <Disc className="mn-rf__disc" />
-    </>
-  );
-}
-
 function OrbitMini({ copy }: { copy: ProjectArtCopy }) {
   const { orbit } = copy;
   return (
@@ -188,9 +143,9 @@ function OrbitMini({ copy }: { copy: ProjectArtCopy }) {
   );
 }
 
-export type FeaturedId = "mochifile" | "ordelis" | "refrain" | "orbit";
+export type FeaturedId = "mochifile" | "ordelis" | "orbit";
 
-/** The small sketch of a featured project. */
+/** The small sketch of Mochifile, Ordelis or Orbit. */
 export function FeaturedMini({
   id,
   copy,
@@ -206,8 +161,6 @@ export function FeaturedMini({
         <MochifileMini copy={copy} intlLocale={intlLocale} />
       ) : id === "ordelis" ? (
         <OrdelisMini copy={copy} />
-      ) : id === "refrain" ? (
-        <RefrainMini copy={copy} />
       ) : (
         <OrbitMini copy={copy} />
       )}

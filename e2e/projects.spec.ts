@@ -2,9 +2,9 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { base, isolate, settleMotion, watchHealth } from "./support";
 
-// Root's projects pages: the four interactive sketches on /projects, the
-// catalog filter on /projects/all, the home cards, and the rule that nothing
-// links to a page that does not exist. Every sitemap page is also audited by
+// Root's projects pages: the cards and "show more" on /projects, the cases,
+// the catalog filter on /projects/all, the home cards, and the rule that
+// nothing links to a page that does not exist. Every sitemap page is also audited by
 // pages.spec.ts; these tests cover the states only interaction reaches.
 
 async function open(page: Page, path: string) {
@@ -32,92 +32,61 @@ async function axe(page: Page) {
 }
 
 for (const width of [1440, 390, 360]) {
-  test(`/projects sketches work by keyboard and pointer at ${width}px`, async ({
+  test(`/projects shows four cards, the rest on demand, and the cases at ${width}px`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 900 });
     const { health } = await open(page, "/projects");
-    await expect(page.locator("main .pj-list article.pj-card")).toHaveCount(4);
-    for (const name of ["Mochifile", "Ordelis", "Refrain", "Orbit"])
+    const cards = page.locator("main .pj-pks article.pj-pk:visible");
+    const first = ["Mochifile", "Ordelis", "Refrain", "Orbit"];
+    const rest = ["yanawa", "Sweep", "Hum", "Morrowferry"];
+    // Four projects up front; the cases' cards follow in their own grid.
+    await expect(
+      page.locator("#my-projects-heading ~ .pj-pks article:visible"),
+    ).toHaveCount(4);
+    for (const name of first)
       await expect(
         page.getByRole("heading", { level: 3, name, exact: true }),
       ).toBeVisible();
-
-    // Mochifile: a target size changes the example result, which stays under it.
-    const mochifile = page.getByRole("group", { name: /^Mochifile sketch/ });
-    await expect(mochifile).toContainText("192 KB · under 200 KB");
-    const target = mochifile.getByRole("button", { name: "500 KB" });
-    await target.focus();
-    await page.keyboard.press("Enter");
-    await expect(target).toHaveAttribute("aria-pressed", "true");
-    await expect(mochifile).toContainText("480 KB · under 500 KB");
-    await expect(mochifile).toContainText("example values");
-    // The design's other two tabs: visual only, and said to be coming soon.
-    await expect(mochifile).not.toContainText("coming soon");
-    await mochifile.getByRole("button", { name: "Convert" }).click();
-    await mochifile.getByRole("button", { name: "PNG" }).click();
-    await expect(mochifile).toContainText("photo.png");
-    await expect(mochifile.locator(".mo-badge")).toHaveText("+105%");
-    await expect(mochifile).toContainText(
-      "coming soon to Mochifile · example values",
+    for (const name of rest)
+      await expect(
+        page.getByRole("heading", { level: 3, name, exact: true }),
+      ).toBeHidden();
+    // Every card says its status in words, over its art.
+    await expect(page.locator("#mochifile .pj-pk__status")).toHaveText(
+      "pre-launch",
     );
-    await expect(mochifile.locator(".mo-meta[aria-live]")).toContainText(
-      "coming soon to Mochifile",
-    );
-    await mochifile.getByRole("button", { name: "Resize" }).click();
-    await mochifile.getByRole("button", { name: "1080" }).click();
-    await expect(mochifile).toContainText("410 KB · 1080 × 810");
-    await expect(mochifile.locator(".mo-frame")).toBeVisible();
-    await mochifile.getByRole("button", { name: "Compress" }).click();
-    await expect(mochifile).toContainText("480 KB · under 500 KB");
-
-    // Ordelis: the planned review step answers both decisions.
-    const ordelis = page.getByRole("group", { name: /^Ordelis sketch/ });
-    await expect(ordelis).toContainText("planned workflow");
-    await ordelis.getByRole("button", { name: "Approve" }).click();
-    await expect(ordelis).toContainText("Approved by you. Ready to merge.");
-    await ordelis.getByRole("button", { name: "Request changes" }).click();
-    await expect(ordelis).toContainText("Sent back with your notes.");
-
-    // Refrain: the record plays and stops; its name follows its visible label.
-    const record = page.getByRole("button", { name: "play the record" });
-    await record.click();
-    await expect(
-      page.getByRole("button", { name: "stop the record" }),
-    ).toBeVisible();
-    await expect(page.locator(".sk--refrain")).toHaveAttribute(
-      "data-playing",
+    await expect(page.locator("#refrain .rf3")).toHaveAttribute(
+      "aria-hidden",
       "true",
     );
-    await page.getByRole("button", { name: "stop the record" }).click();
-    await expect(page.locator(".sk--refrain")).not.toHaveAttribute(
-      "data-playing",
-      /.*/,
-    );
 
-    // Orbit: queue and cancel follow Orbit's rules, simulated in the browser.
-    const orbit = page.getByRole("group", { name: /^Orbit sketch/ });
-    await expect(orbit).toContainText("simulated in your browser");
-    await orbit.getByRole("button", { name: "Queue a job" }).click();
-    await expect(
-      orbit.getByRole("list", { name: "State changes" }),
-    ).toContainText("queued");
-    const cancel = orbit.getByRole("button", { name: "Cancel" });
-    await expect(cancel).toHaveAttribute("aria-disabled", "false");
-    await cancel.focus();
+    // The other four appear in place, and the button says what it does.
+    const more = page.getByRole("button", { name: "Show 4 more projects" });
+    await expect(more).toHaveAttribute("aria-expanded", "false");
+    await more.focus();
     await page.keyboard.press("Enter");
-    await expect(
-      orbit.getByRole("list", { name: "State changes" }),
-    ).toContainText("cancelled");
-    // Focus stays on Cancel even when nothing is left to cancel.
-    await expect(cancel).toBeFocused();
-
-    // Client work: the published case, the next slot, and no route that does
-    // not exist. The demo itself is only reachable from the case page.
-    await expect(page.locator("#stucco h3")).toHaveText("Stucco.");
-    await expect(page.locator("main .pj-empty")).toContainText(
-      "Case coming soon",
+    const fewer = page.getByRole("button", { name: "Show fewer projects" });
+    await expect(fewer).toHaveAttribute("aria-expanded", "true");
+    await expect(fewer).toBeFocused();
+    for (const name of rest)
+      await expect(
+        page.getByRole("heading", { level: 3, name, exact: true }),
+      ).toBeVisible();
+    await expect(page.locator("#morrowferry")).toContainText(
+      "no public link yet",
     );
+    await expect(cards).toHaveCount(10);
+    await fewer.click();
+    await expect(more).toHaveAttribute("aria-expanded", "false");
+
+    // Cases: both published, each linking only to its page. The demos are
+    // only reachable from the case pages.
+    await expect(page.locator("#stucco h3")).toHaveText("Stucco.");
+    await expect(page.locator("#quadra h3")).toHaveText("Quadra");
+    await expect(
+      page.getByRole("link", { name: /^Read the case\s*: Quadra$/ }),
+    ).toHaveAttribute("href", "/projects/quadra");
     await expect(page.locator('main a[href*="/work/"]')).toHaveCount(0);
     await expect(page.locator('a[href*="/projects/clients"]')).toHaveCount(0);
 
@@ -238,11 +207,17 @@ test("projects pages link only to real pages and public destinations", async ({
 }) => {
   await open(page, "/");
   for (const id of ["mochifile", "ordelis", "refrain", "orbit"])
-    await expect(
-      page.locator(`a.pj-home-card[href="/projects#${id}"]`),
-    ).toHaveCount(1);
-  await page.locator('a.pj-home-card[href="/projects#orbit"]').click();
-  await expect(page).toHaveURL(/\/projects#orbit$/);
+    await expect(page.locator(`main article.pj-pk#${id}`)).toHaveCount(1);
+  await expect(
+    page.locator("#orbit").getByRole("link", { name: /Try the experiment/ }),
+  ).toHaveAttribute(
+    "href",
+    "https://lab.raioviajante.com/experiments/execution-states/",
+  );
+  await page
+    .getByRole("link", { name: /All projects, including client work/ })
+    .click();
+  await expect(page).toHaveURL(/\/projects$/);
   await page.getByRole("link", { name: /View all projects/ }).click();
   await expect(page).toHaveURL(/\/projects\/all$/);
   await page.getByRole("link", { name: /02\. Projects/ }).click();
@@ -251,10 +226,16 @@ test("projects pages link only to real pages and public destinations", async ({
   for (const path of [
     "/projects",
     "/projects/all",
+    "/projects/quadra",
     "/pt/projects",
     "/pt/projects/all",
+    "/pt/projects/quadra",
     "/",
     "/pt",
+    "/about",
+    "/pt/about",
+    "/contact",
+    "/pt/contact",
   ]) {
     await page.goto(base("root") + path);
     const hrefs = await page

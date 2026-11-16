@@ -1,0 +1,63 @@
+/*
+ * The Refrain card art's own typefaces and textures (Root's projects pages
+ * and home). The four typefaces are the app's own, cut down to the
+ * characters the art draws by scripts/refrain-art.mjs, and appear nowhere
+ * else, as Stucco's Barlow appears only in its card. Loaded only by the pages
+ * that show the art; a face downloads only when the art is drawn.
+ */
+
+@font-face {
+  font-family: "Refrain Archivo";
+  src: url("../assets/projects/refrain/fonts/archivo-800.woff") format("woff");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Refrain Serif";
+  src: url("../assets/projects/refrain/fonts/instrument-serif.woff")
+    format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Refrain Serif";
+  src: url("../assets/projects/refrain/fonts/instrument-serif-italic.woff")
+    format("woff");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Refrain Pixel";
+  src: url("../assets/projects/refrain/fonts/silkscreen.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Refrain Hand";
+  src: url("../assets/projects/refrain/fonts/la-belle-aurore.woff")
+    format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.rf-paper {
+  background-color: var(--refrain-paper);
+  background-image: url("../assets/projects/refrain/paper.webp");
+  background-repeat: repeat;
+  background-blend-mode: multiply;
+}
+
+.rf-navy {
+  background-color: var(--refrain-navy);
+  background-image: url("../assets/projects/refrain/navy.webp");
+  background-repeat: repeat;
+}

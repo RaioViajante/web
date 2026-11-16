@@ -1,0 +1,128 @@
+/*
+ * Page titles type themselves once when a page appears (TypedTitle in
+ * components/typed-title.tsx): in at most twenty steps of 45ms (a character
+ * each, or a few on a long title), then a block caret blinks beside the last
+ * character and goes. Only opacity and a shadow change, so nothing moves,
+ * reflows or widens the page. Under reduced motion, and in print, the title
+ * is simply there.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .rv-typed > [class^="rv-c"] {
+    animation: rv-type 1ms steps(1) both;
+    animation-delay: calc(120ms + var(--rv-i) * 45ms);
+  }
+
+  /* The caret is the last character's shadow: drawn beside it, it takes no
+     room and never widens the page, even when the title fills the line. */
+  .rv-typed > [class^="rv-c"]:last-of-type {
+    animation:
+      rv-type 1ms steps(1) both,
+      rv-caret 1.9s linear both;
+    animation-delay: calc(120ms + var(--rv-i) * 45ms);
+  }
+
+  /* A title types once (typed.ts marks it done): restyling, or switching
+     reduced motion off again, never replays it. */
+  .rv-typed[data-typed="done"] > [class^="rv-c"] {
+    animation: none;
+  }
+}
+
+@keyframes rv-type {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rv-caret {
+  0%,
+  20%,
+  40%,
+  60%,
+  80%,
+  100% {
+    box-shadow: 0.62em 0 0 -0.12em transparent;
+  }
+  10%,
+  30%,
+  50%,
+  70% {
+    box-shadow: 0.62em 0 0 -0.12em currentColor;
+  }
+}
+
+@media print {
+  .rv-typed > [class^="rv-c"] {
+    opacity: 1;
+    animation: none;
+  }
+  .rv-typed > [class^="rv-c"]:last-of-type {
+    box-shadow: none;
+  }
+}
+
+/* Each step's place in the title. */
+.rv-c0 {
+  --rv-i: 0;
+}
+.rv-c1 {
+  --rv-i: 1;
+}
+.rv-c2 {
+  --rv-i: 2;
+}
+.rv-c3 {
+  --rv-i: 3;
+}
+.rv-c4 {
+  --rv-i: 4;
+}
+.rv-c5 {
+  --rv-i: 5;
+}
+.rv-c6 {
+  --rv-i: 6;
+}
+.rv-c7 {
+  --rv-i: 7;
+}
+.rv-c8 {
+  --rv-i: 8;
+}
+.rv-c9 {
+  --rv-i: 9;
+}
+.rv-c10 {
+  --rv-i: 10;
+}
+.rv-c11 {
+  --rv-i: 11;
+}
+.rv-c12 {
+  --rv-i: 12;
+}
+.rv-c13 {
+  --rv-i: 13;
+}
+.rv-c14 {
+  --rv-i: 14;
+}
+.rv-c15 {
+  --rv-i: 15;
+}
+.rv-c16 {
+  --rv-i: 16;
+}
+.rv-c17 {
+  --rv-i: 17;
+}
+.rv-c18 {
+  --rv-i: 18;
+}
+.rv-c19 {
+  --rv-i: 19;
+}

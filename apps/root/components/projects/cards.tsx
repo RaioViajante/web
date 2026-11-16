@@ -1,54 +1,50 @@
 import type { ReactNode } from "react";
 import type { LocaleId } from "../../../../site/locales";
 import { CONTACT } from "../../../../site/sites";
-import type { ClientCase, Project, ProjectsCopy } from "../../lib/projects";
+import type { Case, Project, ProjectsCopy } from "../../lib/projects";
 import { routes } from "../../lib/routes";
 import { pad, ProjectAction, ProjectIcon, StatusMark } from "./parts";
 import "./cards.css";
 import "./pages.css";
 
-/** A project on /projects: its interactive sketch above name, kind, status, description and link. */
-export function FeaturedProject({
+/**
+ * A project on /projects and the home page: its art with the status over it,
+ * then name, kind, a short description and where to see it.
+ */
+export function ProjectCard({
   project,
-  index,
-  total,
   locale,
   copy,
   sketch,
 }: {
   project: Project;
-  index: number;
-  total: number;
   locale: LocaleId;
   copy: ProjectsCopy;
   sketch: ReactNode;
 }) {
   const text = copy.projects[project.id];
-  const heading = `pj-${project.id}`;
+  const heading = `pk-${project.id}`;
   return (
     <article
-      className="pj-card"
+      className="pj-pk"
       id={project.id}
       aria-labelledby={heading}
       data-motion="card"
     >
-      <div className="pj-card__art">
-        <span className="pj-card__number" aria-hidden="true">
-          {pad(index + 1)} / {pad(total)}
-        </span>
-        {sketch}
-      </div>
-      <div className="pj-card__body">
-        <div className="pj-card__head">
-          <ProjectIcon project={project} size={42} className="pj-card__icon" />
-          <div className="pj-card__title">
+      <span className="pj-pk__art pj-art">{sketch}</span>
+      <div className="pj-pk__body">
+        <div className="pj-pk__head">
+          <ProjectIcon project={project} size={34} className="pj-pk__icon" />
+          <div className="pj-pk__title">
             <h3 id={heading}>{project.name}</h3>
-            <span className="pj-card__meta">{text.meta}</span>
+            <span className="pj-pk__meta">{text.meta}</span>
           </div>
-          <StatusMark stage={project.stage}>{text.status}</StatusMark>
         </div>
-        <p className="pj-card__description">{text.description}</p>
-        <div className="pj-card__foot">
+        <StatusMark stage={project.stage} className="pj-status pj-pk__status">
+          {text.status}
+        </StatusMark>
+        <p className="pj-pk__desc">{text.summary}</p>
+        <div className="pj-pk__foot">
           <ProjectAction
             project={project}
             locale={locale}
@@ -85,7 +81,7 @@ export function ProjectTile({
       aria-labelledby={heading}
       data-motion="card"
     >
-      <div className="pj-tile__art">{sketch}</div>
+      <div className="pj-tile__art pj-art">{sketch}</div>
       <div className="pj-tile__body">
         <p className="pj-tile__top">
           <span aria-hidden="true">№ {pad(number)}</span>
@@ -112,18 +108,18 @@ export function ProjectTile({
 }
 
 /**
- * A published client case. The link is a plain anchor on purpose: a client-side
+ * A published case. The link is a plain anchor on purpose: a client-side
  * navigation would keep this page's CSP, whose `frame-src 'none'` would block
  * the demo on the case page.
  */
-export function ClientCaseCard({
+export function CaseCard({
   item,
   index,
   locale,
   copy,
   art,
 }: {
-  item: ClientCase;
+  item: Case;
   index: number;
   locale: LocaleId;
   copy: ProjectsCopy;
@@ -133,17 +129,17 @@ export function ClientCaseCard({
   const heading = `case-${item.id}`;
   return (
     <article
-      className="pj-card pj-case"
+      className="pj-pk pj-case"
       id={item.id}
       aria-labelledby={heading}
       data-motion="card"
     >
       {art}
-      <div className="pj-card__body">
-        <div className="pj-card__head">
-          <div className="pj-card__title">
-            <h3 id={heading}>{item.client}</h3>
-            <span className="pj-card__meta">
+      <div className="pj-pk__body">
+        <div className="pj-pk__head">
+          <div className="pj-pk__title">
+            <h3 id={heading}>{item.name}</h3>
+            <span className="pj-pk__meta">
               {item.year} · {text.scope}
             </span>
           </div>
@@ -151,14 +147,17 @@ export function ClientCaseCard({
             {`${copy.page.caseLabel} ${pad(index + 1)}`}
           </StatusMark>
         </div>
-        <p className="pj-card__description">{text.summary}</p>
-        <div className="pj-card__foot">
+        <p className="pj-pk__desc">{text.summary}</p>
+        <div className="pj-pk__foot">
           <a
             className="pj-action"
             href={routes[item.route][locale]!}
             data-sound="nav"
           >
-            <span className="pj-action__text">{text.action}</span>
+            <span className="pj-action__text">
+              {text.action}
+              <span className="rv-sr-only">: {item.name}</span>
+            </span>
             <span className="pj-action__arrow" aria-hidden="true">
               →
             </span>

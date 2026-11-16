@@ -3,10 +3,17 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
 /**
- * Holds the slideshow on photo 01 until 45% of the art is in view. Without
+ * Holds a case card's slideshow (Stucco., Quadra) on its first frame until 45%
+ * of the art is in view. Without
  * JavaScript, or under reduced motion, it simply stays there.
  */
-export function StuccoPlay({ children }: { children: ReactNode }) {
+export function StuccoPlay({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   const art = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const element = art.current;
@@ -26,7 +33,11 @@ export function StuccoPlay({ children }: { children: ReactNode }) {
     return () => observer.disconnect();
   }, []);
   return (
-    <div ref={art} className="st-art st-wait" aria-hidden="true">
+    <div
+      ref={art}
+      className={`st-art st-wait${className ? ` ${className}` : ""}`}
+      aria-hidden="true"
+    >
       {children}
     </div>
   );

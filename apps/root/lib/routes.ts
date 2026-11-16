@@ -13,6 +13,7 @@ export type RouteKey =
   | "projects"
   | "projects-all"
   | "projects-stucco"
+  | "projects-quadra"
   | "contact"
   | "gallery"
   | "this-site"
@@ -32,6 +33,10 @@ export const routes: Record<RouteKey, RoutePaths> = {
     en: "/projects/stucco",
     "pt-BR": "/pt/projects/stucco",
   },
+  "projects-quadra": {
+    en: "/projects/quadra",
+    "pt-BR": "/pt/projects/quadra",
+  },
   contact: { en: "/contact", "pt-BR": "/pt/contact" },
   gallery: { en: "/gallery", "pt-BR": "/pt/gallery" },
   "this-site": { en: "/this-site", "pt-BR": "/pt/this-site" },
@@ -45,7 +50,7 @@ export const routes: Record<RouteKey, RoutePaths> = {
  * Static demos served from public/, one language each. They are not pages:
  * they stay out of the sitemap and the search index, and answer with noindex.
  */
-export const staticDemos = ["/work/stucco/"] as const;
+export const staticDemos = ["/work/stucco/", "/work/quadra/"] as const;
 
 export const routeKeys = Object.keys(routes) as RouteKey[];
 
@@ -61,11 +66,12 @@ export function routeOfPath(
 
 /**
  * A page that lives under another page's navigation item: the catalog of all
- * projects and the client cases keep "projects" current in the sidebar.
+ * projects and the cases keep "projects" current in the sidebar.
  */
 export const navigationParent: Partial<Record<RouteKey, RouteKey>> = {
   "projects-all": "projects",
   "projects-stucco": "projects",
+  "projects-quadra": "projects",
 };
 
 /** The real counterparts of a page: its other declared locales. Never inferred from a path. */

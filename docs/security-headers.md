@@ -109,9 +109,14 @@ No additional server runtime was introduced for Docs or Lab.
 | Dump | `frame-src`   | `https://giscus.app`                                                                             | The comments widget                                               |
 
 Root's framing has two narrow exceptions, both same-origin and tested in
-`security/headers.test.mjs`: `frame-src 'self'` on exactly `/projects/stucco`
-and `/pt/projects/stucco`, and `frame-ancestors 'self'` on `/work/*`, which also
-answers `X-Robots-Tag: noindex, nofollow`. Everything else keeps `'none'`. The
+`security/headers.test.mjs`: `frame-src 'self'` on exactly the case pages
+(`/projects/stucco`, `/projects/quadra` and their `/pt` counterparts), and
+`frame-ancestors 'self'` on `/work/*`, which also answers
+`X-Robots-Tag: noindex, nofollow`. One more exception covers only the Quadra
+demo (`/work/quadra/*`): its templates write `style` attributes into the markup
+they render, so its policy has `style-src-attr 'unsafe-inline'`. Scripts there
+stay `script-src 'self'` with `script-src-attr 'none'`, and no other path gets
+it (`demosWithStyleAttributes`). Everything else keeps `'none'`. The
 demo's static files use the static policy from `next.config.ts`; `proxy.ts`
 skips them because they carry no nonce. A CSP belongs to the document, so a link
 into a case page must be a full navigation. Documents with a framing exception omit
@@ -126,8 +131,8 @@ CORS response remains unchanged.
 
 Permissions Policy denies unused camera, microphone, geolocation, screen
 capture, payment, USB, fullscreen and clipboard-read capabilities. It retains
-first-party audio and code-copy access; Root has no code-copy controls, so it
-denies clipboard-write too. Dump additionally permits clipboard-write for the
+first-party audio and copy access: code blocks on Dump, Docs and Lab, and the
+address on Root's Contact page. Dump additionally permits clipboard-write for the
 Giscus iframe, matching its actual `allow` attribute. Names were checked against
 the [W3C feature registry](https://github.com/w3c/webappsec-permissions-policy/blob/main/features.md).
 Browser support differs; Firefox reports Giscus's clipboard-write iframe
@@ -202,7 +207,7 @@ Content-Security-Policy: default-src 'none'; script-src 'nonce-NONCE' 'strict-dy
 Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
 X-Content-Type-Options: nosniff
 Referrer-Policy: strict-origin-when-cross-origin
-Permissions-Policy: camera=(), microphone=(), geolocation=(), display-capture=(), payment=(), usb=(), fullscreen=(), autoplay=(self), clipboard-read=(), clipboard-write=()
+Permissions-Policy: camera=(), microphone=(), geolocation=(), display-capture=(), payment=(), usb=(), fullscreen=(), autoplay=(self), clipboard-read=(), clipboard-write=(self)
 Cross-Origin-Opener-Policy: same-origin
 ```
 

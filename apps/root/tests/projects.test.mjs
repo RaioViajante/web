@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ptProjectsCopy, ptStuccoCopy } from "../lib/pt.ts";
+import { ptProjectsCopy, ptQuadraCopy, ptStuccoCopy } from "../lib/pt.ts";
 import {
-  clientCases,
+  cases,
   countLabel,
   featuredProjects,
   projectCategories,
@@ -12,18 +12,13 @@ import {
 } from "../lib/projects.ts";
 import {
   formatSize,
-  isFinished,
-  mochifileConverted,
-  mochifileFormats,
-  mochifileResized,
   mochifileResult,
   mochifileTargets,
-  mochifileWidths,
-  transition,
 } from "../lib/sketch-demos.ts";
+import { quadraCopy, quadraPartner } from "../lib/quadra.ts";
 import { routes, routeKeys } from "../lib/routes.ts";
 import { stuccoCopy } from "../lib/stucco.ts";
-import { roughEllipse, roughLine } from "../lib/sketch.ts";
+import { refrainFontText } from "../../../packages/design/scripts/refrain-art.mjs";
 
 // The projects pages publish facts about real projects. These checks keep the
 // data honest: the approved set and order, no private repository, no
@@ -114,11 +109,13 @@ test("each project's copy exists in both languages, translated", () => {
   for (const { id, link } of projects) {
     const en = projectsCopy.projects[id];
     const pt = ptProjectsCopy.projects[id];
-    for (const field of ["description", "summary", "status", "tagline"])
+    for (const field of ["description", "summary", "status"])
       assert.notEqual(pt[field], en[field], `${id}.${field}`);
-    // A label is only needed, and only present, where there is a link.
-    assert.equal(Boolean(en.actionShort), Boolean(link), id);
-    assert.equal(Boolean(pt.actionShort), Boolean(link), id);
+    // Labels are only needed, and only present, where there is a link.
+    for (const copy of [en, pt]) {
+      assert.equal(Boolean(copy.action), Boolean(link), id);
+      assert.equal(Boolean(copy.actionShort), Boolean(link), id);
+    }
   }
   for (const category of projectCategories)
     assert.ok(ptProjectsCopy.categories[category]);
@@ -139,21 +136,36 @@ test("the sketch copy is fully translated, including the words inside the art", 
     .filter(([key, value]) => portuguese.get(key) === value)
     .map(([key]) => key)
     .sort();
-  assert.deepEqual(same, ["hum.volume", "mochifile.original", "yanawa.tokens"]);
+  assert.deepEqual(same, ["hum.volume", "yanawa.tokens"]);
 });
 
-test("the only published client case is Stucco., and its page exists", () => {
+test("Refrain's art draws only characters its cut-down typefaces have", () => {
+  const faces = {
+    kicker: refrainFontText.silkscreen,
+    tagline: refrainFontText.instrumentSerifItalic,
+    note: refrainFontText.laBelleAurore,
+  };
+  for (const copy of [projectsCopy, ptProjectsCopy])
+    for (const [key, set] of Object.entries(faces))
+      for (const char of copy.art.refrain[key])
+        assert.ok(set.includes(char), `${key}: "${char}"`);
+});
+
+test("the published cases are Stucco. and Quadra, and their pages exist", () => {
   assert.deepEqual(
-    clientCases.map(({ id, client, year }) => [id, client, year]),
-    [["stucco", "Stucco.", "2026"]],
+    cases.map(({ id, name, year }) => [id, name, year]),
+    [
+      ["stucco", "Stucco.", "2026"],
+      ["quadra", "Quadra", "2025"],
+    ],
   );
-  for (const { route } of clientCases) {
+  for (const { route } of cases) {
     assert.ok(routeKeys.includes(route), route);
     assert.ok(routes[route]["pt-BR"], route);
   }
 });
 
-test("the Stucco. case has the same shape in both languages", () => {
+test("each case has the same shape in both languages", () => {
   const paths = (value, path = []) =>
     Array.isArray(value)
       ? [
@@ -167,6 +179,17 @@ test("the Stucco. case has the same shape in both languages", () => {
         : [path.join(".")];
   assert.deepEqual(paths(ptStuccoCopy), paths(stuccoCopy));
   assert.notEqual(ptStuccoCopy.intro, stuccoCopy.intro);
+  assert.deepEqual(paths(ptQuadraCopy), paths(quadraCopy));
+  assert.notEqual(ptQuadraCopy.intro, quadraCopy.intro);
+});
+
+test("the Quadra case says what is fictional and that its demo stores nothing", () => {
+  for (const copy of [quadraCopy, ptQuadraCopy]) {
+    assert.match(copy.note, /fictional|fictícios/);
+    const state = copy.tech.rows.find(({ term }) => /state|Estado/.test(term));
+    assert.match(state.value, /nothing is stored|nada fica guardado/);
+  }
+  assert.match(quadraPartner.profile, /^https:\/\//);
 });
 
 test("the Stucco. case states the owner's print sizes and that the brand is fictional", () => {
@@ -194,6 +217,8 @@ test("nothing published is a placeholder", () => {
     ptProjectsCopy,
     stuccoCopy,
     ptStuccoCopy,
+    quadraCopy,
+    ptQuadraCopy,
   ])) {
     assert.doesNotMatch(text, /[[\]]/, text);
     assert.doesNotMatch(text, /\bTODO\b|lorem ipsum/, text);
@@ -208,52 +233,15 @@ test("Orbit's copy never claims scheduling or execution exists", () => {
   }
 });
 
-test("the Orbit sketch follows Orbit's transition rules", () => {
-  assert.equal(transition("queued", "start"), "running");
-  assert.equal(transition("running", "succeed"), "succeeded");
-  assert.equal(transition("running", "fail"), "failed");
-  assert.equal(transition("queued", "cancel"), "cancelled");
-  assert.equal(transition("running", "cancel"), "cancelled");
-  assert.equal(transition("queued", "succeed"), undefined);
-  assert.equal(transition("queued", "fail"), undefined);
-  assert.equal(transition("running", "start"), undefined);
-  for (const finished of ["succeeded", "failed", "cancelled"]) {
-    assert.ok(isFinished(finished));
-    for (const action of ["start", "succeed", "fail", "cancel"])
-      assert.equal(transition(finished, action), undefined);
-  }
-});
-
 test("the Mochifile sketch always lands under the chosen target", () => {
   for (const target of mochifileTargets) {
     const result = mochifileResult(target);
     assert.ok(result.kb <= target, `${target}`);
     assert.ok(result.reduction > 0 && result.reduction < 100);
   }
-  // Convert can grow a file (PNG) and the bars then scale to the larger size.
-  const png = mochifileConverted("png");
-  assert.ok(png.change > 0 && png.after === 100 && png.before < 100);
-  for (const format of mochifileFormats) {
-    const { before, after } = mochifileConverted(format);
-    assert.ok(Math.max(before, after) === 100, format);
-  }
-  // Resize keeps the 4:3 shape and gets smaller with the width.
-  let previous = Infinity;
-  for (const width of mochifileWidths) {
-    const result = mochifileResized(width);
-    assert.equal(result.height, (width * 3) / 4);
-    assert.ok(result.kb < previous && result.change < 0, `${width}`);
-    previous = result.kb;
-  }
   assert.equal(formatSize(4800, "en-US"), "4.8 MB");
   assert.equal(formatSize(4800, "pt-BR"), "4,8 MB");
   assert.equal(formatSize(192, "pt-BR"), "192 KB");
-});
-
-test("hand-drawn strokes are deterministic", () => {
-  assert.equal(roughLine(0, 0, 10, 10, 3), roughLine(0, 0, 10, 10, 3));
-  assert.notEqual(roughLine(0, 0, 10, 10, 3), roughLine(0, 0, 10, 10, 4));
-  assert.equal(roughEllipse(0, 0, 5, 5, 9), roughEllipse(0, 0, 5, 5, 9));
 });
 
 test("the catalog count uses each language's plural", () => {

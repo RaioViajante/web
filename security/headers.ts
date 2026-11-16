@@ -24,10 +24,21 @@ export interface Framing {
   frameSelf?: boolean;
   /** The page may be embedded by a same-origin page. */
   embeddableBySelf?: boolean;
+  /**
+   * Style attributes are allowed (`style-src-attr 'unsafe-inline'`). Only the
+   * Quadra demo, whose templates write them (`workHeaders`); scripts stay as
+   * strict as everywhere else.
+   */
+  styleAttributes?: boolean;
 }
 
 /** Root's case pages, which show the demo under /work/ in an iframe. */
-export const demoHostPaths = ["/projects/stucco", "/pt/projects/stucco"];
+export const demoHostPaths = [
+  "/projects/stucco",
+  "/pt/projects/stucco",
+  "/projects/quadra",
+  "/pt/projects/quadra",
+];
 
 /** The framing a nonce-carrying Root page gets, by exact path. */
 export function rootFraming(pathname: string): Framing {
@@ -49,7 +60,7 @@ export function contentSecurityPolicy(
     `script-src ${scripts}${site === "dump" ? " https://giscus.app" : ""}${development ? " 'unsafe-eval'" : ""}`,
     "script-src-attr 'none'",
     `style-src 'self'${nonce && !development ? ` 'nonce-${nonce}'` : ""}${site === "dump" ? " https://giscus.app" : ""}${development ? " 'unsafe-inline'" : ""}`,
-    `style-src-attr ${styles ? `'unsafe-hashes' ${styles.map(styleHash).join(" ")}` : "'none'"}`,
+    `style-src-attr ${framing.styleAttributes ? "'unsafe-inline'" : styles ? `'unsafe-hashes' ${styles.map(styleHash).join(" ")}` : "'none'"}`,
     "img-src 'self'",
     "font-src 'self'",
     `connect-src 'self' ${Object.entries(siteOrigins)
@@ -83,9 +94,10 @@ export function securityHeaders(site: Site) {
     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
     {
       key: "Permissions-Policy",
-      // Keep user-initiated Web Audio and code-copy controls. Giscus's iframe
-      // explicitly requests clipboard-write for its own copy controls.
-      value: `camera=(), microphone=(), geolocation=(), display-capture=(), payment=(), usb=(), fullscreen=(), autoplay=(self), clipboard-read=(), clipboard-write=(${site === "root" ? "" : "self"}${site === "dump" ? ' "https://giscus.app"' : ""})`,
+      // Keep user-initiated Web Audio and copy controls (code blocks; Root's
+      // Contact copies the address). Giscus's iframe explicitly requests
+      // clipboard-write for its own copy controls.
+      value: `camera=(), microphone=(), geolocation=(), display-capture=(), payment=(), usb=(), fullscreen=(), autoplay=(self), clipboard-read=(), clipboard-write=(self${site === "dump" ? ' "https://giscus.app"' : ""})`,
     },
     { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   ];
@@ -98,17 +110,22 @@ export function staticHeaders(site: Site) {
   ];
 }
 
+/** The static demos whose templates write style attributes. */
+export const demosWithStyleAttributes = ["/work/quadra/"];
+
 /**
  * Root's static demos under /work/: embeddable by Root's own pages, and kept
  * out of search through this header. robots.txt must not disallow them, or
- * crawlers would never read it.
+ * crawlers would never read it. `styleAttributes` is for the demos in
+ * `demosWithStyleAttributes` only.
  */
-export function workHeaders() {
+export function workHeaders({ styleAttributes = false } = {}) {
   return [
     {
       key: "Content-Security-Policy",
       value: contentSecurityPolicy("root", undefined, false, {
         embeddableBySelf: true,
+        styleAttributes,
       }),
     },
     { key: "X-Robots-Tag", value: "noindex, nofollow" },

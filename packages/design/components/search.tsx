@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { TypedTitle } from "./typed-title";
 import { Art, art } from "./art";
 import { SiteLink, type LinkComponent } from "./link";
 import { DEFAULT_LOCALE, type LocaleId } from "../../../site/locales";
@@ -144,7 +145,7 @@ export function SearchPage({
     >
       <header className="rv-search-page__header">
         <p className="rv-label">{search.eyebrow}</p>
-        <h1>{search.heading}</h1>
+        <TypedTitle text={search.heading} />
         <div className="rv-ask">
           <Art
             name="searchCharacter"

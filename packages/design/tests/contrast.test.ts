@@ -37,7 +37,11 @@ it("keeps the text inside project artwork at 4.5:1 on its surfaces", () => {
     ],
     [["ordelis-you"], ["ordelis-fg"]],
     [["ordelis-fg"], ["ordelis-line-strong"]],
-    [["refrain-ink", "refrain-ink-2"], ["refrain-paper"]],
+    [
+      ["refrain-ink", "refrain-muted", "refrain-pen"],
+      ["refrain-paper", "refrain-sleeve"],
+    ],
+    [["refrain-label"], ["refrain-wine"]],
     [["stucco-white"], ["stucco-ink"]],
     [["stucco-ink"], ["stucco-yellow"]],
     [["stucco-muted"], ["stucco-sand"]],

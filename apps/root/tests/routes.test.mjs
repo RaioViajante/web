@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { aboutCopy } from "../lib/about.ts";
+import { contactCopy } from "../lib/contact.ts";
 import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import test from "node:test";
@@ -19,6 +21,7 @@ import {
 } from "../lib/routes.ts";
 import { affiliateDisclosure, gear } from "../lib/setup.ts";
 import {
+  ptAbout,
   ptContact,
   ptNavigation,
   ptDocsHome,
@@ -88,6 +91,7 @@ test("English paths are unprefixed and unchanged", () => {
     projects: "/projects",
     "projects-all": "/projects/all",
     "projects-stucco": "/projects/stucco",
+    "projects-quadra": "/projects/quadra",
     contact: "/contact",
     gallery: "/gallery",
     "this-site": "/this-site",
@@ -165,6 +169,7 @@ test("the shipped Portuguese pages include the translated This Site route", () =
       "/pt/privacy",
       "/pt/projects",
       "/pt/projects/all",
+      "/pt/projects/quadra",
       "/pt/projects/stucco",
       "/pt/search",
       "/pt/setup",
@@ -193,6 +198,7 @@ test("Root participation activates only its published Portuguese routes", () => 
     "projects",
     "projects-all",
     "projects-stucco",
+    "projects-quadra",
     "contact",
     "gallery",
     "this-site",
@@ -223,6 +229,7 @@ test("rollback disables Root participation while its Portuguese routes stay publ
       "/pt/privacy",
       "/pt/projects",
       "/pt/projects/all",
+      "/pt/projects/quadra",
       "/pt/projects/stucco",
       "/pt/search",
       "/pt/setup",
@@ -259,12 +266,26 @@ test("Portuguese cross-site links use every active Portuguese homepage", () => {
   );
 });
 
-test("Portuguese Contact has complete route-facing copy", () => {
+test("Portuguese Contact and About have the English pages' shape, fully written", () => {
   assert.equal(ptPageSeo.contact?.title, "contato");
   assert.equal(ptSearchDescriptions.contact, "Formas de entrar em contato");
-  assert.equal(ptContact.messageItems.length, 4);
-  for (const value of Object.values(ptContact).flat())
-    assert.ok(typeof value === "string" && value.length > 0);
+  const leaves = (value, path = []) =>
+    typeof value === "string"
+      ? [path.join(".")]
+      : Object.entries(value).flatMap(([key, item]) =>
+          leaves(item, [...path, key]),
+        );
+  for (const [pt, en] of [
+    [ptContact, contactCopy],
+    [ptAbout, aboutCopy],
+  ]) {
+    assert.deepEqual(leaves(pt), leaves(en));
+    for (const path of leaves(pt)) {
+      const value = path.split(".").reduce((item, key) => item[key], pt);
+      // Only the About page's English note is empty in English.
+      if (path !== "englishNote") assert.ok(value.length > 0, path);
+    }
+  }
 });
 
 test("Portuguese This Site has route, SEO, search and page copy", () => {
@@ -352,7 +373,7 @@ test("Setup discloses affiliate links in both languages", () => {
 });
 
 test("static demos are never declared as pages, so no index lists them", () => {
-  assert.deepEqual(staticDemos, ["/work/stucco/"]);
+  assert.deepEqual(staticDemos, ["/work/stucco/", "/work/quadra/"]);
   for (const { path } of declaredPages())
     assert.equal(path.startsWith("/work"), false, path);
 });
@@ -366,6 +387,17 @@ test("the Stucco. case is declared in both languages with reciprocal counterpart
   ]);
   assert.ok(ptPageSeo["projects-stucco"]?.title);
   assert.ok(ptSearchDescriptions["projects-stucco"]);
+});
+
+test("the Quadra case is declared in both languages with reciprocal counterparts", () => {
+  assert.deepEqual(counterpartsOf("projects-quadra", "en"), [
+    { locale: "pt-BR", path: "/pt/projects/quadra" },
+  ]);
+  assert.deepEqual(counterpartsOf("projects-quadra", "pt-BR"), [
+    { locale: "en", path: "/projects/quadra" },
+  ]);
+  assert.ok(ptPageSeo["projects-quadra"]?.title);
+  assert.ok(ptSearchDescriptions["projects-quadra"]);
 });
 
 test("Portuguese projects pages have their own metadata and search copy", () => {

@@ -125,6 +125,34 @@ that is rare and was judged not worth the bytes. Other artwork is unchanged.
   chunks carry no project code. The sketch palettes live in
   `packages/design/styles/project-art.css`, loaded only by those pages, so no
   other page or site carries them.
+- **`root/home` cards and Refrain's art (November 2026).** The home page's
+  four project cards became the larger cards of `/projects` (16:10 art,
+  description and their own link), and Refrain's card draws the app's own art
+  in its own four typefaces, cut down to the characters it uses (about 22 KB
+  of WOFF in all, `budgets.artFonts`) with its paper and navy textures, torn
+  edge and sleeve photo. Measured on a cold mobile load, total went from
+  341,365 to 442,100 bytes, stylesheet from 9,203 to 16,572, font from 33,835
+  to 64,154, image from 160,334 to 179,755 and requests from 26 to 36. The
+  new limits are the old ones plus the measured growth, so the headroom stays
+  what it was: `max.total` 498,048, `max.stylesheet` 22,784, `max.font`
+  73,728, `max.image` 204,800 and `max.requests` 39. Script (166,355, under
+  its unchanged 184,320) is the shared chunks' growth since the last
+  baseline, not this change: the home page loads no project script. The
+  art's typefaces load with the art, without a preload, so `perf:check`
+  leaves them out of its one-interface-font and preload rules by name
+  (`artFonts`) and still counts their bytes. The catalog's sketches and the
+  cases' art never load on the home page. Every other page is as before.
+- **Typed titles on Lab's experiment pages (November 2026).** Every page
+  title now types itself (`styles/typed.css`, design-system "Motion"), which
+  adds 276 bytes of gzipped CSS to the shared stylesheet. Lab's experiment
+  pages were within a few hundred bytes of their stylesheet limit and
+  measured 13,404 bytes against 13,312. Their `max.stylesheet` becomes
+  13,824 (the old limit plus the growth, rounded up to 512 bytes), and the
+  three lightest pages' `max.total` (boot-sector, execution-states,
+  filename-classifier) 81,408 by the same rule. The typed CSS was first cut
+  from 80 per-character rules to 20 (a long title types a few characters per
+  step) to keep the growth this small. Every other page and field is as
+  before.
 - **Docs and Lab script (November 2026).** The shared page entrance motion
   (`packages/design/motion.ts`, design-system "Motion") ships in the shared
   behavior chunk every page loads. Bundled, minified and gzipped alone
@@ -176,7 +204,9 @@ page that really has no LCP. So:
 
 - **Fonts:** one 32 KB variable WOFF2 per app, self-hosted, preloaded exactly
   once (`next/font` in Root and Dump, an explicit link in Docs and Lab), no
-  third-party font request, `font-display: optional`. Nothing was added.
+  third-party font request, `font-display: optional`. The only other faces are
+  Refrain's card art's, on the Root pages that show it (see
+  `root/home` above).
 - **Images:** all responses are real images; none is empty. The largest are the
   root gallery's character sheet (125 KB WebP) and the search character, the LCP
   of every search page, now the 320 px derivative described in

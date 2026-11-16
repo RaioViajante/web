@@ -23,7 +23,7 @@ for `next/font`.
 Artwork is not stored in the app: the avatar frames, the gallery images and the
 "work of art" sticker come from `packages/design/assets`. Gallery styles are scoped to its route; the shared shell keeps its existing geometry.
 
-Root has routes for home, about, projects, all projects, the Stucco. client case, contact, gallery, this site, setup,
+Root has routes for home, about, projects, all projects, the Stucco. and Quadra cases, contact, gallery, this site, setup,
 search, privacy, and terms of use, and a 404 page (`app/not-found.tsx`) built on
 the shared template. The primary navigation contains the local content
 routes except Setup,
@@ -49,8 +49,8 @@ or immediately on keyboard focus. On every page, in both languages, a link
 that leaves the four sites (profiles, Setup's affiliate links, project
 actions, GitHub, the ANPD guide) opens in a new tab and says so to assistive
 technology; the email and every RaioViajante destination stay in the tab.
-The one exception is the client case's demo layer, whose "New tab" button opens
-the static demo at `/work/stucco/` in a new tab by design, and says so. The avatar flips on click
+The one exception is a case's demo layer, whose "New tab" button opens
+its static demo (`/work/stucco/`, `/work/quadra/`) in a new tab by design, and says so. The avatar flips on click
 with a separate two-part flip sound.
 Its ten-frame illustration loops every three seconds after the frames have
 loaded. Reduced motion keeps the centered portrait still and disables the flip.
@@ -60,57 +60,80 @@ Its text toggle sits alone at the top of the reading column.
 
 ### Projects
 
-The projects area implements the approved Claude Design handoff
-(`reference/raioviajante-projects.zip`, local and untracked) inside the shared
-shell. Facts and English copy live in `lib/projects.ts`; Portuguese copy in
+The projects area implements the approved Claude Design handoffs
+(`reference/raioviajante-projects.zip` and its successor in `reference/new/`,
+both local and untracked) inside the shared shell, with the project facts
+verified for the first one kept where the second differs. Facts and English copy live in `lib/projects.ts`; Portuguese copy in
 `ptProjectsCopy` (`lib/pt.ts`), typed by the same `ProjectsCopy`, including every
 word drawn inside the sketches. Components are in `components/projects/`.
 
-- **Home (00.1).** Four cards (Mochifile, Ordelis, Refrain, Orbit), each a
-  single link to its card on `/projects`, with a small CSS-only sketch, icon,
-  short line and status, then "More projects and client work" to `/projects`.
-- **`/projects`.** "02. My projects": the same four with large sketches that
-  work as local demonstrations (Mochifile: the design's Compress, Convert and
-  Resize tabs with example values; Compress picks a target size, as the real
-  tool does, and Convert and Resize, which Mochifile lists as coming soon,
-  say "coming soon to Mochifile" in their note; Ordelis: approve or request changes in the planned review step;
-  Refrain: play or stop the record; Orbit: queue and cancel executions that
-  follow Orbit's transition rules, simulated in the browser). Then "View all
-  projects" and "02.1 Client work": the Stucco. case and the box for the next one. There is no
-  link to a client catalog; the client card component renders only real cases.
-- **`/projects/all`.** All eight projects as smaller tiles, filtered by kind
-  (all, tools, music, systems, languages, games) with pressed-state buttons and
-  a polite count. Without JavaScript every tile stays visible. The sidebar
+- **Cards.** Home (00.1) and `/projects` share one compact card: the
+  project's small sketch in a 16:10 frame with its status over the art, top
+  right, on the page's gray; then icon, name, kind, the short description
+  and where to see it (the docs, the lab experiment, the essay, the site or
+  the repository; "no public link yet" for Morrowferry). The cards stand in
+  two columns, the second a step lower; one column on phones.
+- **Home (00.1).** The four featured projects (Mochifile, Ordelis, Refrain,
+  Orbit), then "All projects, including client work" to `/projects`.
+- **`/projects`.** "02. My projects": the same four, and a "Show 4 more
+  projects" button (`aria-expanded`) that shows yanawa, Sweep, Hum and
+  Morrowferry in place and becomes "Show fewer projects". Without
+  JavaScript they stay hidden and "View all projects" lists every one. The
+  earlier interactive sketches (Mochifile's tabs, Ordelis's approval, the
+  Orbit simulation, the Refrain record) were retired with this design.
+  Then "02.1 Cases": Stucco. (client work) and Quadra (an academic
+  project), each card a browser and a phone showing its demo.
+- **`/projects/all`.** All eight projects as smaller tiles in the same two
+  stepped columns, filtered by kind (all, tools, music, systems, languages,
+  games) with pressed-state buttons and a polite count; the step follows the
+  tiles that are shown. Without JavaScript every tile stays visible. The sidebar
   keeps "projects" current (`navigationParent` in `lib/routes.ts`).
 - **Honesty.** Status is a word with a solid (usable) or dashed (still being
   built) mark. Example numbers are labelled; Orbit is described as not
   scheduling or running anything yet; Ordelis and Hum sketches say they show a
   planned workflow or interface. Refrain and Morrowferry have private
   repositories and are never linked; Morrowferry says "no public link yet".
-- **Artwork.** The project icons and the Mochifile wordmark are 128-pixel
-  derivatives in `packages/design/assets/projects/`
-  (`pnpm --filter @raioviajante/design project-icons`). Sweep and Hum have no
+- **Artwork.** The project icons are 128-pixel derivatives in
+  `packages/design/assets/projects/`
+  (`pnpm --filter @raioviajante/design project-icons`); Refrain's is the
+  app's own touch icon. Sweep and Hum have no
   logo yet, so their icon slot shows their initial on a square in their sketch
   colors (`.pj-letter`, CSS only); replace it when a logo is approved. The sketches are drawn
-  in code: HTML/CSS, SVG, a seeded hand-drawn stroke generator for Refrain
-  (`lib/sketch.ts`) and a token-colored pixel scene for Morrowferry. Their
-  colors are the project-artwork tokens in `packages/design/styles/project-art.css`,
-  loaded only by these pages; the page chrome stays
-  gray, and there are no gradients, glows or shadows.
+  in code: HTML/CSS, SVG and a token-colored pixel scene for Morrowferry.
+  Their colors are the project-artwork tokens in
+  `packages/design/styles/project-art.css`, loaded only by these pages; the
+  page chrome stays gray, and there are no gradients, glows or shadows,
+  except in Refrain's.
+- **Refrain's art.** By the approved design (v3), Refrain's card dresses as
+  the app: paper, a wine "refrain" wordmark in Archivo, a line in
+  Instrument Serif italic, a note in La Belle Aurore, a Silkscreen kicker, a
+  sleeve titled "Grace." with its photo and a record half out of it, a navy
+  band under a torn edge (`components/projects/RefrainArt.tsx`). The catalog
+  shows a compact version. Like a case's brand typeface, the four typefaces
+  appear nowhere else: `pnpm --filter @raioviajante/design refrain-art` cuts
+  them down to the characters the art draws (a test keeps the copy inside
+  those sets) and they load only with the art
+  (`@raioviajante/design/refrain-art.css`, OFL in the fonts folder). The
+  record and sleeve keep their grooves, shine and shadows; while the card is
+  hovered or focused the record slides out and turns, and under reduced
+  motion it moves without a transition.
 - **Delivery.** No server-rendered `style` attributes (the CSP blocks them):
   timings and positions are classes in `cards.css`, `pages.css`, `minis.css`,
-  `catalog-minis.css` and `sketches.css`. Values known only in the browser
-  (the Mochifile bar widths, the Orbit orbits) are set on the client through
-  the CSSOM. The home page loads only the cards and the four small sketches;
-  the catalog adds its own; the large sketches' CSS and client code load only
-  on `/projects`.
+  `catalog-minis.css` and `refrain-art.css`. The home page loads the cards
+  and the sketches; only `/projects` loads the cases' art and the "show more"
+  script.
 - **Motion.** Looping animations play only while a card is hovered or has
-  focus, and otherwise rest on a complete frame (WCAG 2.2.2); a playing
-  Refrain record keeps spinning. Orbit queues one execution the first time
-  its sketch comes into view, and after that only when the visitor asks.
-  Everything stops under reduced motion.
+  focus, and otherwise rest on a complete frame (WCAG 2.2.2). Everything
+  stops under reduced motion.
 
-### Client case: Stucco.
+### Cases: Stucco. and Quadra
+
+Both cases share their page's parts: the facts, the tour
+(`components/projects/CaseTour.tsx`), the demo layer (`CaseDemo.tsx`), the
+numbered sections and the way back. Their cards share the browser and phone
+of `stucco-art.css`.
+
+#### Stucco. (client work)
 
 `/projects/stucco` and its Portuguese counterpart tell the case, implementing
 the approved prototype (`reference/stucco-demo/`, local and untracked). The
@@ -135,11 +158,38 @@ Portuguese is the original. Images are derived from the kit by
   so it runs under the same CSP without a nonce; `next.config.ts` sends its
   headers and `proxy.ts` skips its files. The bare path redirects to
   `index.html` because the demo's relative paths need a URL inside its folder.
-- **Exceptions to the visual rules.** They apply to every client case, only
+- **Exceptions to the visual rules.** They apply to every case, only
   inside its approved design. Here the frames of the tour, the card art, the
   brand art and the demo layer have shadows, the card art has a photo scrim
   that repeats the demo's, and the layer's backdrop is blurred, as the
   gallery's is.
+
+#### Quadra (academic project)
+
+`/projects/quadra` and its Portuguese counterpart tell the events and
+space-booking system Bryan made with Rafael for a university, reimagined as
+the fictional Quadra (copy in `lib/quadra.ts` and `ptQuadraCopy`). The
+institution is never named; the demo's people, groups and numbers are
+invented, and the case keeps the original system and the portfolio concepts
+apart. The credit links Rafael's LinkedIn profile, in a new tab. Images are
+derived from the handoff by
+`pnpm --filter @raioviajante/design quadra-art <handoff>` into
+`packages/design/assets/projects/quadra/` and imported from the generated
+`@raioviajante/design/quadra`.
+
+- **Card.** The demo's screens in the browser and the phone, on the brand's
+  court-blue background, with the same slideshow rules as Stucco.'s.
+- **`/work/quadra/`.** The demo is the handoff's front-end build, about 20
+  screens, unchanged except where the site's rules require: its two
+  typefaces (Schibsted Grotesk and Geist Mono, OFL) are served from its own
+  folder instead of Google Fonts, its icon and its selects' arrow are files
+  instead of `data:` URLs (`img-src 'self'`), and its state lives in the page's memory instead of `localStorage`,
+  so a reload starts over and nothing is stored (the case and the demo say
+  so). Its templates write `style` attributes, so `/work/quadra/*` alone has
+  `style-src-attr 'unsafe-inline'`; its scripts stay as strict as everywhere
+  else (`docs/security-headers.md`). When the demo uses Esc itself (a dialog,
+  a drawer, a popover, its search results, its menu) it marks the key handled, and the demo
+  layer stays open.
 
 ### Gallery
 
@@ -191,10 +241,36 @@ The homepage avatar and favicon also come from the user's
 art collection. The supplied favicon PNG is
 the source for the multi-size `app/favicon.ico`, `app/icon.png`,
 `app/apple-icon.png`, and the 192-pixel icon referenced by `app/manifest.ts`.
-The About page uses Bryan's supplied personal introduction and interests without
-turning into a résumé. Contact keeps email as the primary channel and gives a
-short guide to first messages. This Site describes the root app and links to the
-public source repository.
+This Site describes the root app and links to the public source repository.
+
+### About and Contact
+
+Both follow the handoff in `reference/new/` (local and untracked), with their
+copy in `lib/about.ts`, `lib/contact.ts` and `ptAbout` / `ptContact`.
+
+- **About** (`components/AboutPage.tsx`) carries the avatar above its title
+  (the shared flipping avatar, at 96px) and Bryan's own words: who he is, what
+  he does, three Dump posts about learning (real titles and paths in each
+  language; the handoff's other two posts do not exist on Dump and are left
+  out), the four places, "Right now" (each project's status from the projects
+  copy, so it never disagrees with the cards), his tools as plain pills, a
+  link to Setup and life away from the screen. It ends with the one
+  invitation card on Root, to Contact. On phones each leader row becomes
+  name over note.
+- **Contact** (`components/ContactPage.tsx`, `ContactMail.tsx`) opens with its title (typed like every page title, `docs/design-system.md`), the "Hi!" sticker and
+  "Open to new projects" as a word with a gray mark. The email card writes
+  an email, copies the address (Root allows clipboard-write for this; the
+  result is announced, and a failure says the address instead) and offers
+  seven subjects as pressed buttons that fill the email's subject line and
+  change a polite hint. Then six things he is up for, a guide to pitching
+  with an example and three steps, four messages that are not work (each
+  card an email with its subject) and the profiles from `lib/links.ts`,
+  Dump's feed and the four places. On phones a "Write to me" button stays at
+  the bottom once the card has scrolled past (`IntersectionObserver`;
+  hidden and out of the tab order until then). The stickers ("Hi!", the
+  thumbs-up that appears on copy, the one peeking with a cat) are cells of
+  the gallery's sheet, decorative and without shadows; the cards carry no
+  glyph icons, by the design rules.
 
 The supplied Gallery export in the local `reference/` directory is the visual and
 interaction specification for this redesign. It is locally excluded from Git; its

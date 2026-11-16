@@ -1,24 +1,32 @@
 {
   "_readme": "Performance budgets for the four apps, measured on local production builds. HARD budgets fail `pnpm perf:check` / `pnpm perf:lighthouse`; SOFT ones only warn. See docs/performance.md. Weights are deterministic bytes (cold mobile load, gzip as served by the local server); each max is the measured baseline + 15% + 4 KB. Lighthouse numbers are synthetic lab measurements, not real-user Core Web Vitals. Budgets are never rewritten automatically: change them here, in a reviewed commit, with the reason.",
   "largestImage": 153600,
+  "artFonts": [
+    "archivo-800",
+    "instrument-serif",
+    "instrument-serif-italic",
+    "la-belle-aurore",
+    "silkscreen"
+  ],
+  "_artFonts": "Refrain's card art draws in its app's own four typefaces, cut down to the characters it uses (packages/design/scripts/refrain-art.mjs, about 22 KB in all). They load with the art, without a preload, on the pages that show it; the one-interface-font and preload rules ignore them, and the font weight counts them. See docs/performance.md.",
   "_largestImage": "Single-image transfer ceiling. Largest today: the root gallery character sheet, 125 KB WebP at the 750px variant.",
   "weight": {
     "root/home": {
       "baseline": {
-        "total": 341365,
-        "script": 156529,
-        "stylesheet": 9203,
-        "font": 33835,
-        "image": 160334,
-        "requests": 26
+        "total": 442100,
+        "script": 166355,
+        "stylesheet": 16572,
+        "font": 64154,
+        "image": 179755,
+        "requests": 36
       },
       "max": {
-        "total": 397312,
+        "total": 498048,
         "script": 184320,
-        "stylesheet": 15360,
-        "font": 43008,
-        "image": 184320,
-        "requests": 29
+        "stylesheet": 22784,
+        "font": 73728,
+        "image": 204800,
+        "requests": 39
       }
     },
     "root/gallery": {
@@ -193,9 +201,9 @@
         "requests": 7
       },
       "max": {
-        "total": 80896,
+        "total": 81408,
         "script": 18432,
-        "stylesheet": 13312,
+        "stylesheet": 13824,
         "font": 43008,
         "image": 16384,
         "requests": 10
@@ -211,9 +219,9 @@
         "requests": 7
       },
       "max": {
-        "total": 80896,
+        "total": 81408,
         "script": 19456,
-        "stylesheet": 13312,
+        "stylesheet": 13824,
         "font": 43008,
         "image": 16384,
         "requests": 10
@@ -229,9 +237,9 @@
         "requests": 7
       },
       "max": {
-        "total": 80896,
+        "total": 81408,
         "script": 19456,
-        "stylesheet": 13312,
+        "stylesheet": 13824,
         "font": 43008,
         "image": 16384,
         "requests": 10
@@ -249,7 +257,7 @@
       "max": {
         "total": 98304,
         "script": 22528,
-        "stylesheet": 13312,
+        "stylesheet": 13824,
         "font": 43008,
         "image": 16384,
         "requests": 11
@@ -267,7 +275,7 @@
       "max": {
         "total": 98304,
         "script": 22528,
-        "stylesheet": 13312,
+        "stylesheet": 13824,
         "font": 43008,
         "image": 16384,
         "requests": 11
@@ -285,7 +293,7 @@
       "max": {
         "total": 102400,
         "script": 31744,
-        "stylesheet": 13312,
+        "stylesheet": 13824,
         "font": 43008,
         "image": 16384,
         "requests": 11
@@ -303,7 +311,7 @@
       "max": {
         "total": 98304,
         "script": 27648,
-        "stylesheet": 13312,
+        "stylesheet": 13824,
         "font": 43008,
         "image": 16384,
         "requests": 11

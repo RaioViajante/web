@@ -14,6 +14,8 @@ import { attachScrollRegions } from "./scroll-regions";
 import { attachSearch } from "./search/client";
 import { initOwnerClock, updateOwnerClocks } from "./clock";
 import { attachMotion } from "./motion";
+import { prefersReducedMotion } from "./reduced-motion";
+import { attachTypedTitles, settleTypedTitles } from "./typed";
 
 function fillRequestedPath() {
   document
@@ -27,6 +29,8 @@ function fillRequestedPath() {
 function refreshPageState() {
   fillRequestedPath();
   updateOwnerClocks();
+  // A page that arrives under reduced motion has nothing to type.
+  if (prefersReducedMotion()) settleTypedTitles();
 }
 
 export function startBehavior() {
@@ -38,6 +42,7 @@ export function startBehavior() {
     attachScrollRegions(),
     attachAvatarCoin(),
     initOwnerClock(),
+    attachTypedTitles(),
     // Last, so it measures the page the other helpers have prepared.
     attachMotion(),
   ];

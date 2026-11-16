@@ -23,6 +23,11 @@ export function GET() {
       "/projects/stucco",
       "Client case: site and brand for a plaster studio",
     ],
+    [
+      "Quadra case",
+      "/projects/quadra",
+      "Academic case: events and space bookings for a university",
+    ],
   ].map(([title, href, description], index) => ({
     site: "root",
     locale: DEFAULT_LOCALE,

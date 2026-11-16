@@ -1,0 +1,366 @@
+/*
+ * Refrain's card art (RefrainArt.tsx). Its typefaces and textures are in
+ * @raioviajante/design/refrain-art.css, its colors in project-art.css. By the
+ * approved design, and like the client cases' art, the record and the sleeve
+ * carry their own shadows and the record its grooves and shine: the one
+ * place on these pages with gradients or shadows (apps/root/docs/design.md).
+ */
+
+.rf3,
+.rfm {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  color: var(--refrain-ink);
+  font-family: "Refrain Archivo", Arial, Helvetica, sans-serif;
+}
+
+.rf3 span,
+.rfm span {
+  display: block;
+}
+
+.rf3 {
+  background-size: 900px auto;
+}
+
+.rfm {
+  background-size: 700px auto;
+}
+
+.rf3-k {
+  position: absolute;
+  top: 8%;
+  left: 6%;
+  color: var(--refrain-muted);
+  font-family: "Refrain Pixel", monospace;
+  font-size: 2.1cqw;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.rf3-w,
+.rfm-w {
+  position: absolute;
+  color: var(--refrain-wine);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.065em;
+}
+
+.rf3-w {
+  top: 13%;
+  left: 5%;
+  font-size: 17cqw;
+}
+
+.rf3-t,
+.rfm-t {
+  position: absolute;
+  width: 46%;
+  font-family: "Refrain Serif", Georgia, serif;
+  font-style: italic;
+  line-height: 1.05;
+}
+
+.rf3-t {
+  top: 44%;
+  left: 6%;
+  font-size: 5.6cqw;
+}
+
+.rf3-n {
+  position: absolute;
+  bottom: 15%;
+  left: 7%;
+  color: var(--refrain-pen);
+  font-family: "Refrain Hand", cursive;
+  font-size: 4.2cqw;
+  white-space: nowrap;
+  rotate: -4deg;
+}
+
+/* the record and its sleeve */
+
+.rf3-sl {
+  position: absolute;
+  top: 16%;
+  right: 13%;
+  width: 31cqw;
+  height: 31cqw;
+  rotate: 6deg;
+}
+
+.rf3-v,
+.rfm-v {
+  position: absolute;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    var(--refrain-vinyl) 0 0.9px,
+    var(--refrain-groove) 1.2px,
+    var(--refrain-groove-2) 1.8px
+  );
+  transition:
+    translate 0.8s cubic-bezier(0.3, 0.7, 0.2, 1),
+    rotate 1.4s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.rf3-v {
+  top: 3%;
+  left: 46%;
+  width: 94%;
+  height: 94%;
+  box-shadow: 0 14px 22px -12px var(--refrain-shadow);
+}
+
+.rf3-sh {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 20deg,
+    var(--refrain-clear) 0deg,
+    var(--refrain-shine) 22deg,
+    var(--refrain-clear) 50deg,
+    var(--refrain-clear) 180deg,
+    var(--refrain-shine-2) 204deg,
+    var(--refrain-clear) 232deg
+  );
+}
+
+.rf3-lb,
+.rfm-lb {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--refrain-wine);
+}
+
+.rf3-lb {
+  inset: 32%;
+}
+
+.rf3-lb::after,
+.rfm-lb::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  background: var(--refrain-paper);
+  content: "";
+}
+
+.rf3-lb::after {
+  width: 6%;
+  height: 6%;
+  margin: -3% 0 0 -3%;
+}
+
+.rf3-lb span {
+  position: absolute;
+  right: 0;
+  left: 0;
+  color: var(--refrain-label);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.rf3-l1 {
+  bottom: 56%;
+  font-family: "Refrain Hand", cursive;
+  font-size: 2.6cqw;
+}
+
+.rf3-l2 {
+  top: 60%;
+  font-family: "Refrain Pixel", monospace;
+  font-size: 1.1cqw;
+}
+
+.rf3-c,
+.rfm-c {
+  position: absolute;
+  z-index: 1;
+  background: var(--refrain-sleeve);
+}
+
+.rf3-c {
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 7% 7% 6%;
+  box-shadow:
+    0 12px 20px -12px var(--refrain-shadow-2),
+    0 1px 0 var(--refrain-crease);
+}
+
+.rf3-c b,
+.rfm-c b {
+  font-family: "Refrain Serif", Georgia, serif;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.rf3-c b {
+  font-size: 5.6cqw;
+}
+
+.rf3-img,
+.rfm-img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+  filter: sepia(0.18) saturate(0.85);
+}
+
+.rf3-img {
+  height: auto;
+  aspect-ratio: 1.45;
+  margin-top: 6%;
+}
+
+.rf3-ft {
+  display: flex !important;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: auto;
+  line-height: 1;
+}
+
+.rf3-ft i {
+  font-family: "Refrain Serif", Georgia, serif;
+  font-size: 3cqw;
+}
+
+.rf3-ft em {
+  color: var(--refrain-wine);
+  font-family: "Refrain Hand", cursive;
+  font-size: 2.8cqw;
+  font-style: normal;
+  line-height: 1;
+  text-align: right;
+}
+
+/* the navy band under its torn edge */
+
+.rf3-nv,
+.rfm-nv {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.rf3-nv {
+  height: 9%;
+  background-size: 600px auto;
+}
+
+.rf3-e,
+.rfm-e {
+  position: absolute;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.rf3-e {
+  bottom: 8%;
+}
+
+/* the compact art on the catalog's tiles */
+
+.rfm-w {
+  top: 12px;
+  left: 14px;
+  font-size: min(15cqw, 58px);
+  line-height: 1;
+}
+
+.rfm-t {
+  top: calc(18px + min(15cqw, 58px));
+  left: 16px;
+  font-size: 15px;
+}
+
+.rfm-sl {
+  position: absolute;
+  top: 14px;
+  right: 15%;
+  width: 88px;
+  height: 96px;
+  rotate: 6deg;
+}
+
+.rfm-v {
+  top: 4px;
+  left: 42%;
+  width: 88px;
+  height: 88px;
+  box-shadow: 0 10px 16px -10px var(--refrain-shadow);
+}
+
+.rfm-lb {
+  inset: 33%;
+}
+
+.rfm-lb::after {
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+}
+
+.rfm-c {
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  width: 88px;
+  height: 96px;
+  padding: 7px 7px 0;
+  box-shadow:
+    0 10px 16px -10px var(--refrain-shadow-2),
+    0 1px 0 var(--refrain-crease);
+}
+
+.rfm-c b {
+  font-size: 14px;
+}
+
+.rfm-img {
+  height: auto;
+  aspect-ratio: 1.1;
+  margin-top: 5px;
+}
+
+.rfm-nv {
+  z-index: 2;
+  height: 13px;
+  background-size: 500px auto;
+}
+
+.rfm-e {
+  bottom: 11px;
+  z-index: 2;
+}
+
+/* the record slides out of its sleeve while the card is pointed at or focused */
+
+:is(.pj-pk, .pj-tile):is(:hover, :focus-within) .rf3-v {
+  translate: 9cqw 0;
+  rotate: 200deg;
+}
+
+:is(.pj-pk, .pj-tile):is(:hover, :focus-within) .rfm-v {
+  translate: 34px 0;
+  rotate: 200deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf3-v,
+  .rfm-v {
+    transition: none;
+  }
+}

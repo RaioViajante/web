@@ -49,15 +49,18 @@ Read `docs/design-system.md` and `docs/blocks.md` for the implemented contract.
   use the shared renderer and token colors. Never copy a renderer into an app.
 - Use words for status, warnings and controls. No decorative icons, gradients,
   glow, colored badges, emoji, bento grids or second typeface. Preserve the
-  documented root gallery effects and the client-case exceptions below; do not
-  add shadows elsewhere.
-- Client cases on Root are the one other exception, only inside each case's
-  approved design: shadows on framed screenshots, printed pieces and the demo
-  layer, a blurred backdrop on that layer, a photo scrim and the client's own
-  typeface inside the card art, and a card slideshow that runs once in view
-  (paused on hover or focus, still under reduced motion). The page chrome stays
-  gray and in Noto Sans Mono. A demo under `/work/` keeps the client's own
-  design. See `apps/root/docs/design.md`.
+  documented root gallery effects and the case and Refrain exceptions below;
+  do not add shadows elsewhere.
+- Cases on Root (client work and academic projects) are the one other
+  exception, only inside each case's approved design: shadows on framed
+  screenshots, printed pieces and the demo layer, a blurred backdrop on that
+  layer, a photo scrim and the brand's own typeface inside the card art, and a
+  card slideshow that runs once in view (paused on hover or focus, still under
+  reduced motion). The page chrome stays gray and in Noto Sans Mono. A demo
+  under `/work/` keeps its brand's own design. Refrain's card art is the one
+  project sketch with the same latitude: its app's own four typefaces (cut
+  down to the characters drawn), paper and navy textures, and a record and
+  sleeve with grooves, shine and shadows. See `apps/root/docs/design.md`.
 - Artwork lives once in `packages/design/assets`, with its all-rights-reserved
   license. Use `Art`/gallery static imports, meaningful alt text (empty for
   decorative images), explicit dimensions and lazy loading below the fold.

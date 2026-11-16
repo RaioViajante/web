@@ -6,6 +6,7 @@
   "exports": {
     "./styles.css": "./styles/index.css",
     "./project-art.css": "./styles/project-art.css",
+    "./refrain-art.css": "./styles/refrain-art.css",
     "./components": "./components/index.ts",
     "./art": "./components/art.tsx",
     "./shell": "./components/Shell.tsx",
@@ -23,6 +24,8 @@
     "./gallery": "./components/gallery.ts",
     "./projects": "./components/projects.ts",
     "./stucco": "./components/stucco.ts",
+    "./quadra": "./components/quadra.ts",
+    "./refrain": "./components/refrain.ts",
     "./avatar": "./components/avatar.ts",
     "./theme-color": "./theme-color.ts",
     "./social-image": "./social-image.tsx",
@@ -43,6 +46,7 @@
     "@types/node": "^24.13.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "harfbuzzjs": "0.10.0",
     "jsdom": "^26.1.0",
     "mdast-util-directive": "^3.1.0",
     "prettier": "^3.9.6",
@@ -69,7 +73,10 @@
     "icons": "node scripts/icons.mjs",
     "search-art": "node scripts/search-art.mjs",
     "project-icons": "node scripts/project-icons.mjs",
-    "stucco-art": "node scripts/stucco-art.mjs"
+    "stucco-art": "node scripts/stucco-art.mjs",
+    "quadra-art": "node scripts/quadra-art.mjs",
+    "refrain-art": "node scripts/refrain-art.mjs",
+    "social-art": "node scripts/social-art.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0",

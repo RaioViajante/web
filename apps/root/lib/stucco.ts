@@ -3,42 +3,20 @@
 // testimonials in the demo are fictional; the real client is never named.
 // This file imports types only, so a plain Node test can load it.
 
-export type StuccoDevice = "desktop" | "mobile";
+import type { CaseDemoCopy, CaseDevice, CaseTourCopy } from "./case.ts";
+
+export type StuccoDevice = CaseDevice;
 export type StuccoGroup = "home" | "menu" | "services" | "projects" | "contact";
 export type StuccoPiece = "business" | "review" | "car" | "social";
-
-interface StuccoStep {
-  title: string;
-  caption: string;
-}
 
 export interface StuccoCopy {
   kicker: string;
   title: string;
   intro: string;
   note: string;
-  demo: {
-    open: string;
-    hint: string;
-    label: string;
-    newTab: string;
-    close: string;
-    loading: string;
-  };
+  demo: CaseDemoCopy;
   facts: readonly { term: string; value: string; wide: boolean }[];
-  tour: {
-    heading: string;
-    device: string;
-    steps: string;
-    desktop: string;
-    mobile: string;
-    previous: string;
-    next: string;
-    /** Alt text of a screenshot; takes {device} and {title}. */
-    shotAlt: string;
-    groups: Record<StuccoGroup, string>;
-    captions: Record<StuccoDevice, Record<string, StuccoStep>>;
-  };
+  tour: CaseTourCopy<StuccoGroup>;
   brief: {
     heading: string;
     lead: string;

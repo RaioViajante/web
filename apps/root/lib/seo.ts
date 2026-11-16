@@ -20,7 +20,7 @@ const english: Record<RouteKey, { title: string; description: string }> = {
   projects: {
     title: "projects",
     description:
-      "What RaioViajante builds: Mochifile, Ordelis, Refrain and Orbit, each with a small sketch you can try, and a place for client work.",
+      "What RaioViajante builds: Mochifile, Ordelis, Refrain, Orbit and four more projects, and the cases told about client and academic work.",
   },
   "projects-all": {
     title: "all projects",
@@ -31,6 +31,11 @@ const english: Record<RouteKey, { title: string; description: string }> = {
     title: "Stucco. · client work",
     description:
       "Case study of a website and brand identity for a plaster and drywall studio, shown as a concept demo with a fictional brand.",
+  },
+  "projects-quadra": {
+    title: "Quadra · academic project",
+    description:
+      "Case study of an events and space-booking system for a university, made by two people as an academic project and reimagined as a fictional product with a front-end demo.",
   },
   contact: {
     title: "contact",

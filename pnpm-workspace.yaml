@@ -8,14 +8,6 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
 
-# pnpm's default minimumReleaseAge supply-chain policy rejects packages newer
-# than its cutoff. These exact versions were reviewed and intentionally
-# adopted by the dependency update commit; re-verify before extending.
-minimumReleaseAgeExclude:
-  - "@astrojs/internal-helpers@0.12.0"
-  - "@astrojs/markdown-satteri@0.4.3"
-  - astro@7.3.6
-
 # Security overrides. Each pins an upstream-exact version to its patched
 # release; remove an entry when the owning package ships the fix.
 # - fflate: satori (through @vercel/og) pins 0.7.3 exactly, which has a
