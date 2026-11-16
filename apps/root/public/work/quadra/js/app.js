@@ -146,13 +146,25 @@
   };
   const AUTH_FREE = ['login', 'forgot', 'verify', 'agenda'];
   const DYN = /^(event|space|agenda)-([A-Za-z0-9-]+)$/;
-  const dynOk = (r) => { const m = r.match(DYN); if (!m) return false; return m[1] === 'space' ? !!space(m[2]) : !!EV.find((e) => e.id === m[2] && (m[1] !== 'agenda' || e.public)); };
+  // The route from the address, rebuilt only from trusted values: a known
+  // route's own name, or a kind and the id of an entity that exists. Nothing
+  // the address says reaches the page as it was written.
+  const DYN_KINDS = ['event', 'space', 'agenda'];
+  const trustedRoute = (hash) => {
+    const known = ROUTES.find((name) => name === hash);
+    if (known) return known;
+    const m = hash.match(DYN);
+    const kind = m && DYN_KINDS.find((name) => name === m[1]);
+    if (!kind) return null;
+    if (kind === 'space') { const found = space(m[2]); return found ? 'space-' + found.id : null; }
+    const found = EV.find((e) => e.id === m[2] && (kind !== 'agenda' || e.public));
+    return found ? kind + '-' + found.id : null;
+  };
   const ROUTES = ['login', 'forgot', 'verify', 'dashboard', 'calendar', 'events', 'new-event', 'reservations', 'requests', 'spaces', 'participants', 'analytics', 'users', 'notifications', 'agenda', 'account'];
 
   function go(r) { if (location.hash !== '#' + r) location.hash = r; else route(); }
   function route() {
-    let r = (location.hash || '').slice(1) || (saved.authed ? 'dashboard' : 'login');
-    if (!ROUTES.includes(r) && !dynOk(r)) r = saved.authed ? 'dashboard' : 'login';
+    let r = trustedRoute((location.hash || '').slice(1)) || (saved.authed ? 'dashboard' : 'login');
     if (!saved.authed && !AUTH_FREE.includes(r) && !r.startsWith('agenda-')) r = 'login';
     if (S.route !== r) S.v = {};
     if (saved.authed && (r === 'login' || r === 'verify')) r = 'dashboard';
