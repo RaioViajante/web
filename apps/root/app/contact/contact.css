@@ -235,18 +235,20 @@
 
 /* things I'm up for */
 
+/* Two columns, the second a step lower. The step is a shift, not a margin,
+   so the rows keep the same 18px between cards as between the columns. */
 .ct-offers {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   align-items: start;
-  margin: 8px 0 0 66px;
-  padding: 0;
+  margin: 28px 0 0 66px;
+  padding: 0 0 26px;
   list-style: none;
 }
 
 .ct-offers > li:nth-child(even) {
-  margin-top: 26px;
+  transform: translateY(26px);
 }
 
 .ct-offer,
@@ -406,7 +408,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
-  margin: 0 0 0 66px;
+  margin: 28px 0 0 66px;
   padding: 0;
   list-style: none;
 }
@@ -433,13 +435,13 @@
 
 /* where else */
 
+/* The group labels: clear of what comes before them and of their own list. */
 .ct-group {
-  margin: 6px 0 0 66px;
+  margin: 34px 0 14px 66px;
 }
 
-.ct-group + .about-rows,
-.ct-group + .about-places {
-  margin-top: -2px;
+h2 + .ct-group {
+  margin-top: 4px;
 }
 
 /* goodbye */
@@ -503,8 +505,11 @@
   .ct-offers {
     grid-template-columns: minmax(0, 1fr);
   }
+  .ct-offers {
+    padding-bottom: 0;
+  }
   .ct-offers > li:nth-child(even) {
-    margin-top: 0;
+    transform: none;
   }
   .ct-free {
     grid-template-columns: repeat(2, minmax(0, 1fr));
