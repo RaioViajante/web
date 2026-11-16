@@ -1,28 +1,16 @@
 /*
  * Page titles type themselves once when a page appears (TypedTitle in
- * components/typed-title.tsx): each character fades in after the one
- * before, at a pace that keeps every title near one second, then a block
- * caret blinks beside the last one and goes. Only opacity and a shadow
- * change, so nothing moves, reflows or widens the page. Under reduced motion, and in print, the title is
- * simply there.
+ * components/typed-title.tsx): in at most twenty steps of 45ms (a character
+ * each, or a few on a long title), then a block caret blinks beside the last
+ * character and goes. Only opacity and a shadow change, so nothing moves,
+ * reflows or widens the page. Under reduced motion, and in print, the title
+ * is simply there.
  */
-
-.rv-typed {
-  --rv-type-step: 45ms;
-}
-
-.rv-typed[data-pace="medium"] {
-  --rv-type-step: 28ms;
-}
-
-.rv-typed[data-pace="long"] {
-  --rv-type-step: 15ms;
-}
 
 @media (prefers-reduced-motion: no-preference) {
   .rv-typed > [class^="rv-c"] {
     animation: rv-type 1ms steps(1) both;
-    animation-delay: calc(120ms + var(--rv-i) * var(--rv-type-step));
+    animation-delay: calc(120ms + var(--rv-i) * 45ms);
   }
 
   /* The caret is the last character's shadow: drawn beside it, it takes no
@@ -31,7 +19,7 @@
     animation:
       rv-type 1ms steps(1) both,
       rv-caret 1.9s linear both;
-    animation-delay: calc(120ms + var(--rv-i) * var(--rv-type-step));
+    animation-delay: calc(120ms + var(--rv-i) * 45ms);
   }
 
   /* A title types once (typed.ts marks it done): restyling, or switching
@@ -77,7 +65,7 @@
   }
 }
 
-/* Each character's place in the title. */
+/* Each step's place in the title. */
 .rv-c0 {
   --rv-i: 0;
 }
@@ -137,184 +125,4 @@
 }
 .rv-c19 {
   --rv-i: 19;
-}
-.rv-c20 {
-  --rv-i: 20;
-}
-.rv-c21 {
-  --rv-i: 21;
-}
-.rv-c22 {
-  --rv-i: 22;
-}
-.rv-c23 {
-  --rv-i: 23;
-}
-.rv-c24 {
-  --rv-i: 24;
-}
-.rv-c25 {
-  --rv-i: 25;
-}
-.rv-c26 {
-  --rv-i: 26;
-}
-.rv-c27 {
-  --rv-i: 27;
-}
-.rv-c28 {
-  --rv-i: 28;
-}
-.rv-c29 {
-  --rv-i: 29;
-}
-.rv-c30 {
-  --rv-i: 30;
-}
-.rv-c31 {
-  --rv-i: 31;
-}
-.rv-c32 {
-  --rv-i: 32;
-}
-.rv-c33 {
-  --rv-i: 33;
-}
-.rv-c34 {
-  --rv-i: 34;
-}
-.rv-c35 {
-  --rv-i: 35;
-}
-.rv-c36 {
-  --rv-i: 36;
-}
-.rv-c37 {
-  --rv-i: 37;
-}
-.rv-c38 {
-  --rv-i: 38;
-}
-.rv-c39 {
-  --rv-i: 39;
-}
-.rv-c40 {
-  --rv-i: 40;
-}
-.rv-c41 {
-  --rv-i: 41;
-}
-.rv-c42 {
-  --rv-i: 42;
-}
-.rv-c43 {
-  --rv-i: 43;
-}
-.rv-c44 {
-  --rv-i: 44;
-}
-.rv-c45 {
-  --rv-i: 45;
-}
-.rv-c46 {
-  --rv-i: 46;
-}
-.rv-c47 {
-  --rv-i: 47;
-}
-.rv-c48 {
-  --rv-i: 48;
-}
-.rv-c49 {
-  --rv-i: 49;
-}
-.rv-c50 {
-  --rv-i: 50;
-}
-.rv-c51 {
-  --rv-i: 51;
-}
-.rv-c52 {
-  --rv-i: 52;
-}
-.rv-c53 {
-  --rv-i: 53;
-}
-.rv-c54 {
-  --rv-i: 54;
-}
-.rv-c55 {
-  --rv-i: 55;
-}
-.rv-c56 {
-  --rv-i: 56;
-}
-.rv-c57 {
-  --rv-i: 57;
-}
-.rv-c58 {
-  --rv-i: 58;
-}
-.rv-c59 {
-  --rv-i: 59;
-}
-.rv-c60 {
-  --rv-i: 60;
-}
-.rv-c61 {
-  --rv-i: 61;
-}
-.rv-c62 {
-  --rv-i: 62;
-}
-.rv-c63 {
-  --rv-i: 63;
-}
-.rv-c64 {
-  --rv-i: 64;
-}
-.rv-c65 {
-  --rv-i: 65;
-}
-.rv-c66 {
-  --rv-i: 66;
-}
-.rv-c67 {
-  --rv-i: 67;
-}
-.rv-c68 {
-  --rv-i: 68;
-}
-.rv-c69 {
-  --rv-i: 69;
-}
-.rv-c70 {
-  --rv-i: 70;
-}
-.rv-c71 {
-  --rv-i: 71;
-}
-.rv-c72 {
-  --rv-i: 72;
-}
-.rv-c73 {
-  --rv-i: 73;
-}
-.rv-c74 {
-  --rv-i: 74;
-}
-.rv-c75 {
-  --rv-i: 75;
-}
-.rv-c76 {
-  --rv-i: 76;
-}
-.rv-c77 {
-  --rv-i: 77;
-}
-.rv-c78 {
-  --rv-i: 78;
-}
-.rv-c79 {
-  --rv-i: 79;
 }

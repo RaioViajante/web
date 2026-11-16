@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { IndexHeader, PageHeader } from "../components/page";
-import { TYPED_MAX, TypedTitle, typedPace } from "../components/typed-title";
+import { TYPED_STEPS, TypedTitle, typedSteps } from "../components/typed-title";
 
 // The jsdom environment gives import.meta.url an http scheme; tests run from
 // the package folder.
@@ -35,23 +35,23 @@ describe("typed page titles", () => {
       expect(h1(markup).classList.contains("rv-typed")).toBe(true);
   });
 
-  it("give characters past the last delay the last one", () => {
-    const long = "x".repeat(TYPED_MAX + 5);
-    const spans = h1(
-      renderToStaticMarkup(<TypedTitle text={long} />),
-    ).querySelectorAll("span");
-    expect(spans[TYPED_MAX + 4]!.className).toBe(`rv-c${TYPED_MAX - 1}`);
+  it("type short titles a character at a time, long ones in at most twenty steps", () => {
+    expect(typedSteps("docs")).toEqual(["d", "o", "c", "s"]);
+    const long = "I Started Designing a Language Before I Could Compile One";
+    const steps = typedSteps(long);
+    expect(steps).toHaveLength(TYPED_STEPS);
+    expect(steps.join("")).toBe(long);
+    // The caret is the last step's shadow, so that step is one character.
+    expect(steps.at(-1)).toBe("e");
+    const title = h1(renderToStaticMarkup(<TypedTitle text={long} />));
+    expect(title.textContent).toBe(long);
+    expect(title.lastElementChild!.className).toBe(`rv-c${TYPED_STEPS - 1}`);
   });
 
-  it("have a delay for every index and a pace for every length", () => {
-    for (let index = 0; index < TYPED_MAX; index++)
+  it("have a place for every step, and type only when motion is welcome", () => {
+    for (let index = 0; index < TYPED_STEPS; index++)
       expect(css).toContain(`.rv-c${index} {\n  --rv-i: ${index};\n}`);
-    for (const length of [1, 20, 21, 40, 41, 120])
-      expect(css).toMatch(
-        typedPace(length) === "short"
-          ? /\.rv-typed \{\n  --rv-type-step/
-          : new RegExp(`data-pace="${typedPace(length)}"`),
-      );
+    expect(css).not.toContain(`.rv-c${TYPED_STEPS} {`);
     // Nothing types under reduced motion: every animation is inside the
     // no-preference query.
     const outside = css.replace(

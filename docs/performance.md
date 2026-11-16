@@ -142,6 +142,17 @@ that is rare and was judged not worth the bytes. Other artwork is unchanged.
   leaves them out of its one-interface-font and preload rules by name
   (`artFonts`) and still counts their bytes. The catalog's sketches and the
   cases' art never load on the home page. Every other page is as before.
+- **Typed titles on Lab's experiment pages (November 2026).** Every page
+  title now types itself (`styles/typed.css`, design-system "Motion"), which
+  adds 276 bytes of gzipped CSS to the shared stylesheet. Lab's experiment
+  pages were within a few hundred bytes of their stylesheet limit and
+  measured 13,404 bytes against 13,312. Their `max.stylesheet` becomes
+  13,824 (the old limit plus the growth, rounded up to 512 bytes), and the
+  three lightest pages' `max.total` (boot-sector, execution-states,
+  filename-classifier) 81,408 by the same rule. The typed CSS was first cut
+  from 80 per-character rules to 20 (a long title types a few characters per
+  step) to keep the growth this small. Every other page and field is as
+  before.
 - **Docs and Lab script (November 2026).** The shared page entrance motion
   (`packages/design/motion.ts`, design-system "Motion") ships in the shared
   behavior chunk every page loads. Bundled, minified and gzipped alone
