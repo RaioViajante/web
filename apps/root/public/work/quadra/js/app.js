@@ -22,7 +22,7 @@
   const cat = (id) => CATEGORIES.find((c) => c.id === id);
   const group = (id) => GROUPS.find((g) => g.id === id);
   const user = (id) => UU.find((u) => u.id === id);
-  const initials = (name) => name.split(' ').filter((w) => /^[A-Z&]/.test(w)).map((w) => w[0]).join('').replace('&', '').slice(0, 2);
+  const initials = (name) => name.split(' ').filter((w) => /^[A-Z&]/.test(w)).map((w) => w[0]).join('').replace(/&/g, '').slice(0, 2);
   const evVars = (c) => '--ev:' + c.color + ';--ev-soft:' + c.soft + ';--ev-ink:' + c.ink;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const narrowQ = matchMedia('(max-width: 640px)');

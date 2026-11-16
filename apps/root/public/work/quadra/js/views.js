@@ -563,7 +563,8 @@
     C = ctx;
     const m = r.match(/^(event|space|agenda)-([A-Za-z0-9-]+)$/);
     if (m) return m[1] === 'event' ? V.event(m[2]) : m[1] === 'space' ? V.space(m[2]) : V.agendaEvent(m[2]);
-    return (V[r] || V.events)();
+    // Only the views this file defines; route() has already checked r.
+    return (Object.prototype.hasOwnProperty.call(V, r) ? V[r] : V.events)();
   };
   QV.title = (r, ctx) => { C = ctx; const m = r.match(/^(event|space|agenda)-(.+)$/); if (m) { if (m[1] === 'space') return C.space(m[2]).name; const e = evById(m[2]); return e ? e.title : 'Event'; } return TITLES[r] || 'Quadra'; };
   const wrap = (o) => { Object.keys(o).forEach((k) => { const f = o[k]; o[k] = (a, ctx, ev) => { if (ctx) C = ctx; return f(a, C, ev); }; }); };
