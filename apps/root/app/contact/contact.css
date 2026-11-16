@@ -1,0 +1,586 @@
+/*
+ * The Contact page (components/ContactPage.tsx, ContactMail.tsx). Gray like
+ * every page; the pills, buttons, places and leader rows come from about.css.
+ * The stickers are cells of the gallery's sheet, without shadows.
+ */
+
+/* stickers: one cell of the six-by-five sheet */
+
+.ct-sticker {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ct-sticker img {
+  position: absolute;
+  top: -100%;
+  width: 600%;
+  max-width: none;
+  height: 500%;
+}
+
+.ct-sticker--hi img {
+  left: -200%;
+}
+
+.ct-sticker--thumb img {
+  left: -300%;
+}
+
+.ct-sticker--peek img {
+  left: -500%;
+}
+
+/* header */
+
+.ct-head {
+  position: relative;
+}
+
+.ct-sticker--hi {
+  top: -14px;
+  right: 4%;
+  width: 74px;
+  height: 74px;
+  rotate: 9deg;
+  transition:
+    rotate 350ms cubic-bezier(0.3, 0.7, 0.2, 1),
+    translate 350ms cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.ct-head:hover .ct-sticker--hi {
+  rotate: -4deg;
+  translate: 0 -4px;
+}
+
+.rv-header h1.ct-title {
+  width: fit-content;
+  margin-inline: auto;
+}
+
+/* The title types itself once, on a first look; never under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .ct-title {
+    animation: ct-type 700ms steps(15) 200ms both;
+  }
+}
+
+@keyframes ct-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.rv-header p.ct-intro {
+  max-width: 56ch;
+  margin: 6px auto 0;
+  color: var(--block-notes);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.ct-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 4px 14px 4px 11px;
+  border: 1px solid var(--rule-note);
+  border-radius: 999px;
+  color: var(--block-notes);
+  font-size: 13px;
+}
+
+.ct-status__mark {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--fg-2);
+}
+
+/* the email card */
+
+.ct-mail-wrap {
+  position: relative;
+  margin-bottom: 72px;
+}
+
+.ct-mail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 30px 28px 26px;
+  border: 1px solid var(--table-rule);
+  border-radius: 26px;
+}
+
+.ct-label,
+.ct-caps {
+  margin: 0;
+  color: var(--fg-3);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ct-address {
+  align-self: flex-start;
+  color: var(--fg);
+  font-size: clamp(20px, 5.2vw, 34px);
+  font-weight: var(--weight-heading);
+  line-height: 1.2;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.ct-address:hover,
+.ct-address:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 8px;
+}
+
+.ct-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.ct-copy {
+  min-height: var(--touch);
+  padding: 0 20px;
+  border: 1px solid var(--rule-note);
+  border-radius: 999px;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: border-color var(--ease-nav) ease;
+}
+
+.ct-copy:hover,
+.ct-copy:focus-visible,
+.ct-mail.is-copied .ct-copy {
+  border-color: var(--fg);
+}
+
+.ct-sticker--thumb {
+  top: -26px;
+  right: 22px;
+  width: 64px;
+  height: 64px;
+  opacity: 0;
+  scale: 0.6;
+  rotate: -12deg;
+  transition:
+    opacity 250ms ease,
+    scale 350ms cubic-bezier(0.3, 1.6, 0.4, 1),
+    rotate 350ms ease;
+}
+
+.ct-mail-wrap:has(.ct-mail.is-copied) .ct-sticker--thumb {
+  opacity: 1;
+  scale: 1;
+  rotate: 6deg;
+}
+
+.ct-subjects {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 16px;
+  border-top: 1px dotted var(--dots);
+}
+
+.ct-question {
+  color: var(--block-notes);
+  font-size: 14px;
+}
+
+.ct-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ct-chip {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px dashed var(--rule-note);
+  border-radius: 999px;
+  background: none;
+  color: var(--block-notes);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    border-color var(--ease-nav) ease,
+    color var(--ease-nav) ease,
+    background-color var(--ease-nav) ease;
+}
+
+.ct-chip:hover {
+  border-style: solid;
+  border-color: var(--fg-2);
+  color: var(--fg);
+}
+
+.ct-chip[aria-pressed="true"] {
+  border: 1px solid var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.ct-mail p.ct-hint {
+  min-height: 1.8em;
+  margin: 0;
+  color: var(--fg-2);
+  font-size: 13px;
+}
+
+.ct-mail p.ct-note {
+  margin: 2px 0 0;
+  color: var(--fg-3);
+  font-size: 13px;
+}
+
+/* things I'm up for */
+
+.ct-offers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+  margin: 8px 0 0 66px;
+  padding: 0;
+  list-style: none;
+}
+
+.ct-offers > li:nth-child(even) {
+  margin-top: 26px;
+}
+
+.ct-offer,
+.ct-free__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid var(--table-rule);
+  color: var(--fg);
+  text-decoration: none;
+  transition: border-color var(--ease-nav) ease;
+}
+
+.ct-offer {
+  padding: 18px 20px 16px;
+  border-radius: 20px;
+}
+
+.ct-offer:hover,
+.ct-offer:focus-visible,
+.ct-free__item:hover,
+.ct-free__item:focus-visible {
+  border-color: var(--fg-3);
+}
+
+.ct-offer__title {
+  font-size: 15.5px;
+  font-weight: var(--weight-heading);
+}
+
+.ct-offer__text,
+.ct-free__text {
+  color: var(--fg-2);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.ct-offer__go {
+  margin-top: 8px;
+  color: var(--fg-3);
+  font-size: 13px;
+  transition: color var(--ease-nav) ease;
+}
+
+.ct-offer__go span {
+  display: inline-block;
+  transition: transform var(--ease-nav) ease;
+}
+
+.ct-offer:hover .ct-offer__go,
+.ct-offer:focus-visible .ct-offer__go {
+  color: var(--fg);
+}
+
+.ct-offer:hover .ct-offer__go span,
+.ct-offer:focus-visible .ct-offer__go span {
+  transform: translateX(4px);
+}
+
+/* pitch */
+
+.ct-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 58ch;
+  margin: 0 0 0 66px;
+  padding: 0;
+  list-style: none;
+}
+
+.ct-list li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--block-notes);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.ct-list li::before {
+  position: absolute;
+  top: 0.85em;
+  left: 0;
+  width: 10px;
+  border-top: 1px solid var(--rule-note);
+  content: "";
+}
+
+.ct-example {
+  max-width: 58ch;
+  margin: 14px 0 0 66px;
+  padding: 20px 22px 18px;
+  border: 1px solid var(--table-rule);
+  border-left: 2px solid var(--rule-note);
+  border-radius: 4px 18px 18px 4px;
+}
+
+.ct-example figcaption {
+  margin-bottom: 8px;
+  color: var(--fg-3);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+}
+
+.rv-section .ct-example p {
+  margin: 0;
+  color: var(--block-notes);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.ct-next {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0 0 66px;
+}
+
+.ct-next ol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 60ch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ct-step;
+}
+
+.ct-next li {
+  position: relative;
+  padding-left: 40px;
+  color: var(--block-notes);
+  font-size: 15px;
+  line-height: 1.75;
+  counter-increment: ct-step;
+}
+
+.ct-next li::before {
+  position: absolute;
+  top: 1px;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--rule-note);
+  border-radius: 50%;
+  color: var(--fg);
+  font-size: 12px;
+  content: counter(ct-step);
+}
+
+/* it doesn't have to be work */
+
+.ct-free {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 0 66px;
+  padding: 0;
+  list-style: none;
+}
+
+.ct-free li {
+  display: flex;
+}
+
+.ct-free__item {
+  flex: 1;
+  padding: 14px;
+  border-radius: 16px;
+}
+
+.ct-free__title {
+  font-size: 14px;
+  font-weight: var(--weight-heading);
+}
+
+.ct-free__text {
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+/* where else */
+
+.ct-group {
+  margin: 6px 0 0 66px;
+}
+
+.ct-group + .about-rows,
+.ct-group + .about-places {
+  margin-top: -2px;
+}
+
+/* goodbye */
+
+.ct-bye {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 8px;
+  text-align: center;
+}
+
+.ct-bye .ct-sticker--peek {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  margin-bottom: 6px;
+}
+
+.ct-bye p {
+  margin: 0;
+  color: var(--block-notes);
+  font-size: 15px;
+}
+
+.ct-bye p.ct-sign {
+  color: var(--fg);
+  font-weight: var(--weight-heading);
+}
+
+/* the phones' write-to-me button, once the card has scrolled past */
+
+.ct-sticky {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .ct-sticker--hi {
+    top: -6px;
+    right: 0;
+    width: 56px;
+    height: 56px;
+  }
+  .ct-mail {
+    padding: 22px 18px;
+  }
+  .ct-sticker--thumb {
+    top: -20px;
+    right: 10px;
+    width: 52px;
+    height: 52px;
+  }
+  .ct-chip {
+    min-height: var(--touch);
+  }
+  .ct-offers,
+  .ct-list,
+  .ct-example,
+  .ct-next,
+  .ct-group {
+    margin-left: 0;
+  }
+  .ct-offers {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ct-offers > li:nth-child(even) {
+    margin-top: 0;
+  }
+  .ct-free {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-left: 0;
+  }
+  .ct-sticky {
+    position: fixed;
+    z-index: 20;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 0 8px 0 18px;
+    border: 1px solid var(--fg);
+    border-radius: 999px;
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 14px;
+    font-weight: var(--weight-heading);
+    text-decoration: none;
+    transform: translateY(140%);
+    transition: transform 300ms cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+  .ct-sticky.is-on {
+    transform: none;
+  }
+  .ct-sticky__address {
+    flex: 1 1 auto;
+    overflow: hidden;
+    font-size: 12.5px;
+    font-weight: 400;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ct-sticky .about-arrow {
+    border-color: var(--bg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-sticker--hi,
+  .ct-sticker--thumb,
+  .ct-chip,
+  .ct-copy,
+  .ct-offer,
+  .ct-offer__go,
+  .ct-offer__go span,
+  .ct-free__item,
+  .ct-sticky {
+    transition: none;
+  }
+}

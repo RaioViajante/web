@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { aboutCopy } from "../lib/about.ts";
+import { contactCopy } from "../lib/contact.ts";
 import { readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import test from "node:test";
@@ -19,6 +21,7 @@ import {
 } from "../lib/routes.ts";
 import { affiliateDisclosure, gear } from "../lib/setup.ts";
 import {
+  ptAbout,
   ptContact,
   ptNavigation,
   ptDocsHome,
@@ -263,12 +266,26 @@ test("Portuguese cross-site links use every active Portuguese homepage", () => {
   );
 });
 
-test("Portuguese Contact has complete route-facing copy", () => {
+test("Portuguese Contact and About have the English pages' shape, fully written", () => {
   assert.equal(ptPageSeo.contact?.title, "contato");
   assert.equal(ptSearchDescriptions.contact, "Formas de entrar em contato");
-  assert.equal(ptContact.messageItems.length, 4);
-  for (const value of Object.values(ptContact).flat())
-    assert.ok(typeof value === "string" && value.length > 0);
+  const leaves = (value, path = []) =>
+    typeof value === "string"
+      ? [path.join(".")]
+      : Object.entries(value).flatMap(([key, item]) =>
+          leaves(item, [...path, key]),
+        );
+  for (const [pt, en] of [
+    [ptContact, contactCopy],
+    [ptAbout, aboutCopy],
+  ]) {
+    assert.deepEqual(leaves(pt), leaves(en));
+    for (const path of leaves(pt)) {
+      const value = path.split(".").reduce((item, key) => item[key], pt);
+      // Only the About page's English note is empty in English.
+      if (path !== "englishNote") assert.ok(value.length > 0, path);
+    }
+  }
 });
 
 test("Portuguese This Site has route, SEO, search and page copy", () => {

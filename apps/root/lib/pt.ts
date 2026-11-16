@@ -6,6 +6,8 @@
 // in their pages, beside the English originals. Names, handles, the email
 // address and tool names are not translated.
 
+import { aboutNow, toolsUnder, type AboutCopy } from "./about.ts";
+import type { ContactCopy } from "./contact.ts";
 import type { GalleryCopy } from "./gallery.ts";
 import type { ProjectsCopy } from "./projects.ts";
 import type { QuadraCopy } from "./quadra.ts";
@@ -364,82 +366,253 @@ export const ptProjectsCopy: ProjectsCopy = {
   },
 };
 
-export const ptAbout = {
+export const ptAbout: AboutCopy = {
   label: "sobre",
-  title: "Bryan",
-  line: "A pessoa por trás do RaioViajante.",
-  whoTitle: "Quem sou",
-  who: "Sou o Bryan, desenvolvedor de software. Gosto de construir coisas para a web, testar ideias e entender como o software funciona. A curiosidade costuma me levar de uma pergunta a algo que posso fazer e com que posso aprender.",
-  snapshotTitle: "Resumo rápido",
-  snapshot: [
-    {
-      label: "Funções",
-      value:
-        "Atuo com engenharia de software e também estou começando a criar conteúdo.",
+  title: "Sobre",
+  line: "com curiosidade de sobra para construir por conta própria.",
+  avatarLabel: "Virar o avatar do RaioViajante",
+  who: {
+    heading: "Quem sou",
+    paragraphs: [
+      "Sou o Bryan. Na internet, sou também o RaioViajante, meu alter ego e uma forma de dar vida às coisas que passam pela minha cabeça.",
+      "Gosto de criar coisas. Programo, desenho, escrevo e começo projetos que nem sempre sei onde vão terminar. Sou curioso demais para me prender a uma coisa só, e boa parte do que faço começa simplesmente porque tive vontade de tentar.",
+      "Nem tudo que faço precisa ter uma finalidade. Algumas coisas existem porque achei bonitas, outras porque queria aprender, e algumas porque precisava colocar algum sentimento em algum lugar.",
+      "Este site é um pouco de tudo isso. Um espaço para guardar minhas ideias, projetos, desenhos, pensamentos e tudo mais que eu encontrar pelo caminho. Ainda estou descobrindo muita coisa, e provavelmente sempre vou estar.",
+    ],
+  },
+  work: {
+    heading: "O que eu faço",
+    lead: "Gosto de transformar ideias em coisas que existem, mesmo quando começo sem saber exatamente como.",
+    rows: [
+      {
+        name: "Design de interfaces",
+        note: "ideias, protótipos, experiências",
+      },
+      { name: "Front-end", note: "sites, interações, pequenos detalhes" },
+      { name: "Back-end", note: "APIs, dados, regras de negócio" },
+      {
+        name: "Desenho e identidade",
+        note: "personagens, ilustrações, stickers",
+        to: "gallery",
+      },
+      {
+        name: "Experimentos",
+        note: "ferramentas, linguagens, ideias inacabadas",
+        to: "lab",
+      },
+      {
+        name: "Escrita",
+        note: "descobertas, pensamentos, registros",
+        to: "dump",
+      },
+    ],
+  },
+  writing: {
+    heading: "O que escrevi sobre aprender",
+    lead: "Do dump, onde anoto o que descubro enquanto construo.",
+    posts: [
+      {
+        title: "Não existe printf aqui embaixo",
+        note: "osdev",
+        path: "/pt/posts/nao-existe-printf-aqui-embaixo",
+      },
+      {
+        title:
+          "Comecei a projetar uma linguagem antes de conseguir compilar uma",
+        note: "compiladores",
+        path: "/pt/posts/comecei-a-projetar-uma-linguagem-antes-de-conseguir-compilar-uma",
+      },
+      {
+        title: "Meus cards de projeto estavam se adiantando aos meus projetos",
+        note: "honestidade",
+        path: "/pt/posts/meus-cards-de-projeto-estavam-se-adiantando-aos-meus-projetos",
+      },
+    ],
+  },
+  places: {
+    heading: "Quatro lugares",
+    lead: "Meu site pessoal estava tentando ser página inicial, caderno, site de documentação e laboratório ao mesmo tempo, então dividi.",
+    notes: {
+      root: "início e projetos",
+      dump: "caderno",
+      docs: "documentação",
+      lab: "experimentos",
     },
-    {
-      label: "Foco atual",
-      value:
-        "Construir minhas próprias ferramentas, evoluir na programação e como pessoa, e melhorar no violão pelo caminho.",
-    },
-    {
-      label: "Stack atual",
-      value: "Java, Spring Boot, TypeScript, React e PostgreSQL.",
-    },
-    {
-      label: "Temas",
-      value:
-        "Software, ferramentas para desenvolvedores, código aberto, web, IA, criação de conteúdo e música.",
-    },
-    {
-      label: "Ferramentas de desenvolvimento",
-      value: "VS Code, GitHub, Docker, pnpm e fluxos de trabalho no terminal.",
-    },
-    {
-      label: "Ferramentas de IA",
-      value: "ChatGPT, Codex, Claude, Kimi e OpenCode.",
-    },
-    {
-      label: "O que valorizo",
-      value:
-        "Interfaces simples, documentação honesta e software fácil de raciocinar.",
-    },
-    {
-      label: "O que costuma acontecer",
-      value:
-        "Construo algo, encontro três coisas de que não gosto, refaço e, eventualmente, dou por terminado.",
-    },
-  ],
-  whyTitle: "Por que construo",
-  why: "Programar é a forma que encontro de seguir essa curiosidade: desmontar uma ideia, entender um pouco mais e construir minha própria versão. Passo a maior parte do tempo com desenvolvimento web, sistemas de back-end e ferramentas para desenvolvedores. Java e TypeScript/JavaScript são terreno familiar; os projetos pessoais me dão espaço para explorar além deles.",
-  siteTitle: "RaioViajante",
-  siteBefore:
-    "RaioViajante é o lugar onde reúno projetos, textos, documentação e coisas que descubro pelo caminho. Algumas ideias viram software. Outras viram anotações no ",
-  siteMiddle1: ", documentação no ",
-  siteMiddle2: " ou experimentos no ",
+  },
+  now: { heading: "Agora", projects: aboutNow },
+  tools: {
+    heading: "Ferramentas",
+    lead: "As ferramentas que uso para programar, desenhar, escrever, experimentar e organizar minhas ideias. Algumas fazem parte do meu dia a dia; outras aparecem quando um projeto precisa delas.",
+    groups: toolsUnder([
+      "Linguagens",
+      "Front-end",
+      "Back-end",
+      "Banco de dados",
+      "Testes",
+      "Código e CI",
+      "Infra e deploy",
+      "Editores e terminal",
+      "IA e agentes",
+      "Design e desenho",
+      "Ideias e anotações",
+      "Inspiração",
+      "Vídeo e animação",
+      "Sistemas",
+    ]),
+    setupQuestion: "Curioso pelo resto do meu setup?",
+    setupLink: "Ver o setup",
+  },
+  away: {
+    heading: "Longe da tela",
+    paragraphs: [
+      "Fora do código, gosto de tocar violão, ler e assistir a filmes que ficam na cabeça por dias.",
+      "E gosto muito de música. Daquelas que você escuta sozinho, volta anos depois e percebe que alguma coisa mudou. Tenho álbuns que significam muito para mim, mesmo quando não consigo explicar exatamente o motivo. Foi daí que nasceu o Refrain: um lugar para guardar esses álbuns e o que eles me lembram.",
+      "Também desenho, quase sempre sem motivo nenhum além de querer. Parte disso foi parar na galeria.",
+    ],
+    rows: [
+      { name: "Refrain", note: "diário musical", to: "refrain" },
+      { name: "Galeria", note: "desenhos e personagens", to: "gallery" },
+    ],
+  },
+  invite: {
+    heading: "Tem um projeto em mente?",
+    line: "Me conta o que você está construindo.",
+    action: "Fale comigo",
+  },
   englishNote: " (em inglês)",
-  outsideTitle: "Fora do código",
-  outside:
-    "Gosto de música e de tocar violão, e arranjo tempo para filmes, livros e jogos. Fazem parte do meu mundo mesmo quando não têm nada a ver com software.",
 };
 
-export const ptContact = {
+export const ptContact: ContactCopy = {
   label: "contato",
-  title: "Vamos conversar",
-  line: "Ideias, dúvidas, feedback ou só um oi.",
-  primaryTitle: "Contato principal",
-  primary:
-    "Esta é a melhor forma de falar comigo sobre código aberto, algo que poderíamos construir juntos ou uma dúvida sobre o que fiz, escrevi ou documentei. Correções, feedback e um simples oi também são bem-vindos.",
-  messageTitle: "Uma boa primeira mensagem",
-  messageItems: [
-    "O que você tem em mente",
-    "Um link relevante para um projeto, texto ou documentação, se houver",
-    "Que tipo de conversa ou colaboração você procura",
-    "Qualquer prazo importante",
-  ],
-  firstStepTitle: "Um primeiro passo simples",
-  firstStep:
-    "Algumas linhas de contexto bastam para começar. Não precisa preparar um briefing formal.",
+  title: "Oi, aqui é o Bryan.",
+  intro:
+    "Se você chegou até aqui, provavelmente tem uma ideia, uma pergunta ou só vontade de conversar. Pode escrever. Projeto, música, um desenho, um texto do dump que te fez pensar em alguma coisa, tudo vale.",
+  status: "Disponível para novos projetos",
+  mail: {
+    label: "e-mail",
+    write: "Escrever um e-mail",
+    copy: "Copiar endereço",
+    copied: "Copiado",
+    copyFailed: "Não deu para copiar. O endereço é mail@raioviajante.com.",
+    question: "Sobre o que você quer falar?",
+    hint: "Escolhe um assunto, ou só escreve direto.",
+    subjects: [
+      {
+        title: "Projeto novo",
+        hint: "Conta o que é, pra quem é e pra quando.",
+      },
+      {
+        title: "Freela",
+        hint: "Fala do time, do que precisa e por quanto tempo.",
+      },
+      {
+        title: "Colaboração",
+        hint: "Me conta a ideia, mesmo que ainda esteja meio solta.",
+      },
+      {
+        title: "Música",
+        hint: "Me indica um álbum e conta por que ele importa.",
+      },
+      {
+        title: "Desenho",
+        hint: "Manda o que você desenha, ou o que quer que eu desenhe.",
+      },
+      {
+        title: "Um texto",
+        hint: "Qual post do dump? Discordar também vale.",
+      },
+      { title: "Só um oi", hint: "Oi. Só isso já é ótimo." },
+    ],
+    note: "Respondo em até 3 dias úteis.",
+  },
+  offers: {
+    heading: "Coisas que topo fazer",
+    lead: "Gosto de fazer tudo. Cada projeto é uma aventura nova, e se for algo que eu nunca fiz, eu aprendo fazendo.",
+    subject: "Projeto: ",
+    action: "escrever sobre isso",
+    items: [
+      {
+        title: "Desenvolvimento",
+        description: "Sites, apps e APIs, do protótipo ao deploy.",
+      },
+      {
+        title: "Interfaces",
+        description:
+          "Fluxos, protótipos e os detalhes pequenos que fazem diferença.",
+      },
+      {
+        title: "Design e identidade",
+        description: "Marcas, personagens e sistemas visuais.",
+      },
+      {
+        title: "Ilustrações",
+        description: "Personagens, stickers, capas. Quase sempre no Procreate.",
+      },
+      {
+        title: "Experimentos",
+        description: "Ferramentas e linguagens que ainda não sabem o que são.",
+      },
+      {
+        title: "Ideias criativas",
+        description:
+          "Projetos meio estranhos e colaborações sem formato definido.",
+      },
+    ],
+  },
+  pitch: {
+    heading: "Se quiser propor algo",
+    lead: "Não precisa de briefing formal. Escreve do jeito que você falaria. Isso aqui ajuda:",
+    items: [
+      "O que você está construindo, e para quem.",
+      "Do que você precisa: design, desenvolvimento ou os dois.",
+      "Quando gostaria de começar, e se há algum prazo.",
+      "Uma faixa de orçamento, se você já tiver uma.",
+      "Links do que já existe: um site, um arquivo, um rascunho.",
+    ],
+    exampleLabel: "uma primeira mensagem pode ser simples assim",
+    example:
+      "Oi, Bryan! Tenho uma lojinha de cerâmica e queria um site simples, com as peças e um jeito de encomendar. Ainda não tenho logo. Queria lançar antes de março. O orçamento é curto, mas dá pra conversar. Segue o Instagram da loja: …",
+    nextLabel: "O que acontece depois",
+    steps: [
+      "Respondo em até 3 dias úteis, às vezes com umas perguntas.",
+      "A gente conversa, por e-mail ou numa chamada, o que for mais fácil pra você.",
+      "Mando uma proposta com escopo, prazo e valor. Se fizer sentido pros dois, a gente começa.",
+    ],
+  },
+  free: {
+    heading: "Não precisa ser trabalho",
+    lead: "Também gosto de receber mensagem que não tem nada a ver com projeto.",
+    items: [
+      {
+        title: "Música",
+        description: "Me indica um álbum que mudou alguma coisa pra você.",
+        subject: "Um álbum pra você",
+      },
+      {
+        title: "Desenho",
+        description: "Me mostra o que você desenha.",
+        subject: "Desenho",
+      },
+      {
+        title: "Textos",
+        description: "Leu algo no dump e quer responder?",
+        subject: "Sobre um texto do dump",
+      },
+      {
+        title: "Qualquer coisa",
+        description: "Uma pergunta, uma ideia, ou só um oi.",
+        subject: "Oi",
+      },
+    ],
+  },
+  elsewhere: {
+    heading: "Onde mais me encontrar",
+    social: "Redes",
+    ecosystem: "O ecossistema RaioViajante",
+    feed: "feed do dump",
+  },
+  bye: "Valeu por passar aqui.",
+  sticky: "Me escreve",
 };
 
 export const ptGallery = {

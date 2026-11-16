@@ -1,27 +1,287 @@
-.about-snapshot {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 42px;
-  row-gap: 26px;
-  margin: 30px 0 0;
+/*
+ * The About page (components/AboutPage.tsx). Gray like every page: rows are
+ * the shared leaders, the rest is rules and pills on the page's own gray.
+ * The Contact page reuses the places, the pills and the buttons.
+ */
+
+.about-avatar {
+  display: block;
+  margin-bottom: 6px;
 }
 
-.about-snapshot__item {
-  min-width: 0;
+.about-avatar .avatar-coin,
+.about-avatar .rv-avatar {
+  width: 96px;
+  height: 96px;
 }
 
-.about-snapshot dt {
+.rv-section p.about-p,
+.rv-section p.about-lead {
+  max-width: 60ch;
+  margin: 0 0 14px 66px;
+}
+
+.rv-section p.about-p {
+  color: var(--block-notes);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+.rv-section p.about-lead {
   color: var(--fg-2);
-  font-size: var(--size-small);
+  font-size: 14px;
+  line-height: 1.8;
 }
 
-.about-snapshot dd {
-  margin: 2px 0 0;
+.about-rows {
+  margin-left: 66px;
+}
+
+/* the four places */
+
+.about-places {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 0 66px;
+  padding: 0;
+  list-style: none;
+}
+
+.about-places li {
+  display: flex;
+}
+
+.about-place {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-height: var(--touch);
+  padding: 14px 12px 12px;
+  border: 1px solid var(--table-rule);
+  border-radius: 16px;
+  color: var(--fg);
+  text-decoration: none;
+  transition: border-color var(--ease-nav) ease;
+}
+
+.about-place:hover,
+.about-place:focus-visible {
+  border-color: var(--fg-3);
+}
+
+.about-place__name {
+  font-size: 13px;
+  font-weight: var(--weight-heading);
   overflow-wrap: anywhere;
 }
 
-@media (max-width: 600px) {
-  .about-snapshot {
+.about-place__note {
+  color: var(--fg-3);
+  font-size: 12.5px;
+}
+
+/* tools */
+
+.about-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 0 0 66px;
+}
+
+.about-tools__group {
+  display: grid;
+  grid-template-columns: 172px minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+}
+
+.about-tools dt {
+  color: var(--fg-3);
+  font-size: 13px;
+}
+
+.about-tools dd {
+  margin: 0;
+}
+
+.about-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-chips li {
+  padding: 3px 12px;
+  border: 1px solid var(--table-rule);
+  border-radius: 999px;
+  color: var(--block-notes);
+  font-size: 13px;
+}
+
+/* the pill links: "see the setup", "get in touch" */
+
+.about-setup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  margin: 14px 0 0 66px;
+  padding: 0 10px 0 20px;
+  border: 1px solid var(--table-rule);
+  border-radius: 999px;
+  color: var(--fg);
+  font-size: 14px;
+  text-decoration: none;
+  transition: border-color var(--ease-nav) ease;
+}
+
+.about-setup__dots {
+  flex: 1 1 24px;
+  border-bottom: 1px dotted var(--dots);
+  transform: translateY(-4px);
+}
+
+.about-setup__link {
+  color: var(--fg-2);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.about-arrow {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--rule-note);
+  border-radius: 50%;
+  transition:
+    transform var(--ease-nav) ease,
+    background-color var(--ease-nav) ease,
+    border-color var(--ease-nav) ease,
+    color var(--ease-nav) ease;
+}
+
+.about-setup:hover,
+.about-setup:focus-visible {
+  border-color: var(--fg-2);
+}
+
+.about-setup:hover .about-arrow,
+.about-setup:focus-visible .about-arrow {
+  transform: translateX(3px);
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.about-invite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 8px;
+  padding: 26px 28px;
+  border: 1px solid var(--table-rule);
+  border-radius: 26px;
+}
+
+.about-invite h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: var(--weight-heading);
+}
+
+.about-invite p {
+  margin: 4px 0 0;
+  color: var(--fg-2);
+  font-size: 14px;
+}
+
+.about-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 0 8px 0 20px;
+  border: 1px solid var(--fg);
+  border-radius: 999px;
+  background: var(--fg);
+  color: var(--bg);
+  font: inherit;
+  font-size: 13.5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.about-button .about-arrow {
+  border-color: var(--bg);
+}
+
+.about-button:hover .about-arrow,
+.about-button:focus-visible .about-arrow {
+  transform: translateX(3px);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+@media (max-width: 760px) {
+  .rv-section p.about-p,
+  .rv-section p.about-lead,
+  .about-rows,
+  .about-tools,
+  .about-setup {
+    margin-left: 0;
+  }
+  /* each leader becomes name above note */
+  .about-rows .rv-leader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--dots);
+  }
+  .about-rows .rv-leader__dots {
+    display: none;
+  }
+  .about-rows .rv-leader__value {
+    font-size: 13px;
+    text-align: left;
+  }
+  .about-places {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-left: 0;
+  }
+  .about-tools__group {
     grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+  .about-setup {
+    padding-left: 16px;
+    font-size: 13px;
+  }
+  .about-setup__dots {
+    display: none;
+  }
+  .about-setup__link {
+    margin-left: auto;
+  }
+  .about-invite {
+    padding: 22px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-place,
+  .about-setup,
+  .about-arrow {
+    transition: none;
   }
 }
