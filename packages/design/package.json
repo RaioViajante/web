@@ -75,7 +75,8 @@
     "project-icons": "node scripts/project-icons.mjs",
     "stucco-art": "node scripts/stucco-art.mjs",
     "quadra-art": "node scripts/quadra-art.mjs",
-    "refrain-art": "node scripts/refrain-art.mjs"
+    "refrain-art": "node scripts/refrain-art.mjs",
+    "social-art": "node scripts/social-art.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0",

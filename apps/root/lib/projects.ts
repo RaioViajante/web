@@ -209,6 +209,8 @@ export const cases: readonly Case[] = [
 /** Every word a case card shows. */
 export interface CaseText {
   scope: string;
+  /** One line about the case, for its social card. */
+  line: string;
   summary: string;
   action: string;
 }
@@ -393,12 +395,14 @@ export const projectsCopy: ProjectsCopy = {
   cases: {
     stucco: {
       scope: "website + brand · concept demo",
+      line: "A site and brand for a plaster and drywall studio.",
       summary:
         "A site and brand for a plaster and drywall studio: hero slideshow, a filterable gallery of 47 projects, service pages, a quote form, business and review cards. The brand is fictional; the photos are the studio's real work.",
       action: "Read the case",
     },
     quadra: {
       scope: "academic project · product + UI · concept demo",
+      line: "An events and space-booking system for a university.",
       summary:
         "An events and space-booking system for a university, made with Rafael as an academic project and reimagined as the fictional Quadra: a calendar of periods, requests that need approval, check-in, analytics and a public agenda.",
       action: "Read the case",

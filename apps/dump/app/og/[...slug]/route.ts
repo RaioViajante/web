@@ -1,5 +1,7 @@
 import { socialKey } from "../../../../../seo/metadata";
 import { getSeoPages, notFoundPages } from "@/lib/seo";
+import { dumpCopy } from "@/lib/copy";
+import { declaredPages } from "@/lib/routes";
 import { site } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -22,7 +24,17 @@ export async function GET(
   );
   if (!page) return new Response("Not found", { status: 404 });
   // Deferred so tests can import the static params without loading Satori.
-  const { createSocialImage } =
+  const { createSiteSocialImage, createSocialImage } =
     await import("@raioviajante/design/social-image");
+  // The home is the family's card; every other page keeps its own.
+  const home = declaredPages().find(
+    ({ key, path }) => key === "home" && path === page.path,
+  );
+  if (home)
+    return createSiteSocialImage(
+      "dump",
+      home.locale,
+      dumpCopy(home.locale).home.line,
+    );
   return createSocialImage(site.name, page.title, site.url);
 }

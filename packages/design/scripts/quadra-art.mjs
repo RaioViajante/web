@@ -7,8 +7,8 @@
  * The handoff folder holds `assets/quadra/` (tour screenshots, brand boards
  * and the card background). Every width is capped below the single-image
  * budget (perf/budgets.json) by lowering the quality. Output never carries the
- * sources' metadata. It also writes the two JPEGs the case's social card
- * draws, since the social renderer reads neither WebP nor srcsets.
+ * sources' metadata. The case's social card draws JPEG copies of some of
+ * these, made by scripts/social-art.mjs.
  */
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -93,15 +93,6 @@ async function variants(source, stem, widths, quality) {
   return out;
 }
 
-async function jpeg(source, name, width) {
-  const data = await sharp(source)
-    .resize({ width, withoutEnlargement: true, kernel: "lanczos3" })
-    .flatten({ background: "#ffffff" })
-    .jpeg({ quality: 80, mozjpeg: true })
-    .toBuffer();
-  await writeFile(join(target, name), data);
-}
-
 const identifier = (name) =>
   name
     .replace(/\.(webp|jpg)$/, "")
@@ -166,13 +157,6 @@ async function main(handoff) {
       80,
     ),
   );
-
-  await jpeg(
-    source("shots", "desktop-02-dashboard.webp"),
-    "social-desktop.jpg",
-    960,
-  );
-  await jpeg(source("shots", "mobile-01-login.webp"), "social-phone.jpg", 320);
 
   const pick = (device) =>
     `[${cardSlides[device]

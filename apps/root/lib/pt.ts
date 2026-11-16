@@ -285,12 +285,14 @@ export const ptProjectsCopy: ProjectsCopy = {
   cases: {
     stucco: {
       scope: "site + marca · demo conceitual",
+      line: "Site e marca para um estúdio de gesso e drywall.",
       summary:
         "Site e marca para um estúdio de gesso e drywall: slideshow na abertura, galeria filtrável com 47 projetos, páginas de serviço, formulário de orçamento, cartões de visita e de avaliação. A marca é fictícia; as fotos são trabalhos reais do estúdio.",
       action: "Ler o case",
     },
     quadra: {
       scope: "projeto acadêmico · produto + UI · demo conceitual",
+      line: "Um sistema de eventos e reserva de espaços para uma faculdade.",
       summary:
         "Um sistema de eventos e reserva de espaços para uma faculdade, feito com o Rafael como projeto acadêmico e reimaginado como a Quadra, uma marca fictícia: calendário por períodos, pedidos com aprovação, check-in, análises e agenda pública.",
       action: "Ler o case",
